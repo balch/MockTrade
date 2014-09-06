@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/EditControl"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/string_edit_control_label"
+        style="@style/ControlLabel">
+    </TextView>
+
+    <EditText
+        android:id="@+id/string_edit_control_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapSentences"
+        android:hint="@string/bean_control_string_hint">
+    </EditText>
+
+</LinearLayout>

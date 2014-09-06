@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/pre-dexed/debug/classes-26e2a990a3adfe92849aacfc7b408763b7457a06.jar"
+        jar="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
+    <item
+        dex="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-204d878b3b295b3ba6607d63a42238e11904c13b.jar"
+        jar="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
+    <item
+        dex="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/pre-dexed/debug/classes-5daf53ae64bbef676c7109db21f416e3fcff8da5.jar"
+        jar="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/exploded-aar/MockTrade/AppFramework/unspecified/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="120d5b35dd831aed0e4c027fad60a836fc7aefc8"/>
+    <item
+        dex="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/pre-dexed/debug/library-1.0.6-c4bcd3cebedc3b16494966929c72e5171bab6d67.jar"
+        jar="/Users/Balch/.gradle/caches/modules-2/files-2.1/com.mcxiaoke.volley/library/1.0.6/f4566c0fd6a9ff2c152768f28360b7523ef2dfb9/library-1.0.6.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="f4566c0fd6a9ff2c152768f28360b7523ef2dfb9"/>
+    <item
+        dex="/Users/Balch/Dev/Android/MockTrade/MockTradeApp/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-bca9cd8c8082330ef7549e0398af852faae531fd.jar"
+        jar="/Applications/Android Studio.app/sdk/extras/android/m2repository/com/android/support/support-annotations/20.0.0/support-annotations-20.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa"/>
+
+</pre-dex-items>

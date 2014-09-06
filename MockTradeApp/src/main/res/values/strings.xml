@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MockTrade</string>
+    <string name="action_settings">Settings</string>
+    <string name="init_database_error_title">Error initialing Database</string>
+    <string name="init_database_error_message">There has been an error initializing the database.
+        This renders the application unusable.  Contact the vendor to report the problem.</string>
+    <string name="nav_money_center">$$$ Center</string>
+    <string name="nav_research">Research</string>
+    <string name="nav_ideas">Ideas</string>
+    <string name="nav_settings">Settings</string>
+    <string name="settings_market_open_time_title">Market Open Time</string>
+    <string name="settings_market_open_time_summary">Local time the markets open. This is used to determine when the app starts polling.</string>
+    <string name="settings_market_close_time_title">Market Close Time</string>
+    <string name="settings_market_close_time_summary">Local time the markets close. This is used to determine when the app stops polling.</string>
+    <string name="settings_poll_interval_title">Poll Interval - Normal</string>
+    <string name="settings_poll_interval_summary">Interval that the application checks for stock updates.</string>
+    <string name="settings_poll_interval_order_title">Poll Interval - Open Orders</string>
+    <string name="settings_poll_interval_order_summary">Interval that the application checks when processing open orders.</string>
+
+    <string-array name="settings_poll_interval_display_values">
+        <item>30 Seconds</item>
+        <item>1 Minute</item>
+        <item>5 Minutes</item>
+        <item>15 Minutes</item>
+    </string-array>
+
+    <string-array name="settings_poll_interval_order_display_values">
+        <item>5 Seconds</item>
+        <item>15 Seconds</item>
+        <item>30 Seconds</item>
+        <item>1 Minute</item>
+    </string-array>
+
+    <string name="day_change_label">TODAY</string>
+    <string name="total_change_label">TOTAL</string>
+
+    <string name="account_totals_label">Totals</string>
+    <string name="account_name_label">Name</string>
+    <string name="account_description_label">Description</string>
+    <string name="account_init_balance_label">Initial Balance</string>
+    <string name="account_strategy_label">Strategy</string>
+    <string name="account_current_balance_label">Current Balance</string>
+
+    <string-array name="account_strategy_display_values">
+        <item>None</item>
+        <item>Dogs of the Dow</item>
+    </string-array>
+
+    <string name="account_create_title">New Portfolio</string>
+
+    <string name="account_delete_dlg_title">Are you sure?</string>
+    <string name="account_delete_dlg_message_format">You are about to delete \'%s\' and the associated data.  This cannot be undone!!!</string>
+
+    <string name="order_create_buy_title">Buy</string>
+    <string name="order_create_sell_title">Sell</string>
+
+    <string-array name="order_status_display_values">
+        <item>Open</item>
+        <item>Fulfilled</item>
+        <item>Error</item>
+        <item>Canceled</item>
+    </string-array>
+
+    <string-array name="order_type_display_values">
+        <item>Buy</item>
+        <item>Sell</item>
+    </string-array>
+
+    <string-array name="order_strategy_display_values">
+        <item>Market</item>
+        <item>Manual</item>
+        <item>Limit</item>
+        <item>Stop Loss</item>
+        <item>Trailing Stop ($)</item>
+        <item>Trailing Stop (%)</item>
+    </string-array>
+
+    <string-array name="order_duration_display_values">
+        <item>Good til Canceled</item>
+        <item>Day</item>
+    </string-array>
+
+    <string name="account_item_new_order_button">Buy</string>
+    <string name="account_item_open_orders_format">Open\nOrders: %d</string>
+
+    <string name="order_edit_title_edit">Change Order</string>
+    <string name="order_edit_title_new">New Order</string>
+    <string name="order_edit_ok_button_new">Execute</string>
+    <string name="order_edit_ok_button_edit">Change</string>
+
+    <string name="order_symbol_label">Symbol</string>
+    <string name="order_action_label">Action</string>
+    <string name="order_strategy_label">Order Type</string>
+    <string name="order_limit_price_label">Limit Price</string>
+    <string name="order_stop_price_label">Stop Amount($)</string>
+    <string name="order_stop_percent_label">Stop Amount(%)</string>
+    <string name="order_quantity_label">Quantity</string>
+    <string name="order_symbol_hint">ex: GOOG</string>
+
+    <string name="portfolio_heading">Portfolio</string>
+    <string name="portfolio_new_account_button">New</string>
+
+    <string name="quantity_edit_control_balance_label">Available Funds:</string>
+    <string name="quantity_edit_control_cost_buy_label">Estimated Cost:</string>
+    <string name="quantity_edit_control_cost_sell_label">Estimated Value:</string>
+    <string name="quantity_edit_control_market_closed_warning">The markets are currently closed. Orders will be processed at the next market open.</string>
+
+    <string name="quantity_edit_error_insufficient_funds">Insufficient Funds</string>
+    <string name="quantity_edit_error_invalid_amount">Invalid Amount</string>
+
+    <string name="notification_order_title">MockTrade Execution</string>
+    <string name="notification_order_success_format" formatted="false">%s Order %d for %s executed %d shares at %s for a total cost of %s.</string>
+    <string name="notification_order_error_format" formatted="false">Order %d for %s failed to executed. Error: %s</string>
+
+</resources>

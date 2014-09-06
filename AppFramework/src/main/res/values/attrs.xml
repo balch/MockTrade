@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="NavButton">
+        <attr name="off_color" format="color" />
+        <attr name="on_color" format="color" />
+        <attr name="image" format="integer" />
+        <attr name="state" format="enum">
+            <enum name="off" value="0"/>
+            <enum name="on" value="1"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="LocalTimePicker">
+        <attr name="valueTimeZone" format="string" />
+    </declare-styleable>
+</resources>

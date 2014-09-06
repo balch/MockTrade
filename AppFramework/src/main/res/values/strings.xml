@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">AppFramework</string>
+
+    <string name="picker_preference_positive">Set</string>
+    <string name="picker_preference_negative">Cancel</string>
+
+    <string name="bean_control_string_hint">Enter text here</string>
+
+    <string name="error_empty_string">Cannot be empty</string>
+
+    <string name="bean_edit_view_ok_button_edit">Save</string>
+    <string name="bean_edit_view_ok_button_new">Create</string>
+    <string name="bean_edit_view_button_cancel">Cancel</string>
+
+</resources>

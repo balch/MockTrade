@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+     These string resources allows the pref keys to be specified once
+     and used in the Setting class and in the setting_pref_screen.xml
+     screen layout
+    -->
+
+    <string name="market_open_time">market_open_time</string>
+    <string name="market_close_time">market_close_time</string>
+    <string name="poll_interval">poll_interval</string>
+    <string name="poll_interval_order">poll_interval_order</string>
+
+    <string-array name="poll_interval_values">
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>900</item>
+    </string-array>
+
+    <string-array name="poll_interval_order_values">
+        <item>5</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+</resources>

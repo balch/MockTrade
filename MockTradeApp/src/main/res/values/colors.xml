@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="nav_on_color">#ff27db4e</color>
+    <color name="nav_off_color">#ff666666</color>
+</resources>

@@ -40,6 +40,7 @@ import com.balch.android.app.framework.bean.BeanValidatorException;
 import com.balch.android.app.framework.bean.BeanViewHint;
 import com.balch.android.app.framework.bean.controls.BeanControlMapper;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -101,8 +102,8 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
         this.description = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
         this.price = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
 
-        TradeApplication tradeApplication = (TradeApplication)this.getContext().getApplicationContext();
-        this.financeModel = tradeApplication.getModelFactory().getModel(FinanceModel.class);
+        ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+        this.financeModel = modelFactory.getModel(FinanceModel.class);
 
         this.value.setHint(R.string.order_symbol_hint);
     }

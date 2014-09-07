@@ -32,6 +32,7 @@ import com.balch.android.app.framework.bean.BeanValidatorException;
 import com.balch.android.app.framework.bean.controls.BeanControlMap;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
 import com.balch.android.app.framework.bean.controls.EnumEditControl;
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
@@ -77,9 +78,9 @@ public class OrderEditController implements BeanExternalController<Order> {
     public void initialize(Context context, Order order, BeanControlMap beanControlMap) {
 
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
-        TradeApplication tradeApplication = (TradeApplication) context.getApplicationContext();
 
-        FinanceModel financeModel = tradeApplication.getModelFactory().getModel(FinanceModel.class);
+        ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+        FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
 
         QuantityPriceControl quantityControl = beanControlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);

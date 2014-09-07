@@ -31,6 +31,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.balch.android.app.framework.TemplateActivity;
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
@@ -56,9 +57,9 @@ public class OrderService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
 
         try {
-            TradeApplication application = (TradeApplication)this.getApplication();
-            FinanceModel financeModel = application.getModelFactory().getModel(FinanceModel.class);
-            final PortfolioModel portfolioModel = application.getModelFactory().getModel(PortfolioModel.class);
+            ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
+            final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Order> orders = portfolioModel.getOpenOrders();
 
             if (orders.size() > 0) {

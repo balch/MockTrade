@@ -73,10 +73,17 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     private YQLSourceProvider yqlScheme;
     private ModelFactory modelFactory;
 
+    private static TradeApplication instance;
+
+    public static TradeApplication getInstance() {
+        return instance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        this.instance = this;
 
         this.buttonMap = new HashMap<NavButton, Fragment>();
         this.settings = new Settings(this);

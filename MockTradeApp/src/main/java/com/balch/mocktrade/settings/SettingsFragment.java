@@ -25,6 +25,7 @@ package com.balch.mocktrade.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.preference.PreferenceFragment;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
@@ -40,8 +41,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.poll_interval))) {
-            TradeApplication application = (TradeApplication)this.getActivity().getApplication();
-            FinanceModel financeModel = application.getModelFactory().getModel(FinanceModel.class);
+            ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             financeModel.setQuoteServiceAlarm();
         }
     }

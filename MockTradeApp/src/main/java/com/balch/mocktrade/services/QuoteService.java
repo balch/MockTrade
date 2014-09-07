@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
@@ -61,9 +62,9 @@ public class QuoteService extends IntentService {
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
-            TradeApplication application = (TradeApplication)this.getApplication();
-            FinanceModel financeModel = application.getModelFactory().getModel(FinanceModel.class);
-            final PortfolioModel portfolioModel = application.getModelFactory().getModel(PortfolioModel.class);
+            ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
+            final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Investment> investments = portfolioModel.getAllInvestments();
 
             if (investments.size() > 0) {
@@ -153,8 +154,8 @@ public class QuoteService extends IntentService {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
             if (strategyClazz != null) {
                 try {
-                    TradeApplication application = (TradeApplication)this.getApplication();
-                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, this, application.getModelFactory());
+                    ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, this, modelFactory);
                     if (doDailyUpdate) {
                         strategy.dailyUpdate(account, accountIdToInvestmentMap.get(account.getId()), quoteMap);
                     }

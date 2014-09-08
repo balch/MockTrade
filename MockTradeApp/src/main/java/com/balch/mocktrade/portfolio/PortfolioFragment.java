@@ -47,6 +47,6 @@ public class PortfolioFragment extends BaseFragment<PortfolioPresenter, Portfoli
 
     @Override
     public void refresh() {
-        this.presenter.reload();
+        this.presenter.refresh();
     }
 }

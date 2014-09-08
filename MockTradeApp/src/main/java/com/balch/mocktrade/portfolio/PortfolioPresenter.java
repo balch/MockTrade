@@ -49,6 +49,7 @@ import com.balch.mocktrade.account.AccountItemView;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
+import com.balch.mocktrade.services.QuoteService;
 
 import java.util.List;
 
@@ -107,7 +108,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.quoteUpdateReceiver = new QuoteUpdateReceiver(this);
 
         setupAdapter();
-        reload();
+        reload(true);
     }
 
     @Override
@@ -133,7 +134,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
                                     model.deleteAccount(account);
-                                    reload();
+                                    reload(true);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Deleting account", ex);
                                     Toast.makeText(application, "Error deleting account", Toast.LENGTH_LONG).show();
@@ -159,13 +160,23 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.view.setPortfolioAdapter(this.portfolioAdapter);
     }
 
-    protected void reload() {
-        application.getActivity().showProgress();
-        refresh();
+    /**
+     * Reload update the UI from the data in the database
+     */
+    private void reload(boolean showProgress) {
+        if (showProgress) {
+            application.getActivity().showProgress();
+        }
+        this.loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
     }
 
-    protected void refresh() {
-        this.loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
+    /**
+     * Refresh launches the quote service which will call the QuoteUpdateReceiver
+     * to update the UI once the quotes are fetched
+     */
+    public void refresh() {
+        application.getActivity().showProgress();
+        this.getContext().startService(QuoteService.getIntent(this.getContext()));
     }
 
     static public void updateView(Context context) {
@@ -303,13 +314,13 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                 if (account != null) {
                     // create a new Account instance to make sure the account is initialized correctly
                     model.createAccount(new Account(account.getName(), account.getDescription(), account.getInitialBalance(), account.getStrategy()));
-                    reload();
+                    reload(true);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = BeanEditActivity.getResult(data);
                 if (order != null) {
                     model.createOrder(order);
-                    reload();
+                    reload(true);
 
                     model.processOrders(this.getContext(),
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
@@ -327,7 +338,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            this.portfolioPresenter.refresh();
+            this.portfolioPresenter.reload(false);
         }
 
         private static Intent getIntent() {

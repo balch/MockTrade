@@ -198,7 +198,7 @@ public class SqlConnection extends SQLiteOpenHelper {
     @Override
     public void onConfigure(SQLiteDatabase db){
         super.onConfigure(db);
-        db.execSQL("PRAGMA foreign_keys = ON;");
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override

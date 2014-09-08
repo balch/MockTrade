@@ -5,6 +5,7 @@
     <string name="picker_preference_negative">Cancel</string>
 
     <string name="bean_control_string_hint">Enter text here</string>
+    <string name="bean_control_money_hint">Enter dollars here</string>
 
     <string name="error_empty_string">Cannot be empty</string>
 

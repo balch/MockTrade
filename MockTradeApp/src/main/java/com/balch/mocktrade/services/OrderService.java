@@ -40,6 +40,7 @@ import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioPresenter;
 import com.balch.mocktrade.receivers.OrderReceiver;
 
 import java.util.ArrayList;
@@ -72,7 +73,8 @@ public class OrderService extends IntentService {
                     @Override
                     public void onResponse(Map<String, Quote> quoteMap) {
                         try {
-                            boolean reshedule = false;
+                            boolean updateView = false;
+                            boolean reschedule = false;
                             for (Order o : orders) {
                                 try {
                                     Quote quote = quoteMap.get(o.getSymbol());
@@ -84,8 +86,9 @@ public class OrderService extends IntentService {
                                                 o.getSymbol(), o.getQuantity(),
                                                 orderResult.getPrice().getCurrency(),
                                                 orderResult.getCost().getCurrency()));
+                                        updateView = true;
                                     } else {
-                                        reshedule = true;
+                                        reschedule = true;
                                     }
 
                                 } catch (Exception ex) {
@@ -95,7 +98,11 @@ public class OrderService extends IntentService {
                                 }
                             }
 
-                            if (reshedule) {
+                            if (updateView) {
+                                PortfolioPresenter.updateView(OrderService.this);
+                            }
+
+                            if (reschedule) {
                                 portfolioModel.scheduleOrderServiceAlarm();
                             }
 

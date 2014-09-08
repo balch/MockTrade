@@ -59,6 +59,8 @@ public class QuoteService extends IntentService {
     @Override
     protected void onHandleIntent(final Intent intent) {
 
+        boolean completeWakefulIntentOnExit = false;
+
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
@@ -105,9 +107,8 @@ public class QuoteService extends IntentService {
                             }
 
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
-
-                            PortfolioPresenter.updateView(QuoteService.this);
                         } finally {
+                            PortfolioPresenter.updateView(QuoteService.this);
                             QuoteReceiver.completeWakefulIntent(intent);
                         }
                     }
@@ -119,10 +120,14 @@ public class QuoteService extends IntentService {
                         try {
 
                         } finally {
+                            PortfolioPresenter.updateView(QuoteService.this);
                             QuoteReceiver.completeWakefulIntent(intent);
                         }
                     }
                 });
+            } else {
+                completeWakefulIntentOnExit = true;
+                PortfolioPresenter.updateView(QuoteService.this);
             }
 
             // if the market is closed reset alarm to next market open time
@@ -131,8 +136,13 @@ public class QuoteService extends IntentService {
             }
 
         } catch (Exception ex) {
+            completeWakefulIntentOnExit = true;
             Log.e(TAG, "onHandleIntent exception", ex);
-            QuoteReceiver.completeWakefulIntent(intent);
+        } finally {
+            if (completeWakefulIntentOnExit) {
+                QuoteReceiver.completeWakefulIntent(intent);
+            }
+
         }
     }
 

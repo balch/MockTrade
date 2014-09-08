@@ -112,6 +112,15 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
+    public void scheduleOrderServiceAlarmIfNeeded() {
+        List<Order> openOrders = this.getOpenOrders();
+        if (openOrders.size() > 0) {
+            this.scheduleOrderServiceAlarm();;
+        }
+
+    }
+
+    @Override
     public OrderResult attemptExecuteOrder(Order order, Quote quote) throws Exception {
         return orderModel.attemptExecuteOrder(order, quote);
     }

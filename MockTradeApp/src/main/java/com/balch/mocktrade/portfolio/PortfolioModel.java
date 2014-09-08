@@ -57,5 +57,7 @@ public interface PortfolioModel extends BaseModel {
 
     void scheduleOrderServiceAlarm();
 
+    void scheduleOrderServiceAlarmIfNeeded();
+
 }
 

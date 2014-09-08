@@ -30,6 +30,7 @@ import android.util.Log;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.portfolio.PortfolioModel;
 
 public class BootReceiver extends WakefulBroadcastReceiver {
     private static final String TAG = BootReceiver.class.getName();
@@ -42,6 +43,9 @@ public class BootReceiver extends WakefulBroadcastReceiver {
             ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             financeModel.setQuoteServiceAlarm();
+
+            PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+            portfolioModel.scheduleOrderServiceAlarmIfNeeded();
         }
     }
 }

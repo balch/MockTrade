@@ -38,18 +38,15 @@
                 android:layout_gravity="bottom"
                 android:textSize="12sp"
                 android:textColor="@color/nav_on_color"
-                android:minHeight="1dp"
-                android:minWidth="1dp"
                 android:text="@string/account_item_new_order_button"
                 />
 
-            <TextView
-                android:id="@+id/account_item_open_order_text"
+            <Button
+                android:id="@+id/account_item_open_order_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:textColor="@color/nav_on_color"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:visibility="gone"/>
         </LinearLayout>
 
@@ -65,8 +62,7 @@
         <TextView
             android:id="@+id/account_item_current_balance"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1.5"
+            android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="@android:color/primary_text_dark"
@@ -75,15 +71,13 @@
         <TextView
             android:id="@+id/account_item_total_performance"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/account_item_day_performance"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:textSize="12sp"/>
 
     </LinearLayout>

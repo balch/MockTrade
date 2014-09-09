@@ -44,7 +44,7 @@ public class AccountItemView extends LinearLayout {
     protected AccountItemViewListener accountItemViewListener;
     protected TextView name;
     protected TextView currentBalance;
-    protected TextView openOrdersText;
+    protected Button openOrders;
     protected TextView dayPerformance;
     protected TextView totalPerformance;
     protected LinearLayout valueLayout;
@@ -73,7 +73,7 @@ public class AccountItemView extends LinearLayout {
         this.dayPerformance = (TextView)findViewById(R.id.account_item_day_performance);
         this.totalPerformance = (TextView)findViewById(R.id.account_item_total_performance);
         this.tradeButton = (Button)findViewById(R.id.account_item_trade_button);
-        this.openOrdersText = (TextView)findViewById(R.id.account_item_open_order_text);
+        this.openOrders = (Button)findViewById(R.id.account_item_open_order_button);
         this.valueLayout = (LinearLayout)findViewById(R.id.account_item_value_layout);
 
         this.tradeButton.setOnClickListener(new OnClickListener() {
@@ -85,7 +85,7 @@ public class AccountItemView extends LinearLayout {
             }
         });
 
-        this.openOrdersText.setOnClickListener(new OnClickListener() {
+        this.openOrders.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (accountItemViewListener != null) {
@@ -114,9 +114,9 @@ public class AccountItemView extends LinearLayout {
         boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));
         this.tradeButton.setVisibility(allowTrade?VISIBLE:GONE);
 
-        this.openOrdersText.setVisibility((openOrderCount > 0) ? VISIBLE : GONE);
+        this.openOrders.setVisibility((openOrderCount > 0) ? VISIBLE : GONE);
         if (openOrderCount > 0) {
-            this.openOrdersText.setText(String.format(getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
+            this.openOrders.setText(String.format(getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
         }
     }
 

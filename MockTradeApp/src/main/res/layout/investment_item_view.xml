@@ -18,17 +18,17 @@
 
         <TextView
             android:id="@+id/investment_item_description"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_weight="1.5"/>
+            />
 
         <TextView
             android:id="@+id/investment_item_symbol"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textColor="@android:color/primary_text_dark"
             android:textSize="12sp"/>
 
@@ -44,17 +44,17 @@
 
         <TextView
             android:id="@+id/investment_item_price"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_weight="1.5"/>
+            />
 
         <TextView
             android:id="@+id/investment_item_perf"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@android:color/primary_text_dark"
@@ -70,17 +70,17 @@
 
         <TextView
             android:id="@+id/investment_item_value"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@android:color/primary_text_dark"
-            android:layout_weight="1.5"/>
+            />
 
         <TextView
             android:id="@+id/investment_item_value_change"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@android:color/primary_text_dark"

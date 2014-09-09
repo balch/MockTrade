@@ -83,7 +83,7 @@
     </string-array>
 
     <string name="account_item_new_order_button">Buy</string>
-    <string name="account_item_open_orders_format">Open\nOrders: %d</string>
+    <string name="account_item_open_orders_format">Orders: %d</string>
 
     <string name="order_edit_title_edit">Change Order</string>
     <string name="order_edit_title_new">New Order</string>

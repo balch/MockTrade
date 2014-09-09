@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/8/14 3:41 PM
+ * Created: 9/8/14 9:58 PM
  *
  * This file is part of MockTrade.
  *
@@ -22,11 +22,15 @@
 
 package com.balch.mocktrade.order;
 
-import com.balch.android.app.framework.model.BaseModel;
+public class OrderCancelException extends Exception {
+    private static final String TAG = OrderCancelException.class.getName();
 
-import java.util.List;
+    public OrderCancelException() {
+        super();
+    }
 
-public interface OrderModel extends BaseModel {
-    List<Order> getOpenOrders(Long accountId);
-    void cancelOrder(Order order) throws OrderCancelException;
+    public OrderCancelException(String message) {
+        super(message);
+    }
+
 }

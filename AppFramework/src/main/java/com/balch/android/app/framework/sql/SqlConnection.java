@@ -153,26 +153,42 @@ public class SqlConnection extends SQLiteOpenHelper {
     }
 
     public boolean update(BaseBean bean) throws Exception {
-        return update(bean, this.getWritableDatabase());
+        return update(bean, null, null, this.getWritableDatabase());
     }
 
     public boolean update(BaseBean bean, SQLiteDatabase db) throws Exception {
+        return update(bean, null, null, db);
+    }
+
+    public boolean update(BaseBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws Exception {
 
         ISO8601DateTime now = new ISO8601DateTime();
         bean.setUpdateTime(now);
         ContentValues values = getContentValues(bean);
 
-        int count = db.update(bean.getTableName(), values, this.getWhereById(bean), null);
+        StringBuilder where = new StringBuilder("_id=?");
+        List<String> whereArgList = new ArrayList<String>();
+        whereArgList.add(bean.getId().toString());
+
+        if (!TextUtils.isEmpty(extraWhere)) {
+            where.append(" ").append(extraWhere);
+            if (whereArgs != null) {
+                for (String s : whereArgs) {
+                    whereArgList.add(s);
+                }
+            }
+        }
+        int count = db.update(bean.getTableName(), values, where.toString(),
+                whereArgList.toArray(new String[whereArgList.size()]));
         return (count == 1);
     }
-
 
     public boolean delete(BaseBean bean) throws Exception {
         return delete(bean, this.getWritableDatabase());
     }
 
     public boolean delete(BaseBean bean, SQLiteDatabase db) throws Exception {
-        return (db.delete(bean.getTableName(), this.getWhereById(bean), null) == 1);
+        return (db.delete(bean.getTableName(), "_id=?", new String[]{bean.getId().toString()}) == 1);
     }
 
 /////////////////////////////////
@@ -237,10 +253,6 @@ public class SqlConnection extends SQLiteOpenHelper {
             }
         }
         return sql;
-    }
-
-    protected String getWhereById(BaseBean bean) {
-        return "_id=" + bean.getId();
     }
 
     protected static class GetContentValuesHandler implements MetadataUtils.Handler {

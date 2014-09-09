@@ -85,12 +85,22 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
     }
 
     @Override
-    public void cancelOrder(Order order) {
+    public void cancelOrder(Order order) throws OrderCancelException {
         try {
             order.setStatus(Order.OrderStatus.CANCELED);
-            if (!this.getSqlConnection().update(order)) {
-                throw new Exception("Order was not updated");
+
+            // only update the order if the status is still open
+            // still may need some locking to make sure the order
+            // is not executed after is has been canceled
+            String where = " AND "+Order.SQL_STATUS+"=?";
+            String [] whereArgs = new String[]{Order.OrderStatus.OPEN.name()};
+
+            if (!this.getSqlConnection().update(order, where, whereArgs,
+                    this.getSqlConnection().getWritableDatabase())) {
+                throw new OrderCancelException("Order cannot be canceled");
             }
+        } catch (OrderCancelException ex) {
+            throw ex;
         } catch (Exception ex) {
             Log.e(TAG, "Error in cancelOrder", ex);
             throw new RuntimeException(ex);

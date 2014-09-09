@@ -28,4 +28,5 @@ import java.util.List;
 
 public interface OrderModel extends BaseModel {
     List<Order> getOpenOrders(Long accountId);
+    void cancelOrder(Order order);
 }

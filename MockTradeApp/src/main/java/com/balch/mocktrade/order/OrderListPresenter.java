@@ -22,13 +22,19 @@
 
 package com.balch.mocktrade.order;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
+import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
 
 import java.util.ArrayList;
@@ -43,6 +49,9 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
     protected OrderListView view;
     protected Long accountId;
 
+    final Handler handler = new Handler();
+
+
     public OrderListPresenter(Long accountId, OrderModel model, OrderListView view) {
         this.accountId = accountId;
         this.model = model;
@@ -53,8 +62,23 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
     public void initialize(Bundle savedInstanceState) {
         this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
-            public boolean onCancelOrder(Order order) {
-                return false;
+            public boolean onCancelOrder(final Order order) {
+                new AlertDialog.Builder(application.getActivity())
+                        .setTitle(R.string.order_cancel_dlg_title)
+                        .setMessage(String.format(getString(R.string.order_cancel_dlg_message_format), order.getId(), order.getSymbol()))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    model.cancelOrder(order);
+                                    reload(true);
+                                } catch (Exception ex) {
+                                    Log.e(TAG, "Error Canceling Order", ex);
+                                    Toast.makeText(application, "Error Canceling Order", Toast.LENGTH_LONG).show();
+                                }
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
+                return true;
             }
         });
         reload(true);
@@ -74,6 +98,17 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
 
     @Override
     public void onLoadFinished(Loader<List<Order>> loader, List<Order> data) {
+
+        if (data.size() == 0) {
+            this.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    application.closeCurrentView();
+                }
+            });
+            return;
+        }
+
         this.view.bind(data);
         application.getActivity().hideProgress();
 

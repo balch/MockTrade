@@ -25,11 +25,12 @@ package com.balch.mocktrade.order;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.mocktrade.R;
+
+import java.text.DateFormat;
 
 
 public class OrderItemView extends LinearLayout {
@@ -39,12 +40,12 @@ public class OrderItemView extends LinearLayout {
     }
 
     protected OrderItemViewListener listener;
+    protected TextView orderId;
     protected TextView symbol;
     protected TextView action;
     protected TextView createDate;
     protected TextView strategy;
     protected TextView quantity;
-    protected Button   cancelButton;
     protected Order order;
 
     public OrderItemView(Context context) {
@@ -65,19 +66,22 @@ public class OrderItemView extends LinearLayout {
     protected void initialize() {
         inflate(getContext(), R.layout.order_item_view, this);
 
+        this.orderId = (TextView)findViewById(R.id.order_item_id);
         this.symbol = (TextView)findViewById(R.id.order_item_symbol);
         this.action = (TextView)findViewById(R.id.order_item_action);
         this.createDate = (TextView)findViewById(R.id.order_item_created);
         this.strategy = (TextView)findViewById(R.id.order_item_strategy);
-        this.cancelButton = (Button)findViewById(R.id.order_item_cancel_button);
         this.quantity = (TextView)findViewById(R.id.order_item_quantity);
 
-        this.cancelButton.setOnClickListener(new OnClickListener() {
+        this.setLongClickable(true);
+        this.setOnLongClickListener(new OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                boolean handled = false;
                 if (listener != null) {
-                    listener.onCancelOrder(order);
+                    handled = listener.onCancelOrder(order);
                 }
+                return handled;
             }
         });
 
@@ -86,9 +90,10 @@ public class OrderItemView extends LinearLayout {
     public void bind(Order order) {
         this.order = order;
 
+        this.orderId.setText(order.getId().toString());
         this.symbol.setText(order.getSymbol());
         this.action.setText(order.getAction().toString());
-        this.createDate.setText(order.getCreateTime().toString());
+        this.createDate.setText(DateFormat.getDateTimeInstance().format(order.getCreateTime().getDate()));
         this.strategy.setText(order.getStrategy().toString());
         this.quantity.setText(order.getQuantity().toString());
 

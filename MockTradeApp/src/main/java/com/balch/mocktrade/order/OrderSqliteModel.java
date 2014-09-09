@@ -23,6 +23,7 @@
 package com.balch.mocktrade.order;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderManager.OrderManagerListener {
+    private static final String TAG = OrderSqliteModel.class.getName();
 
     protected InvestmentSqliteModel investmentModel;
     protected OrderManager orderManager;
@@ -77,7 +79,21 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             return this.getSqlConnection().query(Order.class, where.toString(),
                     whereArgs.toArray(new String[whereArgs.size()]), null);
         } catch (Exception e) {
+            Log.e(TAG, "Error in getOpenOrders", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void cancelOrder(Order order) {
+        try {
+            order.setStatus(Order.OrderStatus.CANCELED);
+            if (!this.getSqlConnection().update(order)) {
+                throw new Exception("Order was not updated");
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "Error in cancelOrder", ex);
+            throw new RuntimeException(ex);
         }
     }
 

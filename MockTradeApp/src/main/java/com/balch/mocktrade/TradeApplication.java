@@ -30,6 +30,7 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -201,7 +202,11 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         // not sure if we need this here for the first time the app launches
         FinanceModel financeModel = this.getModelFactory().getModel(FinanceModel.class);
         financeModel.setQuoteServiceAlarm();
+    }
 
+    public void closeCurrentView() {
+        FragmentManager fragmentManager = this.activity.getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
     @Override

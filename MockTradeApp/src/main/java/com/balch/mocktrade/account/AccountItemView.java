@@ -38,6 +38,7 @@ public class AccountItemView extends LinearLayout {
 
     public interface AccountItemViewListener {
         void onTradeButtonClicked(Account account);
+        void onShowOpenOrdersClicked(Account account);
     }
 
     protected AccountItemViewListener accountItemViewListener;
@@ -84,6 +85,14 @@ public class AccountItemView extends LinearLayout {
             }
         });
 
+        this.openOrdersText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (accountItemViewListener != null) {
+                    accountItemViewListener.onShowOpenOrdersClicked(account);
+                }
+            }
+        });
 
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {

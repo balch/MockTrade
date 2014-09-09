@@ -49,6 +49,7 @@ import com.balch.mocktrade.account.AccountItemView;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
+import com.balch.mocktrade.order.OrderListFragment;
 import com.balch.mocktrade.services.QuoteService;
 
 import java.util.List;
@@ -155,6 +156,11 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
             @Override
             public void onTradeButtonClicked(Account account) {
                 showNewBuyOrderActivity(account);
+            }
+
+            @Override
+            public void onShowOpenOrdersClicked(Account account) {
+                getApplication().getActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
             }
         });
         this.view.setPortfolioAdapter(this.portfolioAdapter);

@@ -34,15 +34,25 @@ import com.balch.mocktrade.investment.InvestmentSqliteModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class OrderSqliteModel extends SqliteModel implements OrderManager.OrderManagerListener {
+public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderManager.OrderManagerListener {
 
-    protected final InvestmentSqliteModel investmentModel;
-    protected final OrderManager orderManager;
+    protected InvestmentSqliteModel investmentModel;
+    protected OrderManager orderManager;
+
+    public OrderSqliteModel() {
+    }
 
     public OrderSqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
+        initialize(modelProvider);
+    }
+
+    @Override
+    public void initialize(ModelProvider modelProvider) {
+        super.initialize(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
         this.orderManager = new OrderManager(modelProvider.getContext(),
                 (FinanceModel)getModelFactory().getModel(FinanceModel.class),
@@ -50,10 +60,22 @@ public class OrderSqliteModel extends SqliteModel implements OrderManager.OrderM
     }
 
     public List<Order> getOpenOrders() {
+        return getOpenOrders(null);
+    }
+
+    public List<Order> getOpenOrders(Long accountId) {
         try {
-            String where = Order.SQL_STATUS+"=?";
-            String [] whereArgs = new String[]{Order.OrderStatus.OPEN.name()};
-            return this.getSqlConnection().query(Order.class, where, whereArgs, null);
+            StringBuilder where = new StringBuilder(Order.SQL_STATUS+"=?");
+            List<String> whereArgs = new ArrayList<String>();
+            whereArgs.add(Order.OrderStatus.OPEN.name());
+
+            if (accountId != null) {
+                where.append(" AND ").append(Order.SQL_ACCOUNT_ID).append("=?");
+                whereArgs.add(String.valueOf(accountId));
+            }
+
+            return this.getSqlConnection().query(Order.class, where.toString(),
+                    whereArgs.toArray(new String[whereArgs.size()]), null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -164,4 +186,8 @@ public class OrderSqliteModel extends SqliteModel implements OrderManager.OrderM
     }
 
 
+    @Override
+    public void destroy() {
+
+    }
 }

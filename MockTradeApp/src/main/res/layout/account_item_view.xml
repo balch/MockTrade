@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/primary_text_dark"
             />
 
         <LinearLayout
@@ -69,7 +69,8 @@
             android:layout_weight="1.5"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/primary_text_dark"
+            />
 
         <TextView
             android:id="@+id/account_item_total_performance"

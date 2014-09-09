@@ -45,6 +45,8 @@ import com.balch.mocktrade.finance.FinanceYQLModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteSourceProvider;
 import com.balch.mocktrade.model.YQLSourceProvider;
+import com.balch.mocktrade.order.OrderModel;
+import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioFragment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
@@ -123,6 +125,7 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         this.yqlScheme = new YQLSourceProvider(this);
 
         this.modelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, this.sqliteScheme, true);
+        this.modelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, this.sqliteScheme, true);
         this.modelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, this.yqlScheme, true);
     }
 

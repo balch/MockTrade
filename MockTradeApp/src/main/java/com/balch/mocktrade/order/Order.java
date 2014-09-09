@@ -157,17 +157,17 @@ public class Order  extends BaseBean implements Serializable {
 
     @SqlColumn(name = "limit_price")
     @BeanColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
-    @BeanColumnNew(order = 4, labelResId = R.string.order_limit_price_label)
+    @BeanColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
     protected Money limitPrice;
 
     @SqlColumn(name = "stop_price")
     @BeanColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
-    @BeanColumnNew(order = 5, labelResId = R.string.order_stop_price_label)
+    @BeanColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
     protected Money stopPrice;
 
     @SqlColumn(name = "stop_percent")
     @BeanColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
-    @BeanColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
+    @BeanColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
     protected Double stopPercent;
 
     @SqlColumn

@@ -34,6 +34,7 @@ import com.balch.android.app.framework.bean.BeanViewHint;
 import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
 import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.bean.controls.NumberEditControl;
 import com.balch.android.app.framework.bean.controls.EnumEditControl;
 import com.balch.android.app.framework.bean.controls.MoneyEditControl;
 import com.balch.android.app.framework.bean.controls.StringEditControl;
@@ -61,8 +62,8 @@ public class MetadataUtils {
         BOOLEAN(Boolean.class, null),
         INTEGER(Integer.class, null),
         LONG(Long.class, null),
-        DOUBLE(Double.class, null),
-        FLOAT(Float.class, null),
+        DOUBLE(Double.class, NumberEditControl.class),
+        FLOAT(Float.class, NumberEditControl.class),
         UNSUPPORTED(null, UnsupportedEditControl.class);
 
         protected final Class<?> clazz;

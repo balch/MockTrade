@@ -136,8 +136,12 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
             Object obj = descriptor.getField().get(descriptor.getItem());
             this.value.setText(this.getValueAsString(obj));
 
-            // check the hints associated with this field
             for (BeanViewHint hint : descriptor.getHints()) {
+                if (hint.getHint() == BeanViewHint.Hint.INIT_EMPTY) {
+                    if (hint.getBoolValue()) {
+                        this.value.setText("");
+                    }
+                }
             }
         } catch (IllegalAccessException e) {
             this.value.setText("IllegalAccessException getting value");

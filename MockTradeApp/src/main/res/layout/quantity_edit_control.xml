@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:hint="@string/bean_control_string_hint">
+        android:hint="@string/bean_control_number_hint">
     </EditText>
 
     <LinearLayout

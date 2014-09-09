@@ -30,7 +30,8 @@ public class BeanViewHint {
         NON_NEGATIVE,
         HIDE_CENTS,
         NOT_EMPTY,
-        PERCENT;
+        PERCENT,
+        INIT_EMPTY
     }
 
     protected final Hint hint;

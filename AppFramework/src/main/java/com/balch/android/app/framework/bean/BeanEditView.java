@@ -213,6 +213,7 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
             }
 
         } catch (Exception e) {
+            Log.e(TAG, "Error Populating control", e);
             Toast.makeText(this.getContext(), e.getMessage(), Toast.LENGTH_LONG);
         }
     }
@@ -230,13 +231,15 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
         int cnt = this.editControlLayout.getChildCount();
         for (int x = 0; x < cnt; x++) {
             View view = this.editControlLayout.getChildAt(x);
-            if (view instanceof BeanEditControl) {
-                BeanEditControl control = (BeanEditControl)view;
-                try {
-                    control.validate();
-                } catch (BeanValidatorException e) {
-                    hasError = true;
-                    break;
+            if (view.getVisibility() == VISIBLE) {
+                if (view instanceof BeanEditControl) {
+                    BeanEditControl control = (BeanEditControl) view;
+                    try {
+                        control.validate();
+                    } catch (BeanValidatorException e) {
+                        hasError = true;
+                        break;
+                    }
                 }
             }
         }

@@ -121,6 +121,10 @@ public class StringEditControl extends LinearLayout implements BeanEditControl, 
                     this.value.setLines(hint.getIntValue());
                 } else if (hint.getHint() == BeanViewHint.Hint.NOT_EMPTY) {
                     this.allowEmpty = !hint.getBoolValue();
+                } else if (hint.getHint() == BeanViewHint.Hint.INIT_EMPTY) {
+                    if (hint.getBoolValue()) {
+                        this.value.setText("");
+                    }
                 }
             }
         } catch (IllegalAccessException e) {

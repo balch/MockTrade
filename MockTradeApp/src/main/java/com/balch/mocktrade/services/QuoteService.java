@@ -98,7 +98,7 @@ public class QuoteService extends IntentService {
                                     Quote quote = quoteMap.get(i.getSymbol());
                                     if (quote != null) {
                                         i.setPrevDayClose(quote.getPreviousClose());
-                                        i.setPrice(quote.getPrice());
+                                        i.setPrice(quote.getPrice(), quote.getLastTradeTime());
                                         portfolioModel.updateInvestment(i);
                                     }
                                 } catch (Exception ex) {

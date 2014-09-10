@@ -87,7 +87,6 @@ public class ISO8601DateTime implements Serializable {
 
     public static Date toDate(String iso8601string) throws ParseException {
         String s = iso8601string.replace("Z", "+00:00");
-        s = s.substring(0, 22) + s.substring(23);  // to get rid of the ":"
         return  new SimpleDateFormat(getDateFormat(false)).parse(s);
     }
 

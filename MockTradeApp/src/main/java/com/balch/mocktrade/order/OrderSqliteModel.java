@@ -36,6 +36,7 @@ import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderManager.OrderManagerListener {
@@ -162,7 +163,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
                 }
                 investment = new Investment(account, quote.getSymbol(),
                         Investment.InvestmentStatus.OPEN, quote.getName(), quote.getExchange(),
-                        cost, price, order.getQuantity());
+                        cost, price, new Date(0), order.getQuantity());
                 getSqlConnection().insert(investment, db);
             } else {
                 if (order.getAction() == Order.OrderAction.SELL) {

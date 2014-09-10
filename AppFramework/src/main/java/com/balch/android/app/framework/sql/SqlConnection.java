@@ -195,9 +195,26 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String script = getScript(this.createScript);
+        executeScript(this.createScript, db);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, String.format("onUpgrade(%d -> %d)", oldVersion, newVersion));
+        for (int x = oldVersion+1; x <= newVersion; x++) {
+            executeScript(String.format(this.updateScript, x), db);
+        }
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    protected void executeScript(String scriptName, SQLiteDatabase db) {
+        String script = getScript(scriptName);
         if (script == null) {
-            throw new RuntimeException("Error loading " + this.createScript);
+            throw new RuntimeException("Error loading " + scriptName);
         }
 
         String[] statements = script.split(";");
@@ -217,17 +234,9 @@ public class SqlConnection extends SQLiteOpenHelper {
         db.setForeignKeyConstraintsEnabled(true);
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
     protected String getScript(String scriptName) {
+        Log.d(TAG, "getting Script contents for " + scriptName);
+
         InputStream inputStream = null;
         String sql = null;
         try {

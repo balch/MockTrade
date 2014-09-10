@@ -25,10 +25,13 @@ package com.balch.mocktrade.investment;
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.bean.BaseBean;
 import com.balch.android.app.framework.sql.annotations.SqlColumn;
+import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.order.Order;
+
+import java.util.Date;
 
 public class Investment extends BaseBean  {
     public static final String TABLE_NAME = "investment";
@@ -56,7 +59,7 @@ public class Investment extends BaseBean  {
 
     public Investment(Account account, String symbol,
                       InvestmentStatus status, String description, String exchange,
-                      Money costBasis, Money price, Long quantity) {
+                      Money costBasis, Money price, Date lastTradeTime, Long quantity) {
         this.account = account;
         this.symbol = symbol;
         this.status = status;
@@ -66,6 +69,7 @@ public class Investment extends BaseBean  {
         this.price = price;
         this.prevDayClose = price.clone();
         this.quantity = quantity;
+        this.lastTradeTime = new ISO8601DateTime(lastTradeTime);
     }
 
     @SqlColumn(name=ACCOUNT_ID)
@@ -88,6 +92,9 @@ public class Investment extends BaseBean  {
 
     @SqlColumn
     protected Money price;
+
+    @SqlColumn(name = "last_trade_time")
+    protected ISO8601DateTime lastTradeTime;
 
     @SqlColumn(name="prev_day_close")
     protected Money prevDayClose;
@@ -147,8 +154,9 @@ public class Investment extends BaseBean  {
         return price;
     }
 
-    public void setPrice(Money price) {
+    public void setPrice(Money price, Date lastTradeTime) {
         this.price = price;
+        this.lastTradeTime = new ISO8601DateTime(lastTradeTime);
     }
 
     public Long getQuantity() {
@@ -173,6 +181,10 @@ public class Investment extends BaseBean  {
 
     public void setPrevDayClose(Money prevDayClose) {
         this.prevDayClose = prevDayClose;
+    }
+
+    public ISO8601DateTime getLastTradeTime() {
+        return lastTradeTime;
     }
 
     public void aggregateOrder(Order order, Money price) {

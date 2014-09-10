@@ -25,6 +25,7 @@ package com.balch.mocktrade.investment;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -80,11 +81,19 @@ public class InvestmentItemView extends LinearLayout {
 
     public void bind(Investment investment) {
         this.investment = investment;
+
         this.symbol.setText(TextUtils.isEmpty(investment.getExchange()) ?
                 investment.getSymbol() :
                 investment.getExchange() + ": " + investment.getSymbol());
         this.description.setText(investment.getDescription());
-        this.price.setText(investment.getPrice().getCurrency());
+
+        String price = investment.getPrice().getCurrency();
+        if (!DateUtils.isToday(investment.getLastTradeTime().getDate().getTime())) {
+            price = price + " **";
+        }
+
+        this.price.setText(price);
+
         this.value.setText(investment.getValue().getCurrency());
 
         Money delta = Money.subtract(investment.getPrice(), investment.getPrevDayClose());

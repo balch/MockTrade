@@ -61,9 +61,9 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     private static final String TAG = TradeApplication.class.getName();
 
     private static final String DATABASE_NAME = "mocktrade.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
-    private static final String DATABASE_UPDATE_SCRIPT = "sql/update.sql";
+    private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
     private SqlConnection sqlConnection;
     private RequestQueue requestQueue;
@@ -92,7 +92,7 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         this.settings = new Settings(this);
 
         this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
-                DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT);
+                DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
         new InitializeDatabase(this).execute();
 
         this.requestQueue = VolleyBackground.newRequestQueue(this, 10);

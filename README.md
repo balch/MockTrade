@@ -1,8 +1,8 @@
 MockTrade 
 ===============================
 
-<b>
-&lt;TL;DR&gt;
+
+######&lt;TL;DR&gt;
 
 * Open Source Android Trading Simulator
 * AppFramework Library
@@ -18,8 +18,7 @@ MockTrade
         * Dogs of the Dow
         * Strategy plugin model
 
-&lt;/TL;DR&gt;
-</b>
+######&lt;/TL;DR&gt;
 
 ### MockTrade Application
 Lets get this out of the way, this app is very much a WIP and still has 

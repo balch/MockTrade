@@ -1,6 +1,7 @@
 MockTrade 
 ===============================
 
+<b>
 &lt;TL;DR&gt;
 
 * Open Source Android Trading Simulator
@@ -18,7 +19,7 @@ MockTrade
         * Strategy plugin model
 
 &lt;/TL;DR&gt;
-
+</b>
 
 ### MockTrade Application
 Lets get this out of the way, this app is very much a WIP and still has 
@@ -62,8 +63,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
     * ExternalController model to allow custom validation and advanced UI behavior
 
 ### Next Steps
-* Order List/Detail screens
-* Investment Detail Screens
+* Investment/Account/Order Detail Screens
 * Gamification
 * Option Chains
 

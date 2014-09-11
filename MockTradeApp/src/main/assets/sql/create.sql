@@ -18,6 +18,7 @@ CREATE TABLE investment (
  exchange TEXT NOT NULL,
  cost_basis INTEGER NOT NULL,
  price INTEGER NOT NULL,
+ last_trade_time TEXT NOT NULL,
  prev_day_close INTEGER NOT NULL,
  quantity INTEGER NOT NULL,
  create_time TEXT NOT NULL,

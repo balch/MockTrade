@@ -27,12 +27,12 @@ import com.balch.android.app.framework.types.Money;
 public class PerformanceItem {
     protected final Money costBasis;
     protected final Money value;
-    protected final Money prevDayValue;
+    protected final Money todayChange;
 
-    public PerformanceItem(Money costBasis, Money value, Money prevDayValue) {
+    public PerformanceItem(Money costBasis, Money value, Money todayChange) {
         this.costBasis = costBasis;
         this.value = value;
-        this.prevDayValue = prevDayValue;
+        this.todayChange = todayChange;
     }
 
     public Money getCostBasis() {
@@ -43,27 +43,20 @@ public class PerformanceItem {
         return value;
     }
 
-    public Money getPrevDayValue() {
-        return prevDayValue;
+    public Money getTodayChange() {
+        return todayChange;
     }
 
     public void aggregate(PerformanceItem performanceItem) {
         this.costBasis.add(performanceItem.getCostBasis());
-        this.prevDayValue.add(performanceItem.getPrevDayValue());
+        this.todayChange.add(performanceItem.getTodayChange());
         this.value.add(performanceItem.getValue());
     }
 
     public Money getDailyChange() {
-        return Money.subtract(this.value, this.prevDayValue);
+        return this.todayChange;
     }
 
-    public float getDailyChangePercent() {
-        float percent = (this.prevDayValue.getMicroCents() != 0) ?
-                Money.subtract(this.value, this.prevDayValue).getMicroCents() / (float) this.prevDayValue.getMicroCents() :
-                1.0f;
-
-        return percent * 100.0f;
-    }
 
     public Money getTotalChange() {
         return Money.subtract(this.value, this.costBasis);

@@ -22,6 +22,8 @@
 
 package com.balch.mocktrade.investment;
 
+import android.text.format.DateUtils;
+
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.bean.BaseBean;
 import com.balch.android.app.framework.sql.annotations.SqlColumn;
@@ -33,13 +35,13 @@ import com.balch.mocktrade.order.Order;
 
 import java.util.Date;
 
-public class Investment extends BaseBean  {
+public class Investment extends BaseBean {
     public static final String TABLE_NAME = "investment";
 
     static public final String SYMBOL = "symbol";
     static public final String ACCOUNT_ID = "account_id";
 
-    public enum InvestmentStatus  implements MetadataUtils.EnumResource {
+    public enum InvestmentStatus implements MetadataUtils.EnumResource {
         OPEN,
         CLOSED;
 
@@ -72,7 +74,7 @@ public class Investment extends BaseBean  {
         this.lastTradeTime = new ISO8601DateTime(lastTradeTime);
     }
 
-    @SqlColumn(name=ACCOUNT_ID)
+    @SqlColumn(name = ACCOUNT_ID)
     protected Account account;
 
     @SqlColumn
@@ -87,7 +89,7 @@ public class Investment extends BaseBean  {
     @SqlColumn
     protected String exchange;
 
-    @SqlColumn(name="cost_basis")
+    @SqlColumn(name = "cost_basis")
     protected Money costBasis;
 
     @SqlColumn
@@ -96,7 +98,7 @@ public class Investment extends BaseBean  {
     @SqlColumn(name = "last_trade_time")
     protected ISO8601DateTime lastTradeTime;
 
-    @SqlColumn(name="prev_day_close")
+    @SqlColumn(name = "prev_day_close")
     protected Money prevDayClose;
 
     @SqlColumn
@@ -168,11 +170,11 @@ public class Investment extends BaseBean  {
     }
 
     public Money getValue() {
-        return  Money.multiply(this.price, this.quantity);
+        return Money.multiply(this.price, this.quantity);
     }
 
     public Money getPrevDayValue() {
-        return  Money.multiply(this.prevDayClose, this.quantity);
+        return Money.multiply(this.prevDayClose, this.quantity);
     }
 
     public Money getPrevDayClose() {
@@ -191,5 +193,9 @@ public class Investment extends BaseBean  {
         // note: this work with sell orders!!!
         this.costBasis.add(order.getCost(price));
         this.quantity += order.getQuantityDelta();
+    }
+
+    public boolean isPriceCurrent() {
+        return DateUtils.isToday(this.lastTradeTime.getDate().getTime());
     }
 }

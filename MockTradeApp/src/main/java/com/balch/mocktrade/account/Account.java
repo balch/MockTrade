@@ -158,16 +158,19 @@ public class Account extends BaseBean implements Serializable {
 
     public PerformanceItem getPerformanceItem(List<Investment> investments) {
         Money currentBalance = new Money(this.getAvailableFunds().getMicroCents());
-        Money prevDayBalance = new Money(this.getAvailableFunds().getMicroCents());
+        Money todayChange = new Money(0);
 
         if (investments != null) {
             for (Investment i : investments) {
                 currentBalance.add(i.getValue());
-                prevDayBalance.add(i.getPrevDayValue());
+
+                if (i.isPriceCurrent()) {
+                    todayChange.add(Money.subtract(i.getValue(),i.getPrevDayValue()));
+                }
             }
         }
 
-        return new PerformanceItem(this.initialBalance, currentBalance, prevDayBalance);
+        return new PerformanceItem(this.initialBalance, currentBalance, todayChange);
     }
 
     @Override

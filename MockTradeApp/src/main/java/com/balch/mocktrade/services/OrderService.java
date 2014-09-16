@@ -80,12 +80,20 @@ public class OrderService extends IntentService {
                                     Quote quote = quoteMap.get(o.getSymbol());
                                     OrderResult orderResult = portfolioModel.attemptExecuteOrder(o, quote);
                                     if (orderResult.isSuccess()) {
-                                        sendNotification(o, String.format(
-                                                getString(R.string.notification_order_success_format),
-                                                o.getAction(), o.getId(),
-                                                o.getSymbol(), o.getQuantity(),
-                                                orderResult.getPrice().getCurrency(),
-                                                orderResult.getCost().getCurrency()));
+
+                                        String msg = (o.getAction() == Order.OrderAction.BUY) ?
+                                                String.format(getString(R.string.notification_order_buy_success_format),
+                                                        o.getSymbol(), o.getQuantity(),
+                                                        orderResult.getPrice().getCurrency(),
+                                                        orderResult.getCost().getCurrency()) :
+                                                String.format(getString(R.string.notification_order_sell_success_format),
+                                                        o.getSymbol(), o.getQuantity(),
+                                                        orderResult.getPrice().getCurrency(),
+                                                        orderResult.getValue().getCurrency(),
+                                                        orderResult.getProfit().getCurrency());
+
+
+                                        sendNotification(o, msg);
                                         updateView = true;
                                     } else {
                                         reschedule = true;

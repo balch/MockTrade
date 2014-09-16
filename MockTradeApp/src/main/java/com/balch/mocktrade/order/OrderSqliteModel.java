@@ -134,6 +134,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
         db.beginTransaction();
         try {
             Money cost = order.getCost(price);
+            Money profit = new Money(0);
 
             Account account = getSqlConnection().queryById(Account.class, order.getAccount().getId());
 
@@ -170,6 +171,8 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
                     if (order.getQuantity() > investment.getQuantity()) {
                         throw new Exception("Selling too many shares");
                     }
+
+                    profit = Money.subtract(transactionCost, investment.getCostBasis());
                 }
 
                 investment.aggregateOrder(order, price);
@@ -192,7 +195,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
             db.setTransactionSuccessful();
 
-            return new OrderResult(true, price, cost, transactionId);
+            return new OrderResult(true, price, cost, profit, transactionId);
         } finally {
             db.endTransaction();
         }

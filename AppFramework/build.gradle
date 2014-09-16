@@ -25,4 +25,17 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.6'
 }
 
-task testClasses {}
+apply plugin: 'android-unit-test'
+
+androidUnitTest {
+    testReleaseBuildType true
+}
+
+dependencies {
+    repositories {
+        mavenCentral()
+    }
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.robolectric:robolectric:2.3'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+}

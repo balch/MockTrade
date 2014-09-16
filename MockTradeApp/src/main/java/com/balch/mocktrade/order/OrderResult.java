@@ -28,12 +28,14 @@ public class OrderResult {
     protected final boolean success;
     protected final Money price;
     protected final Money cost;
+    protected final Money profit;
     protected final long confirmationId;
 
-    public OrderResult(boolean success, Money price, Money cost, long confirmationId) {
+    public OrderResult(boolean success, Money price, Money cost, Money profit, long confirmationId) {
         this.success = success;
         this.price = price;
         this.cost = cost;
+        this.profit = profit;
         this.confirmationId = confirmationId;
     }
 
@@ -47,6 +49,14 @@ public class OrderResult {
 
     public Money getCost() {
         return cost;
+    }
+
+    public Money getValue() {
+        return Money.multiply(cost, -1);
+    }
+
+    public Money getProfit() {
+        return profit;
     }
 
     public long getConfirmationId() {

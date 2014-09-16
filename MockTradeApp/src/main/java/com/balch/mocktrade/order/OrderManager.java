@@ -127,7 +127,7 @@ class OrderManager {
     }
 
     protected OrderResult executeLimitOrder(Order order, Quote quote) throws Exception {
-        OrderResult orderResult = new OrderResult(false, null, null, 0);
+        OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
             if ( ((order.getAction() == Order.OrderAction.BUY)  && (compareQuoteToLimit <= 0)) ||
@@ -156,7 +156,7 @@ class OrderManager {
             highestPriceChanged = true;
         }
 
-        OrderResult orderResult = new OrderResult(false, null, null, 0);
+        OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             if (quote.getPrice().compareTo(order.getHighestPrice()) > 0) {
                 order.setHighestPrice(quote.getPrice());
@@ -194,7 +194,7 @@ class OrderManager {
             throw new UnsupportedOperationException("Cannot have a Stop Loss order if the action is BUY");
         }
 
-        OrderResult orderResult = new OrderResult(false, null, null, 0);
+        OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
             if (compareQuoteToLimit <= 0) {
@@ -206,7 +206,7 @@ class OrderManager {
     }
 
     protected OrderResult executeMarketOrder(Order order, Quote quote) throws Exception {
-        OrderResult orderResult = new OrderResult(false, null, null, 0);
+        OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             orderResult = this.listener.executeOrder(order, quote, quote.getPrice());
         }

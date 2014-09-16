@@ -30,6 +30,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -70,7 +71,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
     }
 
     public void setDollars(double dollars) {
-        this.microCents = (int)(dollars * DOLLAR_TO_MICRO_CENT);
+        this.microCents = (long)(dollars * DOLLAR_TO_MICRO_CENT);
     }
 
     public void setDollars(String dollars) {
@@ -105,7 +106,22 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
 
     public String getCurrency(int decimalPlaces) {
         double dollars = getDollars();
-        return String.format("%1s%2$,.0"+decimalPlaces+"f", getSymbol(), dollars);
+
+        StringBuilder patternBuilder = new StringBuilder(getSymbol());
+        patternBuilder.append("#,##0");
+
+        if (decimalPlaces == 1) {
+            patternBuilder.append(".0");
+        } else if (decimalPlaces >= 2) {
+            patternBuilder.append(".00");
+            for (int x = 0 ; x < decimalPlaces - 2; x++) {
+                patternBuilder.append("#");
+            }
+        }
+
+        String pattern = patternBuilder.toString();
+        DecimalFormat format = new DecimalFormat(pattern + ";-" + pattern);
+        return format.format(dollars);
     }
 
     public static String getSymbol() {

@@ -121,7 +121,8 @@
     <string name="quantity_edit_error_invalid_amount">Invalid Amount</string>
 
     <string name="notification_order_title">MockTrade Execution</string>
-    <string name="notification_order_success_format" formatted="false">%s Order %d for %s executed %d shares at %s for a total cost of %s.</string>
+    <string name="notification_order_buy_success_format" formatted="false">Buy order for %s executed %d shares at %s for a total cost of %s.</string>
+    <string name="notification_order_sell_success_format" formatted="false">Sell order for %s executed %d shares at %s for a total value of %s. (Profit: %s)</string>
     <string name="notification_order_error_format" formatted="false">Order %d for %s failed to executed. Error: %s</string>
 
 </resources>

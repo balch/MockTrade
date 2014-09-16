@@ -69,7 +69,7 @@ public class OrderEditController implements BeanExternalController<Order> {
 
         if (!hasAvailableFunds) {
             throw new BeanValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_insufficient_funds));
-        } else if (cost.getDollars() == 0.0) {
+        } else if ((cost.getDollars() == 0.0) && (order.getStrategy() != Order.OrderStrategy.MANUAL)) {
             throw new BeanValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_invalid_amount));
         }
     }

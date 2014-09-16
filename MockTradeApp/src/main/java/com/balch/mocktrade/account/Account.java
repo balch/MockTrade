@@ -73,19 +73,21 @@ public class Account extends BaseBean implements Serializable {
     }
 
     public Account() {
-        this("", "", new Money(0), Strategy.NONE);
+        this("", "", new Money(0), Strategy.NONE, false);
     }
 
-    public Account(String name, String description, Money initialBalance, Strategy strategy) {
-        this(name, description, initialBalance, initialBalance.clone(), strategy);
+    public Account(String name, String description, Money initialBalance, Strategy strategy, boolean excludeFromTotals) {
+        this(name, description, initialBalance, initialBalance.clone(), strategy, excludeFromTotals);
     }
 
-    public Account(String name, String description, Money initialBalance, Money availableFunds, Strategy strategy) {
+    public Account(String name, String description, Money initialBalance, Money availableFunds,
+                   Strategy strategy, boolean excludeFromTotals) {
         this.name = name;
         this.description = description;
         this.initialBalance = initialBalance;
         this.availableFunds = availableFunds;
         this.strategy = strategy;
+        this.excludeFromTotals = excludeFromTotals;
     }
 
     @SqlColumn
@@ -110,6 +112,11 @@ public class Account extends BaseBean implements Serializable {
 
     @SqlColumn(name = "available_funds")
     protected Money availableFunds;
+
+    @SqlColumn(name = "exclude_from_totals")
+    @BeanColumnEdit(order = 5, labelResId = R.string.account_exclude_from_totals_label, state = BeanEditState.READONLY)
+    @BeanColumnNew(order = 5,labelResId = R.string.account_exclude_from_totals_label)
+    protected Boolean excludeFromTotals;
 
     public void aggregate(Account account) {
         this.initialBalance.add(account.initialBalance);
@@ -156,6 +163,14 @@ public class Account extends BaseBean implements Serializable {
         this.strategy = strategy;
     }
 
+    public Boolean getExcludeFromTotals() {
+        return excludeFromTotals;
+    }
+
+    public void setExcludeFromTotals(Boolean excludeFromTotals) {
+        this.excludeFromTotals = excludeFromTotals;
+    }
+
     public PerformanceItem getPerformanceItem(List<Investment> investments) {
         Money currentBalance = new Money(this.getAvailableFunds().getMicroCents());
         Money todayChange = new Money(0);
@@ -181,6 +196,7 @@ public class Account extends BaseBean implements Serializable {
                 ", initialBalance=" + initialBalance +
                 ", availableFunds=" + availableFunds +
                 ", strategy=" + strategy +
+                ", excludeFromTotals=" + excludeFromTotals +
                 '}';
     }
 

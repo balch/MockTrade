@@ -5,6 +5,7 @@ CREATE TABLE account (
  initial_balance INTEGER NOT NULL,
  available_funds INTEGER NOT NULL,
  strategy TEXT NOT NULL,
+ exclude_from_totals INTEGER NOT NULL DEFAULT 0,
  create_time TEXT NOT NULL,
  update_time TEXT NOT NULL
 );

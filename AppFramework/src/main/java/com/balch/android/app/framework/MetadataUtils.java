@@ -34,6 +34,7 @@ import com.balch.android.app.framework.bean.BeanViewHint;
 import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
 import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.bean.controls.BoolEditControl;
 import com.balch.android.app.framework.bean.controls.NumberEditControl;
 import com.balch.android.app.framework.bean.controls.EnumEditControl;
 import com.balch.android.app.framework.bean.controls.MoneyEditControl;
@@ -59,7 +60,7 @@ public class MetadataUtils {
         DATE(Date.class, null),
         BASEBEAN(BaseBean.class, null),
         STRING(String.class, StringEditControl.class),
-        BOOLEAN(Boolean.class, null),
+        BOOLEAN(Boolean.class, BoolEditControl.class),
         INTEGER(Integer.class, null),
         LONG(Long.class, null),
         DOUBLE(Double.class, NumberEditControl.class),

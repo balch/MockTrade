@@ -1,0 +1,1 @@
+ALTER TABLE account ADD COLUMN exclude_from_totals INTEGER NOT NULL DEFAULT 0;

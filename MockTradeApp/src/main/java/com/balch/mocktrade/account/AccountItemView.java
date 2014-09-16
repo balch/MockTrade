@@ -23,6 +23,7 @@
 package com.balch.mocktrade.account;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -106,6 +107,10 @@ public class AccountItemView extends LinearLayout {
         this.account = account;
         this.name.setText(account.getName());
         this.currentBalance.setText(performanceItem.getValue().getCurrency());
+
+        this.name.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+        this.currentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+
         this.totalPerformance.setText(TextFormatUtils.getLongChangePercentText(this.getContext(),
                 performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
         this.dayPerformance.setText(TextFormatUtils.getShotChangeText(this.getContext(),

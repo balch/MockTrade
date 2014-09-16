@@ -199,18 +199,20 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
         PerformanceItem performanceItem = new PerformanceItem(new Money(), new Money(), new Money());
 
-        boolean showTotals = (data.getAccounts().size() > 1);
-        Account totals = new Account(this.getString(R.string.account_totals_label), "", new Money(0), Account.Strategy.NONE);
+        int accountsWithTotals = 0;
+        Account totals = new Account(this.getString(R.string.account_totals_label), "", new Money(0), Account.Strategy.NONE, false);
 
-        if (showTotals) {
-            for (Account account : data.getAccounts()) {
+        for (Account account : data.getAccounts()) {
+            if (!account.getExcludeFromTotals()) {
                 totals.aggregate(account);
                 List<Investment> investments = data.getInvestments(account.getId());
                 performanceItem.aggregate(account.getPerformanceItem(investments));
+
+                accountsWithTotals++;
             }
         }
 
-        this.view.setTotals(showTotals, totals, performanceItem);
+        this.view.setTotals((accountsWithTotals > 1), totals, performanceItem);
         this.portfolioAdapter.bind(data);
         portfolioAdapter.notifyDataSetChanged();
 
@@ -268,7 +270,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
     protected void showNewAccountActivity() {
         Intent intent = BeanEditActivity.getIntent(this.view.getContext(), R.string.account_create_title,
-                new Account("","", new Money(100000.0), Account.Strategy.NONE),
+                new Account("","", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
         if (this.parentActivity != null) {
@@ -319,7 +321,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                 Account account = BeanEditActivity.getResult(data);
                 if (account != null) {
                     // create a new Account instance to make sure the account is initialized correctly
-                    model.createAccount(new Account(account.getName(), account.getDescription(), account.getInitialBalance(), account.getStrategy()));
+                    model.createAccount(new Account(account.getName(), account.getDescription(),
+                            account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals()));
                     reload(true);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {

@@ -317,7 +317,7 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         @Override
         public boolean handleBoolean(Field field) {
-            values.put(column, (Boolean) value);
+            values.put(column, (Boolean)value ? 1 : 0);
             return true;
         }
 
@@ -461,7 +461,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         @Override
         public boolean handleBoolean(Field field) {
             try {
-                field.set(item, Boolean.valueOf(cursor.getString(idx)));
+                field.set(item, (cursor.getInt(idx) == 1));
             } catch (IllegalAccessException e) {
                 throw new UnsupportedOperationException(e);
             }

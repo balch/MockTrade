@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/EditControl"
+    android:orientation="vertical">
+
+    <CheckBox
+        android:id="@+id/bool_edit_control_value"
+        style="@style/ControlLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@null"
+        android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+        >
+    </CheckBox>
+
+</LinearLayout>

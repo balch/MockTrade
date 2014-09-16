@@ -42,6 +42,7 @@
     <string name="account_init_balance_label">Initial Balance</string>
     <string name="account_strategy_label">Strategy</string>
     <string name="account_current_balance_label">Current Balance</string>
+    <string name="account_exclude_from_totals_label">Exclude From Totals</string>
 
     <string-array name="account_strategy_display_values">
         <item>None</item>

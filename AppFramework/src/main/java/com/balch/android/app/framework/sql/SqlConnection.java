@@ -44,10 +44,14 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SqlConnection extends SQLiteOpenHelper {
     private static final String TAG = "balch.SqlConnection";  // isLoggable requires < 23 chars
+
+    protected Map<String, String> sqlColumnCache = new HashMap<String, String>();
 
     protected final Context context;
     protected final String createScript;
@@ -529,21 +533,33 @@ public class SqlConnection extends SQLiteOpenHelper {
                                                            SetFieldFromCursorHandler setFieldFromCursorHandler)
             throws Exception {
 
-        final SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-        if (sqlColumn != null) {
-            String column = (sqlColumn.name().equals("") ?
-                    field.getName() :
-                    sqlColumn.name());
+        // getAnnotation is SLOW
+        // Caching column names gives a 2x speedup
+        String key = field.getDeclaringClass().getSimpleName() + "." + field.getName();
+        String columnName = sqlColumnCache.get(key);
+        if (columnName == null) {
+            final SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
+            if (sqlColumn != null) {
+                columnName = (sqlColumn.name().equals("") ?
+                        field.getName() :
+                        sqlColumn.name());
+            } else {
+                // annotation does not exits, use an empty name
+                columnName = "";
+            }
+            sqlColumnCache.put(key, columnName);
+        }
 
+        if (!TextUtils.isEmpty(columnName)) {
             Cursor cursor = setFieldFromCursorHandler.getCursor();
-            final int idx = cursor.getColumnIndex(column);
+            final int idx = cursor.getColumnIndex(columnName);
 
             if (idx >= 0) {
                 if (!cursor.isNull(idx)) {
                     MetadataUtils.handleField(field, setFieldFromCursorHandler.bind(idx, item));
                 }
             } else {
-                String msg = "Cannot find Column:"+column+" in this list of columns:"+
+                String msg = "Cannot find Column:"+columnName+" in this list of columns:"+
                         TextUtils.join(",", cursor.getColumnNames());
                 Log.e(TAG, msg);
                 throw new Exception(msg);

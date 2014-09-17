@@ -35,9 +35,9 @@ import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
 import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
 import com.balch.android.app.framework.bean.controls.BoolEditControl;
-import com.balch.android.app.framework.bean.controls.NumberEditControl;
 import com.balch.android.app.framework.bean.controls.EnumEditControl;
 import com.balch.android.app.framework.bean.controls.MoneyEditControl;
+import com.balch.android.app.framework.bean.controls.NumberEditControl;
 import com.balch.android.app.framework.bean.controls.StringEditControl;
 import com.balch.android.app.framework.bean.controls.UnsupportedEditControl;
 import com.balch.android.app.framework.types.ISO8601DateTime;
@@ -47,10 +47,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MetadataUtils {
     private static final String TAG = MetadataUtils.class.getName();
+
+    protected static Map<String, List<Field>> fieldCache = new HashMap<String, List<Field>>();
 
     // TODO: more EditControl classes
     public enum FrameworkType {
@@ -217,11 +221,19 @@ public class MetadataUtils {
         return frameworkType;
     }
 
-    static public List<Field> getAllFields(Class<?> type) {
-        return getAllFields(new ArrayList<Field>(), type);
+    public static List<Field> getAllFields(Class<?> type) {
+
+        String key = type.getName();
+        List<Field> fields = fieldCache.get(key);
+        if (fields == null) {
+            fields = getAllFields(new ArrayList<Field>(), type);
+            fieldCache.put(key, fields);
+        }
+
+        return fields;
     }
 
-    static protected List<Field> getAllFields(List<Field> fields, Class<?> type) {
+    protected static List<Field> getAllFields(List<Field> fields, Class<?> type) {
         for (Field field : type.getDeclaredFields()) {
             field.setAccessible(true);
             fields.add(field);

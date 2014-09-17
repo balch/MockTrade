@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.StopWatch;
 import com.balch.android.app.framework.bean.BaseBean;
 import com.balch.android.app.framework.sql.annotations.SqlColumn;
 import com.balch.android.app.framework.types.ISO8601DateTime;
@@ -46,7 +47,7 @@ import java.util.Date;
 import java.util.List;
 
 public class SqlConnection extends SQLiteOpenHelper {
-    private static final String TAG = SqlConnection.class.getName();
+    private static final String TAG = "balch.SqlConnection";  // isLoggable requires < 23 chars
 
     protected final Context context;
     protected final String createScript;
@@ -103,6 +104,11 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     public <T extends BaseBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws Exception {
 
+        StopWatch sw = null;
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            sw = StopWatch.getInstance();
+        }
+
         List<T> results = new ArrayList<T>();
 
         Constructor<T> ctor = clazz.getConstructor();
@@ -129,6 +135,11 @@ public class SqlConnection extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
+        }
+
+        if (sw != null) {
+            long elapsedMs = sw.stop();
+            Log.d(TAG, String.format("SqlConnection.query on %s took %d ms to return %d rows", table, elapsedMs, results.size()));
         }
 
         return results;
@@ -539,6 +550,4 @@ public class SqlConnection extends SQLiteOpenHelper {
             }
         }
     }
-
-
 }

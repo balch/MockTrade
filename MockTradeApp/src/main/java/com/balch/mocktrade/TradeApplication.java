@@ -93,7 +93,7 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
         this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                 DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
-        new InitializeDatabase(this).execute();
+        new InitializeDatabase().execute();
 
         this.requestQueue = VolleyBackground.newRequestQueue(this, 10);
 
@@ -221,13 +221,8 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
     private class InitializeDatabase extends AsyncTask<Void, Void, Void> {
         private final String TAG = this.getClass().getName();
-        private final TradeApplication context;
         private Exception exception;
         private long startTime;
-
-        public InitializeDatabase(TradeApplication context) {
-            this.context = context;
-        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -253,7 +248,7 @@ public class TradeApplication extends Application implements BaseApplication, Mo
             Log.d(TAG, String.format("Database Initialization Complete:  Time: %.02f secs State:%s", +elapsed/1000.0f, sqlConnection.getState()));
 
             if ( exception != null ) {
-                new AlertDialog.Builder(this.context.getActivity())
+                new AlertDialog.Builder(TradeApplication.this.getActivity())
                         .setTitle(R.string.init_database_error_title)
                         .setMessage(R.string.init_database_error_message)
                         .setCancelable(false)

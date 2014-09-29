@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SqlConnection extends SQLiteOpenHelper {
-    private static final String TAG = "balch.SqlConnection";  // isLoggable requires < 23 chars
+    private static final String TAG = SqlConnection.class.getSimpleName();
 
     protected Map<String, String> sqlColumnCache = new HashMap<String, String>();
 
@@ -193,7 +193,7 @@ public class SqlConnection extends SQLiteOpenHelper {
     protected void executeScript(String scriptName, SQLiteDatabase db) {
         String script = getScript(scriptName);
         if (script == null) {
-            throw new RuntimeException("Error loading " + scriptName);
+            throw new IllegalArgumentException("Error loading " + scriptName);
         }
 
         String[] statements = script.split(";");
@@ -231,6 +231,7 @@ public class SqlConnection extends SQLiteOpenHelper {
             sql = sqlBuilder.toString();
         } catch (Exception e) {
             Log.e(TAG, "getScript", e);
+            throw new IllegalArgumentException(e);
         } finally {
             if (inputStream != null) {
                 try {

@@ -22,16 +22,12 @@
 
 package com.balch.mocktrade;
 
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.balch.android.app.framework.BaseApplication;
@@ -93,12 +89,10 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
         this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                 DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
-        new InitializeDatabase().execute();
 
         this.requestQueue = VolleyBackground.newRequestQueue(this, 10);
 
         this.configureModelFactory();
-
     }
 
     @Override
@@ -132,28 +126,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
     @Override
     public SqlConnection getSqlConnection() {
-        if (!sqlConnection.isAvailable()) {
-            if (sqlConnection.isInitializing()) {
-                int maxTries = 60;
-                int count = 0;
-
-                // should display a wait activity
-                try {
-                    while (sqlConnection.isInitializing() && (count < maxTries)) {
-                        Thread.yield();
-                        Thread.sleep(200);
-                        count++;
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        }
-
-        if (!sqlConnection.isAvailable()) {
-            Log.e(TAG, "Could not get SqlConnection  State="+sqlConnection.getState());
-            throw new RuntimeException("SqlConnection is not available");
-        }
-
         return sqlConnection;
     }
 
@@ -218,50 +190,4 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     public RequestQueue getRequestQueue() {
         return this.requestQueue;
     }
-
-    private class InitializeDatabase extends AsyncTask<Void, Void, Void> {
-        private final String TAG = this.getClass().getName();
-        private Exception exception;
-        private long startTime;
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                sqlConnection.initialize();
-            } catch (Exception e) {
-                this.exception = e;
-                Log.e(TAG, "doInBackground: Initialize SqlConnection", e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            Log.d(TAG, "Starting InitializeDatabase");
-            this.startTime = System.currentTimeMillis();
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            long elapsed = System.currentTimeMillis() - startTime;
-            Log.d(TAG, String.format("Database Initialization Complete:  Time: %.02f secs State:%s", +elapsed/1000.0f, sqlConnection.getState()));
-
-            if ( exception != null ) {
-                new AlertDialog.Builder(TradeApplication.this.getActivity())
-                        .setTitle(R.string.init_database_error_title)
-                        .setMessage(R.string.init_database_error_message)
-                        .setCancelable(false)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                System.exit(1);
-                            }
-                        })
-                        .create()
-                        .show();
-            }
-        };
-    }
-
 }

@@ -57,48 +57,12 @@ public class SqlConnection extends SQLiteOpenHelper {
     protected final String createScript;
     protected final String updateScript;
 
-    enum SqlConnectionState {
-        UNINITIALIZED,
-        INITIALIZING,
-        AVAILABLE,
-        ERROR
-    }
-
-    protected SqlConnectionState state = SqlConnectionState.UNINITIALIZED;
-
     public SqlConnection(Context context, String databaseName, int version,
                          String createScript, String updateScript) {
         super(context, databaseName, null, version);
         this.context = context;
         this.createScript = createScript;
         this.updateScript = updateScript;
-    }
-
-    public void initialize() throws Exception {
-        this.state = SqlConnectionState.INITIALIZING;
-        try {
-            this.state = SqlConnectionState.AVAILABLE;
-        } catch (Exception ex) {
-            this.state = SqlConnectionState.ERROR;
-            throw ex;
-        }
-    }
-
-    public boolean isAvailable() {
-        return (this.state == SqlConnectionState.AVAILABLE);
-    }
-
-    public boolean isInitializing() {
-        return ((this.state == SqlConnectionState.INITIALIZING) ||
-                (this.state == SqlConnectionState.UNINITIALIZED));
-    }
-
-    public boolean isError() {
-        return (this.state == SqlConnectionState.ERROR);
-    }
-
-    public SqlConnectionState getState() {
-        return state;
     }
 
     public <T extends BaseBean> T queryById(Class<T> clazz, Long id) throws Exception {

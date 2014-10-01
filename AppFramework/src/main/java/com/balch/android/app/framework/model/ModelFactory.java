@@ -44,7 +44,7 @@ public class ModelFactory {
         return getModel(defaultSourceProvider, clazz);
     }
 
-    public <T> T getModel(ModelSourceProvider sourceProvider, Class<? extends BaseModel> clazz) {
+    public <T extends BaseModel> T getModel(ModelSourceProvider sourceProvider, Class<? extends BaseModel> clazz) {
         T model;
 
         if (sourceProvider == defaultSourceProvider) {

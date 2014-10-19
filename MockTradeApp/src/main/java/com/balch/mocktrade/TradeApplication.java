@@ -80,6 +80,24 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
     @Override
     public void onCreate() {
+
+    /*
+            // Tell Android what thread issues you want to detect and what to do when found.
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()    // or use .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            // Tell Android what VM issues you want to detect and what to do when found.
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()       // Log the problem
+                    .penaltyDeath()     // Then kill the app
+                    .build());
+
+    */
         super.onCreate();
 
         this.instance = this;

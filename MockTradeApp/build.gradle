@@ -1,19 +1,18 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
         applicationId "com.balch.mocktrade"
         minSdkVersion 16
-        targetSdkVersion 19
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,6 +35,6 @@ dependencies {
         mavenCentral()
     }
     testCompile 'junit:junit:4.10'
-    testCompile 'org.robolectric:robolectric:2.3'
+    testCompile 'org.robolectric:robolectric:2.4'
     testCompile 'org.mockito:mockito-all:1.9.5'
 }

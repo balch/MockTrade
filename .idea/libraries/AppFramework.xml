@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="AppFramework">
-    <CLASSES>
-      <root url="file://$PROJECT_DIR$/AppFramework/build/outputs/aar/AppFramework.aar" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

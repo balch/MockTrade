@@ -27,6 +27,7 @@ import android.util.Log;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
@@ -97,7 +98,7 @@ public class QuoteGoogleFinance implements Quote {
         throw new UnsupportedOperationException();
     }
 
-    public static QuoteGoogleFinance fromJSONObject(JSONObject jsonObject) throws Exception {
+    public static QuoteGoogleFinance fromJSONObject(JSONObject jsonObject) throws JSONException {
         QuoteGoogleFinance quote = new QuoteGoogleFinance();
         Iterator iter = jsonObject.keys();
         while (iter.hasNext()) {

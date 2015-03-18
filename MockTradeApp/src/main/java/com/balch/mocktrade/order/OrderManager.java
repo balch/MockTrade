@@ -35,6 +35,8 @@ import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.receivers.OrderReceiver;
 import com.balch.mocktrade.settings.Settings;
 
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -45,9 +47,9 @@ class OrderManager {
     private static final String TAG = OrderManager.class.getName();
 
     public interface OrderManagerListener {
-        OrderResult executeOrder(Order order, Quote quote, Money price) throws Exception;
+        OrderResult executeOrder(Order order, Quote quote, Money price) throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;
         Investment getInvestmentBySymbol(String symbol, Long accountId);
-        boolean updateOrder(Order order) throws Exception;
+        boolean updateOrder(Order order) throws IllegalAccessException;
     }
 
     protected final FinanceModel financeModel;
@@ -77,13 +79,13 @@ class OrderManager {
                 pendingIntent);
     }
 
-    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws Exception {
+    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (order == null) {
-            throw new Exception("Order not found");
+            throw new IllegalArgumentException("Order not found");
         }
 
         if (quote == null) {
-            throw new Exception("Quote not found");
+            throw new IllegalArgumentException("Quote not found");
         }
 
         OrderResult result;
@@ -117,7 +119,7 @@ class OrderManager {
         return result;
     }
 
-    protected boolean isQuoteValid(Quote quote) throws Exception {
+    protected boolean isQuoteValid(Quote quote)  {
         Date tradeDate = quote.getLastTradeTime();
         return (financeModel.isMarketOpen() && isToday(tradeDate));
     }
@@ -126,7 +128,7 @@ class OrderManager {
         return DateUtils.isToday(date.getTime());
     }
 
-    protected OrderResult executeLimitOrder(Order order, Quote quote) throws Exception {
+    protected OrderResult executeLimitOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
@@ -139,7 +141,7 @@ class OrderManager {
         return orderResult;
     }
 
-    protected OrderResult executeTrailingStopLossOrder(Order order, Quote quote) throws Exception {
+    protected OrderResult executeTrailingStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (order.getAction() == Order.OrderAction.BUY) {
             throw new UnsupportedOperationException("Cannot have a Stop Loss order if the action is BUY");
         }
@@ -149,7 +151,7 @@ class OrderManager {
         if (order.getHighestPrice().getDollars() == 0.0) {
             Investment investment = listener.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
             if (investment == null) {
-                throw new Exception("Can't sell and investment you don't own");
+                throw new IllegalArgumentException("Can't sell and investment you don't own");
             }
 
             order.setHighestPrice(investment.getPrice());
@@ -171,7 +173,7 @@ class OrderManager {
                     double percent = delta.getDollars() * 100f / order.getHighestPrice().getDollars();
                     executeOrder = percent >= order.getStopPercent();
                 } else {
-                    throw new Exception("Invalid Order Strategy: " + order.getStrategy());
+                    throw new IllegalArgumentException("Invalid Order Strategy: " + order.getStrategy());
                 }
 
                 if (executeOrder) {
@@ -182,14 +184,14 @@ class OrderManager {
 
         if (highestPriceChanged) {
             if (!listener.updateOrder(order)) {
-                throw new Exception("Error updating order");
+                throw new IllegalArgumentException("Error updating order");
             }
         }
 
         return orderResult;
     }
 
-    protected OrderResult executeStopLossOrder(Order order, Quote quote) throws Exception {
+    protected OrderResult executeStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (order.getAction() == Order.OrderAction.BUY) {
             throw new UnsupportedOperationException("Cannot have a Stop Loss order if the action is BUY");
         }
@@ -205,7 +207,7 @@ class OrderManager {
         return orderResult;
     }
 
-    protected OrderResult executeMarketOrder(Order order, Quote quote) throws Exception {
+    protected OrderResult executeMarketOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             orderResult = this.listener.executeOrder(order, quote, quote.getPrice());

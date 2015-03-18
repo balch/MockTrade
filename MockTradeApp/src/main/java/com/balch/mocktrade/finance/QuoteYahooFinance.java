@@ -27,6 +27,7 @@ import android.util.Log;
 
 import com.balch.android.app.framework.types.Money;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -162,7 +163,7 @@ public class QuoteYahooFinance implements Quote {
         return new Money(this.data.get(this.PreviousClose));
     }
 
-    public static QuoteYahooFinance fromJSONObject(JSONObject jsonObject) throws Exception {
+    public static QuoteYahooFinance fromJSONObject(JSONObject jsonObject) throws JSONException {
         QuoteYahooFinance quote = new QuoteYahooFinance();
         Iterator iter = jsonObject.keys();
         while (iter.hasNext()) {
@@ -174,7 +175,7 @@ public class QuoteYahooFinance implements Quote {
 
         String error = quote.data.get(QuoteYahooFinance.ErrorIndicationreturnedforsymbolchangedinvalid);
         if (!TextUtils.isEmpty(error)) {
-            throw new Exception(error);
+            throw new JSONException(error);
         }
 
         return quote;

@@ -35,6 +35,8 @@ import com.balch.mocktrade.investment.InvestmentSqliteModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -117,19 +119,24 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
     }
 
 
-    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws Exception {
+    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws OrderExecutionException {
         try {
             return orderManager.attemptExecuteOrder(order, quote);
         } catch (Exception ex) {
             if (order != null) {
-                order.setStatus(Order.OrderStatus.ERROR);
-                getSqlConnection().update(order);
+
+                try {
+                    order.setStatus(Order.OrderStatus.ERROR);
+                    getSqlConnection().update(order);
+                } catch (IllegalAccessException e) {
+                    throw new OrderExecutionException(ex);
+                }
             }
-            throw ex;
+            throw new OrderExecutionException(ex);
         }
     }
 
-    public OrderResult executeOrder(Order order, Quote quote, Money price) throws Exception {
+    public OrderResult executeOrder(Order order, Quote quote, Money price) throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         SQLiteDatabase db = getSqlConnection().getWritableDatabase();
         db.beginTransaction();
         try {
@@ -142,7 +149,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             Transaction.TransactionType transactionType;
             if (order.getAction() == Order.OrderAction.BUY) {
                 if (account.getAvailableFunds().getDollars() < cost.getDollars()) {
-                    throw new Exception("Insufficient funds");
+                    throw new IllegalAccessException("Insufficient funds");
                 }
                 transactionType = Transaction.TransactionType.WITHDRAWAL;
             } else {
@@ -154,13 +161,13 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
             account.getAvailableFunds().add(transactionCost);
             if (!getSqlConnection().update(account, db)) {
-                throw new Exception("Error updating account");
+                throw new IllegalAccessException("Error updating account");
             }
 
             Investment investment = investmentModel.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
             if (investment == null) {
                 if (order.getAction() == Order.OrderAction.SELL) {
-                    throw new Exception("Can't sell and investment you don't own");
+                    throw new IllegalAccessException("Can't sell and investment you don't own");
                 }
                 investment = new Investment(account, quote.getSymbol(),
                         Investment.InvestmentStatus.OPEN, quote.getName(), quote.getExchange(),
@@ -169,7 +176,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             } else {
                 if (order.getAction() == Order.OrderAction.SELL) {
                     if (order.getQuantity() > investment.getQuantity()) {
-                        throw new Exception("Selling too many shares");
+                        throw new IllegalAccessException("Selling too many shares");
                     }
 
                     profit = Money.subtract(transactionCost, investment.getCostBasis());
@@ -178,19 +185,19 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
                 investment.aggregateOrder(order, price);
                 if (investment.getQuantity() > 0) {
                     if (!getSqlConnection().update(investment, db)) {
-                        throw new Exception("Error updating investment");
+                        throw new IllegalAccessException("Error updating investment");
                     }
                 } else {
                     // delete the investment if we sold everything
                     if (!getSqlConnection().delete(investment, db)) {
-                        throw new Exception("Error updating investment");
+                        throw new IllegalAccessException("Error updating investment");
                     }
                 }
             }
 
             order.setStatus(Order.OrderStatus.FULFILLED);
             if (!getSqlConnection().update(order, db)) {
-                throw new Exception("Error updating order");
+                throw new IllegalAccessException("Error updating order");
             }
 
             db.setTransactionSuccessful();
@@ -207,7 +214,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
     }
 
     @Override
-    public boolean updateOrder(Order order) throws Exception {
+    public boolean updateOrder(Order order) throws IllegalAccessException {
         return getSqlConnection().update(order);
     }
 

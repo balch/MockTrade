@@ -60,7 +60,7 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-                                              Context context, ModelFactory modelFactory) throws Exception {
+                                              Context context, ModelFactory modelFactory) throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
         baseStrategy.init(context, modelFactory);
 

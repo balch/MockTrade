@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,12 +67,12 @@ public class SqlConnection extends SQLiteOpenHelper {
         this.updateScript = updateScript;
     }
 
-    public <T extends BaseBean> T queryById(Class<T> clazz, Long id) throws Exception {
+    public <T extends BaseBean> T queryById(Class<T> clazz, Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
         List<T> items = this.query(clazz, BaseBean._ID+"=?", new String[]{String.valueOf(id)}, null);
         return (items.size() == 1) ? items.get(0) : null;
     }
 
-    public <T extends BaseBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws Exception {
+    public <T extends BaseBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
         StopWatch sw = null;
         if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -113,11 +115,11 @@ public class SqlConnection extends SQLiteOpenHelper {
         return results;
     }
 
-    public long insert(BaseBean bean) throws Exception {
+    public long insert(BaseBean bean) throws SQLException, IllegalAccessException {
         return insert(bean, this.getWritableDatabase());
     }
 
-    public long insert(BaseBean bean, SQLiteDatabase db) throws Exception {
+    public long insert(BaseBean bean, SQLiteDatabase db) throws SQLException, IllegalAccessException {
         ISO8601DateTime now = new ISO8601DateTime();
         bean.setCreateTime(now);
         bean.setUpdateTime(now);
@@ -125,21 +127,21 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         bean.setId(db.insert(bean.getTableName(), null, values));
         if (bean.getId() == -1) {
-            throw new Exception("Error inserting record");
+            throw new SQLException("Error inserting record");
         }
 
         return bean.getId();
     }
 
-    public boolean update(BaseBean bean) throws Exception {
+    public boolean update(BaseBean bean) throws IllegalAccessException {
         return update(bean, null, null, this.getWritableDatabase());
     }
 
-    public boolean update(BaseBean bean, SQLiteDatabase db) throws Exception {
+    public boolean update(BaseBean bean, SQLiteDatabase db) throws IllegalAccessException {
         return update(bean, null, null, db);
     }
 
-    public boolean update(BaseBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws Exception {
+    public boolean update(BaseBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
 
         ISO8601DateTime now = new ISO8601DateTime();
         bean.setUpdateTime(now);
@@ -162,11 +164,11 @@ public class SqlConnection extends SQLiteOpenHelper {
         return (count == 1);
     }
 
-    public boolean delete(BaseBean bean) throws Exception {
+    public boolean delete(BaseBean bean)  {
         return delete(bean, this.getWritableDatabase());
     }
 
-    public boolean delete(BaseBean bean, SQLiteDatabase db) throws Exception {
+    public boolean delete(BaseBean bean, SQLiteDatabase db)  {
         return (db.delete(bean.getTableName(), "_id=?", new String[]{bean.getId().toString()}) == 1);
     }
 
@@ -331,7 +333,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         }
     }
 
-    protected ContentValues getContentValues(BaseBean bean) throws Exception {
+    protected ContentValues getContentValues(BaseBean bean) throws IllegalAccessException {
         final ContentValues values = new ContentValues();
 
         GetContentValuesHandler handler = new GetContentValuesHandler(values);
@@ -496,7 +498,7 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     protected <T extends BaseBean> void setFieldFromCursor(final Field field, final T item,
                                                            SetFieldFromCursorHandler setFieldFromCursorHandler)
-            throws Exception {
+            throws SQLException {
 
         // getAnnotation is SLOW
         // Caching column names gives a 2x speedup
@@ -527,7 +529,7 @@ public class SqlConnection extends SQLiteOpenHelper {
                 String msg = "Cannot find Column:"+columnName+" in this list of columns:"+
                         TextUtils.join(",", cursor.getColumnNames());
                 Log.e(TAG, msg);
-                throw new Exception(msg);
+                throw new SQLException(msg);
             }
         }
     }

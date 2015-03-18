@@ -29,6 +29,7 @@ import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
+import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public interface PortfolioModel extends BaseModel {
 
     List<Order> getOpenOrders();
 
-    OrderResult attemptExecuteOrder(final Order order, Quote quote) throws Exception;
+    OrderResult attemptExecuteOrder(final Order order, Quote quote) throws IllegalAccessException, OrderExecutionException;
 
     boolean updateInvestment(Investment investment);
 

@@ -33,6 +33,7 @@ import com.balch.mocktrade.investment.InvestmentSqliteModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 import com.balch.mocktrade.order.Order;
+import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
@@ -121,7 +122,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
-    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws Exception {
+    public OrderResult attemptExecuteOrder(Order order, Quote quote) throws OrderExecutionException {
         return orderModel.attemptExecuteOrder(order, quote);
     }
 

@@ -40,7 +40,7 @@ public class AccountSqliteModel extends SqliteModel  {
 
     public List<Account> getAllAccounts() {
         try {
-            return getSqlConnection().query(Account.class, null, null, Account.SQL_NAME + " COLLATE NOCASE");
+            return getSqlConnection().query(Account.class, null, null, Account.COLUMN_NAME + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

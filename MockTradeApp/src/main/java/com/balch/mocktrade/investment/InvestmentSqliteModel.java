@@ -38,10 +38,10 @@ public class InvestmentSqliteModel extends SqliteModel {
             String where = null;
             String [] whereArgs = null;
             if (accountId != null) {
-                where = Investment.ACCOUNT_ID + " = ?";
+                where = Investment.COLUMN_ACCOUNT_ID + " = ?";
                 whereArgs = new String[]{accountId.toString()};
             }
-            return this.getSqlConnection().query(Investment.class, where, whereArgs, Investment.SYMBOL + " COLLATE NOCASE");
+            return this.getSqlConnection().query(Investment.class, where, whereArgs, Investment.COLUMN_SYMBOL + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -53,7 +53,7 @@ public class InvestmentSqliteModel extends SqliteModel {
 
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
         try {
-            String where = String.format("%s = ? AND %s = ?", Investment.SYMBOL, Investment.ACCOUNT_ID);
+            String where = String.format("%s = ? AND %s = ?", Investment.COLUMN_SYMBOL, Investment.COLUMN_ACCOUNT_ID);
             String [] whereArgs = new String[]{symbol, accountId.toString()};
             List<Investment> investments = this.getSqlConnection().query(Investment.class, where, whereArgs, null);
 

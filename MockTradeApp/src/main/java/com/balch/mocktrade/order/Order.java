@@ -22,101 +22,75 @@
 
 package com.balch.mocktrade.order;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.bean.BaseBean;
 import com.balch.android.app.framework.bean.BeanEditState;
 import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
 import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
-import com.balch.android.app.framework.sql.annotations.SqlColumn;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Order  extends BaseBean implements Serializable {
     public static final String TABLE_NAME = "[order]";
 
-    public static final String SQL_ACCOUNT_ID = "account_id";
-    public static final String SQL_STATUS = "status";
+    public static final String COLUMN_ACCOUNT_ID = "account_id";
+    public static final String COLUMN_SYMBOL = "symbol";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_ACTION = "action";
+    public static final String COLUMN_STRATEGY = "strategy";
+    public static final String COLUMN_DURATION = "duration";
+    public static final String COLUMN_LIMIT_PRICE = "limit_price";
+    public static final String COLUMN_STOP_PRICE = "stop_price";
+    public static final String COLUMN_STOP_PERCENT = "stop_percent";
+    public static final String COLUMN_QUANTITY = "quantity";
+    public static final String COLUMN_HIGHEST_PRICE = "highest_price";
 
     public static final String FLD_LIMIT_PRICE = "limitPrice";
     public static final String FLD_STOP_PRICE = "stopPrice";
     public static final String FLD_STOP_PERCENT = "stopPercent";
-    public static final String FLD_STRATEGY = "strategy";
-    public static final String FLD_QUANTITY = "quantity";
-    public static final String FLD_SYMBOL = "symbol";
-    public static final String FLD_ACTION = "action";
 
-    public enum OrderStatus implements MetadataUtils.EnumResource {
-        OPEN,
-        FULFILLED,
-        ERROR,
-        CANCELED;
+    protected Account account;
 
-        @Override
-        public int getListResId() {
-            return R.array.order_status_display_values;
-        }
-    }
+    @BeanColumnEdit(order = 1, state = BeanEditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
+    @BeanColumnNew(order = 1, customControl = StockSymbolControl.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
+    protected String symbol;
 
-    public enum OrderAction implements MetadataUtils.EnumResource {
-        BUY,
-        SELL;
+    protected OrderStatus status;
 
-        @Override
-        public int getListResId() {
-            return R.array.order_type_display_values;
-        }
-    }
+    @BeanColumnEdit(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
+    @BeanColumnNew(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
+    protected OrderAction action;
 
-    private static final int FLAG_BUY = (1<<0);
-    private static final int FLAG_SELL = (1<<1);
-    public enum OrderStrategy implements MetadataUtils.EnumResource {
-        MARKET(FLAG_BUY | FLAG_SELL),
-        MANUAL(FLAG_BUY | FLAG_SELL),
-        LIMIT(FLAG_BUY | FLAG_SELL),
-        STOP_LOSS(FLAG_SELL),
-        TRAILING_STOP_AMOUNT_CHANGE(FLAG_SELL),
-        TRAILING_STOP_PERCENT_CHANGE(FLAG_SELL);
+    @BeanColumnEdit(order = 3, state = BeanEditState.READONLY, labelResId = R.string.order_strategy_label)
+    @BeanColumnNew(order = 3, labelResId = R.string.order_strategy_label)
+    protected OrderStrategy strategy;
 
+    protected OrderDuration duration;
 
-        private int supportedActions;
+    @BeanColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
+    @BeanColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
+    protected Money limitPrice;
 
-        private OrderStrategy(int flags) {
-            this.supportedActions = flags;
-        }
+    @BeanColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
+    @BeanColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
+    protected Money stopPrice;
 
-        @Override
-        public int getListResId() {
-            return R.array.order_strategy_display_values;
-        }
+    @BeanColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
+    @BeanColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
+    protected Double stopPercent;
 
-        public boolean isBuySuported() {
-            return ((this.supportedActions & FLAG_BUY) != 0);
-        }
+    @BeanColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
+    @BeanColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
+    protected Long quantity;
 
-        public boolean isSellSuported() {
-            return ((this.supportedActions & FLAG_SELL) != 0);
-        }
-
-    }
-
-    public enum OrderDuration implements MetadataUtils.EnumResource {
-        GOOD_TIL_CANCELED,
-        DAY;
-
-        @Override
-        public int getListResId() {
-            return R.array.order_duration_display_values;
-        }
-
-    }
-
-    @Override
-    public String getTableName() {
-        return Order.TABLE_NAME;
-    }
+    protected Money highestPrice;
 
     public Order() {
         this.symbol = "";
@@ -131,52 +105,10 @@ public class Order  extends BaseBean implements Serializable {
         this.highestPrice = new Money(0);
     }
 
-    @SqlColumn(name = SQL_ACCOUNT_ID)
-    protected Account account;
-
-    @SqlColumn
-    @BeanColumnEdit(order = 1, state = BeanEditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    @BeanColumnNew(order = 1, customControl = StockSymbolControl.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    protected String symbol;
-
-    @SqlColumn
-    protected OrderStatus status;
-
-    @SqlColumn
-    @BeanColumnEdit(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
-    @BeanColumnNew(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
-    protected OrderAction action;
-
-    @SqlColumn
-    @BeanColumnEdit(order = 3, state = BeanEditState.READONLY, labelResId = R.string.order_strategy_label)
-    @BeanColumnNew(order = 3, labelResId = R.string.order_strategy_label)
-    protected OrderStrategy strategy;
-
-    @SqlColumn
-    protected OrderDuration duration;
-
-    @SqlColumn(name = "limit_price")
-    @BeanColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
-    @BeanColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
-    protected Money limitPrice;
-
-    @SqlColumn(name = "stop_price")
-    @BeanColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
-    @BeanColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
-    protected Money stopPrice;
-
-    @SqlColumn(name = "stop_percent")
-    @BeanColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
-    @BeanColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
-    protected Double stopPercent;
-
-    @SqlColumn
-    @BeanColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
-    @BeanColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
-    protected Long quantity;
-
-    @SqlColumn(name = "highest_price")
-    protected Money highestPrice;
+    @Override
+    public String getTableName() {
+        return Order.TABLE_NAME;
+    }
 
     public Account getAccount() {
         return account;
@@ -275,6 +207,108 @@ public class Order  extends BaseBean implements Serializable {
     public Money getCost(Money price) {
         return Money.multiply(price, this.getQuantityDelta());
     }
+
+    @Override
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_ACCOUNT_ID, this.account.getId());
+        values.put(COLUMN_SYMBOL, this.symbol);
+        values.put(COLUMN_STATUS, this.status.name());
+        values.put(COLUMN_ACTION, this.action.name());
+        values.put(COLUMN_STRATEGY, this.strategy.name());
+        values.put(COLUMN_DURATION, this.duration.name());
+        values.put(COLUMN_LIMIT_PRICE, this.limitPrice.getMicroCents());
+        values.put(COLUMN_STOP_PRICE, this.stopPrice.getMicroCents());
+        values.put(COLUMN_STOP_PERCENT, this.stopPercent);
+        values.put(COLUMN_QUANTITY, this.quantity);
+        values.put(COLUMN_HIGHEST_PRICE, this.highestPrice.getMicroCents());
+
+        return values;
+    }
+
+    @Override
+    public void populate(Cursor cursor, Map<String, Integer> columnMap) {
+        this.id = cursor.getLong(columnMap.get(COLUMN_ID));
+        this.account = new Account();
+        this.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        this.symbol = cursor.getString(columnMap.get(COLUMN_SYMBOL));
+        this.status = OrderStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS)));
+        this.action = OrderAction.valueOf(cursor.getString(columnMap.get(COLUMN_ACTION)));
+        this.strategy = OrderStrategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY)));
+        this.duration = OrderDuration.valueOf(cursor.getString(columnMap.get(COLUMN_DURATION)));
+        this.limitPrice = new Money(cursor.getLong(columnMap.get(COLUMN_LIMIT_PRICE)));
+        this.stopPrice = new Money(cursor.getLong(columnMap.get(COLUMN_STOP_PRICE)));
+        this.stopPercent = cursor.getDouble(columnMap.get(COLUMN_STOP_PERCENT));
+        this.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
+        this.highestPrice = new Money(cursor.getLong(columnMap.get(COLUMN_HIGHEST_PRICE)));
+    }
+
+
+    public enum OrderStatus implements MetadataUtils.EnumResource {
+        OPEN,
+        FULFILLED,
+        ERROR,
+        CANCELED;
+
+        @Override
+        public int getListResId() {
+            return R.array.order_status_display_values;
+        }
+    }
+
+    public enum OrderAction implements MetadataUtils.EnumResource {
+        BUY,
+        SELL;
+
+        @Override
+        public int getListResId() {
+            return R.array.order_type_display_values;
+        }
+    }
+
+    private static final int FLAG_BUY = (1<<0);
+    private static final int FLAG_SELL = (1<<1);
+    public enum OrderStrategy implements MetadataUtils.EnumResource {
+        MARKET(FLAG_BUY | FLAG_SELL),
+        MANUAL(FLAG_BUY | FLAG_SELL),
+        LIMIT(FLAG_BUY | FLAG_SELL),
+        STOP_LOSS(FLAG_SELL),
+        TRAILING_STOP_AMOUNT_CHANGE(FLAG_SELL),
+        TRAILING_STOP_PERCENT_CHANGE(FLAG_SELL);
+
+
+        private int supportedActions;
+
+        private OrderStrategy(int flags) {
+            this.supportedActions = flags;
+        }
+
+        @Override
+        public int getListResId() {
+            return R.array.order_strategy_display_values;
+        }
+
+        public boolean isBuySuported() {
+            return ((this.supportedActions & FLAG_BUY) != 0);
+        }
+
+        public boolean isSellSuported() {
+            return ((this.supportedActions & FLAG_SELL) != 0);
+        }
+
+    }
+
+    public enum OrderDuration implements MetadataUtils.EnumResource {
+        GOOD_TIL_CANCELED,
+        DAY;
+
+        @Override
+        public int getListResId() {
+            return R.array.order_duration_display_values;
+        }
+    }
+
 }
 
 

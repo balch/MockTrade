@@ -45,16 +45,16 @@ public class OrderEditController implements BeanExternalController<Order> {
 
     @Override
     public void onChanged(Context context, BeanColumnDescriptor descriptor, Object value, BeanControlMap beanControlMap) throws BeanValidatorException {
-        if (descriptor.getField().getName().equals(Order.FLD_STRATEGY)) {
+        if (descriptor.getField().getName().equals(Order.COLUMN_STRATEGY)) {
             onChangeStrategy((Order.OrderStrategy) value, beanControlMap);
-        } else if (descriptor.getField().getName().equals(Order.FLD_ACTION)) {
+        } else if (descriptor.getField().getName().equals(Order.COLUMN_ACTION)) {
             onChangeAction(context, (Order.OrderAction) value, beanControlMap);
         }
     }
 
     @Override
     public void validate(Context context, Order order, BeanControlMap beanControlMap) throws BeanValidatorException {
-        StockSymbolControl symbolControl = beanControlMap.get(Order.FLD_SYMBOL);
+        StockSymbolControl symbolControl = beanControlMap.get(Order.COLUMN_SYMBOL);
         Money price = symbolControl.getPrice();
         if (order.getStrategy() == Order.OrderStrategy.MANUAL) {
             price = order.getLimitPrice();
@@ -64,7 +64,7 @@ public class OrderEditController implements BeanExternalController<Order> {
         boolean hasAvailableFunds = ((order.getAction() == Order.OrderAction.SELL) ||
                 (cost.getDollars() <= order.getAccount().getAvailableFunds().getDollars()));
 
-        QuantityPriceControl quantityControl = beanControlMap.get(Order.FLD_QUANTITY);
+        QuantityPriceControl quantityControl = beanControlMap.get(Order.COLUMN_QUANTITY);
         quantityControl.setCost(cost, hasAvailableFunds);
 
         if (!hasAvailableFunds) {
@@ -82,13 +82,13 @@ public class OrderEditController implements BeanExternalController<Order> {
         ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
         FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
 
-        QuantityPriceControl quantityControl = beanControlMap.get(Order.FLD_QUANTITY);
+        QuantityPriceControl quantityControl = beanControlMap.get(Order.COLUMN_QUANTITY);
         quantityControl.setOrderInfo(order);
         quantityControl.setMarketIsOpen(financeModel.isMarketOpen());
         quantityControl.setAccountInfo(order.account);
         quantityControl.setEnabled(controlEnabled);
 
-        BeanEditControl control = beanControlMap.get(Order.FLD_SYMBOL);
+        BeanEditControl control = beanControlMap.get(Order.COLUMN_SYMBOL);
         control.setEnabled(controlEnabled);
     }
 
@@ -127,7 +127,7 @@ public class OrderEditController implements BeanExternalController<Order> {
     }
 
     protected void onChangeAction(Context context, Order.OrderAction action, BeanControlMap beanControlMap) {
-        BeanEditControl control = beanControlMap.get(Order.FLD_STRATEGY);
+        BeanEditControl control = beanControlMap.get(Order.COLUMN_STRATEGY);
         if (control instanceof EnumEditControl) {
             int selectionIndex = 0;
             Order.OrderStrategy strategy = (Order.OrderStrategy) control.getValue();

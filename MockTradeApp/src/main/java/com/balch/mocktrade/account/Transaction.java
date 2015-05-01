@@ -23,24 +23,27 @@
 package com.balch.mocktrade.account;
 
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import com.balch.android.app.framework.bean.BaseBean;
-import com.balch.android.app.framework.sql.annotations.SqlColumn;
 import com.balch.android.app.framework.types.Money;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Transaction extends BaseBean implements Serializable {
     static public final String TABLE_NAME = "[transaction]";
 
-    @Override
-    public String getTableName() {
-        return Transaction.TABLE_NAME;
-    }
+    public static final String COLUMN_ACCOUNT_ID = "account_id";
+    public static final String COLUMN_AMOUNT = "amount";
+    public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_NOTES = "notes";
 
-    public enum TransactionType  {
-        DEPOSIT,
-        WITHDRAWAL;
-   }
+    protected Account account;
+    protected Money amount;
+    protected TransactionType type;
+    protected String notes;
 
     public Transaction() {
     }
@@ -52,17 +55,15 @@ public class Transaction extends BaseBean implements Serializable {
         this.notes = notes;
     }
 
-    @SqlColumn(name="account_id")
-    protected Account account;
+    @Override
+    public String getTableName() {
+        return Transaction.TABLE_NAME;
+    }
 
-    @SqlColumn
-    protected Money amount;
-
-    @SqlColumn
-    protected TransactionType type;
-
-    @SqlColumn
-    protected String notes;
+    public enum TransactionType  {
+        DEPOSIT,
+        WITHDRAWAL;
+    }
 
     public Account getAccount() {
         return account;
@@ -95,4 +96,27 @@ public class Transaction extends BaseBean implements Serializable {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    @Override
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_ACCOUNT_ID, this.account.getId());
+        values.put(COLUMN_AMOUNT, this.amount.getMicroCents());
+        values.put(COLUMN_TYPE, this.type.name());
+        values.put(COLUMN_NOTES, this.notes);
+
+        return values;
+    }
+
+    @Override
+    public void populate(Cursor cursor, Map<String, Integer> columnMap) {
+        this.id = cursor.getLong(columnMap.get(COLUMN_ID));
+        this.account = new Account();
+        this.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        this.amount = new Money(cursor.getLong(columnMap.get(COLUMN_AMOUNT)));
+        this.type = TransactionType.valueOf(cursor.getString(columnMap.get(COLUMN_TYPE)));
+        this.notes = cursor.getString(columnMap.get(COLUMN_NOTES));
+    }
+
 }

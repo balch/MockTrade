@@ -30,23 +30,18 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.StopWatch;
 import com.balch.android.app.framework.bean.BaseBean;
-import com.balch.android.app.framework.sql.annotations.SqlColumn;
 import com.balch.android.app.framework.types.ISO8601DateTime;
-import com.balch.android.app.framework.types.Money;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -87,17 +82,10 @@ public class SqlConnection extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             cursor = this.getReadableDatabase().query(table, null, where, whereArgs, null, null, orderBy);
-
-            SetFieldFromCursorHandler setFieldFromCursorHandler = new SetFieldFromCursorHandler(cursor);
-
-            List<Field> fields = MetadataUtils.getAllFields(clazz);
+            Map<String, Integer> columnMap = getColumnMap(cursor);
             while (cursor.moveToNext()) {
                 T item = ctor.newInstance();
-
-                for (final Field field : fields) {
-                    setFieldFromCursor(field, item, setFieldFromCursorHandler);
-                }
-
+                item.populate(cursor, columnMap);
                 results.add(item);
 
             }
@@ -120,17 +108,19 @@ public class SqlConnection extends SQLiteOpenHelper {
     }
 
     public long insert(BaseBean bean, SQLiteDatabase db) throws SQLException, IllegalAccessException {
-        ISO8601DateTime now = new ISO8601DateTime();
-        bean.setCreateTime(now);
-        bean.setUpdateTime(now);
-        ContentValues values = getContentValues(bean);
+        ContentValues values = bean.getContentValues();
 
-        bean.setId(db.insert(bean.getTableName(), null, values));
-        if (bean.getId() == -1) {
+        ISO8601DateTime now = new ISO8601DateTime();
+        values.put(BaseBean.COLUMN_CREATE_TIME, now.toString());
+        values.put(BaseBean.COLUMN_UPDATE_TIME, now.toString());
+
+        long id = db.insert(bean.getTableName(), null, values);
+        if (id == -1) {
             throw new SQLException("Error inserting record");
         }
 
-        return bean.getId();
+        bean.setId(id);
+        return id;
     }
 
     public boolean update(BaseBean bean) throws IllegalAccessException {
@@ -143,9 +133,10 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     public boolean update(BaseBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
 
+        ContentValues values = bean.getContentValues();
+
         ISO8601DateTime now = new ISO8601DateTime();
-        bean.setUpdateTime(now);
-        ContentValues values = getContentValues(bean);
+        values.put(BaseBean.COLUMN_UPDATE_TIME, now.toString());
 
         StringBuilder where = new StringBuilder("_id=?");
         List<String> whereArgList = new ArrayList<String>();
@@ -246,291 +237,15 @@ public class SqlConnection extends SQLiteOpenHelper {
         return sql;
     }
 
-    protected static class GetContentValuesHandler implements MetadataUtils.Handler {
-        protected final ContentValues values;
-        protected String column;
-        protected Object value;
+    private Map<String, Integer> getColumnMap(Cursor cursor) {
+        Map<String, Integer> columnMap = new Hashtable<>(cursor.getColumnCount());
 
-        public GetContentValuesHandler(ContentValues values) {
-            this.values = values;
+        for (int x = 0; x < cursor.getColumnCount(); x++) {
+            columnMap.put(cursor.getColumnName(x), x);
         }
 
-        public GetContentValuesHandler bind(String column, Object value) {
-            this.column = column;
-            this.value = value;
-            return this;
-        }
-
-        @Override
-        public boolean handleMoney(Field field) {
-            values.put(column, Long.valueOf(((Money) value).getMicroCents()));
-            return true;
-        }
-
-        @Override
-        public boolean handleEnum(Field field) {
-            values.put(column, ((Enum) value).name());
-            return true;
-        }
-
-        @Override
-        public boolean handleISO8601DateTime(Field field) {
-            values.put(column, ((ISO8601DateTime) value).toString());
-            return true;
-        }
-
-        @Override
-        public boolean handleDate(Field field) {
-            values.put(column, ISO8601DateTime.toISO8601((Date) value));
-            return true;
-        }
-
-        @Override
-        public boolean handleBaseBean(Field field) {
-            values.put(column, ((BaseBean) value).getId());
-            return true;
-        }
-
-        @Override
-        public boolean handleString(Field field) {
-            values.put(column, (String) value);
-            return true;
-        }
-
-        @Override
-        public boolean handleBoolean(Field field) {
-            values.put(column, (Boolean)value ? 1 : 0);
-            return true;
-        }
-
-        @Override
-        public boolean handleInteger(Field field) {
-            values.put(column, (Integer) value);
-            return true;
-        }
-
-        @Override
-        public boolean handleLong(Field field) {
-            values.put(column, (Long) value);
-            return true;
-        }
-
-        @Override
-        public boolean handleDouble(Field field) {
-            values.put(column, (Double) value);
-            return true;
-        }
-
-        @Override
-        public boolean handleFloat(Field field) {
-            values.put(column, (Float) value);
-            return true;
-        }
-
-        @Override
-        public boolean handleUnsupported(Field field) {
-            throw new UnsupportedOperationException("Unsupported Type:" + field.getType().getName());
-        }
+        return columnMap;
     }
 
-    protected ContentValues getContentValues(BaseBean bean) throws IllegalAccessException {
-        final ContentValues values = new ContentValues();
 
-        GetContentValuesHandler handler = new GetContentValuesHandler(values);
-
-        List<Field> fields = MetadataUtils.getAllFields(((Object) bean).getClass());
-        for (final Field field : fields) {
-            final SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            if (sqlColumn != null) {
-                final String column = (sqlColumn.name().equals("") ?
-                        field.getName() :
-                        sqlColumn.name());
-
-                final Object value = field.get(bean);
-                if (value != null) {
-                    MetadataUtils.handleField(field, handler.bind(column, value));
-                }
-            }
-        }
-        return values;
-    }
-
-    protected static class SetFieldFromCursorHandler implements MetadataUtils.Handler {
-        protected final Cursor cursor;
-        protected int  idx;
-        protected BaseBean item;
-
-        public SetFieldFromCursorHandler(Cursor cursor) {
-            this.cursor = cursor;
-        }
-
-        public SetFieldFromCursorHandler bind(int idx, BaseBean item) {
-            this.idx = idx;
-            this.item = item;
-            return this;
-        }
-
-        public Cursor getCursor() {
-            return cursor;
-        }
-
-        @Override
-        public boolean handleMoney(Field field) {
-            try {
-                field.set(item, new Money(cursor.getLong(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleEnum(Field field) {
-            try {
-                field.set(item, Enum.valueOf((Class<Enum>) field.getType(), cursor.getString(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleISO8601DateTime(Field field) {
-            try {
-                field.set(item, new ISO8601DateTime(cursor.getString(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            } catch (ParseException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleDate(Field field) {
-            try {
-                field.set(item, ISO8601DateTime.toDate(cursor.getString(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            } catch (ParseException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleBaseBean(Field field) {
-            try {
-                BaseBean bean = (BaseBean)field.getType().newInstance();
-                bean.setId(cursor.getLong(idx));
-                field.set(item, bean);
-            } catch (Exception e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleString(Field field) {
-            try {
-                field.set(item, cursor.getString(idx));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleBoolean(Field field) {
-            try {
-                field.set(item, (cursor.getInt(idx) == 1));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleInteger(Field field) {
-            try {
-                field.set(item, Integer.valueOf(cursor.getInt(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleLong(Field field) {
-            try {
-                field.set(item, Long.valueOf(cursor.getLong(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleDouble(Field field) {
-            try {
-                field.set(item, Double.valueOf(cursor.getDouble(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleFloat(Field field) {
-            try {
-                field.set(item, Float.valueOf(cursor.getFloat(idx)));
-            } catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException(e);
-            }
-            return true;
-        }
-
-        @Override
-        public boolean handleUnsupported(Field field) {
-            throw new UnsupportedOperationException("Unsupported Type:" + field.getType().getName());
-        }
-    }
-
-    protected <T extends BaseBean> void setFieldFromCursor(final Field field, final T item,
-                                                           SetFieldFromCursorHandler setFieldFromCursorHandler)
-            throws SQLException {
-
-        // getAnnotation is SLOW
-        // Caching column names gives a 2x speedup
-        String key = field.getDeclaringClass().getSimpleName() + "." + field.getName();
-        String columnName = sqlColumnCache.get(key);
-        if (columnName == null) {
-            final SqlColumn sqlColumn = field.getAnnotation(SqlColumn.class);
-            if (sqlColumn != null) {
-                columnName = (sqlColumn.name().equals("") ?
-                        field.getName() :
-                        sqlColumn.name());
-            } else {
-                // annotation does not exits, use an empty name
-                columnName = "";
-            }
-            sqlColumnCache.put(key, columnName);
-        }
-
-        if (!TextUtils.isEmpty(columnName)) {
-            Cursor cursor = setFieldFromCursorHandler.getCursor();
-            final int idx = cursor.getColumnIndex(columnName);
-
-            if (idx >= 0) {
-                if (!cursor.isNull(idx)) {
-                    MetadataUtils.handleField(field, setFieldFromCursorHandler.bind(idx, item));
-                }
-            } else {
-                String msg = "Cannot find Column:"+columnName+" in this list of columns:"+
-                        TextUtils.join(",", cursor.getColumnNames());
-                Log.e(TAG, msg);
-                throw new SQLException(msg);
-            }
-        }
-    }
 }

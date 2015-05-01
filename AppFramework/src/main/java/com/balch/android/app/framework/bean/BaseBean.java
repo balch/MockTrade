@@ -22,24 +22,29 @@
 
 package com.balch.android.app.framework.bean;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import com.balch.android.app.framework.sql.annotations.SqlColumn;
 import com.balch.android.app.framework.sql.SqlTable;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public abstract class BaseBean implements BaseColumns, SqlTable, Serializable {
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_CREATE_TIME = "create_time";
+    public static final String COLUMN_UPDATE_TIME = "update_time";
 
-    @SqlColumn(name = "_id")
     protected Long id;
 
-    @SqlColumn(name = "create_time")
     protected ISO8601DateTime createTime;
 
-    @SqlColumn(name = "update_time")
     protected ISO8601DateTime updateTime;
+
+    public abstract ContentValues getContentValues();
+    public abstract void populate(Cursor cursor, Map<String, Integer> columnMap);
 
     public Long getId() {
         return id;

@@ -70,12 +70,12 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
     public List<Order> getOpenOrders(Long accountId) {
         try {
-            StringBuilder where = new StringBuilder(Order.SQL_STATUS+"=?");
+            StringBuilder where = new StringBuilder(Order.COLUMN_STATUS+"=?");
             List<String> whereArgs = new ArrayList<String>();
             whereArgs.add(Order.OrderStatus.OPEN.name());
 
             if (accountId != null) {
-                where.append(" AND ").append(Order.SQL_ACCOUNT_ID).append("=?");
+                where.append(" AND ").append(Order.COLUMN_ACCOUNT_ID).append("=?");
                 whereArgs.add(String.valueOf(accountId));
             }
 
@@ -95,7 +95,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             // only update the order if the status is still open
             // still may need some locking to make sure the order
             // is not executed after is has been canceled
-            String where = " AND "+Order.SQL_STATUS+"=?";
+            String where = " AND "+Order.COLUMN_STATUS+"=?";
             String [] whereArgs = new String[]{Order.OrderStatus.OPEN.name()};
 
             if (!this.getSqlConnection().update(order, where, whereArgs,

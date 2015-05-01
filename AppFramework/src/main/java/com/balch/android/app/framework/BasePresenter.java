@@ -47,6 +47,11 @@ public abstract class BasePresenter<T extends Application> {
         return this.application.getString(resId);
     }
 
+    public final String getString(int resId, Object... formatArgs) {
+        return this.application.getString(resId, formatArgs);
+    }
+
+
     public void restoreInstanceState(Bundle savedInstanceState) {
     }
 

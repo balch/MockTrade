@@ -65,7 +65,7 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
             public boolean onCancelOrder(final Order order) {
                 new AlertDialog.Builder(application.getActivity())
                         .setTitle(R.string.order_cancel_dlg_title)
-                        .setMessage(String.format(getString(R.string.order_cancel_dlg_message_format), order.getId(), order.getSymbol()))
+                        .setMessage(getString(R.string.order_cancel_dlg_message_format, order.getId(), order.getSymbol()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {

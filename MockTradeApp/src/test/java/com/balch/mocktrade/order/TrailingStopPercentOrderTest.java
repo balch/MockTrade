@@ -24,28 +24,32 @@ package com.balch.mocktrade.order;
 
 import android.content.Context;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.finance.QuoteGeneric;
 import com.balch.mocktrade.settings.Settings;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 
 @RunWith(Parameterized.class)
 public class TrailingStopPercentOrderTest {

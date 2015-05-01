@@ -94,7 +94,7 @@
     <string name="order_item_quantity">Quantity:</string>
 
     <string name="order_cancel_dlg_title">Are you sure?</string>
-    <string name="order_cancel_dlg_message_format" formatted="false">You are about to cancel Order #:%d for \'%s\'.  This cannot be undone!!!</string>
+    <string name="order_cancel_dlg_message_format">You are about to cancel Order #:%1$d for \'%2$s\'.  This cannot be undone!!!</string>
 
     <string name="order_edit_title_edit">Change Order</string>
     <string name="order_edit_title_new">New Order</string>
@@ -122,8 +122,8 @@
     <string name="quantity_edit_error_invalid_amount">Invalid Amount</string>
 
     <string name="notification_order_title">MockTrade Execution</string>
-    <string name="notification_order_buy_success_format" formatted="false">Buy order for %s executed %d shares at %s for a total cost of %s.</string>
-    <string name="notification_order_sell_success_format" formatted="false">Sell order for %s executed %d shares at %s for a total value of %s. (Profit: %s)</string>
-    <string name="notification_order_error_format" formatted="false">Order %d for %s failed to executed. Error: %s</string>
+    <string name="notification_order_buy_success_format">Buy order for %1$s executed %2$d shares at %3$s for a total cost of %4$s.</string>
+    <string name="notification_order_sell_success_format">Sell order for %1$s executed %2$d shares at %3$s for a total value of %4$s. (Profit: %5$s)</string>
+    <string name="notification_order_error_format">Order %1$d for %2$s failed to executed. Error: %3$s</string>
 
 </resources>

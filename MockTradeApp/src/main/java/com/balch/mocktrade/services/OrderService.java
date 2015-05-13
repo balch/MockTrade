@@ -64,7 +64,7 @@ public class OrderService extends IntentService {
             final List<Order> orders = portfolioModel.getOpenOrders();
 
             if (orders.size() > 0) {
-                List<String> symbols = new ArrayList<String>(orders.size());
+                List<String> symbols = new ArrayList<>(orders.size());
                 for (Order o : orders) {
                     symbols.add(o.getSymbol());
                 }
@@ -142,14 +142,12 @@ public class OrderService extends IntentService {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                         .setContentText(msg);
 
-        // TODO: Make this go somewhere cool
         Intent clickIntent = new Intent(this, TemplateActivity.class);
 
         PendingIntent pendingClickIntent =
                 PendingIntent.getActivity(this, 0 , clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingClickIntent);
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        int id = R.id.notification_order_id;
         int id = (int)(order.getId() % Integer.MAX_VALUE);
         notificationManager.notify(id, builder.build());
     }

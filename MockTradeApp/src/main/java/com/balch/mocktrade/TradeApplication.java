@@ -26,6 +26,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -80,29 +81,27 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
     @Override
     public void onCreate() {
+        super.onCreate();
 
-    /*
-            // Tell Android what thread issues you want to detect and what to do when found.
+        if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
                     .detectDiskWrites()
-                    .detectNetwork()    // or use .detectAll() for all detectable problems
+                    .detectNetwork()
                     .penaltyLog()
                     .build());
-            // Tell Android what VM issues you want to detect and what to do when found.
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
-                    .penaltyLog()       // Log the problem
-                    .penaltyDeath()     // Then kill the app
+                    .penaltyLog()
+                    .penaltyDeath()
                     .build());
 
-    */
-        super.onCreate();
+        }
 
-        this.instance = this;
+        TradeApplication.instance = this;
 
-        this.buttonMap = new HashMap<NavButton, Fragment>();
+        this.buttonMap = new HashMap<>();
         this.settings = new Settings(this);
 
         this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,

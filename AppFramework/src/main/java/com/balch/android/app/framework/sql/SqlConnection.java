@@ -40,15 +40,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 public class SqlConnection extends SQLiteOpenHelper {
     private static final String TAG = SqlConnection.class.getSimpleName();
-
-    protected Map<String, String> sqlColumnCache = new HashMap<String, String>();
 
     protected final Context context;
     protected final String createScript;

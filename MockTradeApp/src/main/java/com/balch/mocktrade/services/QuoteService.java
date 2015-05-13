@@ -29,7 +29,6 @@ import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
-import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -65,9 +64,9 @@ public class QuoteService extends IntentService {
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
-            TradeApplication application = (TradeApplication)this.getApplication();
-            FinanceModel financeModel = application.getModelFactory().getModel(FinanceModel.class);
-            final PortfolioModel portfolioModel = application.getModelFactory().getModel(PortfolioModel.class);
+            ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
+            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
+            final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Investment> investments = portfolioModel.getAllInvestments();
 
             if (investments.size() > 0) {
@@ -118,12 +117,8 @@ public class QuoteService extends IntentService {
                     public void onErrorResponse(String error) {
                         // failed to return quotes
                         // Error has been logged
-                        try {
-
-                        } finally {
-                            PortfolioPresenter.updateView(QuoteService.this);
-                            QuoteReceiver.completeWakefulIntent(intent);
-                        }
+                        PortfolioPresenter.updateView(QuoteService.this);
+                        QuoteReceiver.completeWakefulIntent(intent);
                     }
                 });
             } else {

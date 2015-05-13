@@ -34,9 +34,9 @@ import com.balch.android.app.framework.TemplateActivity;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
+import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
@@ -58,7 +58,7 @@ public class OrderService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
 
         try {
-            ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+            ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Order> orders = portfolioModel.getOpenOrders();

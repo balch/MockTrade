@@ -35,8 +35,8 @@ import com.balch.android.app.framework.bean.controls.EnumEditControl;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.model.ModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +79,7 @@ public class OrderEditController implements BeanExternalController<Order> {
 
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
 
-        ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+        ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
         FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
 
         QuantityPriceControl quantityControl = beanControlMap.get(Order.COLUMN_QUANTITY);

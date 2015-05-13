@@ -28,8 +28,8 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
-import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 
 public class BootReceiver extends WakefulBroadcastReceiver {
@@ -40,7 +40,7 @@ public class BootReceiver extends WakefulBroadcastReceiver {
 
         Log.i(TAG, "BootReceiver onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+            ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             financeModel.setQuoteServiceAlarm();
 

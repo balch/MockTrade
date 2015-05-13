@@ -54,7 +54,7 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        TradeApplication tradeApplication = TradeApplication.getInstance();
+        TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
         tradeApplication.getActivity().showProgress();
 
         View view = inflater.inflate(R.layout.your_content_here_view, container, false);
@@ -68,7 +68,7 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                TradeApplication tradeApplication = TradeApplication.getInstance();
+                TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
                 tradeApplication.getActivity().hideProgress();
             }
         });
@@ -107,7 +107,7 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
 
     @Override
     public void refresh() {
-        TradeApplication tradeApplication = TradeApplication.getInstance();
+        TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
         tradeApplication.getActivity().showProgress();
 
         this.webView.reload();

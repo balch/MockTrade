@@ -73,11 +73,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     private YQLSourceProvider yqlScheme;
     private ModelFactory modelFactory;
 
-    private static TradeApplication instance;
-
-    public static TradeApplication getInstance() {
-        return instance;
-    }
 
     @Override
     public void onCreate() {
@@ -98,8 +93,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
                     .build());
 
         }
-
-        TradeApplication.instance = this;
 
         this.buttonMap = new HashMap<>();
         this.settings = new Settings(this);

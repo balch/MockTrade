@@ -24,13 +24,13 @@ package com.balch.mocktrade.portfolio;
 
 import com.balch.android.app.framework.BaseFragment;
 import com.balch.android.app.framework.model.ModelFactory;
-import com.balch.mocktrade.TradeApplication;
+import com.balch.mocktrade.model.ModelProvider;
 
 public class PortfolioFragment extends BaseFragment<PortfolioPresenter, PortfolioView> {
 
     @Override
     protected PortfolioPresenter createPresenter(PortfolioView view) {
-        ModelFactory modelFactory = TradeApplication.getInstance().getModelFactory();
+        ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
         PortfolioModel model = modelFactory.getModel(PortfolioModel.class);
         return new PortfolioPresenter(this, model, view);
     }

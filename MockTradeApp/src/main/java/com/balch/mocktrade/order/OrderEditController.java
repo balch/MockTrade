@@ -131,8 +131,8 @@ public class OrderEditController implements BeanExternalController<Order> {
         if (control instanceof EnumEditControl) {
             int selectionIndex = 0;
             Order.OrderStrategy strategy = (Order.OrderStrategy) control.getValue();
-            List<Object> enumValues = new ArrayList<Object>();
-            List<String> displayValues = new ArrayList<String>();
+            List<Object> enumValues = new ArrayList<>();
+            List<String> displayValues = new ArrayList<>();
 
             String [] masterDisplayValues = context.getResources().getStringArray(strategy.getListResId());
 

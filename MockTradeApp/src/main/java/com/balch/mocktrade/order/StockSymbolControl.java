@@ -102,7 +102,8 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
         this.description = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
         this.price = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
 
-        ModelFactory modelFactory = ((ModelProvider)this.getContext().getApplicationContext()).getModelFactory();
+        ModelFactory modelFactory;
+        modelFactory = ((ModelProvider)this.getContext().getApplicationContext()).getModelFactory();
         this.financeModel = modelFactory.getModel(FinanceModel.class);
 
         this.value.setHint(R.string.order_symbol_hint);
@@ -160,7 +161,7 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
 
 
     protected List<InputFilter> getInputFilters() {
-        return new ArrayList<InputFilter>();
+        return new ArrayList<>();
     }
 
     protected String getValueAsString(Object obj) {

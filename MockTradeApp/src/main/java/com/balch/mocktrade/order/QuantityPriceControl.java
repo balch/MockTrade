@@ -160,7 +160,7 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
     }
 
     protected List<InputFilter> getInputFilters() {
-        return new ArrayList<InputFilter>();
+        return new ArrayList<>();
     }
 
     protected String getValueAsString(Object obj) {

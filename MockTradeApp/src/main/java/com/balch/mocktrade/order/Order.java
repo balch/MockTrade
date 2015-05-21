@@ -98,10 +98,10 @@ public class Order  extends BaseBean implements Serializable {
         this.action = OrderAction.BUY;
         this.strategy = OrderStrategy.MARKET;
         this.duration = OrderDuration.GOOD_TIL_CANCELED;
-        this.quantity = new Long(0);
+        this.quantity = 0L;
         this.limitPrice = new Money(0);
         this.stopPrice = new Money(0);
-        this.stopPercent = new Double(0.0);
+        this.stopPercent = 0.0;
         this.highestPrice = new Money(0);
     }
 
@@ -267,7 +267,7 @@ public class Order  extends BaseBean implements Serializable {
         }
     }
 
-    private static final int FLAG_BUY = (1<<0);
+    private static final int FLAG_BUY = (1);
     private static final int FLAG_SELL = (1<<1);
     public enum OrderStrategy implements MetadataUtils.EnumResource {
         MARKET(FLAG_BUY | FLAG_SELL),
@@ -280,7 +280,7 @@ public class Order  extends BaseBean implements Serializable {
 
         private int supportedActions;
 
-        private OrderStrategy(int flags) {
+        OrderStrategy(int flags) {
             this.supportedActions = flags;
         }
 

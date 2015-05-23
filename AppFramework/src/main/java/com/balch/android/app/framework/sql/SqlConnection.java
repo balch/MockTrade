@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -82,6 +83,23 @@ public class SqlConnection extends SQLiteOpenHelper {
             Map<String, Integer> columnMap = getColumnMap(cursor);
             while (cursor.moveToNext()) {
                 T item = ctor.newInstance();
+                ISO8601DateTime iso8601DateTime;
+                try {
+                    iso8601DateTime = new ISO8601DateTime(cursor.getString(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
+                } catch (ParseException ex) {
+                    iso8601DateTime = new ISO8601DateTime();
+                    Log.e(TAG, "Error reading CreateTime time", ex);
+                }
+                item.setCreateTime(iso8601DateTime);
+
+                try {
+                    iso8601DateTime = new ISO8601DateTime(cursor.getString(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
+                } catch (ParseException ex) {
+                    iso8601DateTime = new ISO8601DateTime();
+                    Log.e(TAG, "Error reading UpdateTime time", ex);
+                }
+                item.setUpdateTime(iso8601DateTime);
+
                 mapper.populate(item, cursor, columnMap);
                 results.add(item);
 

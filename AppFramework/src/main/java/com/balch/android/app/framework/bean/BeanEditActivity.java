@@ -28,6 +28,7 @@ import android.os.Bundle;
 
 import com.balch.android.app.framework.BaseActivity;
 import com.balch.android.app.framework.BasePresenter;
+import com.balch.android.app.framework.sql.SqlBean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +57,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
         }
 
         BeanExternalController validator = (BeanExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
-        BaseBean item = (BaseBean) intent.getSerializableExtra(EXTRA_ITEM);
+        SqlBean item = (SqlBean) intent.getSerializableExtra(EXTRA_ITEM);
         boolean  isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
         int okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
         int cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
@@ -65,7 +66,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
                 okButtonResId, cancelButtonResId,
                 new BeanEditView.BeanEditViewListener() {
                     @Override
-                    public void onSave(BaseBean item) {
+                    public void onSave(SqlBean item) {
                         Intent intent = getIntent();
                         intent.putExtra(EXTRA_RESULT, item);
                         setResult(RESULT_OK, intent);
@@ -86,7 +87,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
         return new BeanEditView(this);
     }
 
-    public static Intent getIntent(Context context, int titleResId, BaseBean item, BeanExternalController beanExternalController,
+    public static Intent getIntent(Context context, int titleResId, SqlBean item, BeanExternalController beanExternalController,
                                    int okButtonResId, int cancelButtonResId) {
         Intent intent = new Intent(context, BeanEditActivity.class);
 
@@ -100,7 +101,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
         return intent;
     }
 
-    public static <T extends BaseBean> T getResult(Intent intent) {
+    public static <T extends SqlBean> T getResult(Intent intent) {
         return (T) intent.getSerializableExtra(EXTRA_RESULT);
     }
 }

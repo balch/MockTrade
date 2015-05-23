@@ -25,10 +25,11 @@ package com.balch.android.app.framework.bean;
 import android.content.Context;
 
 import com.balch.android.app.framework.bean.controls.BeanControlMap;
+import com.balch.android.app.framework.sql.SqlBean;
 
 import java.io.Serializable;
 
-public interface BeanExternalController<T extends BaseBean> extends Serializable {
+public interface BeanExternalController<T extends SqlBean> extends Serializable {
 
     void onChanged(Context context, BeanColumnDescriptor descriptor, Object value,
                   BeanControlMap beanControlMap) throws BeanValidatorException;

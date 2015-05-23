@@ -23,11 +23,12 @@
 package com.balch.android.app.framework.bean;
 
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.sql.SqlBean;
 
 import java.lang.reflect.Field;
 
 public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
-    protected final BaseBean item;
+    protected final SqlBean item;
     protected final Field field;
     protected final int labelResId;
     protected final BeanEditState state;
@@ -36,7 +37,7 @@ public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
     protected final Class<? extends BeanEditControl> customControl;
 
 
-    public BeanColumnDescriptor(BaseBean item, Field field, int labelResId,
+    public BeanColumnDescriptor(SqlBean item, Field field, int labelResId,
                                 BeanEditState state, BeanViewHint[] hints, int order,
                                 Class<? extends BeanEditControl> customControl) {
         this.item = item;
@@ -68,7 +69,7 @@ public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
         return field;
     }
 
-    public BaseBean getItem() {
+    public SqlBean getItem() {
         return item;
     }
 

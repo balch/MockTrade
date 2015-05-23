@@ -28,7 +28,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.MetadataUtils;
-import com.balch.android.app.framework.bean.BaseBean;
+import com.balch.android.app.framework.sql.SqlBean;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -39,7 +39,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
-public class Investment extends BaseBean {
+public class Investment extends SqlBean {
     public static final String TAG = Investment.class.getSimpleName();
 
     public static final String TABLE_NAME = "investment";

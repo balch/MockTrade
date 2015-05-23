@@ -26,17 +26,18 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.balch.android.app.framework.BasePresenter;
+import com.balch.android.app.framework.sql.SqlBean;
 
 public class BeanEditPresenter extends BasePresenter<Application> {
 
     protected final BeanEditView view;
     protected final BeanExternalController validator;
-    protected final BaseBean item;
+    protected final SqlBean item;
     protected final boolean isNew;
     protected final int okButtonResId;
     protected final int cancelButtonResId;
 
-    public BeanEditPresenter(BeanEditView view, boolean isNew, BaseBean item, BeanExternalController validator,
+    public BeanEditPresenter(BeanEditView view, boolean isNew, SqlBean item, BeanExternalController validator,
                              int okButtonResId, int cancelButtonResId,
                              BeanEditView.BeanEditViewListener beanEditViewListener) {
         this.view = view;

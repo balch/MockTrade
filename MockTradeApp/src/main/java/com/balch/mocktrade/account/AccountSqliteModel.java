@@ -48,7 +48,7 @@ public class AccountSqliteModel extends SqliteModel  {
 
     public Account getAccount(long accountId) {
         try {
-            List<Account> accounts = getSqlConnection().query(Account.class, Account._ID+"=?", new String[]{String.valueOf(accountId)}, null);
+            List<Account> accounts = getSqlConnection().query(Account.class, Account.COLUMN_ID+"=?", new String[]{String.valueOf(accountId)}, null);
             return (accounts.size() == 1) ? accounts.get(0) : null;
         } catch (Exception e) {
             throw new RuntimeException(e);

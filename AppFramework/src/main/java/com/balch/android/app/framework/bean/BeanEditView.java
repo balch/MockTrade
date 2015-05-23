@@ -37,6 +37,7 @@ import com.balch.android.app.framework.bean.controls.BeanControlMap;
 import com.balch.android.app.framework.bean.controls.BeanControlMapper;
 import com.balch.android.app.framework.bean.controls.BeanEditControl;
 import com.balch.android.app.framework.bean.controls.UnsupportedEditControl;
+import com.balch.android.app.framework.sql.SqlBean;
 import com.balch.android.app.framework.view.BaseView;
 
 import java.lang.reflect.Field;
@@ -46,13 +47,13 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
     private static final String TAG = BeanEditView.class.getName();
 
     public interface BeanEditViewListener {
-        void onSave(BaseBean item);
+        void onSave(SqlBean item);
         void onCancel();
     }
 
     protected BeanEditViewListener beanEditViewListener;
     protected List<BeanColumnDescriptor> columns;
-    protected BaseBean item;
+    protected SqlBean item;
 
     protected LinearLayout editControlLayout;
     protected Button okButton;
@@ -105,7 +106,7 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
 
     }
 
-    public void bind(BaseBean item, boolean isNew, BeanExternalController controller,
+    public void bind(SqlBean item, boolean isNew, BeanExternalController controller,
                      int okButtonResId, int cancelButtonResId) {
         this.item = item;
         this.controller = controller;
@@ -167,11 +168,11 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
         }
     }
 
-    protected BaseBean getPopulatedCopy() {
-        BaseBean bean = createEmptyBean();
+    protected SqlBean getPopulatedCopy() {
+        SqlBean bean = createEmptyBean();
         Field[] fields = ((Object)this.item).getClass().getDeclaredFields();
         for (Field field : fields) {
-            if (BaseBean.class.isAssignableFrom(field.getType())) {
+            if (SqlBean.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 try {
                     field.set(bean, field.get(this.item));
@@ -186,10 +187,10 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
         return  bean;
     }
 
-    protected BaseBean createEmptyBean() {
-        BaseBean bean = null;
+    protected SqlBean createEmptyBean() {
+        SqlBean bean = null;
         try {
-            bean = (BaseBean)((Object)item).getClass().newInstance();
+            bean = (SqlBean)((Object)item).getClass().newInstance();
         } catch (InstantiationException e) {
             Log.e(TAG, "Create basebean object", e);
             setErrorState(true);
@@ -200,7 +201,7 @@ public class BeanEditView extends ScrollView implements BaseView, BeanControlMap
         return bean;
     }
 
-    protected void populateBeanFromControls(BaseBean bean) {
+    protected void populateBeanFromControls(SqlBean bean) {
         try {
             int cnt = this.editControlLayout.getChildCount();
             for (int x = 0; x < cnt; x++) {

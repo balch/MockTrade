@@ -25,10 +25,12 @@ package com.balch.android.app.framework.bean;
 import android.content.Context;
 import android.widget.BaseAdapter;
 
+import com.balch.android.app.framework.sql.SqlBean;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseBeanAdapter<T extends BaseBean> extends BaseAdapter {
+public abstract class BaseBeanAdapter<T extends SqlBean> extends BaseAdapter {
 
     protected final Context context;
     protected final List<T> items = new ArrayList<T>();

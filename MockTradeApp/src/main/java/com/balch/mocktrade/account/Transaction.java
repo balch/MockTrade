@@ -26,13 +26,13 @@ package com.balch.mocktrade.account;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.balch.android.app.framework.bean.BaseBean;
+import com.balch.android.app.framework.sql.SqlBean;
 import com.balch.android.app.framework.types.Money;
 
 import java.io.Serializable;
 import java.util.Map;
 
-public class Transaction extends BaseBean implements Serializable {
+public class Transaction extends SqlBean implements Serializable {
     static public final String TABLE_NAME = "[transaction]";
 
     public static final String COLUMN_ACCOUNT_ID = "account_id";

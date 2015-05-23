@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.bean.BaseBean;
+import com.balch.android.app.framework.sql.SqlBean;
 import com.balch.android.app.framework.bean.BeanColumnDescriptor;
 import com.balch.android.app.framework.bean.BeanEditState;
 import com.balch.android.app.framework.bean.BeanViewHint;
@@ -62,7 +62,7 @@ public class MetadataUtils {
         ENUM(Enum.class, EnumEditControl.class),
         ISO8601DATETIME(ISO8601DateTime.class, null),
         DATE(Date.class, null),
-        BASEBEAN(BaseBean.class, null),
+        BASEBEAN(SqlBean.class, null),
         STRING(String.class, StringEditControl.class),
         BOOLEAN(Boolean.class, BoolEditControl.class),
         INTEGER(Integer.class, null),
@@ -146,7 +146,7 @@ public class MetadataUtils {
         return handled;
     }
 
-    static public List<BeanColumnDescriptor> getBeanColumnDescriptors(BaseBean item, boolean isNew) {
+    static public List<BeanColumnDescriptor> getBeanColumnDescriptors(SqlBean item, boolean isNew) {
 
         List<BeanColumnDescriptor> descriptors = new ArrayList<BeanColumnDescriptor>();
 

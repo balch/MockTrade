@@ -27,7 +27,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.balch.android.app.framework.MetadataUtils;
-import com.balch.android.app.framework.bean.BaseBean;
+import com.balch.android.app.framework.sql.SqlBean;
 import com.balch.android.app.framework.bean.BeanEditState;
 import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
 import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
@@ -42,7 +42,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class Account extends BaseBean implements Serializable {
+public class Account extends SqlBean implements Serializable {
     public static final String TABLE_NAME = "account";
 
     public static final String COLUMN_NAME = "name";

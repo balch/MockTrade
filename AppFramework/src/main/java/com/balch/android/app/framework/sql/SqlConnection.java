@@ -31,7 +31,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.StopWatch;
-import com.balch.android.app.framework.bean.BaseBean;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 
 import java.io.IOException;
@@ -59,12 +58,12 @@ public class SqlConnection extends SQLiteOpenHelper {
         this.updateScript = updateScript;
     }
 
-    public <T extends BaseBean> T queryById(Class<T> clazz, Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        List<T> items = this.query(clazz, BaseBean._ID+"=?", new String[]{String.valueOf(id)}, null);
+    public <T extends SqlBean> T queryById(Class<T> clazz, Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        List<T> items = this.query(clazz, SqlBean.COLUMN_ID+"=?", new String[]{String.valueOf(id)}, null);
         return (items.size() == 1) ? items.get(0) : null;
     }
 
-    public <T extends BaseBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
+    public <T extends SqlBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
         StopWatch sw = null;
         if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -100,16 +99,16 @@ public class SqlConnection extends SQLiteOpenHelper {
         return results;
     }
 
-    public long insert(BaseBean bean) throws SQLException, IllegalAccessException {
+    public long insert(SqlBean bean) throws SQLException, IllegalAccessException {
         return insert(bean, this.getWritableDatabase());
     }
 
-    public long insert(BaseBean bean, SQLiteDatabase db) throws SQLException, IllegalAccessException {
+    public long insert(SqlBean bean, SQLiteDatabase db) throws SQLException, IllegalAccessException {
         ContentValues values = bean.getContentValues();
 
         ISO8601DateTime now = new ISO8601DateTime();
-        values.put(BaseBean.COLUMN_CREATE_TIME, now.toString());
-        values.put(BaseBean.COLUMN_UPDATE_TIME, now.toString());
+        values.put(SqlBean.COLUMN_CREATE_TIME, now.toString());
+        values.put(SqlBean.COLUMN_UPDATE_TIME, now.toString());
 
         long id = db.insert(bean.getTableName(), null, values);
         if (id == -1) {
@@ -120,20 +119,20 @@ public class SqlConnection extends SQLiteOpenHelper {
         return id;
     }
 
-    public boolean update(BaseBean bean) throws IllegalAccessException {
+    public boolean update(SqlBean bean) throws IllegalAccessException {
         return update(bean, null, null, this.getWritableDatabase());
     }
 
-    public boolean update(BaseBean bean, SQLiteDatabase db) throws IllegalAccessException {
+    public boolean update(SqlBean bean, SQLiteDatabase db) throws IllegalAccessException {
         return update(bean, null, null, db);
     }
 
-    public boolean update(BaseBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
+    public boolean update(SqlBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
 
         ContentValues values = bean.getContentValues();
 
         ISO8601DateTime now = new ISO8601DateTime();
-        values.put(BaseBean.COLUMN_UPDATE_TIME, now.toString());
+        values.put(SqlBean.COLUMN_UPDATE_TIME, now.toString());
 
         StringBuilder where = new StringBuilder("_id=?");
         List<String> whereArgList = new ArrayList<String>();
@@ -152,11 +151,11 @@ public class SqlConnection extends SQLiteOpenHelper {
         return (count == 1);
     }
 
-    public boolean delete(BaseBean bean)  {
+    public boolean delete(SqlBean bean)  {
         return delete(bean, this.getWritableDatabase());
     }
 
-    public boolean delete(BaseBean bean, SQLiteDatabase db)  {
+    public boolean delete(SqlBean bean, SQLiteDatabase db)  {
         return (db.delete(bean.getTableName(), "_id=?", new String[]{bean.getId().toString()}) == 1);
     }
 

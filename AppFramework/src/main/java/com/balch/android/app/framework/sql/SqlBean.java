@@ -20,19 +20,17 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.sql;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.provider.BaseColumns;
 
-import com.balch.android.app.framework.sql.SqlTable;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class BaseBean implements BaseColumns, SqlTable, Serializable {
+public abstract class SqlBean implements Serializable {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CREATE_TIME = "create_time";
     public static final String COLUMN_UPDATE_TIME = "update_time";
@@ -43,6 +41,7 @@ public abstract class BaseBean implements BaseColumns, SqlTable, Serializable {
 
     protected ISO8601DateTime updateTime;
 
+    public abstract String getTableName();
     public abstract ContentValues getContentValues();
     public abstract void populate(Cursor cursor, Map<String, Integer> columnMap);
 

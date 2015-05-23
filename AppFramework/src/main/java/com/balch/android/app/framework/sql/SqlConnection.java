@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.StopWatch;
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 
 import java.io.IOException;
@@ -58,12 +59,12 @@ public class SqlConnection extends SQLiteOpenHelper {
         this.updateScript = updateScript;
     }
 
-    public <T extends SqlBean> T queryById(Class<T> clazz, Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        List<T> items = this.query(clazz, SqlBean.COLUMN_ID+"=?", new String[]{String.valueOf(id)}, null);
+    public <T extends DomainObject> T queryById(SqlMapper mapper, Class<T> clazz, Long id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        List<T> items = this.query(mapper, clazz, SqlMapper.COLUMN_ID+"=?", new String[]{String.valueOf(id)}, null);
         return (items.size() == 1) ? items.get(0) : null;
     }
 
-    public <T extends SqlBean> List<T> query(Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
+    public <T extends DomainObject> List<T> query(SqlMapper mapper, Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
         StopWatch sw = null;
         if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -73,7 +74,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         List<T> results = new ArrayList<T>();
 
         Constructor<T> ctor = clazz.getConstructor();
-        String table = ctor.newInstance().getTableName();
+        String table = mapper.getTableName();
 
         Cursor cursor = null;
         try {
@@ -81,7 +82,7 @@ public class SqlConnection extends SQLiteOpenHelper {
             Map<String, Integer> columnMap = getColumnMap(cursor);
             while (cursor.moveToNext()) {
                 T item = ctor.newInstance();
-                item.populate(cursor, columnMap);
+                mapper.populate(item, cursor, columnMap);
                 results.add(item);
 
             }
@@ -99,44 +100,44 @@ public class SqlConnection extends SQLiteOpenHelper {
         return results;
     }
 
-    public long insert(SqlBean bean) throws SQLException, IllegalAccessException {
-        return insert(bean, this.getWritableDatabase());
+    public long insert(SqlMapper mapper, DomainObject item) throws SQLException, IllegalAccessException {
+        return insert(mapper, item, this.getWritableDatabase());
     }
 
-    public long insert(SqlBean bean, SQLiteDatabase db) throws SQLException, IllegalAccessException {
-        ContentValues values = bean.getContentValues();
+    public long insert(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws SQLException, IllegalAccessException {
+        ContentValues values = mapper.getContentValues(item);
 
         ISO8601DateTime now = new ISO8601DateTime();
-        values.put(SqlBean.COLUMN_CREATE_TIME, now.toString());
-        values.put(SqlBean.COLUMN_UPDATE_TIME, now.toString());
+        values.put(SqlMapper.COLUMN_CREATE_TIME, now.toString());
+        values.put(SqlMapper.COLUMN_UPDATE_TIME, now.toString());
 
-        long id = db.insert(bean.getTableName(), null, values);
+        long id = db.insert(mapper.getTableName(), null, values);
         if (id == -1) {
             throw new SQLException("Error inserting record");
         }
 
-        bean.setId(id);
+        item.setId(id);
         return id;
     }
 
-    public boolean update(SqlBean bean) throws IllegalAccessException {
-        return update(bean, null, null, this.getWritableDatabase());
+    public boolean update(SqlMapper mapper, DomainObject item) throws IllegalAccessException {
+        return update(mapper, item, null, null, this.getWritableDatabase());
     }
 
-    public boolean update(SqlBean bean, SQLiteDatabase db) throws IllegalAccessException {
-        return update(bean, null, null, db);
+    public boolean update(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws IllegalAccessException {
+        return update(mapper, item, null, null, db);
     }
 
-    public boolean update(SqlBean bean, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
+    public boolean update(SqlMapper mapper, DomainObject item, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
 
-        ContentValues values = bean.getContentValues();
+        ContentValues values = mapper.getContentValues(item);
 
         ISO8601DateTime now = new ISO8601DateTime();
-        values.put(SqlBean.COLUMN_UPDATE_TIME, now.toString());
+        values.put(SqlMapper.COLUMN_UPDATE_TIME, now.toString());
 
         StringBuilder where = new StringBuilder("_id=?");
         List<String> whereArgList = new ArrayList<String>();
-        whereArgList.add(bean.getId().toString());
+        whereArgList.add(item.getId().toString());
 
         if (!TextUtils.isEmpty(extraWhere)) {
             where.append(" ").append(extraWhere);
@@ -146,17 +147,17 @@ public class SqlConnection extends SQLiteOpenHelper {
                 }
             }
         }
-        int count = db.update(bean.getTableName(), values, where.toString(),
+        int count = db.update(mapper.getTableName(), values, where.toString(),
                 whereArgList.toArray(new String[whereArgList.size()]));
         return (count == 1);
     }
 
-    public boolean delete(SqlBean bean)  {
-        return delete(bean, this.getWritableDatabase());
+    public boolean delete(SqlMapper mapper, DomainObject item)  {
+        return delete(mapper, item, this.getWritableDatabase());
     }
 
-    public boolean delete(SqlBean bean, SQLiteDatabase db)  {
-        return (db.delete(bean.getTableName(), "_id=?", new String[]{bean.getId().toString()}) == 1);
+    public boolean delete(SqlMapper mapper, DomainObject item, SQLiteDatabase db)  {
+        return (db.delete(mapper.getTableName(), "_id=?", new String[]{item.getId().toString()}) == 1);
     }
 
 /////////////////////////////////

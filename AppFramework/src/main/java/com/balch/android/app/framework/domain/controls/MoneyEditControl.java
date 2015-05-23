@@ -20,15 +20,15 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
 import android.content.Context;
 import android.text.InputType;
 import android.util.AttributeSet;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanViewHint;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.types.Money;
 
 public class MoneyEditControl extends StringEditControl {
@@ -50,13 +50,13 @@ public class MoneyEditControl extends StringEditControl {
     protected void initialize() {
         super.initialize();
         this.value.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        this.value.setHint(R.string.bean_control_money_hint);
+        this.value.setHint(R.string.control_money_hint);
     }
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
-        for (BeanViewHint hint : descriptor.getHints()) {
-            if (hint.getHint() == BeanViewHint.Hint.HIDE_CENTS) {
+    public void bind(ColumnDescriptor descriptor) {
+        for (ViewHint hint : descriptor.getHints()) {
+            if (hint.getHint() == ViewHint.Hint.HIDE_CENTS) {
                 this.hideCents = hint.getBoolValue();
             }
         }

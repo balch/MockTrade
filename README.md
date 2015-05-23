@@ -9,7 +9,6 @@ MockTrade
     * TemplateActivity with built in MVP
         * ModelFactory!!!!
         * Error Handling
-    * Annotation Driven SQL Beans
     * Annotation Driven List/Create/Edit Layouts
 * MockTrade Application
     * Proving Ground for AppFramework
@@ -51,7 +50,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
     * View - Extends Android ViewGroup classes
         * caches controls (ViewHolder pattern)
         * provides Listener interfaces to communicate with Presenter
-        * facilitates binding to Business Object beans
+        * facilitates binding to Business/Domain Object patterns
     * Presenter - facade pattern for the Activity/Fragment classes
         * coordinates interactions between the View and Model 
         * error handling framework for exceptions thrown from the Presenter. 

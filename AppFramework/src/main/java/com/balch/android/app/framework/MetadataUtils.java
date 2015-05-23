@@ -27,19 +27,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.sql.SqlBean;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.BeanViewHint;
-import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
-import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
-import com.balch.android.app.framework.bean.controls.BoolEditControl;
-import com.balch.android.app.framework.bean.controls.EnumEditControl;
-import com.balch.android.app.framework.bean.controls.MoneyEditControl;
-import com.balch.android.app.framework.bean.controls.NumberEditControl;
-import com.balch.android.app.framework.bean.controls.StringEditControl;
-import com.balch.android.app.framework.bean.controls.UnsupportedEditControl;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.domain.annotations.ColumnEdit;
+import com.balch.android.app.framework.domain.annotations.ColumnNew;
+import com.balch.android.app.framework.domain.controls.EditControl;
+import com.balch.android.app.framework.domain.controls.BoolEditControl;
+import com.balch.android.app.framework.domain.controls.EnumEditControl;
+import com.balch.android.app.framework.domain.controls.MoneyEditControl;
+import com.balch.android.app.framework.domain.controls.NumberEditControl;
+import com.balch.android.app.framework.domain.controls.StringEditControl;
+import com.balch.android.app.framework.domain.controls.UnsupportedEditControl;
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 
@@ -62,7 +62,7 @@ public class MetadataUtils {
         ENUM(Enum.class, EnumEditControl.class),
         ISO8601DATETIME(ISO8601DateTime.class, null),
         DATE(Date.class, null),
-        BASEBEAN(SqlBean.class, null),
+        DOMAINOBJECT(DomainObject.class, null),
         STRING(String.class, StringEditControl.class),
         BOOLEAN(Boolean.class, BoolEditControl.class),
         INTEGER(Integer.class, null),
@@ -90,7 +90,7 @@ public class MetadataUtils {
 
         boolean handleDate(Field field);
 
-        boolean handleBaseBean(Field field);
+        boolean handleDomainObject(Field field);
 
         boolean handleString(Field field);
 
@@ -125,8 +125,8 @@ public class MetadataUtils {
             handled = handler.handleISO8601DateTime(field);
         } else if (frameworkType == FrameworkType.DATE) {
             handled = handler.handleDate(field);
-        } else if (frameworkType == FrameworkType.BASEBEAN) {
-            handled = handler.handleBaseBean(field);
+        } else if (frameworkType == FrameworkType.DOMAINOBJECT) {
+            handled = handler.handleDomainObject(field);
         } else if (frameworkType == FrameworkType.STRING) {
             handled = handler.handleString(field);
         } else if (frameworkType == FrameworkType.BOOLEAN) {
@@ -146,35 +146,35 @@ public class MetadataUtils {
         return handled;
     }
 
-    static public List<BeanColumnDescriptor> getBeanColumnDescriptors(SqlBean item, boolean isNew) {
+    static public List<ColumnDescriptor> getColumnDescriptors(DomainObject domainObject, boolean isNew) {
 
-        List<BeanColumnDescriptor> descriptors = new ArrayList<BeanColumnDescriptor>();
+        List<ColumnDescriptor> descriptors = new ArrayList<ColumnDescriptor>();
 
-        List<Field> fields = getAllFields(((Object)item).getClass());
+        List<Field> fields = getAllFields(((Object)domainObject).getClass());
         for (Field field : fields) {
             if (isNew) {
-                final BeanColumnNew newable = field.getAnnotation(BeanColumnNew.class);
-                if ((newable != null) && (newable.state() != BeanEditState.HIDDEN)) {
-                    Class<? extends BeanEditControl> customControl = newable.customControl();
-                    if (BeanEditControl.class.equals(customControl)) {
+                final ColumnNew newable = field.getAnnotation(ColumnNew.class);
+                if ((newable != null) && (newable.state() != EditState.HIDDEN)) {
+                    Class<? extends EditControl> customControl = newable.customControl();
+                    if (EditControl.class.equals(customControl)) {
                         customControl = null;
                     }
 
-                    descriptors.add(new BeanColumnDescriptor(item, field, newable.labelResId(),
-                            newable.state(), BeanViewHint.parse(newable.hints()), newable.order(),
+                    descriptors.add(new ColumnDescriptor(domainObject, field, newable.labelResId(),
+                            newable.state(), ViewHint.parse(newable.hints()), newable.order(),
                             customControl));
                 }
 
             } else {
-                final BeanColumnEdit editable = field.getAnnotation(BeanColumnEdit.class);
-                if ((editable != null) && (editable.state() != BeanEditState.HIDDEN)) {
-                    Class<? extends BeanEditControl> customControl = editable.customControl();
-                    if (BeanEditControl.class.equals(customControl)) {
+                final ColumnEdit editable = field.getAnnotation(ColumnEdit.class);
+                if ((editable != null) && (editable.state() != EditState.HIDDEN)) {
+                    Class<? extends EditControl> customControl = editable.customControl();
+                    if (EditControl.class.equals(customControl)) {
                         customControl = null;
                     }
 
-                    descriptors.add(new BeanColumnDescriptor(item, field, editable.labelResId(),
-                            editable.state(), BeanViewHint.parse(editable.hints()), editable.order(),
+                    descriptors.add(new ColumnDescriptor(domainObject, field, editable.labelResId(),
+                            editable.state(), ViewHint.parse(editable.hints()), editable.order(),
                             customControl));
                 }
             }
@@ -185,7 +185,7 @@ public class MetadataUtils {
         return descriptors;
     }
 
-    static public View getEditView(BeanColumnDescriptor columnDescriptor,
+    static public View getEditView(ColumnDescriptor columnDescriptor,
                                    FrameworkType frameworkType, Context context) {
         View view = null;
         Class<? extends ViewGroup> editViewClazz = frameworkType.editViewClazz;

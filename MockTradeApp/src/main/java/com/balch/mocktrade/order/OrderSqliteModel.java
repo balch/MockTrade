@@ -22,11 +22,15 @@
 
 package com.balch.mocktrade.order;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
+import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.account.Transaction;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
@@ -40,11 +44,27 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderManager.OrderManagerListener {
+public class OrderSqliteModel extends SqliteModel implements SqlMapper<Order>, OrderModel, OrderManager.OrderManagerListener {
     private static final String TAG = OrderSqliteModel.class.getName();
 
+    public static final String TABLE_NAME = "[order]";
+
+    public static final String COLUMN_ACCOUNT_ID = "account_id";
+    public static final String COLUMN_SYMBOL = "symbol";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_ACTION = "action";
+    public static final String COLUMN_STRATEGY = "strategy";
+    public static final String COLUMN_DURATION = "duration";
+    public static final String COLUMN_LIMIT_PRICE = "limit_price";
+    public static final String COLUMN_STOP_PRICE = "stop_price";
+    public static final String COLUMN_STOP_PERCENT = "stop_percent";
+    public static final String COLUMN_QUANTITY = "quantity";
+    public static final String COLUMN_HIGHEST_PRICE = "highest_price";
+
     protected InvestmentSqliteModel investmentModel;
+    protected AccountSqliteModel accountModel;
     protected OrderManager orderManager;
 
     public OrderSqliteModel() {
@@ -56,9 +76,16 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
     }
 
     @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+
+    @Override
     public void initialize(ModelProvider modelProvider) {
         super.initialize(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
+        this.accountModel = new AccountSqliteModel(modelProvider);
         this.orderManager = new OrderManager(modelProvider.getContext(),
                 (FinanceModel)getModelFactory().getModel(FinanceModel.class),
                 getSettings(), this);
@@ -70,16 +97,16 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
     public List<Order> getOpenOrders(Long accountId) {
         try {
-            StringBuilder where = new StringBuilder(Order.COLUMN_STATUS+"=?");
+            StringBuilder where = new StringBuilder(COLUMN_STATUS+"=?");
             List<String> whereArgs = new ArrayList<String>();
             whereArgs.add(Order.OrderStatus.OPEN.name());
 
             if (accountId != null) {
-                where.append(" AND ").append(Order.COLUMN_ACCOUNT_ID).append("=?");
+                where.append(" AND ").append(COLUMN_ACCOUNT_ID).append("=?");
                 whereArgs.add(String.valueOf(accountId));
             }
 
-            return this.getSqlConnection().query(Order.class, where.toString(),
+            return this.getSqlConnection().query(this, Order.class, where.toString(),
                     whereArgs.toArray(new String[whereArgs.size()]), null);
         } catch (Exception e) {
             Log.e(TAG, "Error in getOpenOrders", e);
@@ -95,10 +122,10 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             // only update the order if the status is still open
             // still may need some locking to make sure the order
             // is not executed after is has been canceled
-            String where = " AND "+Order.COLUMN_STATUS+"=?";
+            String where = " AND "+COLUMN_STATUS+"=?";
             String [] whereArgs = new String[]{Order.OrderStatus.OPEN.name()};
 
-            if (!this.getSqlConnection().update(order, where, whereArgs,
+            if (!this.getSqlConnection().update(this, order, where, whereArgs,
                     this.getSqlConnection().getWritableDatabase())) {
                 throw new OrderCancelException("Order cannot be canceled");
             }
@@ -112,7 +139,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
     public void createOrder(Order order) {
         try {
-            this.getSqlConnection().insert(order);
+            this.getSqlConnection().insert(this, order);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -127,7 +154,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
                 try {
                     order.setStatus(Order.OrderStatus.ERROR);
-                    getSqlConnection().update(order);
+                    getSqlConnection().update(this, order);
                 } catch (IllegalAccessException e) {
                     throw new OrderExecutionException(ex);
                 }
@@ -143,7 +170,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             Money cost = order.getCost(price);
             Money profit = new Money(0);
 
-            Account account = getSqlConnection().queryById(Account.class, order.getAccount().getId());
+            Account account = getSqlConnection().queryById(accountModel, Account.class, order.getAccount().getId());
 
             Money transactionCost;
             Transaction.TransactionType transactionType;
@@ -157,10 +184,10 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
             }
             transactionCost = Money.multiply(cost, -1);
             Transaction transaction = new Transaction(account, transactionCost, transactionType, "Order Id=" + order.getId());
-            long transactionId = getSqlConnection().insert(transaction, db);
+            long transactionId = getSqlConnection().insert(transaction, transaction, db);
 
             account.getAvailableFunds().add(transactionCost);
-            if (!getSqlConnection().update(account, db)) {
+            if (!getSqlConnection().update(accountModel, account, db)) {
                 throw new IllegalAccessException("Error updating account");
             }
 
@@ -172,7 +199,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
                 investment = new Investment(account, quote.getSymbol(),
                         Investment.InvestmentStatus.OPEN, quote.getName(), quote.getExchange(),
                         cost, price, new Date(0), order.getQuantity());
-                getSqlConnection().insert(investment, db);
+                getSqlConnection().insert(investmentModel, investment, db);
             } else {
                 if (order.getAction() == Order.OrderAction.SELL) {
                     if (order.getQuantity() > investment.getQuantity()) {
@@ -184,19 +211,19 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
                 investment.aggregateOrder(order, price);
                 if (investment.getQuantity() > 0) {
-                    if (!getSqlConnection().update(investment, db)) {
+                    if (!getSqlConnection().update(investmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 } else {
                     // delete the investment if we sold everything
-                    if (!getSqlConnection().delete(investment, db)) {
+                    if (!getSqlConnection().delete(investmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 }
             }
 
             order.setStatus(Order.OrderStatus.FULFILLED);
-            if (!getSqlConnection().update(order, db)) {
+            if (!getSqlConnection().update(this, order, db)) {
                 throw new IllegalAccessException("Error updating order");
             }
 
@@ -215,7 +242,7 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
 
     @Override
     public boolean updateOrder(Order order) throws IllegalAccessException {
-        return getSqlConnection().update(order);
+        return getSqlConnection().update(this, order);
     }
 
     public void scheduleOrderServiceAlarm(boolean isMarketOpen){
@@ -227,4 +254,41 @@ public class OrderSqliteModel extends SqliteModel implements OrderModel, OrderMa
     public void destroy() {
 
     }
+
+    @Override
+    public ContentValues getContentValues(Order order) {
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_ACCOUNT_ID, order.account.getId());
+        values.put(COLUMN_SYMBOL, order.symbol);
+        values.put(COLUMN_STATUS, order.status.name());
+        values.put(COLUMN_ACTION, order.action.name());
+        values.put(COLUMN_STRATEGY, order.strategy.name());
+        values.put(COLUMN_DURATION, order.duration.name());
+        values.put(COLUMN_LIMIT_PRICE, order.limitPrice.getMicroCents());
+        values.put(COLUMN_STOP_PRICE, order.stopPrice.getMicroCents());
+        values.put(COLUMN_STOP_PERCENT, order.stopPercent);
+        values.put(COLUMN_QUANTITY, order.quantity);
+        values.put(COLUMN_HIGHEST_PRICE, order.highestPrice.getMicroCents());
+
+        return values;
+    }
+
+    @Override
+    public void populate(Order order, Cursor cursor, Map<String, Integer> columnMap) {
+        order.setId(cursor.getLong(columnMap.get(COLUMN_ID)));
+        order.account = new Account();
+        order.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        order.symbol = cursor.getString(columnMap.get(COLUMN_SYMBOL));
+        order.status = Order.OrderStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS)));
+        order.action = Order.OrderAction.valueOf(cursor.getString(columnMap.get(COLUMN_ACTION)));
+        order.strategy = Order.OrderStrategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY)));
+        order.duration = Order.OrderDuration.valueOf(cursor.getString(columnMap.get(COLUMN_DURATION)));
+        order.limitPrice = new Money(cursor.getLong(columnMap.get(COLUMN_LIMIT_PRICE)));
+        order.stopPrice = new Money(cursor.getLong(columnMap.get(COLUMN_STOP_PRICE)));
+        order.stopPercent = cursor.getDouble(columnMap.get(COLUMN_STOP_PERCENT));
+        order.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
+        order.highestPrice = new Money(cursor.getLong(columnMap.get(COLUMN_HIGHEST_PRICE)));
+    }
+
 }

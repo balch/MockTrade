@@ -26,13 +26,14 @@ package com.balch.mocktrade.account;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.balch.android.app.framework.sql.SqlBean;
+import com.balch.android.app.framework.domain.DomainObject;
+import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 
 import java.io.Serializable;
 import java.util.Map;
 
-public class Transaction extends SqlBean implements Serializable {
+public class Transaction extends DomainObject implements SqlMapper<Transaction>,  Serializable {
     static public final String TABLE_NAME = "[transaction]";
 
     public static final String COLUMN_ACCOUNT_ID = "account_id";
@@ -98,25 +99,25 @@ public class Transaction extends SqlBean implements Serializable {
     }
 
     @Override
-    public ContentValues getContentValues() {
+    public ContentValues getContentValues(Transaction transaction) {
         ContentValues values = new ContentValues();
 
-        values.put(COLUMN_ACCOUNT_ID, this.account.getId());
-        values.put(COLUMN_AMOUNT, this.amount.getMicroCents());
-        values.put(COLUMN_TYPE, this.type.name());
-        values.put(COLUMN_NOTES, this.notes);
+        values.put(COLUMN_ACCOUNT_ID, transaction.account.getId());
+        values.put(COLUMN_AMOUNT, transaction.amount.getMicroCents());
+        values.put(COLUMN_TYPE, transaction.type.name());
+        values.put(COLUMN_NOTES, transaction.notes);
 
         return values;
     }
 
     @Override
-    public void populate(Cursor cursor, Map<String, Integer> columnMap) {
-        this.id = cursor.getLong(columnMap.get(COLUMN_ID));
-        this.account = new Account();
-        this.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        this.amount = new Money(cursor.getLong(columnMap.get(COLUMN_AMOUNT)));
-        this.type = TransactionType.valueOf(cursor.getString(columnMap.get(COLUMN_TYPE)));
-        this.notes = cursor.getString(columnMap.get(COLUMN_NOTES));
+    public void populate(Transaction transaction, Cursor cursor, Map<String, Integer> columnMap) {
+        transaction.id = cursor.getLong(columnMap.get(COLUMN_ID));
+        transaction.account = new Account();
+        transaction.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        transaction.amount = new Money(cursor.getLong(columnMap.get(COLUMN_AMOUNT)));
+        transaction.type = TransactionType.valueOf(cursor.getString(columnMap.get(COLUMN_TYPE)));
+        transaction.notes = cursor.getString(columnMap.get(COLUMN_NOTES));
     }
 
 }

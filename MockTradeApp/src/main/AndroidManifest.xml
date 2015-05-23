@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.balch.android.app.framework.bean.BeanEditActivity"
+            android:name="com.balch.android.app.framework.domain.EditActivity"
             android:label="You Should not see this" >
         </activity>
 

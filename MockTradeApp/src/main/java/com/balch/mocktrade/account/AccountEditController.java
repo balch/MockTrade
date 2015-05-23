@@ -24,32 +24,31 @@ package com.balch.mocktrade.account;
 
 import android.content.Context;
 
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanExternalController;
-import com.balch.android.app.framework.bean.BeanValidatorException;
-import com.balch.android.app.framework.bean.controls.BeanControlMap;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
-import com.balch.mocktrade.TradeApplication;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ExternalController;
+import com.balch.android.app.framework.domain.ValidatorException;
+import com.balch.android.app.framework.domain.controls.ControlMap;
+import com.balch.android.app.framework.domain.controls.EditControl;
 
-public class AccountEditController implements BeanExternalController<Account> {
+public class AccountEditController implements ExternalController<Account> {
     @Override
-    public void onChanged(Context context, BeanColumnDescriptor descriptor, Object value, BeanControlMap beanControlMap) throws BeanValidatorException {
+    public void onChanged(Context context, ColumnDescriptor descriptor, Object value, ControlMap controlMap) throws ValidatorException {
         if (descriptor.getField().getName().equals(Account.FLD_STRATEGY)) {
             Account.Strategy strategy = (Account.Strategy)value;
             if (strategy != Account.Strategy.NONE) {
                 String [] displayVals = context.getResources().getStringArray(strategy.getListResId());
-                BeanEditControl control = beanControlMap.get(Account.FLD_NAME);
+                EditControl control = controlMap.get(Account.FLD_NAME);
                 control.setValue(displayVals[strategy.ordinal()]);
             }
         }
     }
 
     @Override
-    public void validate(Context context, Account account, BeanControlMap beanControlMap) throws BeanValidatorException {
+    public void validate(Context context, Account account, ControlMap controlMap) throws ValidatorException {
     }
 
     @Override
-    public void initialize(Context context, Account account, BeanControlMap beanControlMap) {
+    public void initialize(Context context, Account account, ControlMap controlMap) {
     }
 
 }

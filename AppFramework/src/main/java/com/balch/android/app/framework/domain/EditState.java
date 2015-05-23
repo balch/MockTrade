@@ -20,21 +20,10 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
-import android.content.Context;
-
-import com.balch.android.app.framework.bean.controls.BeanControlMap;
-import com.balch.android.app.framework.sql.SqlBean;
-
-import java.io.Serializable;
-
-public interface BeanExternalController<T extends SqlBean> extends Serializable {
-
-    void onChanged(Context context, BeanColumnDescriptor descriptor, Object value,
-                  BeanControlMap beanControlMap) throws BeanValidatorException;
-
-    void validate(Context context, T item, BeanControlMap beanControlMap) throws BeanValidatorException;
-
-    void initialize(Context context, T item, BeanControlMap beanControlMap);
+public enum EditState {
+    HIDDEN,
+    READONLY,
+    CHANGEABLE
 }

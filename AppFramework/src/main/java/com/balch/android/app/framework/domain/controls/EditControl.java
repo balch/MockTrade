@@ -20,23 +20,23 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanValidatorException;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ValidatorException;
 
-public interface BeanEditControl {
-    public interface BeanEditControlListener {
-        void onChanged(BeanColumnDescriptor descriptor, Object value, boolean hasError) throws BeanValidatorException;
-        void onError(BeanColumnDescriptor descriptor, Object value, String errorMsg);
+public interface EditControl {
+    interface EditControlListener {
+        void onChanged(ColumnDescriptor descriptor, Object value, boolean hasError) throws ValidatorException;
+        void onError(ColumnDescriptor descriptor, Object value, String errorMsg);
     }
 
-    void bind(BeanColumnDescriptor descriptor);
-    BeanColumnDescriptor getDescriptor();
-    void validate() throws BeanValidatorException;
+    void bind(ColumnDescriptor descriptor);
+    ColumnDescriptor getDescriptor();
+    void validate() throws ValidatorException;
     Object getValue();
     void setValue(Object value);
-    void setBeanEditControlListener(BeanEditControlListener listener);
-    void setBeanControlMapper(BeanControlMapper beanControlMapper);
+    void setEditControlListener(EditControlListener listener);
+    void setControlMapper(ControlMapper controlMapper);
     void setEnabled(boolean enabled);
 }

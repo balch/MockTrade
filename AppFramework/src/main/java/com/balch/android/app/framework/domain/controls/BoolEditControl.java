@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -29,18 +29,18 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.BeanValidatorException;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ValidatorException;
 
-public class BoolEditControl extends LinearLayout implements BeanEditControl, View.OnClickListener {
+public class BoolEditControl extends LinearLayout implements EditControl, View.OnClickListener {
     private static final String TAG = BoolEditControl.class.getName();
 
     protected CheckBox checkBox;
 
-    protected BeanColumnDescriptor descriptor;
-    protected BeanEditControlListener beanEditControlListener;
-    protected BeanControlMapper beanControlMapper;
+    protected ColumnDescriptor descriptor;
+    protected EditControlListener editControlListener;
+    protected ControlMapper controlMapper;
 
     public BoolEditControl(Context context) {
         super(context);
@@ -58,19 +58,19 @@ public class BoolEditControl extends LinearLayout implements BeanEditControl, Vi
     }
 
     protected void initialize() {
-        inflate(getContext(), R.layout.bean_edit_control_bool, this);
+        inflate(getContext(), R.layout.edit_control_bool, this);
         this.checkBox = (CheckBox) findViewById(R.id.bool_edit_control_value);
 
         this.checkBox.setOnClickListener(this);
     }
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
+    public void bind(ColumnDescriptor descriptor) {
         this.descriptor = descriptor;
 
         this.checkBox.setText(descriptor.getLabelResId());
 
-        boolean enabled = (descriptor.getState() == BeanEditState.CHANGEABLE);
+        boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
 
         try {
             Object val = descriptor.getField().get(descriptor.getItem());
@@ -85,17 +85,17 @@ public class BoolEditControl extends LinearLayout implements BeanEditControl, Vi
     }
 
     @Override
-    public void setBeanControlMapper(BeanControlMapper beanControlMapper) {
-        this.beanControlMapper = beanControlMapper;
+    public void setControlMapper(ControlMapper controlMapper) {
+        this.controlMapper = controlMapper;
     }
 
     @Override
-    public void validate() throws BeanValidatorException {
+    public void validate() throws ValidatorException {
     }
 
 
     @Override
-    public BeanColumnDescriptor getDescriptor() {
+    public ColumnDescriptor getDescriptor() {
         return this.descriptor;
     }
 
@@ -110,8 +110,8 @@ public class BoolEditControl extends LinearLayout implements BeanEditControl, Vi
     }
 
     @Override
-    public void setBeanEditControlListener(BeanEditControlListener listener) {
-        this.beanEditControlListener = listener;
+    public void setEditControlListener(EditControlListener listener) {
+        this.editControlListener = listener;
     }
 
     @Override
@@ -120,15 +120,15 @@ public class BoolEditControl extends LinearLayout implements BeanEditControl, Vi
         try {
             this.validate();
             this.checkBox.setError(null);
-        } catch (BeanValidatorException e) {
+        } catch (ValidatorException e) {
             this.checkBox.setError(e.getMessage());
             hasError = true;
         }
 
-        if (this.beanEditControlListener != null) {
+        if (this.editControlListener != null) {
             try {
-                this.beanEditControlListener.onChanged(this.descriptor, this.getValue(), hasError);
-            } catch (BeanValidatorException e) {
+                this.editControlListener.onChanged(this.descriptor, this.getValue(), hasError);
+            } catch (ValidatorException e) {
                 this.checkBox.setError(e.getMessage());
             }
         }

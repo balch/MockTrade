@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapSentences"
-        android:hint="@string/bean_control_string_hint">
+        android:hint="@string/control_string_hint">
     </EditText>
 
 </LinearLayout>

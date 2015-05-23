@@ -20,26 +20,25 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
-import com.balch.android.app.framework.sql.SqlBean;
+import com.balch.android.app.framework.domain.controls.EditControl;
 
 import java.lang.reflect.Field;
 
-public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
-    protected final SqlBean item;
+public class ColumnDescriptor implements Comparable<ColumnDescriptor> {
+    protected final DomainObject item;
     protected final Field field;
     protected final int labelResId;
-    protected final BeanEditState state;
-    protected final BeanViewHint [] hints;
+    protected final EditState state;
+    protected final ViewHint[] hints;
     protected final int order;
-    protected final Class<? extends BeanEditControl> customControl;
+    protected final Class<? extends EditControl> customControl;
 
 
-    public BeanColumnDescriptor(SqlBean item, Field field, int labelResId,
-                                BeanEditState state, BeanViewHint[] hints, int order,
-                                Class<? extends BeanEditControl> customControl) {
+    public ColumnDescriptor(DomainObject item, Field field, int labelResId,
+                            EditState state, ViewHint[] hints, int order,
+                            Class<? extends EditControl> customControl) {
         this.item = item;
         this.field = field;
         this.labelResId = labelResId;
@@ -53,11 +52,11 @@ public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
         return labelResId;
     }
 
-    public BeanEditState getState() {
+    public EditState getState() {
         return state;
     }
 
-    public BeanViewHint[] getHints() {
+    public ViewHint[] getHints() {
         return hints;
     }
 
@@ -69,16 +68,16 @@ public class BeanColumnDescriptor implements Comparable<BeanColumnDescriptor> {
         return field;
     }
 
-    public SqlBean getItem() {
+    public DomainObject getItem() {
         return item;
     }
 
-    public Class<? extends BeanEditControl> getCustomControl() {
+    public Class<? extends EditControl> getCustomControl() {
         return customControl;
     }
 
     @Override
-    public int compareTo(BeanColumnDescriptor another) {
+    public int compareTo(ColumnDescriptor another) {
         return (this.order < another.order) ? -1 : ((this.order == another.order) ? 0 : 1);
     }
 }

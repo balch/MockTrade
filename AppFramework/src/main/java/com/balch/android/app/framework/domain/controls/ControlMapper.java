@@ -20,22 +20,8 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.annotations;
+package com.balch.android.app.framework.domain.controls;
 
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface BeanColumnNew {
-    int labelResId();
-    BeanEditState state() default BeanEditState.CHANGEABLE;
-    String [] hints() default {};
-    int order();
-    Class<? extends BeanEditControl> customControl() default BeanEditControl.class;
+public interface ControlMapper {
+    ControlMap getControlMap();
 }

@@ -20,21 +20,21 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
-public class BeanValidatorException extends Exception {
-    public BeanValidatorException() {
+public class ValidatorException extends Exception {
+    public ValidatorException() {
     }
 
-    public BeanValidatorException(String detailMessage) {
+    public ValidatorException(String detailMessage) {
         super(detailMessage);
     }
 
-    public BeanValidatorException(String detailMessage, Throwable throwable) {
+    public ValidatorException(String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
     }
 
-    public BeanValidatorException(Throwable throwable) {
+    public ValidatorException(Throwable throwable) {
         super(throwable);
     }
 }

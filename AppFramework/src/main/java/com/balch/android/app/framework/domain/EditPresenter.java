@@ -20,33 +20,32 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
 import android.app.Application;
 import android.os.Bundle;
 
 import com.balch.android.app.framework.BasePresenter;
-import com.balch.android.app.framework.sql.SqlBean;
 
-public class BeanEditPresenter extends BasePresenter<Application> {
+public class EditPresenter extends BasePresenter<Application> {
 
-    protected final BeanEditView view;
-    protected final BeanExternalController validator;
-    protected final SqlBean item;
+    protected final EditView view;
+    protected final ExternalController validator;
+    protected final DomainObject item;
     protected final boolean isNew;
     protected final int okButtonResId;
     protected final int cancelButtonResId;
 
-    public BeanEditPresenter(BeanEditView view, boolean isNew, SqlBean item, BeanExternalController validator,
-                             int okButtonResId, int cancelButtonResId,
-                             BeanEditView.BeanEditViewListener beanEditViewListener) {
+    public EditPresenter(EditView view, boolean isNew, DomainObject item, ExternalController validator,
+                         int okButtonResId, int cancelButtonResId,
+                         EditView.EditViewListener editViewListener) {
         this.view = view;
         this.isNew = isNew;
         this.item = item;
         this.validator = validator;
         this.okButtonResId = okButtonResId;
         this.cancelButtonResId = cancelButtonResId;
-        this.view.setBeanEditViewListener(beanEditViewListener);
+        this.view.setEditViewListener(editViewListener);
     }
 
     @Override

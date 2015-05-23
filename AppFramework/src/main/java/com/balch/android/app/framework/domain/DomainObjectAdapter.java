@@ -20,22 +20,20 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
 import android.content.Context;
 import android.widget.BaseAdapter;
 
-import com.balch.android.app.framework.sql.SqlBean;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseBeanAdapter<T extends SqlBean> extends BaseAdapter {
+public abstract class DomainObjectAdapter<T extends DomainObject> extends BaseAdapter {
 
     protected final Context context;
     protected final List<T> items = new ArrayList<T>();
 
-    public BaseBeanAdapter(Context context) {
+    public DomainObjectAdapter(Context context) {
         this.context = context;
     }
 

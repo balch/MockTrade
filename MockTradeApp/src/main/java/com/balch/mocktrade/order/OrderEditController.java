@@ -26,12 +26,12 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanExternalController;
-import com.balch.android.app.framework.bean.BeanValidatorException;
-import com.balch.android.app.framework.bean.controls.BeanControlMap;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
-import com.balch.android.app.framework.bean.controls.EnumEditControl;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ExternalController;
+import com.balch.android.app.framework.domain.ValidatorException;
+import com.balch.android.app.framework.domain.controls.ControlMap;
+import com.balch.android.app.framework.domain.controls.EditControl;
+import com.balch.android.app.framework.domain.controls.EnumEditControl;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -41,20 +41,20 @@ import com.balch.mocktrade.model.ModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderEditController implements BeanExternalController<Order> {
+public class OrderEditController implements ExternalController<Order> {
 
     @Override
-    public void onChanged(Context context, BeanColumnDescriptor descriptor, Object value, BeanControlMap beanControlMap) throws BeanValidatorException {
-        if (descriptor.getField().getName().equals(Order.COLUMN_STRATEGY)) {
-            onChangeStrategy((Order.OrderStrategy) value, beanControlMap);
-        } else if (descriptor.getField().getName().equals(Order.COLUMN_ACTION)) {
-            onChangeAction(context, (Order.OrderAction) value, beanControlMap);
+    public void onChanged(Context context, ColumnDescriptor descriptor, Object value, ControlMap controlMap) throws ValidatorException {
+        if (descriptor.getField().getName().equals(Order.FLD_STRATEGY)) {
+            onChangeStrategy((Order.OrderStrategy) value, controlMap);
+        } else if (descriptor.getField().getName().equals(Order.FLD_ACTION)) {
+            onChangeAction(context, (Order.OrderAction) value, controlMap);
         }
     }
 
     @Override
-    public void validate(Context context, Order order, BeanControlMap beanControlMap) throws BeanValidatorException {
-        StockSymbolControl symbolControl = beanControlMap.get(Order.COLUMN_SYMBOL);
+    public void validate(Context context, Order order, ControlMap controlMap) throws ValidatorException {
+        StockSymbolControl symbolControl = controlMap.get(Order.FLD_SYMBOL);
         Money price = symbolControl.getPrice();
         if (order.getStrategy() == Order.OrderStrategy.MANUAL) {
             price = order.getLimitPrice();
@@ -64,35 +64,35 @@ public class OrderEditController implements BeanExternalController<Order> {
         boolean hasAvailableFunds = ((order.getAction() == Order.OrderAction.SELL) ||
                 (cost.getDollars() <= order.getAccount().getAvailableFunds().getDollars()));
 
-        QuantityPriceControl quantityControl = beanControlMap.get(Order.COLUMN_QUANTITY);
+        QuantityPriceControl quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setCost(cost, hasAvailableFunds);
 
         if (!hasAvailableFunds) {
-            throw new BeanValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_insufficient_funds));
+            throw new ValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_insufficient_funds));
         } else if ((cost.getDollars() == 0.0) && (order.getStrategy() != Order.OrderStrategy.MANUAL)) {
-            throw new BeanValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_invalid_amount));
+            throw new ValidatorException(quantityControl.getContext().getString(R.string.quantity_edit_error_invalid_amount));
         }
     }
 
     @Override
-    public void initialize(Context context, Order order, BeanControlMap beanControlMap) {
+    public void initialize(Context context, Order order, ControlMap controlMap) {
 
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
 
         ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
         FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
 
-        QuantityPriceControl quantityControl = beanControlMap.get(Order.COLUMN_QUANTITY);
+        QuantityPriceControl quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);
         quantityControl.setMarketIsOpen(financeModel.isMarketOpen());
         quantityControl.setAccountInfo(order.account);
         quantityControl.setEnabled(controlEnabled);
 
-        BeanEditControl control = beanControlMap.get(Order.COLUMN_SYMBOL);
+        EditControl control = controlMap.get(Order.FLD_SYMBOL);
         control.setEnabled(controlEnabled);
     }
 
-    protected void showControl(BeanEditControl control, boolean visible) {
+    protected void showControl(EditControl control, boolean visible) {
         if (control != null) {
             if (control instanceof ViewGroup) {
                 ((ViewGroup) control).setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -100,7 +100,7 @@ public class OrderEditController implements BeanExternalController<Order> {
         }
     }
 
-    protected void onChangeStrategy(Order.OrderStrategy strategy, BeanControlMap beanControlMap) {
+    protected void onChangeStrategy(Order.OrderStrategy strategy, ControlMap controlMap) {
         boolean showLimitPrice = false;
         boolean showStopPrice = false;
         boolean showStopPercent = false;
@@ -121,13 +121,13 @@ public class OrderEditController implements BeanExternalController<Order> {
                 break;
         }
 
-        showControl(beanControlMap.get(Order.FLD_LIMIT_PRICE), showLimitPrice);
-        showControl(beanControlMap.get(Order.FLD_STOP_PERCENT), showStopPercent);
-        showControl(beanControlMap.get(Order.FLD_STOP_PRICE), showStopPrice);
+        showControl(controlMap.get(Order.FLD_LIMIT_PRICE), showLimitPrice);
+        showControl(controlMap.get(Order.FLD_STOP_PERCENT), showStopPercent);
+        showControl(controlMap.get(Order.FLD_STOP_PRICE), showStopPrice);
     }
 
-    protected void onChangeAction(Context context, Order.OrderAction action, BeanControlMap beanControlMap) {
-        BeanEditControl control = beanControlMap.get(Order.COLUMN_STRATEGY);
+    protected void onChangeAction(Context context, Order.OrderAction action, ControlMap controlMap) {
+        EditControl control = controlMap.get(Order.FLD_STRATEGY);
         if (control instanceof EnumEditControl) {
             int selectionIndex = 0;
             Order.OrderStrategy strategy = (Order.OrderStrategy) control.getValue();

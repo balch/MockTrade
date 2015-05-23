@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -34,23 +34,23 @@ import android.widget.TextView;
 
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.BeanValidatorException;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ValidatorException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnumEditControl extends LinearLayout implements BeanEditControl {
+public class EnumEditControl extends LinearLayout implements EditControl {
     private static final String TAG = EnumEditControl.class.getName();
 
     protected TextView label;
     protected Spinner value;
 
-    protected BeanColumnDescriptor descriptor;
-    protected BeanEditControlListener beanEditControlListener;
-    protected BeanControlMapper beanControlMapper;
+    protected ColumnDescriptor descriptor;
+    protected EditControlListener editControlListener;
+    protected ControlMapper controlMapper;
 
     protected List<Object> enumValues;
 
@@ -70,23 +70,23 @@ public class EnumEditControl extends LinearLayout implements BeanEditControl {
     }
 
     protected void initialize() {
-        inflate(getContext(), R.layout.bean_edit_control_enum, this);
+        inflate(getContext(), R.layout.edit_control_enum, this);
         this.label = (TextView) findViewById(R.id.enum_edit_control_label);
         this.value = (Spinner) findViewById(R.id.enum_edit_control_value);
     }
 
     @Override
-    public void bind(final BeanColumnDescriptor descriptor) {
+    public void bind(final ColumnDescriptor descriptor) {
         this.descriptor = descriptor;
         this.label.setText(descriptor.getLabelResId());
 
         this.value.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (beanEditControlListener != null) {
+                if (editControlListener != null) {
                     try {
-                        beanEditControlListener.onChanged(descriptor, getValue(), false);
-                    } catch (BeanValidatorException e) {
+                        editControlListener.onChanged(descriptor, getValue(), false);
+                    } catch (ValidatorException e) {
                         Log.e(TAG, "Error changing value", e);
                     }
                 }
@@ -97,7 +97,7 @@ public class EnumEditControl extends LinearLayout implements BeanEditControl {
 
             }
         });
-        boolean enabled = (descriptor.getState() == BeanEditState.CHANGEABLE);
+        boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
         try {
             Object obj = descriptor.getField().get(descriptor.getItem());
             List<String> displayValues = new ArrayList<String>();
@@ -131,21 +131,21 @@ public class EnumEditControl extends LinearLayout implements BeanEditControl {
    }
 
     @Override
-    public void setBeanControlMapper(BeanControlMapper beanControlMapper) {
-        this.beanControlMapper = beanControlMapper;
+    public void setControlMapper(ControlMapper controlMapper) {
+        this.controlMapper = controlMapper;
     }
 
     @Override
-    public void validate() throws BeanValidatorException {
+    public void validate() throws ValidatorException {
         int position = this.value.getSelectedItemPosition();
         // empty string validation
         if (position < 0) {
-            throw new BeanValidatorException(getResources().getString(R.string.error_empty_string));
+            throw new ValidatorException(getResources().getString(R.string.error_empty_string));
         }
     }
 
     @Override
-    public BeanColumnDescriptor getDescriptor() {
+    public ColumnDescriptor getDescriptor() {
         return this.descriptor;
     }
 
@@ -172,8 +172,8 @@ public class EnumEditControl extends LinearLayout implements BeanEditControl {
     }
 
     @Override
-    public void setBeanEditControlListener(BeanEditControlListener listener) {
-        this.beanEditControlListener = listener;
+    public void setEditControlListener(EditControlListener listener) {
+        this.editControlListener = listener;
     }
 
 }

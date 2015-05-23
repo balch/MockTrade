@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
 import android.content.Context;
 import android.text.InputType;
@@ -28,8 +28,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanViewHint;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ViewHint;
 
 public class NumberEditControl extends StringEditControl {
 
@@ -52,12 +52,12 @@ public class NumberEditControl extends StringEditControl {
     }
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
-        for (BeanViewHint hint : descriptor.getHints()) {
-            if (hint.getHint() == BeanViewHint.Hint.PERCENT) {
+    public void bind(ColumnDescriptor descriptor) {
+        for (ViewHint hint : descriptor.getHints()) {
+            if (hint.getHint() == ViewHint.Hint.PERCENT) {
                 this.value.setHint(hint.getBoolValue() ?
-                        R.string.bean_control_percent_hint :
-                        R.string.bean_control_number_hint);
+                        R.string.control_percent_hint :
+                        R.string.control_number_hint);
             }
         }
         super.bind(descriptor);

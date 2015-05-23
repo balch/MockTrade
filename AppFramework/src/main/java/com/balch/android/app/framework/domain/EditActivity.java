@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,19 +28,18 @@ import android.os.Bundle;
 
 import com.balch.android.app.framework.BaseActivity;
 import com.balch.android.app.framework.BasePresenter;
-import com.balch.android.app.framework.sql.SqlBean;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class BeanEditActivity extends BaseActivity<BeanEditView> {
+public class EditActivity extends BaseActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
     protected static final String EXTRA_VALIDATOR = "validator";
     protected static final String EXTRA_TITLE_RESID = "titleResId";
     protected static final String EXTRA_OK_BUTTON_RESID = "okButtonResId";
     protected static final String EXTRA_CANCEL_BUTTON_RESID = "cancelButtonResId";
-    protected static final String EXTRA_RESULT = "BeanEditActivityResult";
+    protected static final String EXTRA_RESULT = "EditActivityResult";
 
 
     @Override
@@ -48,7 +47,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
     }
 
     @Override
-    protected List<BasePresenter> createPresenters(BeanEditView view) {
+    protected List<BasePresenter> createPresenters(EditView view) {
 
         Intent intent = this.getIntent();
         int titleResId = intent.getIntExtra(EXTRA_TITLE_RESID, 0);
@@ -56,17 +55,17 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
             this.setTitle(titleResId);
         }
 
-        BeanExternalController validator = (BeanExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
-        SqlBean item = (SqlBean) intent.getSerializableExtra(EXTRA_ITEM);
+        ExternalController validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
+        DomainObject domainObject = (DomainObject) intent.getSerializableExtra(EXTRA_ITEM);
         boolean  isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
         int okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
         int cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
 
-        return Arrays.asList((BasePresenter) new BeanEditPresenter(view, isNew, item, validator,
+        return Arrays.asList((BasePresenter) new EditPresenter(view, isNew, domainObject, validator,
                 okButtonResId, cancelButtonResId,
-                new BeanEditView.BeanEditViewListener() {
+                new EditView.EditViewListener() {
                     @Override
-                    public void onSave(SqlBean item) {
+                    public void onSave(DomainObject item) {
                         Intent intent = getIntent();
                         intent.putExtra(EXTRA_RESULT, item);
                         setResult(RESULT_OK, intent);
@@ -83,17 +82,17 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
     }
 
     @Override
-    protected BeanEditView createView() {
-        return new BeanEditView(this);
+    protected EditView createView() {
+        return new EditView(this);
     }
 
-    public static Intent getIntent(Context context, int titleResId, SqlBean item, BeanExternalController beanExternalController,
+    public static Intent getIntent(Context context, int titleResId, DomainObject domainObject, ExternalController externalController,
                                    int okButtonResId, int cancelButtonResId) {
-        Intent intent = new Intent(context, BeanEditActivity.class);
+        Intent intent = new Intent(context, EditActivity.class);
 
-        intent.putExtra(EXTRA_ISNEW, (item.getId() == null));
-        intent.putExtra(EXTRA_ITEM, item);
-        intent.putExtra(EXTRA_VALIDATOR, beanExternalController);
+        intent.putExtra(EXTRA_ISNEW, (domainObject.getId() == null));
+        intent.putExtra(EXTRA_ITEM, domainObject);
+        intent.putExtra(EXTRA_VALIDATOR, externalController);
         intent.putExtra(EXTRA_TITLE_RESID, titleResId);
         intent.putExtra(EXTRA_OK_BUTTON_RESID, okButtonResId);
         intent.putExtra(EXTRA_CANCEL_BUTTON_RESID, cancelButtonResId);
@@ -101,7 +100,7 @@ public class BeanEditActivity extends BaseActivity<BeanEditView> {
         return intent;
     }
 
-    public static <T extends SqlBean> T getResult(Intent intent) {
+    public static <T extends DomainObject> T getResult(Intent intent) {
         return (T) intent.getSerializableExtra(EXTRA_RESULT);
     }
 }

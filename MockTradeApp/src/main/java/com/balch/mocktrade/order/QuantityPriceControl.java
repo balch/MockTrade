@@ -38,12 +38,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.BeanValidatorException;
-import com.balch.android.app.framework.bean.BeanViewHint;
-import com.balch.android.app.framework.bean.controls.BeanControlMapper;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ValidatorException;
+import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.domain.controls.ControlMapper;
+import com.balch.android.app.framework.domain.controls.EditControl;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
@@ -51,7 +51,7 @@ import com.balch.mocktrade.account.Account;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuantityPriceControl extends LinearLayout implements BeanEditControl, TextWatcher {
+public class QuantityPriceControl extends LinearLayout implements EditControl, TextWatcher {
     private static final String TAG = QuantityPriceControl.class.getName();
     protected static final int TEXT_CHANGE_DELAY_MS = 500;
 
@@ -63,9 +63,9 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
     protected TextView costLabel;
     protected TextView marketClosedWarning;
 
-    protected BeanColumnDescriptor descriptor;
-    protected BeanEditControlListener beanEditControlListener;
-    protected BeanControlMapper beanControlMapper;
+    protected ColumnDescriptor descriptor;
+    protected EditControlListener editControlListener;
+    protected ControlMapper controlMapper;
 
     protected Handler textChangeHandler = new Handler();
     protected Runnable txtChangeRunnable = new Runnable() {
@@ -123,21 +123,21 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
 
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
+    public void bind(ColumnDescriptor descriptor) {
         this.descriptor = descriptor;
         this.label.setText(descriptor.getLabelResId());
 
         this.value.removeTextChangedListener(this);
         this.value.setLines(1);
 
-        boolean enabled = (descriptor.getState() == BeanEditState.CHANGEABLE);
+        boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
         List<InputFilter> filters = getInputFilters();
         try {
             Object obj = descriptor.getField().get(descriptor.getItem());
             this.value.setText(this.getValueAsString(obj));
 
-            for (BeanViewHint hint : descriptor.getHints()) {
-                if (hint.getHint() == BeanViewHint.Hint.INIT_EMPTY) {
+            for (ViewHint hint : descriptor.getHints()) {
+                if (hint.getHint() == ViewHint.Hint.INIT_EMPTY) {
                     if (hint.getBoolValue()) {
                         this.value.setText("");
                     }
@@ -172,16 +172,16 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
     }
 
     @Override
-    public BeanColumnDescriptor getDescriptor() {
+    public ColumnDescriptor getDescriptor() {
         return this.descriptor;
     }
 
     @Override
-    public void validate() throws BeanValidatorException {
+    public void validate() throws ValidatorException {
         String val = this.value.getText().toString();
         // empty string validation
         if (TextUtils.isEmpty(val)) {
-            throw new BeanValidatorException(getResources().getString(R.string.error_empty_string));
+            throw new ValidatorException(getResources().getString(R.string.error_empty_string));
         }
     }
 
@@ -197,13 +197,13 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
     }
 
     @Override
-    public void setBeanEditControlListener(BeanEditControlListener listener) {
-        this.beanEditControlListener = listener;
+    public void setEditControlListener(EditControlListener listener) {
+        this.editControlListener = listener;
     }
 
     @Override
-    public void setBeanControlMapper(BeanControlMapper beanControlMapper) {
-        this.beanControlMapper = beanControlMapper;
+    public void setControlMapper(ControlMapper controlMapper) {
+        this.controlMapper = controlMapper;
     }
 
     @Override
@@ -225,15 +225,15 @@ public class QuantityPriceControl extends LinearLayout implements BeanEditContro
         try {
             this.validate();
             value.setError(null);
-        } catch (BeanValidatorException e) {
+        } catch (ValidatorException e) {
             this.value.setError(e.getMessage());
             hasError = true;
         }
 
-        if (this.beanEditControlListener != null) {
+        if (this.editControlListener != null) {
             try {
-                this.beanEditControlListener.onChanged(this.descriptor, this.getValue(), hasError);
-            } catch (BeanValidatorException e) {
+                this.editControlListener.onChanged(this.descriptor, this.getValue(), hasError);
+            } catch (ValidatorException e) {
                 this.value.setError(e.getMessage());
             }
         }

@@ -20,9 +20,9 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
-public class BeanViewHint {
+public class ViewHint {
 
     public enum Hint {
         DISPLAY_LINES,
@@ -37,7 +37,7 @@ public class BeanViewHint {
     protected final Hint hint;
     protected final String value;
 
-    public BeanViewHint(Hint hint, String value) {
+    public ViewHint(Hint hint, String value) {
         this.hint = hint;
         this.value = value;
     }
@@ -60,22 +60,22 @@ public class BeanViewHint {
 
     @Override
     public String toString() {
-        return BeanViewHint.toString(this.hint, this.value);
+        return ViewHint.toString(this.hint, this.value);
     }
 
     static public String toString(Hint hint, String value) {
         return hint.toString()+"="+value;
     }
 
-    static public BeanViewHint parse(String hintString) {
+    static public ViewHint parse(String hintString) {
         String [] parts = hintString.split("=");
-        return new BeanViewHint(Hint.valueOf(parts[0]), parts[1]);
+        return new ViewHint(Hint.valueOf(parts[0]), parts[1]);
     }
 
-    static public BeanViewHint[] parse(String[] hintStrings) {
-        BeanViewHint[] hints = new BeanViewHint[hintStrings.length];
+    static public ViewHint[] parse(String[] hintStrings) {
+        ViewHint[] hints = new ViewHint[hintStrings.length];
         for (int x = 0; x < hintStrings.length; x++) {
-            hints[x] = BeanViewHint.parse(hintStrings[x]);
+            hints[x] = ViewHint.parse(hintStrings[x]);
         }
         return hints;
     }

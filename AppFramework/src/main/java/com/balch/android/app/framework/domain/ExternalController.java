@@ -20,10 +20,20 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean;
+package com.balch.android.app.framework.domain;
 
-public enum BeanEditState {
-    HIDDEN,
-    READONLY,
-    CHANGEABLE
+import android.content.Context;
+
+import com.balch.android.app.framework.domain.controls.ControlMap;
+
+import java.io.Serializable;
+
+public interface ExternalController<T extends DomainObject> extends Serializable {
+
+    void onChanged(Context context, ColumnDescriptor descriptor, Object value,
+                  ControlMap controlMap) throws ValidatorException;
+
+    void validate(Context context, T item, ControlMap controlMap) throws ValidatorException;
+
+    void initialize(Context context, T item, ControlMap controlMap);
 }

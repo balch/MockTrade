@@ -20,28 +20,25 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.sql;
 
-import java.util.HashMap;
+import android.content.ContentValues;
+import android.database.Cursor;
+
+import com.balch.android.app.framework.domain.DomainObject;
+
 import java.util.Map;
-import java.util.Set;
 
-public class BeanControlMap {
-    protected Map<String, BeanEditControl> fieldNameToControlMap = new HashMap<String, BeanEditControl>();
+public interface SqlMapper<T extends DomainObject> {
+    String COLUMN_ID = "_id";
+    String COLUMN_CREATE_TIME = "create_time";
+    String COLUMN_UPDATE_TIME = "update_time";
 
-    public BeanEditControl put(String key, BeanEditControl control) {
-        return this.fieldNameToControlMap.put(key, control);
-    }
+    String getTableName();
 
-    public <T extends BeanEditControl> T get(String key) {
-        return (T)this.fieldNameToControlMap.get(key);
-    }
+    ContentValues getContentValues(T domainObject);
 
-    public void clear() {
-        this.fieldNameToControlMap.clear();
-    }
+    void populate(T domainObject, Cursor cursor, Map<String, Integer> columnMap);
 
-    public Set<Map.Entry<String,BeanEditControl>> entrySet() {
-        return this.fieldNameToControlMap.entrySet();
-    }
 }
+

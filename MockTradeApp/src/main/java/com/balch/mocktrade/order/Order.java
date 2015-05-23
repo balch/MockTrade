@@ -22,72 +22,59 @@
 
 package com.balch.mocktrade.order;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-
 import com.balch.android.app.framework.MetadataUtils;
-import com.balch.android.app.framework.sql.SqlBean;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.annotations.BeanColumnEdit;
-import com.balch.android.app.framework.bean.annotations.BeanColumnNew;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.annotations.ColumnEdit;
+import com.balch.android.app.framework.domain.annotations.ColumnNew;
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 
 import java.io.Serializable;
-import java.util.Map;
 
-public class Order  extends SqlBean implements Serializable {
-    public static final String TABLE_NAME = "[order]";
-
-    public static final String COLUMN_ACCOUNT_ID = "account_id";
-    public static final String COLUMN_SYMBOL = "symbol";
-    public static final String COLUMN_STATUS = "status";
-    public static final String COLUMN_ACTION = "action";
-    public static final String COLUMN_STRATEGY = "strategy";
-    public static final String COLUMN_DURATION = "duration";
-    public static final String COLUMN_LIMIT_PRICE = "limit_price";
-    public static final String COLUMN_STOP_PRICE = "stop_price";
-    public static final String COLUMN_STOP_PERCENT = "stop_percent";
-    public static final String COLUMN_QUANTITY = "quantity";
-    public static final String COLUMN_HIGHEST_PRICE = "highest_price";
+public class Order  extends DomainObject implements Serializable {
 
     public static final String FLD_LIMIT_PRICE = "limitPrice";
     public static final String FLD_STOP_PRICE = "stopPrice";
     public static final String FLD_STOP_PERCENT = "stopPercent";
+    public static final String FLD_SYMBOL = "symbol";
+    public static final String FLD_ACTION = "action";
+    public static final String FLD_STRATEGY = "strategy";
+    public static final String FLD_QUANTITY = "quantity";
 
     protected Account account;
 
-    @BeanColumnEdit(order = 1, state = BeanEditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    @BeanColumnNew(order = 1, customControl = StockSymbolControl.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
+    @ColumnEdit(order = 1, state = EditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
+    @ColumnNew(order = 1, customControl = StockSymbolControl.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
     protected String symbol;
 
     protected OrderStatus status;
 
-    @BeanColumnEdit(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
-    @BeanColumnNew(order = 2, state = BeanEditState.READONLY, labelResId = R.string.order_action_label)
+    @ColumnEdit(order = 2, state = EditState.READONLY, labelResId = R.string.order_action_label)
+    @ColumnNew(order = 2, state = EditState.READONLY, labelResId = R.string.order_action_label)
     protected OrderAction action;
 
-    @BeanColumnEdit(order = 3, state = BeanEditState.READONLY, labelResId = R.string.order_strategy_label)
-    @BeanColumnNew(order = 3, labelResId = R.string.order_strategy_label)
+    @ColumnEdit(order = 3, state = EditState.READONLY, labelResId = R.string.order_strategy_label)
+    @ColumnNew(order = 3, labelResId = R.string.order_strategy_label)
     protected OrderStrategy strategy;
 
     protected OrderDuration duration;
 
-    @BeanColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
-    @BeanColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
+    @ColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
+    @ColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
     protected Money limitPrice;
 
-    @BeanColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
-    @BeanColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
+    @ColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
+    @ColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
     protected Money stopPrice;
 
-    @BeanColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
-    @BeanColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
+    @ColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
+    @ColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
     protected Double stopPercent;
 
-    @BeanColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
-    @BeanColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
+    @ColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
+    @ColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
     protected Long quantity;
 
     protected Money highestPrice;
@@ -103,11 +90,6 @@ public class Order  extends SqlBean implements Serializable {
         this.stopPrice = new Money(0);
         this.stopPercent = 0.0;
         this.highestPrice = new Money(0);
-    }
-
-    @Override
-    public String getTableName() {
-        return Order.TABLE_NAME;
     }
 
     public Account getAccount() {
@@ -207,43 +189,6 @@ public class Order  extends SqlBean implements Serializable {
     public Money getCost(Money price) {
         return Money.multiply(price, this.getQuantityDelta());
     }
-
-    @Override
-    public ContentValues getContentValues() {
-        ContentValues values = new ContentValues();
-
-        values.put(COLUMN_ACCOUNT_ID, this.account.getId());
-        values.put(COLUMN_SYMBOL, this.symbol);
-        values.put(COLUMN_STATUS, this.status.name());
-        values.put(COLUMN_ACTION, this.action.name());
-        values.put(COLUMN_STRATEGY, this.strategy.name());
-        values.put(COLUMN_DURATION, this.duration.name());
-        values.put(COLUMN_LIMIT_PRICE, this.limitPrice.getMicroCents());
-        values.put(COLUMN_STOP_PRICE, this.stopPrice.getMicroCents());
-        values.put(COLUMN_STOP_PERCENT, this.stopPercent);
-        values.put(COLUMN_QUANTITY, this.quantity);
-        values.put(COLUMN_HIGHEST_PRICE, this.highestPrice.getMicroCents());
-
-        return values;
-    }
-
-    @Override
-    public void populate(Cursor cursor, Map<String, Integer> columnMap) {
-        this.id = cursor.getLong(columnMap.get(COLUMN_ID));
-        this.account = new Account();
-        this.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        this.symbol = cursor.getString(columnMap.get(COLUMN_SYMBOL));
-        this.status = OrderStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS)));
-        this.action = OrderAction.valueOf(cursor.getString(columnMap.get(COLUMN_ACTION)));
-        this.strategy = OrderStrategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY)));
-        this.duration = OrderDuration.valueOf(cursor.getString(columnMap.get(COLUMN_DURATION)));
-        this.limitPrice = new Money(cursor.getLong(columnMap.get(COLUMN_LIMIT_PRICE)));
-        this.stopPrice = new Money(cursor.getLong(columnMap.get(COLUMN_STOP_PRICE)));
-        this.stopPercent = cursor.getDouble(columnMap.get(COLUMN_STOP_PERCENT));
-        this.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
-        this.highestPrice = new Money(cursor.getLong(columnMap.get(COLUMN_HIGHEST_PRICE)));
-    }
-
 
     public enum OrderStatus implements MetadataUtils.EnumResource {
         OPEN,

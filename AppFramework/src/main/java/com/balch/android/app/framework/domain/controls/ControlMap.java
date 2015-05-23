@@ -20,8 +20,28 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
-public interface BeanControlMapper {
-    BeanControlMap getBeanControlMap();
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class ControlMap {
+    protected Map<String, EditControl> fieldNameToControlMap = new HashMap<String, EditControl>();
+
+    public EditControl put(String key, EditControl control) {
+        return this.fieldNameToControlMap.put(key, control);
+    }
+
+    public <T extends EditControl> T get(String key) {
+        return (T)this.fieldNameToControlMap.get(key);
+    }
+
+    public void clear() {
+        this.fieldNameToControlMap.clear();
+    }
+
+    public Set<Map.Entry<String,EditControl>> entrySet() {
+        return this.fieldNameToControlMap.entrySet();
+    }
 }

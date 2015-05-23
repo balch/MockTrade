@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.bean.controls;
+package com.balch.android.app.framework.domain.controls;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -28,12 +28,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanValidatorException;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.ValidatorException;
 
-public class UnsupportedEditControl extends LinearLayout implements BeanEditControl {
+public class UnsupportedEditControl extends LinearLayout implements EditControl {
 
-    protected BeanColumnDescriptor descriptor;
+    protected ColumnDescriptor descriptor;
     protected TextView label;
     protected TextView value;
 
@@ -53,25 +53,25 @@ public class UnsupportedEditControl extends LinearLayout implements BeanEditCont
     }
 
     protected void initialize() {
-        inflate(getContext(), R.layout.bean_edit_control_unsupported, this);
+        inflate(getContext(), R.layout.edit_control_unsupported, this);
         this.label = (TextView)findViewById(R.id.unsupported_edit_control_label);
         this.value = (TextView)findViewById(R.id.unsupported_edit_control_value);
     }
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
+    public void bind(ColumnDescriptor descriptor) {
         this.descriptor = descriptor;
         this.label.setText(descriptor.getLabelResId());
         this.value.setText("Field type '"+descriptor.getField().getType().getSimpleName()+"' is unsupported");
     }
 
     @Override
-    public BeanColumnDescriptor getDescriptor() {
+    public ColumnDescriptor getDescriptor() {
         return this.descriptor;
     }
 
     @Override
-    public void validate() throws BeanValidatorException {
+    public void validate() throws ValidatorException {
 
     }
 
@@ -86,12 +86,12 @@ public class UnsupportedEditControl extends LinearLayout implements BeanEditCont
     }
 
     @Override
-    public void setBeanEditControlListener(BeanEditControlListener listener) {
+    public void setEditControlListener(EditControlListener listener) {
 
     }
 
     @Override
-    public void setBeanControlMapper(BeanControlMapper beanControlMapper) {
+    public void setControlMapper(ControlMapper controlMapper) {
 
     }
 

@@ -39,7 +39,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
-import com.balch.android.app.framework.bean.BeanEditActivity;
+import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
@@ -269,8 +269,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
     }
 
     protected void showNewAccountActivity() {
-        Intent intent = BeanEditActivity.getIntent(this.view.getContext(), R.string.account_create_title,
-                new Account("","", new Money(100000.0), Account.Strategy.NONE, false),
+        Intent intent = EditActivity.getIntent(this.view.getContext(), R.string.account_create_title,
+                new Account("", "", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
         if (this.parentActivity != null) {
@@ -285,7 +285,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         order.setAccount(account);
         order.setAction(Order.OrderAction.BUY);
         order.setStrategy(Order.OrderStrategy.MARKET);
-        Intent intent = BeanEditActivity.getIntent(this.view.getContext(), R.string.order_create_buy_title,
+        Intent intent = EditActivity.getIntent(this.view.getContext(), R.string.order_create_buy_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
         if (this.parentActivity != null) {
@@ -303,7 +303,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         order.setAction(Order.OrderAction.SELL);
         order.setStrategy(Order.OrderStrategy.MARKET);
 
-        Intent intent = BeanEditActivity.getIntent(this.view.getContext(),
+        Intent intent = EditActivity.getIntent(this.view.getContext(),
                 R.string.order_create_sell_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
@@ -318,7 +318,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == NEW_ACCOUNT_RESULT) {
-                Account account = BeanEditActivity.getResult(data);
+                Account account = EditActivity.getResult(data);
                 if (account != null) {
                     // create a new Account instance to make sure the account is initialized correctly
                     model.createAccount(new Account(account.getName(), account.getDescription(),
@@ -326,7 +326,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                     reload(true);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
-                Order order = BeanEditActivity.getResult(data);
+                Order order = EditActivity.getResult(data);
                 if (order != null) {
                     model.createOrder(order);
                     reload(true);

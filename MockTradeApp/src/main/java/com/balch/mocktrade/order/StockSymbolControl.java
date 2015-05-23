@@ -34,12 +34,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.bean.BeanColumnDescriptor;
-import com.balch.android.app.framework.bean.BeanEditState;
-import com.balch.android.app.framework.bean.BeanValidatorException;
-import com.balch.android.app.framework.bean.BeanViewHint;
-import com.balch.android.app.framework.bean.controls.BeanControlMapper;
-import com.balch.android.app.framework.bean.controls.BeanEditControl;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ValidatorException;
+import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.domain.controls.ControlMapper;
+import com.balch.android.app.framework.domain.controls.EditControl;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.android.app.framework.types.Money;
@@ -51,7 +51,7 @@ import com.balch.mocktrade.model.ModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StockSymbolControl extends LinearLayout implements BeanEditControl, TextWatcher {
+public class StockSymbolControl extends LinearLayout implements EditControl, TextWatcher {
     private static final String TAG = StockSymbolControl.class.getName();
     protected static final int TEXT_CHANGE_DELAY_MS = 500;
 
@@ -60,9 +60,9 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
     protected TextView description;
     protected TextView price;
 
-    protected BeanColumnDescriptor descriptor;
-    protected BeanEditControlListener beanEditControlListener;
-    protected BeanControlMapper beanControlMapper;
+    protected ColumnDescriptor descriptor;
+    protected EditControlListener editControlListener;
+    protected ControlMapper controlMapper;
 
     protected FinanceModel financeModel;
 
@@ -121,14 +121,14 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
     }
 
     @Override
-    public void bind(BeanColumnDescriptor descriptor) {
+    public void bind(ColumnDescriptor descriptor) {
         this.descriptor = descriptor;
         this.label.setText(descriptor.getLabelResId());
 
         this.value.removeTextChangedListener(this);
         this.value.setLines(1);
 
-        boolean enabled = (descriptor.getState() == BeanEditState.CHANGEABLE);
+        boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
         this.allowEmpty = true;
         List<InputFilter> filters = getInputFilters();
         try {
@@ -136,12 +136,12 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
             this.value.setText(this.getValueAsString(obj));
 
             // check the hints associated with this field
-            for (BeanViewHint hint : descriptor.getHints()) {
-                if (hint.getHint() == BeanViewHint.Hint.MAX_CHARS) {
+            for (ViewHint hint : descriptor.getHints()) {
+                if (hint.getHint() == ViewHint.Hint.MAX_CHARS) {
                     filters.add(new InputFilter.LengthFilter(hint.getIntValue()));
-                } else if (hint.getHint() == BeanViewHint.Hint.DISPLAY_LINES) {
+                } else if (hint.getHint() == ViewHint.Hint.DISPLAY_LINES) {
                     this.value.setLines(hint.getIntValue());
-                } else if (hint.getHint() == BeanViewHint.Hint.NOT_EMPTY) {
+                } else if (hint.getHint() == ViewHint.Hint.NOT_EMPTY) {
                     this.allowEmpty = !hint.getBoolValue();
                 }
             }
@@ -173,17 +173,17 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
     }
 
     @Override
-    public BeanColumnDescriptor getDescriptor() {
+    public ColumnDescriptor getDescriptor() {
         return this.descriptor;
     }
 
     @Override
-    public void validate() throws BeanValidatorException {
+    public void validate() throws ValidatorException {
         String val = this.value.getText().toString();
         // empty string validation
         if (!this.allowEmpty) {
             if (TextUtils.isEmpty(val)) {
-                throw new BeanValidatorException(getResources().getString(R.string.error_empty_string));
+                throw new ValidatorException(getResources().getString(R.string.error_empty_string));
             }
         }
     }
@@ -199,13 +199,13 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
     }
 
     @Override
-    public void setBeanEditControlListener(BeanEditControlListener listener) {
-        this.beanEditControlListener = listener;
+    public void setEditControlListener(EditControlListener listener) {
+        this.editControlListener = listener;
     }
 
     @Override
-    public void setBeanControlMapper(BeanControlMapper beanControlMapper) {
-        this.beanControlMapper = beanControlMapper;
+    public void setControlMapper(ControlMapper controlMapper) {
+        this.controlMapper = controlMapper;
     }
 
     @Override
@@ -235,7 +235,7 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
         try {
             this.validate();
             value.setError(null);
-        } catch (BeanValidatorException e) {
+        } catch (ValidatorException e) {
             this.value.setError(e.getMessage());
             hasError = true;
         }
@@ -270,7 +270,7 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
                             }
                             value.setError(display);
                             callListenerOnChanged(true);
-                            beanEditControlListener.onError(descriptor, symbol, error);
+                            editControlListener.onError(descriptor, symbol, error);
 //                        Toast.makeText(activity, error, Toast.LENGTH_LONG);
                         }});
 
@@ -281,10 +281,10 @@ public class StockSymbolControl extends LinearLayout implements BeanEditControl,
     }
 
     protected void callListenerOnChanged(boolean hasError) {
-        if (this.beanEditControlListener != null) {
+        if (this.editControlListener != null) {
             try {
-                this.beanEditControlListener.onChanged(this.descriptor, this.getValue(), hasError);
-            } catch (BeanValidatorException e) {
+                this.editControlListener.onChanged(this.descriptor, this.getValue(), hasError);
+            } catch (ValidatorException e) {
                 this.value.setError(e.getMessage());
             }
         }

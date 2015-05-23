@@ -69,7 +69,7 @@ public class NavBar extends LinearLayout {
     }
 
     public void init(AttributeSet attrs, int defStyle) {
-        this.buttons = new ArrayList<NavButton>();
+        this.buttons = new ArrayList<>();
         inflate(getContext(), R.layout.nav_bar, this);
         this.rootLayout = (LinearLayout) this.findViewById(R.id.nav_bar_layout);
     }
@@ -108,10 +108,13 @@ public class NavBar extends LinearLayout {
         button.setLayoutParams(params);
         button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         button.setImageResourceId(drawableId);
-        button.setText(resources.getText(textId));
+
+        CharSequence text =  (orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                    resources.getText(textId) : null;
+        button.setText(text);
         button.setOnColor(this.onColor);
         button.setOffColor(this.offColor);
-        button.setTag(new Integer(this.buttons.size()));
+        button.setTag(this.buttons.size());
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

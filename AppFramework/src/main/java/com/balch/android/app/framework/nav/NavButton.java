@@ -29,6 +29,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -154,7 +155,12 @@ public class NavButton extends LinearLayout {
     }
 
     public void setText(CharSequence text) {
-        this.textView.setText(text);
+        boolean isVisible = !TextUtils.isEmpty(text);
+        this.textView.setVisibility(isVisible ? VISIBLE : GONE);
+
+        if (isVisible) {
+            this.textView.setText(text);
+        }
     }
 
     @Override

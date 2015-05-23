@@ -22,5 +22,6 @@
 
 package com.balch.android.app.framework.model;
 
-public interface ModelInitializer {
+public interface ModelInitializer<T> {
+    void initialize(T modelProvider);
 }

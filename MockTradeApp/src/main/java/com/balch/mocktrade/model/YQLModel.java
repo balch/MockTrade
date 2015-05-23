@@ -32,7 +32,7 @@ import com.balch.mocktrade.settings.Settings;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public abstract class YQLModel implements ModelInitializer {
+public abstract class YQLModel implements ModelInitializer<ModelProvider> {
     protected final static String YQL_BASE_URL = "https://query.yahooapis.com/v1/public/yql";
     protected final static String YQL_ENV = "store://datatables.org/alltableswithkeys";
 
@@ -47,6 +47,7 @@ public abstract class YQLModel implements ModelInitializer {
         initialize(modelProvider);
     }
 
+    @Override
     public void initialize(ModelProvider modelProvider) {
         this.modelProvider = modelProvider;
     }

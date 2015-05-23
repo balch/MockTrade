@@ -30,7 +30,7 @@ import com.balch.android.app.framework.model.ModelInitializer;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.settings.Settings;
 
-public abstract class SqliteModel implements ModelInitializer {
+public abstract class SqliteModel implements ModelInitializer<ModelProvider> {
     protected ModelProvider modelProvider;
 
     public SqliteModel() {
@@ -40,6 +40,7 @@ public abstract class SqliteModel implements ModelInitializer {
         this.modelProvider = modelProvider;
     }
 
+    @Override
     public void initialize(ModelProvider modelProvider) {
         this.modelProvider = modelProvider;
     }

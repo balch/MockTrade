@@ -22,7 +22,7 @@
 
 package com.balch.mocktrade.settings;
 
-import android.content.Context;
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -32,9 +32,9 @@ import java.util.TimeZone;
 
 public class Settings {
 
-    protected Context context;
+    protected Application context;
 
-    public Settings(Context context) {
+    public Settings(Application context) {
         this.context = context;
         PreferenceManager.setDefaultValues(this.context, R.xml.settings_pref_screen, false);
     }

@@ -23,19 +23,18 @@
 package com.balch.mocktrade.model;
 
 import com.balch.android.app.framework.model.ModelSourceProvider;
-import com.balch.mocktrade.TradeApplication;
 
 public class SqliteSourceProvider extends ModelSourceProvider<SqliteModel> {
 
-    protected TradeApplication tradeApplication;
+    protected ModelProvider modelProvider;
 
-    public SqliteSourceProvider(TradeApplication tradeApplication) {
+    public SqliteSourceProvider(ModelProvider modelProvider) {
         super(SqliteModel.class);
-        this.tradeApplication = tradeApplication;
+        this.modelProvider = modelProvider;
     }
 
     @Override
     public void initialize(SqliteModel model) {
-        model.initialize(tradeApplication);
+        model.initialize(modelProvider);
     }
 }

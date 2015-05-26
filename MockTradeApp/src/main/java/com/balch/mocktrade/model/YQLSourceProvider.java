@@ -23,20 +23,19 @@
 package com.balch.mocktrade.model;
 
 import com.balch.android.app.framework.model.ModelSourceProvider;
-import com.balch.mocktrade.TradeApplication;
 
 public class YQLSourceProvider extends ModelSourceProvider<YQLModel> {
 
-    protected final TradeApplication tradeApplication;
+    protected final ModelProvider modelProvider;
 
-    public YQLSourceProvider(TradeApplication tradeApplication) {
+    public YQLSourceProvider(ModelProvider modelProvider) {
         super(YQLModel.class);
-        this.tradeApplication = tradeApplication;
+        this.modelProvider = modelProvider;
     }
 
     @Override
     public void initialize(YQLModel model) {
-        model.initialize(this.tradeApplication);
+        model.initialize(this.modelProvider);
     }
 
 }

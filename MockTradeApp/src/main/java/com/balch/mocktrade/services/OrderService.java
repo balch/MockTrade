@@ -82,11 +82,11 @@ public class OrderService extends IntentService {
                                     if (orderResult.isSuccess()) {
 
                                         String msg = (o.getAction() == Order.OrderAction.BUY) ?
-                                                String.format(getString(R.string.notification_order_buy_success_format),
+                                                getString(R.string.notification_order_buy_success_format,
                                                         o.getSymbol(), o.getQuantity(),
                                                         orderResult.getPrice().getCurrency(),
                                                         orderResult.getCost().getCurrency()) :
-                                                String.format(getString(R.string.notification_order_sell_success_format),
+                                                getString(R.string.notification_order_sell_success_format,
                                                         o.getSymbol(), o.getQuantity(),
                                                         orderResult.getPrice().getCurrency(),
                                                         orderResult.getValue().getCurrency(),

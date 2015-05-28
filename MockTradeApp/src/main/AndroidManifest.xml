@@ -34,8 +34,13 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receivers.QuoteReceiver" />
-        <receiver android:name=".receivers.OrderReceiver" />
+        <receiver
+            android:name=".receivers.QuoteReceiver"
+            android:exported="false"/>
+        
+        <receiver
+            android:name=".receivers.OrderReceiver"
+            android:exported="false"/>
 
         <service
             android:name=".services.OrderService"

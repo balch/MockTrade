@@ -37,7 +37,7 @@ import android.widget.LinearLayout;
 import com.balch.android.app.framework.nav.NavBar;
 
 
-public class TemplateActivity extends FragmentActivity {
+public class TemplateActivity extends FragmentActivity implements ActivityProvider {
     protected BaseApplication application;
 
     protected NavBar navBar;
@@ -118,6 +118,7 @@ public class TemplateActivity extends FragmentActivity {
         this.application.onSaveInstanceState(outState);
     }
 
+    @Override
     public void showProgress() {
         if (this.optionsMenu != null) {
             MenuItem menuItem = this.optionsMenu.findItem(R.id.action_bar_menu_refresh);
@@ -126,6 +127,7 @@ public class TemplateActivity extends FragmentActivity {
         }
     }
 
+    @Override
     public void hideProgress() {
         if (this.optionsMenu != null) {
             MenuItem menuItem = this.optionsMenu.findItem(R.id.action_bar_menu_refresh);
@@ -133,6 +135,7 @@ public class TemplateActivity extends FragmentActivity {
             menuItem.setActionView(null);        }
     }
 
+    @Override
     public void showView(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.template_place_holder, fragment)
@@ -140,6 +143,11 @@ public class TemplateActivity extends FragmentActivity {
                 .commit();
 
         this.showRefreshMenuOption((fragment instanceof Refreshable) && ((Refreshable) fragment).showRefreshMenu());
+    }
+
+    @Override
+    public FragmentManager getFragManager() {
+        return getSupportFragmentManager();
     }
 
     public void setBackground(Drawable background) {

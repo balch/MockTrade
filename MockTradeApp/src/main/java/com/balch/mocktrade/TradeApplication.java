@@ -66,7 +66,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     private RequestQueue requestQueue;
     private Settings settings;
 
-    private TemplateActivity activity;
     private Map<NavButton, Fragment> buttonMap;
 
     private SqliteSourceProvider sqliteScheme;
@@ -139,19 +138,14 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         return sqlConnection;
     }
 
-    public TemplateActivity getActivity() {
-        return activity;
-    }
-
     @Override
     public Settings getSettings() {
         return settings;
     }
 
     @Override
-    public void configureActivity(TemplateActivity activity, NavBar navBar, Bundle savedInstanceState) {
+    public void configureActivity(final TemplateActivity activity, NavBar navBar, Bundle savedInstanceState) {
         activity.showProgress();
-        this.activity = activity;
 
         Resources resources = activity.getResources();
 
@@ -172,13 +166,13 @@ public class TradeApplication extends Application implements BaseApplication, Mo
             public void onClick(NavButton button) {
                 Fragment fragment = TradeApplication.this.buttonMap.get(button);
                 if (fragment != null) {
-                    TradeApplication.this.activity.showView(fragment);
+                    activity.showView(fragment);
                 }
             }
         });
 
         if (savedInstanceState == null) {
-            this.activity.showView(mainFragment);
+            activity.showView(mainFragment);
         }
 
         // not sure if we need this here for the first time the app launches
@@ -186,8 +180,7 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         financeModel.setQuoteServiceAlarm();
     }
 
-    public void closeCurrentView() {
-        FragmentManager fragmentManager = this.activity.getSupportFragmentManager();
+    public void closeCurrentView(FragmentManager fragmentManager) {
         fragmentManager.popBackStack();
     }
 

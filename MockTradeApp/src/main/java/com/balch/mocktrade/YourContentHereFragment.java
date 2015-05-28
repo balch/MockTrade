@@ -31,6 +31,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.balch.android.app.framework.Refreshable;
+import com.balch.android.app.framework.TemplateActivity;
 
 public class YourContentHereFragment extends Fragment implements Refreshable {
 
@@ -54,8 +55,11 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
-        tradeApplication.getActivity().showProgress();
+        final TemplateActivity templateActivity = (getActivity() instanceof TemplateActivity) ?
+                (TemplateActivity)getActivity() : null;
+        if  (templateActivity != null) {
+            templateActivity.showProgress();
+        }
 
         View view = inflater.inflate(R.layout.your_content_here_view, container, false);
         this.webView = (WebView)view.findViewById(R.id.content_here_webview);
@@ -68,8 +72,9 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
-                tradeApplication.getActivity().hideProgress();
+                if  (templateActivity != null) {
+                    templateActivity.hideProgress();
+                }
             }
         });
 
@@ -107,8 +112,12 @@ public class YourContentHereFragment extends Fragment implements Refreshable {
 
     @Override
     public void refresh() {
-        TradeApplication tradeApplication = (TradeApplication)getActivity().getApplication();
-        tradeApplication.getActivity().showProgress();
+
+        final TemplateActivity templateActivity = (getActivity() instanceof TemplateActivity) ?
+                (TemplateActivity)getActivity() : null;
+        if  (templateActivity != null) {
+            templateActivity.showProgress();
+        }
 
         this.webView.reload();
     }

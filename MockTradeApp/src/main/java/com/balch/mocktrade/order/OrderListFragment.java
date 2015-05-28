@@ -24,6 +24,7 @@ package com.balch.mocktrade.order;
 
 import android.os.Bundle;
 
+import com.balch.android.app.framework.ActivityProvider;
 import com.balch.android.app.framework.BaseFragment;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.mocktrade.model.ModelProvider;
@@ -44,7 +45,7 @@ public class OrderListFragment extends BaseFragment<OrderListPresenter, OrderLis
     protected OrderListPresenter createPresenter(OrderListView view) {
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
         OrderModel model = modelFactory.getModel(OrderModel.class);
-        return new OrderListPresenter(this.getArguments().getLong(ARG_ACCOUNT_ID), model, view);
+        return new OrderListPresenter((ActivityProvider)this.getActivity(), this.getArguments().getLong(ARG_ACCOUNT_ID), model, view);
     }
 
     @Override

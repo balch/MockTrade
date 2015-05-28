@@ -33,6 +33,7 @@ import android.support.v4.content.Loader;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.balch.android.app.framework.ActivityProvider;
 import com.balch.android.app.framework.BasePresenter;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeApplication;
@@ -48,14 +49,16 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
     protected OrderModel model;
     protected OrderListView view;
     protected Long accountId;
+    protected ActivityProvider activity;
 
     final Handler handler = new Handler();
 
 
-    public OrderListPresenter(Long accountId, OrderModel model, OrderListView view) {
+    public OrderListPresenter(ActivityProvider activity, Long accountId, OrderModel model, OrderListView view) {
         this.accountId = accountId;
         this.model = model;
         this.view = view;
+        this.activity = activity;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
         this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
             public boolean onCancelOrder(final Order order) {
-                new AlertDialog.Builder(application.getActivity())
+                new AlertDialog.Builder( OrderListPresenter.this.view.getContext())
                         .setTitle(R.string.order_cancel_dlg_title)
                         .setMessage(getString(R.string.order_cancel_dlg_message_format, order.getId(), order.getSymbol()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -86,7 +89,7 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
 
     public void reload(boolean showProgress) {
         if (showProgress) {
-            application.getActivity().showProgress();
+            this.activity.showProgress();
         }
         this.loaderManager.initLoader(ORDER_LOADER_ID, null, this).forceLoad();
     }
@@ -103,14 +106,14 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
             this.handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    application.closeCurrentView();
+                    application.closeCurrentView(OrderListPresenter.this.activity.getFragManager());
                 }
             });
             return;
         }
 
         this.view.bind(data);
-        application.getActivity().hideProgress();
+        this.activity.hideProgress();
 
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247

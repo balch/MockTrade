@@ -39,6 +39,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
+import com.balch.android.app.framework.TemplateActivity;
 import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -94,8 +95,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.parentFragment = fragment;
     }
 
-    protected Context getContext() {
-        return (this.parentActivity != null) ? this.parentActivity : this.parentFragment.getActivity();
+    protected TemplateActivity getTemplateActivity() {
+        return (this.parentActivity != null) ? (TemplateActivity)this.parentActivity : (TemplateActivity)this.parentFragment.getActivity();
     }
 
     @Override
@@ -114,12 +115,12 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
     @Override
     public void onResume() {
-        LocalBroadcastManager.getInstance(this.getContext()).registerReceiver(quoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.getAction()));
+        LocalBroadcastManager.getInstance(this.application).registerReceiver(quoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.getAction()));
     }
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(this.getContext()).unregisterReceiver(quoteUpdateReceiver);
+        LocalBroadcastManager.getInstance(this.application).unregisterReceiver(quoteUpdateReceiver);
     }
 
     protected void setupAdapter() {
@@ -127,7 +128,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
-                new AlertDialog.Builder(application.getActivity())
+                new AlertDialog.Builder(PortfolioPresenter.this.getTemplateActivity())
                         .setTitle(R.string.account_delete_dlg_title)
                         .setMessage(String.format(getString(R.string.account_delete_dlg_message_format), account.getName()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -160,7 +161,9 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
             @Override
             public void onShowOpenOrdersClicked(Account account) {
-                getApplication().getActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
+                if (getTemplateActivity() != null) {
+                    getTemplateActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
+                }
             }
         });
         this.view.setPortfolioAdapter(this.portfolioAdapter);
@@ -171,7 +174,9 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      */
     private void reload(boolean showProgress) {
         if (showProgress) {
-            application.getActivity().showProgress();
+            if (getTemplateActivity() != null) {
+                getTemplateActivity().showProgress();
+            }
         }
         this.loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
     }
@@ -181,8 +186,11 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      * to update the UI once the quotes are fetched
      */
     public void refresh() {
-        application.getActivity().showProgress();
-        this.getContext().startService(QuoteService.getIntent(this.getContext()));
+        TemplateActivity templateActivity = getTemplateActivity();
+        if (templateActivity != null) {
+            templateActivity.showProgress();
+            templateActivity.startService(QuoteService.getIntent(this.application));
+        }
     }
 
     static public void updateView(Context context) {
@@ -220,7 +228,10 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
             @Override
             public void run() {
                 view.explandList();
-                application.getActivity().hideProgress();
+                TemplateActivity templateActivity = getTemplateActivity();
+                if (templateActivity != null) {
+                    templateActivity.hideProgress();
+                }
             }
         });
 
@@ -331,7 +342,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                     model.createOrder(order);
                     reload(true);
 
-                    model.processOrders(this.getContext(),
+                    model.processOrders(this.application,
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
                 }
             }

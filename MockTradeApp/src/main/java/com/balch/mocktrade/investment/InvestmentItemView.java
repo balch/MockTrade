@@ -103,7 +103,7 @@ public class InvestmentItemView extends LinearLayout {
         this.perf.setText(TextFormatUtils.getShortChangePercentText(delta.getDollars(), percent*100));
 
         Money deltaValue = Money.subtract(investment.getValue(), investment.getPrevDayValue());
-        this.valueChange.setText(TextFormatUtils.getShotChangeText(deltaValue.getDollars()));
+        this.valueChange.setText(TextFormatUtils.getShortChangeText(deltaValue.getDollars()));
     }
 
     public Investment getInvestment() {

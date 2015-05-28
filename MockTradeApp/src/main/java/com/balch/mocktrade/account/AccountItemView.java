@@ -113,7 +113,7 @@ public class AccountItemView extends LinearLayout {
 
         this.totalPerformance.setText(TextFormatUtils.getLongChangePercentText(this.getContext(),
                 performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
-        this.dayPerformance.setText(TextFormatUtils.getShotChangeText(this.getContext(),
+        this.dayPerformance.setText(TextFormatUtils.getShortChangeText(this.getContext(),
                 performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
 
         boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));

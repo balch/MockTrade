@@ -55,7 +55,7 @@ public class TextFormatUtils {
         return spanString;
     }
 
-    static public Spannable getShotChangeText(Context context, double dollars, int labelId) {
+    static public Spannable getShortChangeText(Context context, double dollars, int labelId) {
         String sign = (dollars >= 0) ? "" : "-";
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 
@@ -68,7 +68,7 @@ public class TextFormatUtils {
         return spanString;
     }
 
-    static public Spannable getShotChangeText(double dollars) {
+    static public Spannable getShortChangeText(double dollars) {
         String sign = (dollars >= 0) ? "" : "-";
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 

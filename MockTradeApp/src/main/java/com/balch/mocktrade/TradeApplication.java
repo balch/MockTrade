@@ -24,18 +24,12 @@ package com.balch.mocktrade;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Resources;
-import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.android.volley.RequestQueue;
 import com.balch.android.app.framework.BaseApplication;
-import com.balch.android.app.framework.TemplateActivity;
 import com.balch.android.app.framework.model.ModelFactory;
-import com.balch.android.app.framework.nav.NavBar;
-import com.balch.android.app.framework.nav.NavButton;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.view.VolleyBackground;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -45,14 +39,9 @@ import com.balch.mocktrade.model.SqliteSourceProvider;
 import com.balch.mocktrade.model.YQLSourceProvider;
 import com.balch.mocktrade.order.OrderModel;
 import com.balch.mocktrade.order.OrderSqliteModel;
-import com.balch.mocktrade.portfolio.PortfolioFragment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.settings.Settings;
-import com.balch.mocktrade.settings.SettingsFragment;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class TradeApplication extends Application implements BaseApplication, ModelProvider {
     private static final String TAG = TradeApplication.class.getName();
@@ -65,8 +54,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
     private SqlConnection sqlConnection;
     private RequestQueue requestQueue;
     private Settings settings;
-
-    private Map<NavButton, Fragment> buttonMap;
 
     private SqliteSourceProvider sqliteScheme;
     private YQLSourceProvider yqlScheme;
@@ -93,7 +80,6 @@ public class TradeApplication extends Application implements BaseApplication, Mo
 
         }
 
-        this.buttonMap = new HashMap<>();
         this.settings = new Settings(this);
 
         this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
@@ -143,50 +129,9 @@ public class TradeApplication extends Application implements BaseApplication, Mo
         return settings;
     }
 
-    @Override
-    public void configureActivity(final TemplateActivity activity, NavBar navBar, Bundle savedInstanceState) {
-        activity.showProgress();
-
-        Resources resources = activity.getResources();
-
-        activity.setBackground(resources.getDrawable(R.drawable.main_bmp_rpt));
-
-        navBar.setBackground(resources.getDrawable(R.drawable.navbar_bkg));
-
-        navBar.configure(resources.getColor(R.color.nav_on_color), resources.getColor(R.color.nav_off_color));
-
-        Fragment mainFragment = new PortfolioFragment();
-        this.buttonMap.put(navBar.addButton(R.string.nav_money_center, R.drawable.ic_nav_money_center), mainFragment);
-        this.buttonMap.put(navBar.addButton(R.string.nav_research, R.drawable.ic_nav_research), new YourContentHereFragment().setCustomArguments("http://www.cnbc.com/"));
-        this.buttonMap.put(navBar.addButton(R.string.nav_ideas, R.drawable.ic_nav_ideas), new YourContentHereFragment().setCustomArguments("http://wallstcheatsheet.com/category/investing/"));
-        this.buttonMap.put(navBar.addButton(R.string.nav_settings, R.drawable.ic_nav_settings), new SettingsFragment());
-
-        navBar.setOnNavClickListener(new NavBar.OnNavClickListener() {
-            @Override
-            public void onClick(NavButton button) {
-                Fragment fragment = TradeApplication.this.buttonMap.get(button);
-                if (fragment != null) {
-                    activity.showView(fragment);
-                }
-            }
-        });
-
-        if (savedInstanceState == null) {
-            activity.showView(mainFragment);
-        }
-
-        // not sure if we need this here for the first time the app launches
-        FinanceModel financeModel = this.getModelFactory().getModel(FinanceModel.class);
-        financeModel.setQuoteServiceAlarm();
-    }
 
     public void closeCurrentView(FragmentManager fragmentManager) {
         fragmentManager.popBackStack();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-
     }
 
     @Override

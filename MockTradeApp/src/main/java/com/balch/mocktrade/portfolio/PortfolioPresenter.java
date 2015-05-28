@@ -39,7 +39,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
-import com.balch.android.app.framework.TemplateActivity;
+import com.balch.android.app.framework.NavBarActivity;
 import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -95,8 +95,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.parentFragment = fragment;
     }
 
-    protected TemplateActivity getTemplateActivity() {
-        return (this.parentActivity != null) ? (TemplateActivity)this.parentActivity : (TemplateActivity)this.parentFragment.getActivity();
+    protected NavBarActivity getTemplateActivity() {
+        return (this.parentActivity != null) ? (NavBarActivity)this.parentActivity : (NavBarActivity)this.parentFragment.getActivity();
     }
 
     @Override
@@ -186,10 +186,10 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      * to update the UI once the quotes are fetched
      */
     public void refresh() {
-        TemplateActivity templateActivity = getTemplateActivity();
-        if (templateActivity != null) {
-            templateActivity.showProgress();
-            templateActivity.startService(QuoteService.getIntent(this.application));
+        NavBarActivity navBarActivity = getTemplateActivity();
+        if (navBarActivity != null) {
+            navBarActivity.showProgress();
+            navBarActivity.startService(QuoteService.getIntent(this.application));
         }
     }
 
@@ -228,9 +228,9 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
             @Override
             public void run() {
                 view.explandList();
-                TemplateActivity templateActivity = getTemplateActivity();
-                if (templateActivity != null) {
-                    templateActivity.hideProgress();
+                NavBarActivity navBarActivity = getTemplateActivity();
+                if (navBarActivity != null) {
+                    navBarActivity.hideProgress();
                 }
             }
         });

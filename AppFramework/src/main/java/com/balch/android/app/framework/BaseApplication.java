@@ -23,11 +23,5 @@
 package com.balch.android.app.framework;
 
 
-import android.os.Bundle;
-
-import com.balch.android.app.framework.nav.NavBar;
-
 public interface BaseApplication {
-    void configureActivity(TemplateActivity activity, NavBar navBar, Bundle savedInstanceState);
-    void onSaveInstanceState(Bundle savedInstanceState);
 }

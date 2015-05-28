@@ -30,9 +30,9 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.balch.android.app.framework.TemplateActivity;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
+import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
@@ -142,7 +142,7 @@ public class OrderService extends IntentService {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                         .setContentText(msg);
 
-        Intent clickIntent = new Intent(this, TemplateActivity.class);
+        Intent clickIntent = new Intent(this, MainActivity.class);
 
         PendingIntent pendingClickIntent =
                 PendingIntent.getActivity(this, 0 , clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);

@@ -37,20 +37,17 @@ import android.widget.LinearLayout;
 import com.balch.android.app.framework.nav.NavBar;
 
 
-public class TemplateActivity extends FragmentActivity implements ActivityProvider {
-    protected BaseApplication application;
-
+public abstract class NavBarActivity extends FragmentActivity implements ActivityProvider {
     protected NavBar navBar;
     protected LinearLayout rootLayout;
     protected FrameLayout frameLayout;
     protected Menu optionsMenu;
 
+    abstract protected void configureNavBar(NavBar navBar, Bundle savedInstanceState);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        application = (BaseApplication)this.getApplicationContext();
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -61,7 +58,7 @@ public class TemplateActivity extends FragmentActivity implements ActivityProvid
         this.rootLayout = (LinearLayout)findViewById(R.id.template_layout);
         this.frameLayout = (FrameLayout)findViewById(R.id.template_place_holder);
 
-        application.configureActivity(this, this.navBar, savedInstanceState);
+        configureNavBar(this.navBar, savedInstanceState);
 
         if (savedInstanceState == null) {
         }
@@ -72,8 +69,8 @@ public class TemplateActivity extends FragmentActivity implements ActivityProvid
                 int backStackCount = getSupportFragmentManager().getBackStackEntryCount();
                 if (backStackCount > 0) {
                     int selectedIndex = Integer.parseInt(getSupportFragmentManager().getBackStackEntryAt(backStackCount - 1).getName());
-                    if (selectedIndex != TemplateActivity.this.navBar.getSelectedIndex()) {
-                        TemplateActivity.this.navBar.setSelectedIndex(selectedIndex);
+                    if (selectedIndex != NavBarActivity.this.navBar.getSelectedIndex()) {
+                        NavBarActivity.this.navBar.setSelectedIndex(selectedIndex);
                     }
                 } else {
                     // required b/c the first stack frame has an empty fragment
@@ -110,12 +107,6 @@ public class TemplateActivity extends FragmentActivity implements ActivityProvid
         if (this.optionsMenu != null) {
             this.optionsMenu.findItem(R.id.action_bar_menu_refresh).setVisible(show);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        this.application.onSaveInstanceState(outState);
     }
 
     @Override

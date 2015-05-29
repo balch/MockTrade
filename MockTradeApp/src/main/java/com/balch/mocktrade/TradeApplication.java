@@ -28,7 +28,6 @@ import android.os.StrictMode;
 import android.support.v4.app.FragmentManager;
 
 import com.android.volley.RequestQueue;
-import com.balch.android.app.framework.BaseApplication;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.view.VolleyBackground;
@@ -43,7 +42,7 @@ import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.settings.Settings;
 
-public class TradeApplication extends Application implements BaseApplication, ModelProvider {
+public class TradeApplication extends Application implements ModelProvider {
     private static final String TAG = TradeApplication.class.getName();
 
     private static final String DATABASE_NAME = "mocktrade.db";

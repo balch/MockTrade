@@ -23,5 +23,4 @@
 package com.balch.android.app.framework.model;
 
 public interface BaseModel {
-    void destroy();
 }

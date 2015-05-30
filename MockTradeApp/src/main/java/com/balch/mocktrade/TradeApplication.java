@@ -87,6 +87,10 @@ public class TradeApplication extends Application implements ModelProvider {
         this.requestQueue = VolleyBackground.newRequestQueue(this, 10);
 
         this.configureModelFactory();
+
+        FinanceModel financeModel = getModelFactory().getModel(FinanceModel.class);
+        financeModel.setQuoteServiceAlarm();
+
     }
 
     @Override

@@ -118,17 +118,16 @@ class FinanceManager {
 
     public void setQuoteServiceAlarm(){
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = QuoteReceiver.getIntent(context);
 
+        Intent intent = QuoteReceiver.getIntent(context);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        alarmManager.cancel(pendingIntent);
 
         Date startTime = this.nextPollStart();
         if (startTime == null) {
             startTime = new Date();
         }
 
-        alarmManager.setRepeating(AlarmManager.RTC,
+        alarmManager.setInexactRepeating(AlarmManager.RTC,
                 startTime.getTime(),
                 this.settings.getPollInterval() * 1000,
                 pendingIntent);

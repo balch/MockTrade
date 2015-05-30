@@ -249,12 +249,6 @@ public class OrderSqliteModel extends SqliteModel implements SqlMapper<Order>, O
         orderManager.scheduleOrderServiceAlarm(isMarketOpen);
     }
 
-
-    @Override
-    public void destroy() {
-
-    }
-
     @Override
     public ContentValues getContentValues(Order order) {
         ContentValues values = new ContentValues();

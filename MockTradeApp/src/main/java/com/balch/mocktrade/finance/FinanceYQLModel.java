@@ -169,10 +169,6 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
         this.financeManager.setQuoteServiceAlarm();
     }
 
-    @Override
-    public void destroy() {
-
-    }
     protected String getDelimitedSymbols(List<String> symbols) {
         StringBuilder builder = new StringBuilder();
         Set<String> symbolSet = new HashSet<String>();

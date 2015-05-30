@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import com.balch.android.app.framework.NavBarActivity;
 import com.balch.android.app.framework.nav.NavBar;
 import com.balch.android.app.framework.nav.NavButton;
-import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.portfolio.PortfolioFragment;
 import com.balch.mocktrade.settings.SettingsFragment;
 
@@ -52,10 +51,6 @@ public class MainActivity extends NavBarActivity {
             showView(mainFragment);
         }
 
-        // not sure if we need this here for the first time the app launches
-        TradeApplication application = (TradeApplication)this.getApplication();
-        FinanceModel financeModel = application.getModelFactory().getModel(FinanceModel.class);
-        financeModel.setQuoteServiceAlarm();
     }
 
 }

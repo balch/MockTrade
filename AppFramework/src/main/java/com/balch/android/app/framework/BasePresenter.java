@@ -23,9 +23,9 @@
 package com.balch.android.app.framework;
 
 import android.app.Application;
+import android.app.LoaderManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 
 
 public abstract class BasePresenter<T extends Application> {

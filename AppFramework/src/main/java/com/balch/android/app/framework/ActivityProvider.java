@@ -1,7 +1,7 @@
 package com.balch.android.app.framework;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 
 public interface ActivityProvider {
     void showProgress();

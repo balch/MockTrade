@@ -23,11 +23,12 @@
 package com.balch.mocktrade.services;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
@@ -41,7 +42,6 @@ import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioPresenter;
-import com.balch.mocktrade.receivers.OrderReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +49,8 @@ import java.util.Map;
 
 public class OrderService extends IntentService {
     private static final String TAG = OrderService.class.getName();
+
+    public static final String WAKE_LOCK_TAG = "OrderServiceWakeLockTag";
 
     public OrderService() {
         super(OrderService.class.getName());
@@ -116,7 +118,7 @@ public class OrderService extends IntentService {
 
 
                         } finally {
-                            OrderReceiver.completeWakefulIntent(intent);
+                            releaseWakeLock();
                         }
                     }
 
@@ -124,22 +126,22 @@ public class OrderService extends IntentService {
                     public void onErrorResponse(String error) {
                         // failed to return quotes
                         // Error has been logged
-                        OrderReceiver.completeWakefulIntent(intent);
+                        releaseWakeLock();
                     }
                 });
             }
         } catch (Exception ex) {
             Log.e(TAG, "onHandleIntent exception", ex);
-            OrderReceiver.completeWakefulIntent(intent);
+            releaseWakeLock();
         }
     }
 
     private void sendNotification(Order order, String msg) {
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
+        Notification.Builder builder =
+                new Notification.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(this.getString(R.string.notification_order_title))
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+                        .setStyle(new Notification.BigTextStyle().bigText(msg))
                         .setContentText(msg);
 
         Intent clickIntent = new Intent(this, MainActivity.class);
@@ -156,4 +158,13 @@ public class OrderService extends IntentService {
         return new Intent(context, OrderService.class);
     }
 
+    private void releaseWakeLock() {
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                WAKE_LOCK_TAG);
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
+
+    }
 }

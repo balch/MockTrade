@@ -23,9 +23,9 @@
 package com.balch.mocktrade;
 
 import android.app.Application;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.StrictMode;
-import android.support.v4.app.FragmentManager;
 
 import com.android.volley.RequestQueue;
 import com.balch.android.app.framework.model.ModelFactory;

@@ -25,6 +25,7 @@ package com.balch.mocktrade.services;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
@@ -37,7 +38,6 @@ import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioPresenter;
-import com.balch.mocktrade.receivers.QuoteReceiver;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +48,8 @@ import java.util.Map;
 
 public class QuoteService extends IntentService {
     private static final String TAG = QuoteService.class.getName();
+
+    public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 
     protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
     protected static String lastUpdateDate = "";  // move this to shared prefs?
@@ -109,7 +111,7 @@ public class QuoteService extends IntentService {
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
                         } finally {
                             PortfolioPresenter.updateView(QuoteService.this);
-                            QuoteReceiver.completeWakefulIntent(intent);
+                            releaseWakeLock();
                         }
                     }
 
@@ -118,7 +120,7 @@ public class QuoteService extends IntentService {
                         // failed to return quotes
                         // Error has been logged
                         PortfolioPresenter.updateView(QuoteService.this);
-                        QuoteReceiver.completeWakefulIntent(intent);
+                        releaseWakeLock();
                     }
                 });
             } else {
@@ -136,7 +138,7 @@ public class QuoteService extends IntentService {
             Log.e(TAG, "onHandleIntent exception", ex);
         } finally {
             if (completeWakefulIntentOnExit) {
-                QuoteReceiver.completeWakefulIntent(intent);
+                releaseWakeLock();
             }
 
         }
@@ -172,4 +174,15 @@ public class QuoteService extends IntentService {
             }
         }
     }
+
+    private void releaseWakeLock() {
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                WAKE_LOCK_TAG);
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
+
+    }
+
 }

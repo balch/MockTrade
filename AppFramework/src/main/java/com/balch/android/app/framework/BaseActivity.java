@@ -22,9 +22,9 @@
 
 package com.balch.android.app.framework;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +35,7 @@ import com.balch.android.app.framework.view.BaseView;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseActivity<V extends View & BaseView> extends FragmentActivity {
+public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     private static final String TAG = BaseActivity.class.getName();
 
     protected List<BasePresenter> presenters = new ArrayList<BasePresenter>();
@@ -66,7 +66,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends FragmentAc
 
             for (BasePresenter presenter : this.presenters) {
                 presenter.setApplication(this.getApplication());
-                presenter.setLoaderManager(this.getSupportLoaderManager());
+                presenter.setLoaderManager(this.getLoaderManager());
             }
 
             for (BasePresenter presenter : this.presenters) {

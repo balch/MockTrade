@@ -22,16 +22,16 @@
 
 package com.balch.mocktrade;
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.balch.android.app.framework.Refreshable;
 import com.balch.android.app.framework.NavBarActivity;
+import com.balch.android.app.framework.Refreshable;
 
 public class WebViewFragment extends Fragment implements Refreshable {
 
@@ -61,8 +61,7 @@ public class WebViewFragment extends Fragment implements Refreshable {
             navBarActivity.showProgress();
         }
 
-        View view = inflater.inflate(R.layout.your_content_here_view, container, false);
-        this.webView = (WebView)view.findViewById(R.id.content_here_webview);
+        this.webView = new WebView(container.getContext());
         this.webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -81,7 +80,7 @@ public class WebViewFragment extends Fragment implements Refreshable {
 
         this.webView.loadUrl(this.getArguments().getString(ARG_URL));
 
-        return view;
+        return this.webView;
     }
 
     @Override

@@ -22,9 +22,9 @@
 
 package com.balch.mocktrade.receivers;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
@@ -32,12 +32,11 @@ import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 
-public class BootReceiver extends WakefulBroadcastReceiver {
+public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = BootReceiver.class.getName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         Log.i(TAG, "BootReceiver onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();

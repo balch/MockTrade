@@ -29,9 +29,6 @@ import android.os.Bundle;
 import com.balch.android.app.framework.BaseActivity;
 import com.balch.android.app.framework.BasePresenter;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class EditActivity extends BaseActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
@@ -47,7 +44,7 @@ public class EditActivity extends BaseActivity<EditView> {
     }
 
     @Override
-    protected List<BasePresenter> createPresenters(EditView view) {
+    protected BasePresenter createPresenter(EditView view) {
 
         Intent intent = this.getIntent();
         int titleResId = intent.getIntExtra(EXTRA_TITLE_RESID, 0);
@@ -61,7 +58,7 @@ public class EditActivity extends BaseActivity<EditView> {
         int okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
         int cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
 
-        return Arrays.asList((BasePresenter) new EditPresenter(view, isNew, domainObject, validator,
+        return new EditPresenter(view, isNew, domainObject, validator,
                 okButtonResId, cancelButtonResId,
                 new EditView.EditViewListener() {
                     @Override
@@ -78,7 +75,7 @@ public class EditActivity extends BaseActivity<EditView> {
                         setResult(RESULT_CANCELED, intent);
                         finish();
                     }
-                }));
+                });
     }
 
     @Override

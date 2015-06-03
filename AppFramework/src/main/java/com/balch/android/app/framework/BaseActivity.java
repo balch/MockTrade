@@ -32,16 +32,13 @@ import android.widget.Toast;
 
 import com.balch.android.app.framework.view.BaseView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     private static final String TAG = BaseActivity.class.getName();
 
-    protected List<BasePresenter> presenters = new ArrayList<BasePresenter>();
+    protected BasePresenter presenter;
 
     abstract protected void initialize(Bundle savedInstanceState);
-    abstract protected List<BasePresenter> createPresenters(V view);
+    abstract protected BasePresenter createPresenter(V view);
     abstract protected V createView();
 
     protected void handleException(String logMsg, String displayMsg, Exception ex) {
@@ -61,17 +58,13 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
             V view = this.createView();
             view.initializeLayout();
 
-            this.presenters.clear();
-            this.presenters.addAll(this.createPresenters(view));
-
-            for (BasePresenter presenter : this.presenters) {
-                presenter.setApplication(this.getApplication());
-                presenter.setLoaderManager(this.getLoaderManager());
+            this.presenter = this.createPresenter(view);
+            if (this.presenter != null) {
+                this.presenter.setApplication(this.getApplication());
+                this.presenter.setLoaderManager(this.getLoaderManager());
+                this.presenter.initialize(savedInstanceState);
             }
 
-            for (BasePresenter presenter : this.presenters) {
-                presenter.initialize(savedInstanceState);
-            }
             this.setContentView(view);
 
         } catch (Exception ex) {
@@ -83,7 +76,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     public void onStart() {
         try {
             super.onStart();
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onStart();
             }
         } catch (Exception ex) {
@@ -95,7 +88,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     public void onResume() {
         try {
             super.onResume();
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onResume();
             }
         } catch (Exception ex) {
@@ -107,7 +100,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     public void onSaveInstanceState(Bundle outState) {
         try {
             super.onSaveInstanceState(outState);
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onSaveInstanceState(outState);
             }
         } catch (Exception ex) {
@@ -118,7 +111,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     @Override
     public void onPause() {
         try {
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onPause();
             }
             super.onPause();
@@ -130,7 +123,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     @Override
     public void onStop() {
         try {
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onStop();
             }
             super.onStop();
@@ -142,7 +135,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     @Override
     public void onDestroy() {
         try {
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 presenter.onDestroy();
             }
         } catch (Exception ex) {
@@ -155,7 +148,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            for (BasePresenter presenter : this.presenters) {
+            if (this.presenter != null) {
                 // could have result code collisions
                 // make sure to also check for existence of result
                 presenter.onActivityResult(requestCode, resultCode, data);

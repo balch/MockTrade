@@ -94,7 +94,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.parentFragment = fragment;
     }
 
-    protected NavBarActivity getTemplateActivity() {
+    private NavBarActivity getNavBarActivity() {
         return (this.parentActivity != null) ? (NavBarActivity)this.parentActivity : (NavBarActivity)this.parentFragment.getActivity();
     }
 
@@ -127,7 +127,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
-                new AlertDialog.Builder(PortfolioPresenter.this.getTemplateActivity())
+                new AlertDialog.Builder(PortfolioPresenter.this.getNavBarActivity())
                         .setTitle(R.string.account_delete_dlg_title)
                         .setMessage(String.format(getString(R.string.account_delete_dlg_message_format), account.getName()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -160,8 +160,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
             @Override
             public void onShowOpenOrdersClicked(Account account) {
-                if (getTemplateActivity() != null) {
-                    getTemplateActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
+                if (getNavBarActivity() != null) {
+                    getNavBarActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
                 }
             }
         });
@@ -173,8 +173,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      */
     private void reload(boolean showProgress) {
         if (showProgress) {
-            if (getTemplateActivity() != null) {
-                getTemplateActivity().showProgress();
+            if (getNavBarActivity() != null) {
+                getNavBarActivity().showProgress();
             }
         }
         this.loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
@@ -185,7 +185,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      * to update the UI once the quotes are fetched
      */
     public void refresh() {
-        NavBarActivity navBarActivity = getTemplateActivity();
+        NavBarActivity navBarActivity = getNavBarActivity();
         if (navBarActivity != null) {
             navBarActivity.showProgress();
             navBarActivity.startService(QuoteService.getIntent(this.application));
@@ -227,7 +227,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
             @Override
             public void run() {
                 view.explandList();
-                NavBarActivity navBarActivity = getTemplateActivity();
+                NavBarActivity navBarActivity = getNavBarActivity();
                 if (navBarActivity != null) {
                     navBarActivity.hideProgress();
                 }

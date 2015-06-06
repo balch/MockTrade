@@ -71,8 +71,8 @@ class FinanceManager {
         if ((now.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
             (now.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
 
-            Calendar startTime = usePoll ? this.getPollStartTime() : this.getMarketOpenTime();
-            Calendar endTime = usePoll ? this.getPollEndTime() : this.getMarketCloseTime();
+            Calendar startTime = usePoll ? getPollStartTime() : getMarketOpenTime();
+            Calendar endTime = usePoll ? getPollEndTime() : getMarketCloseTime();
 
             if (now.before(startTime)) {
                 val = -1;

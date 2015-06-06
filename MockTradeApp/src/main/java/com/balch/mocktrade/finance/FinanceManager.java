@@ -51,11 +51,11 @@ class FinanceManager {
     }
 
     public boolean isMarketOpen() {
-        return (this.marketOpenCompareValue(false) == 0);
+        return (marketOpenCompareValue(false) == 0);
     }
 
     public boolean isInPollTime() {
-        return (this.marketOpenCompareValue(true) == 0);
+        return (marketOpenCompareValue(true) == 0);
     }
 
     /**
@@ -97,7 +97,7 @@ class FinanceManager {
     protected Date nextMarketOpen(boolean usePoll) {
         Date nextOpen;
 
-        int comapreVal = this.marketOpenCompareValue(usePoll);
+        int comapreVal = marketOpenCompareValue(usePoll);
         if (comapreVal == 0) {
             nextOpen = new Date();
         } else {
@@ -134,19 +134,19 @@ class FinanceManager {
     }
 
     protected Calendar getPollStartTime() {
-        return this.getCalendarFromTime(settings.geMarketOpenTime(), -15);
+        return getCalendarFromTime(settings.geMarketOpenTime(), -15);
     }
 
     protected Calendar getMarketOpenTime() {
-        return this.getCalendarFromTime(settings.geMarketOpenTime(), 0);
+        return getCalendarFromTime(settings.geMarketOpenTime(), 0);
     }
 
     protected Calendar getPollEndTime() {
-        return this.getCalendarFromTime(settings.geMarketCloseTime(), 15);
+        return getCalendarFromTime(settings.geMarketCloseTime(), 15);
     }
 
     protected Calendar getMarketCloseTime() {
-        return this.getCalendarFromTime(settings.geMarketCloseTime(), 0);
+        return getCalendarFromTime(settings.geMarketCloseTime(), 0);
     }
 
     protected Calendar getCalendarFromTime(String time, int offsetMinutes) {

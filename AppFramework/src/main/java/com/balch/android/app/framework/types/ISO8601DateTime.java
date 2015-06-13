@@ -34,6 +34,7 @@ public class ISO8601DateTime implements Serializable {
     private static final String TAG = ISO8601DateTime.class.getName();
 
     private static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static final String ISO_8601_DATE_TIME_FORMAT_1 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'00:00:00Z";
 
     private Date date;
@@ -75,7 +76,7 @@ public class ISO8601DateTime implements Serializable {
 
     public static String toISO8601(Date date, boolean dateOnly) {
         TimeZone tz = dateOnly ? TimeZone.getDefault() : TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat(getDateFormat(dateOnly));
+        DateFormat df = new SimpleDateFormat(getDateFormat(dateOnly, null));
         df.setTimeZone(tz);
         return df.format(date);
     }
@@ -87,11 +88,13 @@ public class ISO8601DateTime implements Serializable {
 
     public static Date toDate(String iso8601string) throws ParseException {
         String s = iso8601string.replace("Z", "+00:00");
-        return  new SimpleDateFormat(getDateFormat(false)).parse(s);
+        return new SimpleDateFormat(getDateFormat(false, iso8601string)).parse(s);
     }
 
-    protected static String getDateFormat(boolean dataOnly) {
-        return dataOnly ? ISO_8601_DATE_FORMAT : ISO_8601_DATE_TIME_FORMAT;
+    protected static String getDateFormat(boolean dataOnly, String iso8601String) {
+        return dataOnly ? ISO_8601_DATE_FORMAT :
+                ((iso8601String != null) && iso8601String.contains("."))
+                        ? ISO_8601_DATE_TIME_FORMAT_1 : ISO_8601_DATE_TIME_FORMAT;
     }
 
     public Date getDate() {

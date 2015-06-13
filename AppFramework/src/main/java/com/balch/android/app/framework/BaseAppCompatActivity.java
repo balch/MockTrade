@@ -22,9 +22,9 @@
 
 package com.balch.android.app.framework;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -32,8 +32,8 @@ import android.widget.Toast;
 
 import com.balch.android.app.framework.view.BaseView;
 
-public abstract class BaseActivity<V extends View & BaseView> extends Activity {
-    private static final String TAG = BaseActivity.class.getName();
+public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
+    private static final String TAG = BaseAppCompatActivity.class.getName();
 
     protected BasePresenter presenter;
 

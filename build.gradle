@@ -17,5 +17,11 @@ allprojects {
         mavenCentral()
     }
 
+    // Temporary workaround for bug: https://code.google.com/p/android-test-kit/issues/detail?id=136
+    configurations.all {
+        resolutionStrategy.force 'com.android.support:support-annotations:22.1.1'
+    }
+
 }
+
 

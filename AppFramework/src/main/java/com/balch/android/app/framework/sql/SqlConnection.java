@@ -118,11 +118,11 @@ public class SqlConnection extends SQLiteOpenHelper {
         return results;
     }
 
-    public long insert(SqlMapper mapper, DomainObject item) throws SQLException, IllegalAccessException {
+    public long insert(SqlMapper mapper, DomainObject item) throws SQLException {
         return insert(mapper, item, this.getWritableDatabase());
     }
 
-    public long insert(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws SQLException, IllegalAccessException {
+    public long insert(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws SQLException {
         ContentValues values = mapper.getContentValues(item);
 
         ISO8601DateTime now = new ISO8601DateTime();
@@ -138,15 +138,15 @@ public class SqlConnection extends SQLiteOpenHelper {
         return id;
     }
 
-    public boolean update(SqlMapper mapper, DomainObject item) throws IllegalAccessException {
+    public boolean update(SqlMapper mapper, DomainObject item)  {
         return update(mapper, item, null, null, this.getWritableDatabase());
     }
 
-    public boolean update(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws IllegalAccessException {
+    public boolean update(SqlMapper mapper, DomainObject item, SQLiteDatabase db)  {
         return update(mapper, item, null, null, db);
     }
 
-    public boolean update(SqlMapper mapper, DomainObject item, String extraWhere, String [] whereArgs, SQLiteDatabase db) throws IllegalAccessException {
+    public boolean update(SqlMapper mapper, DomainObject item, String extraWhere, String [] whereArgs, SQLiteDatabase db)  {
 
         ContentValues values = mapper.getContentValues(item);
 

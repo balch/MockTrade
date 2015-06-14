@@ -151,13 +151,8 @@ public class OrderSqliteModel extends SqliteModel implements SqlMapper<Order>, O
             return orderManager.attemptExecuteOrder(order, quote);
         } catch (Exception ex) {
             if (order != null) {
-
-                try {
-                    order.setStatus(Order.OrderStatus.ERROR);
-                    getSqlConnection().update(this, order);
-                } catch (IllegalAccessException e) {
-                    throw new OrderExecutionException(ex);
-                }
+                order.setStatus(Order.OrderStatus.ERROR);
+                getSqlConnection().update(this, order);
             }
             throw new OrderExecutionException(ex);
         }

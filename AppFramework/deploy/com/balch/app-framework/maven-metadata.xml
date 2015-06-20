@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.balch</groupId>
+  <artifactId>app-framework</artifactId>
+  <version>1.0.0</version>
+  <versioning>
+    <versions>
+      <version>1.0.0</version>
+    </versions>
+    <lastUpdated>20150620052448</lastUpdated>
+  </versioning>
+</metadata>

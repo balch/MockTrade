@@ -41,6 +41,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
 
     // $1 = 10000mc
     private long microCents;
+    private Currency currency = Currency.getInstance("USD");
 
     public Money() {
         this(0L);
@@ -74,6 +75,10 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         this.microCents = (long)(dollars * DOLLAR_TO_MICRO_CENT);
     }
 
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
     public void setDollars(String dollars) {
         Double val = 0.0;
 
@@ -96,7 +101,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         String sign = (microCents >= 0) ? "+" : "-";
         ForegroundColorSpan spanColor = new ForegroundColorSpan((microCents >= 0)? Color.GREEN:Color.RED);
 
-        String val = String.format("%s%s%.02f", sign, getSymbol(), Math.abs(microCents));
+        String val = String.format(Locale.getDefault(), "%s%s%.02f", sign, getSymbol(), Math.abs(microCents));
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, 0, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
@@ -124,8 +129,8 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         return format.format(dollars);
     }
 
-    public static String getSymbol() {
-        return Currency.getInstance(Locale.US).getSymbol();
+    public String getSymbol() {
+        return currency.getSymbol();
     }
 
     public String getCurrencyNoGroupSep(int decimalPlaces) {

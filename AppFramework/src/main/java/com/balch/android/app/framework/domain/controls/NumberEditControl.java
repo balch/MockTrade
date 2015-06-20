@@ -79,6 +79,6 @@ public class NumberEditControl extends StringEditControl {
         if (TextUtils.isEmpty(val)) {
             val = "0";
         }
-        return new Double(val);
+        return Double.valueOf(val);
     }
 }

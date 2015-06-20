@@ -101,7 +101,7 @@ public class BoolEditControl extends LinearLayout implements EditControl, View.O
 
     @Override
     public Object getValue() {
-        return new Boolean(this.checkBox.isChecked());
+        return Boolean.valueOf(this.checkBox.isChecked());
     }
 
     @Override

@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ISO8601DateTime implements Serializable {
@@ -76,7 +77,7 @@ public class ISO8601DateTime implements Serializable {
 
     public static String toISO8601(Date date, boolean dateOnly) {
         TimeZone tz = dateOnly ? TimeZone.getDefault() : TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat(getDateFormat(dateOnly, null));
+        DateFormat df = new SimpleDateFormat(getDateFormat(dateOnly, null), Locale.getDefault());
         df.setTimeZone(tz);
         return df.format(date);
     }
@@ -88,7 +89,7 @@ public class ISO8601DateTime implements Serializable {
 
     public static Date toDate(String iso8601string) throws ParseException {
         String s = iso8601string.replace("Z", "+00:00");
-        return new SimpleDateFormat(getDateFormat(false, iso8601string)).parse(s);
+        return new SimpleDateFormat(getDateFormat(false, iso8601string), Locale.getDefault()).parse(s);
     }
 
     protected static String getDateFormat(boolean dataOnly, String iso8601String) {

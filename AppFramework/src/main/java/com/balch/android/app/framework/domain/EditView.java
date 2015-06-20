@@ -214,7 +214,7 @@ public class EditView extends ScrollView implements BaseView, ControlMapper {
 
         } catch (Exception e) {
             Log.e(TAG, "Error Populating control", e);
-            Toast.makeText(editControlLayout.getContext(), e.getMessage(), Toast.LENGTH_LONG);
+            Toast.makeText(editControlLayout.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

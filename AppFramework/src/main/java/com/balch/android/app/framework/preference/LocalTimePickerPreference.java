@@ -31,11 +31,12 @@ import com.balch.android.app.framework.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class LocalTimePickerPreference extends TimePickerPreference {
 
-    protected  static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    protected  static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
     protected TimeZone timeZone = TimeZone.getDefault();
 

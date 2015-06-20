@@ -22,7 +22,6 @@
 
 package com.balch.android.app.framework.preference;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -30,6 +29,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -56,8 +56,7 @@ public abstract class PreferenceFragment extends Fragment {
     private static final String PREFERENCES_TAG = "android:preferences";
     private static final float HC_HORIZONTAL_PADDING = 16;
 
-    @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {
+    private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

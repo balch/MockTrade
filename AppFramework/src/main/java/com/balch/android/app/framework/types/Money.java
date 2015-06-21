@@ -97,7 +97,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         return getFormatted(2);
     }
 
-    public Spannable getFormmatedWithColor() {
+    public Spannable getFormattedWithColor() {
         String sign = (microCents >= 0) ? "+" : "-";
         ForegroundColorSpan spanColor = new ForegroundColorSpan((microCents >= 0)? Color.GREEN:Color.RED);
 

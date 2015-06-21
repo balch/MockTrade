@@ -86,14 +86,14 @@ public class InvestmentItemView extends LinearLayout {
                 investment.getExchange() + ": " + investment.getSymbol());
         this.description.setText(investment.getDescription());
 
-        String price = investment.getPrice().getCurrency();
+        String price = investment.getPrice().getFormatted();
         if (!investment.isPriceCurrent()) {
             price = price + " **";
         }
 
         this.price.setText(price);
 
-        this.value.setText(investment.getValue().getCurrency());
+        this.value.setText(investment.getValue().getFormatted());
 
         Money delta = Money.subtract(investment.getPrice(), investment.getPrevDayClose());
         float percent = (investment.getPrice().getMicroCents() != 0) ?

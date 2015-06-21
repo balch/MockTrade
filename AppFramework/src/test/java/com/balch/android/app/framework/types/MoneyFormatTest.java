@@ -73,7 +73,7 @@ public class MoneyFormatTest {
     public void testMoneyFormat() throws Exception {
         Money money = new Money(this.value);
 
-        String v = money.getCurrency(this.places);
+        String v = money.getFormatted(this.places);
         assertEquals(this.expectedValue, v);
     }
 }

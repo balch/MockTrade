@@ -117,7 +117,7 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
 
     protected void setInvestmentData(String description, Money price) {
         this.description.setText(description);
-        this.price.setText((price != null) ? price.getCurrency(2) : "");
+        this.price.setText((price != null) ? price.getFormatted(2) : "");
     }
 
     @Override

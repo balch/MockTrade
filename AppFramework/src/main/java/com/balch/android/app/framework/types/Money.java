@@ -93,15 +93,15 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         this.setDollars(val);
     }
 
-    public String getCurrency() {
-        return getCurrency(2);
+    public String getFormatted() {
+        return getFormatted(2);
     }
 
-    public Spannable getColoredCurrency() {
+    public Spannable getFormmatedWithColor() {
         String sign = (microCents >= 0) ? "+" : "-";
         ForegroundColorSpan spanColor = new ForegroundColorSpan((microCents >= 0)? Color.GREEN:Color.RED);
 
-        String val = String.format(Locale.getDefault(), "%s%s%.02f", sign, getSymbol(), Math.abs(microCents));
+        String val = String.format(Locale.getDefault(), "%s%s%.02f", sign, getSymbol(), Math.abs(microCents)/1000f);
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, 0, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
@@ -109,7 +109,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
     }
 
 
-    public String getCurrency(int decimalPlaces) {
+    public String getFormatted(int decimalPlaces) {
         double dollars = getDollars();
 
         StringBuilder patternBuilder = new StringBuilder(getSymbol());
@@ -176,7 +176,7 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
     public String toString() {
         return "Money{" +
                 "microCents=" + microCents +
-                ", currency=" + getCurrency() +
+                ", currency=" + getFormatted() +
                 '}';
     }
 

@@ -107,7 +107,7 @@ public class QuantityPriceControl extends LinearLayout implements EditControl, T
     }
 
     public void setAccountInfo(Account account) {
-        this.availableFunds.setText(account.getAvailableFunds().getCurrency());
+        this.availableFunds.setText(account.getAvailableFunds().getFormatted());
     }
 
     public void setOrderInfo(Order order) {
@@ -246,7 +246,7 @@ public class QuantityPriceControl extends LinearLayout implements EditControl, T
     protected Spannable getCostSpan(Money cost, boolean hasAvailablefunds) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan(hasAvailablefunds ? Color.GREEN : Color.RED);
 
-        String dollars = cost.getCurrency();
+        String dollars = cost.getFormatted();
         SpannableStringBuilder spanString = new SpannableStringBuilder(dollars);
         spanString.setSpan(spanColor, 0, dollars.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 

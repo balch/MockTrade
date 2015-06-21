@@ -106,7 +106,7 @@ public class AccountItemView extends LinearLayout {
     public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
         this.account = account;
         this.name.setText(account.getName());
-        this.currentBalance.setText(performanceItem.getValue().getCurrency());
+        this.currentBalance.setText(performanceItem.getValue().getFormatted());
 
         this.name.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
         this.currentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);

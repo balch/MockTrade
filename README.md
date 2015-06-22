@@ -65,6 +65,14 @@ explore some Application Architecture ideas and apply them to the Android platfo
 * Gamification
 * Option Chains
 
+![Screen Shot 1](./Mocktrade_ss1.png)
+
+![Screen Shot 2](./Mocktrade_ss2.png)
+
+![Screen Shot 3](./Mocktrade_ss3.png)
+
+![Screen Shot 4](./Mocktrade_ss4.png)
+
 ### Attributions
 * Awesome icon site: http://www.iconarchive.com/
     * [Ecommerce Business Icons by DesignContest](http://www.designcontest.com) 

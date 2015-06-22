@@ -65,6 +65,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
 * Gamification
 * Option Chains
 
+### Screenshots
 ![Screen Shot 1](./Mocktrade_ss1.png)
 
 ![Screen Shot 2](./Mocktrade_ss2.png)

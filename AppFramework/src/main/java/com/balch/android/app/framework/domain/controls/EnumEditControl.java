@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EnumEditControl extends LinearLayout implements EditControl {
-    private static final String TAG = EnumEditControl.class.getName();
+    private static final String TAG = EnumEditControl.class.getSimpleName();
 
     protected TextView label;
     protected Spinner value;

@@ -43,7 +43,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public class EditView extends ScrollView implements BaseView, ControlMapper {
-    private static final String TAG = EditView.class.getName();
+    private static final String TAG = EditView.class.getSimpleName();
 
     public interface EditViewListener {
         void onSave(DomainObject domainObject);

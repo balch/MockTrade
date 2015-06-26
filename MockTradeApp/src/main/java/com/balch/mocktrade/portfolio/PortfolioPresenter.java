@@ -55,7 +55,7 @@ import com.balch.mocktrade.services.QuoteService;
 import java.util.List;
 
 public class PortfolioPresenter extends BasePresenter<TradeApplication> implements LoaderManager.LoaderCallbacks<PortfolioData> {
-    private static final String TAG = PortfolioPresenter.class.getName();
+    private static final String TAG = PortfolioPresenter.class.getSimpleName();
 
     protected static final int ACCOUNT_LOADER_ID = 0;
 

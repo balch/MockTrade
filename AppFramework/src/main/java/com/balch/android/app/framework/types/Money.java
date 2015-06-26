@@ -35,7 +35,7 @@ import java.util.Currency;
 import java.util.Locale;
 
 public class Money implements Cloneable, Serializable, Comparable<Money> {
-    private static final String TAG = Money.class.getName();
+    private static final String TAG = Money.class.getSimpleName();
 
     protected static final int DOLLAR_TO_MICRO_CENT = 10000;
 

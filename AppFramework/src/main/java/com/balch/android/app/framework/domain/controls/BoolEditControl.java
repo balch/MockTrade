@@ -34,7 +34,7 @@ import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.ValidatorException;
 
 public class BoolEditControl extends LinearLayout implements EditControl, View.OnClickListener {
-    private static final String TAG = BoolEditControl.class.getName();
+    private static final String TAG = BoolEditControl.class.getSimpleName();
 
     protected CheckBox checkBox;
 

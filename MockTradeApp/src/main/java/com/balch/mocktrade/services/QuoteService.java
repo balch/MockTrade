@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QuoteService extends IntentService {
-    private static final String TAG = QuoteService.class.getName();
+    private static final String TAG = QuoteService.class.getSimpleName();
 
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 

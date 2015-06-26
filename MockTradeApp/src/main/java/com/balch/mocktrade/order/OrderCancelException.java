@@ -23,7 +23,7 @@
 package com.balch.mocktrade.order;
 
 public class OrderCancelException extends Exception {
-    private static final String TAG = OrderCancelException.class.getName();
+    private static final String TAG = OrderCancelException.class.getSimpleName();
 
     public OrderCancelException() {
         super();

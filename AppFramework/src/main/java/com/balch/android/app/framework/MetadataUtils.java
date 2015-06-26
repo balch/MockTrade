@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MetadataUtils {
-    private static final String TAG = MetadataUtils.class.getName();
+    private static final String TAG = MetadataUtils.class.getSimpleName();
 
     protected static Map<String, List<Field>> fieldCache = new HashMap<String, List<Field>>();
 

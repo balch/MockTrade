@@ -31,7 +31,7 @@ import android.util.Log;
 import com.balch.mocktrade.services.OrderService;
 
 public class OrderReceiver extends BroadcastReceiver {
-    private static final String TAG = OrderReceiver.class.getName();
+    private static final String TAG = OrderReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderListPresenter extends BasePresenter<TradeApplication> implements LoaderManager.LoaderCallbacks<List<Order>> {
-    private static final String TAG = OrderListPresenter.class.getName();
+    private static final String TAG = OrderListPresenter.class.getSimpleName();
 
     protected static final int ORDER_LOADER_ID = 0;
 

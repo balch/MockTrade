@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public class QuoteYahooFinance implements Quote {
-    static private final String TAG = QuoteYahooFinance.class.getName();
+    static private final String TAG = QuoteYahooFinance.class.getSimpleName();
 
     protected Map<String, String> data = new HashMap<String, String>();
 

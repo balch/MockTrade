@@ -67,10 +67,7 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     public <T extends DomainObject> List<T> query(SqlMapper mapper, Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
-        StopWatch sw = null;
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            sw = StopWatch.getInstance();
-        }
+        StopWatch sw = StopWatch.getInstance();
 
         List<T> results = new ArrayList<T>();
 
@@ -110,10 +107,8 @@ public class SqlConnection extends SQLiteOpenHelper {
             }
         }
 
-        if (sw != null) {
-            long elapsedMs = sw.stop();
-            Log.d(TAG, String.format("SqlConnection.query on %s took %d ms to return %d rows", table, elapsedMs, results.size()));
-        }
+        long elapsedMs = sw.stop();
+        Log.d(TAG, String.format("SqlConnection.query on %s took %d ms to return %d rows", table, elapsedMs, results.size()));
 
         return results;
     }

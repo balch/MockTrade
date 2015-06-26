@@ -43,7 +43,7 @@ import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.settings.Settings;
 
 public class TradeApplication extends Application implements ModelProvider {
-    private static final String TAG = TradeApplication.class.getName();
+    private static final String TAG = TradeApplication.class.getSimpleName();
 
     private static final String DATABASE_NAME = "mocktrade.db";
     private static final int DATABASE_VERSION = 3;

@@ -41,7 +41,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class DogsOfTheDow extends BaseStrategy {
-    private static final String TAG = DogsOfTheDow.class.getName();
+    private static final String TAG = DogsOfTheDow.class.getSimpleName();
 
     protected static final String[] DOW_SYMBOLS=
             {"AXP","BA","CAT","CSCO","CVX","DD","XOM","GE","GS","HD",

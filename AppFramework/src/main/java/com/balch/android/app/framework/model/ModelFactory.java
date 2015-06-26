@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelFactory {
-    private static final String TAG = ModelFactory.class.getName();
+    private static final String TAG = ModelFactory.class.getSimpleName();
 
     private final Map<ModelSourceProvider, Map<String, Class<?>>> modelMap;
     private final Map<Class<?>, ModelSourceProvider> defaultModelMap;

@@ -44,7 +44,7 @@ import java.util.Date;
  * shared functionality between OrderModel implementations
  */
 class OrderManager {
-    private static final String TAG = OrderManager.class.getName();
+    private static final String TAG = OrderManager.class.getSimpleName();
 
     public interface OrderManagerListener {
         OrderResult executeOrder(Order order, Quote quote, Money price) throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;

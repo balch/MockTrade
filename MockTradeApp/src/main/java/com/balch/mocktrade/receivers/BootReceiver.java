@@ -33,7 +33,7 @@ import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 
 public class BootReceiver extends BroadcastReceiver {
-    private static final String TAG = BootReceiver.class.getName();
+    private static final String TAG = BootReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

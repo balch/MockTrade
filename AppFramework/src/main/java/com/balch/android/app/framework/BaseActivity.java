@@ -33,13 +33,18 @@ import android.widget.Toast;
 import com.balch.android.app.framework.view.BaseView;
 
 public abstract class BaseActivity<V extends View & BaseView> extends Activity {
-    private static final String TAG = BaseActivity.class.getName();
+    private static final String TAG = BaseActivity.class.getSimpleName();
 
+    private String className;
     protected BasePresenter presenter;
 
     abstract protected void initialize(Bundle savedInstanceState);
     abstract protected BasePresenter createPresenter(V view);
     abstract protected V createView();
+
+    public BaseActivity() {
+        this.className = this.getClass().getSimpleName();
+    }
 
     protected void handleException(String logMsg, String displayMsg, Exception ex) {
         if (TextUtils.isEmpty(displayMsg)) {
@@ -52,8 +57,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" OnCreate - Begin");
+
         try {
             super.onCreate(savedInstanceState);
+
             V view = this.createView();
             view.initializeLayout();
 
@@ -68,84 +77,109 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
             this.initialize(savedInstanceState);
 
         } catch (Exception ex) {
-            handleException("OnCreate ",ex.getLocalizedMessage(), ex);
+            handleException("OnCreate ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " OnCreate - End Millis:" + sw.stop());
     }
 
     @Override
     public void onStart() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onStart - Begin");
+
         try {
             super.onStart();
             if (this.presenter != null) {
                 presenter.onStart();
             }
         } catch (Exception ex) {
-            handleException("onStart ",ex.getLocalizedMessage(), ex);
+            handleException("onStart ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onStart - End Millis:" + sw.stop());
     }
 
     @Override
     public void onResume() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onResume - Begin");
+
         try {
             super.onResume();
             if (this.presenter != null) {
                 presenter.onResume();
             }
         } catch (Exception ex) {
-            handleException("onResume ",ex.getLocalizedMessage(), ex);
+            handleException("onResume ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onResume - End Millis:" + sw.stop());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onSaveInstanceState - Begin");
+
         try {
             super.onSaveInstanceState(outState);
             if (this.presenter != null) {
                 presenter.onSaveInstanceState(outState);
             }
         } catch (Exception ex) {
-            handleException("onSaveInstanceState ",ex.getLocalizedMessage(), ex);
+            handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onSaveInstanceState - End Millis:" + sw.stop());
     }
 
     @Override
     public void onPause() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onPause - Begin");
         try {
             if (this.presenter != null) {
                 presenter.onPause();
             }
             super.onPause();
         } catch (Exception ex) {
-            handleException("onPause ",ex.getLocalizedMessage(), ex);
+            handleException("onPause ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onPause - End Millis:" + sw.stop());
     }
 
     @Override
     public void onStop() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onStop - Begin");
         try {
             if (this.presenter != null) {
                 presenter.onStop();
             }
             super.onStop();
         } catch (Exception ex) {
-            handleException("onStop",ex.getLocalizedMessage(), ex);
+            handleException("onStop", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onStop - End Millis:" + sw.stop());
     }
 
     @Override
     public void onDestroy() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             if (this.presenter != null) {
                 presenter.onDestroy();
             }
         } catch (Exception ex) {
-            handleException("onDestroy",ex.getLocalizedMessage(), ex);
+            handleException("onDestroy", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onDestroy - End Millis:" + sw.stop());
         super.onDestroy();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onActivityResult - Begin");
+
         super.onActivityResult(requestCode, resultCode, data);
         try {
             if (this.presenter != null) {
@@ -156,6 +190,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onActivityResult",ex.getLocalizedMessage(), ex);
         }
-    }
 
+        Log.i(TAG, this.className + " onActivityResult - End Millis:" + sw.stop());
+    }
 }

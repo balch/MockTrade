@@ -37,12 +37,17 @@ import com.balch.android.app.framework.view.BaseView;
 
 public abstract class BaseFragment<P extends BasePresenter, V extends View & BaseView>
         extends Fragment implements Refreshable {
-    private static final String TAG = BaseFragment.class.getName();
+    private static final String TAG = BaseFragment.class.getSimpleName();
 
     protected P presenter;
+    private String className;
 
     abstract protected P createPresenter(V view);
     abstract protected V createView();
+
+    public BaseFragment() {
+        this.className = this.getClass().getSimpleName();
+    }
 
     @Override
     public boolean showRefreshMenu() {
@@ -70,6 +75,8 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onCreateView - Begin");
         try {
             V view = this.createView();
             this.presenter = createPresenter(view);
@@ -81,25 +88,32 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
             return view;
 
         } catch (Exception ex) {
-            handleException("OnCreate ",ex.getLocalizedMessage(), ex);
+            handleException("OnCreate ", ex.getLocalizedMessage(), ex);
             return null;
+        } finally {
+            Log.i(TAG, this.className + " onCreateView - End Secs:" + sw.stop());
         }
     }
 
     @Override
     public void onStart() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onStart - Begin");
         try {
             super.onStart();
             if (presenter != null) {
                 presenter.onStart();
             }
         } catch (Exception ex) {
-            handleException("onStart ",ex.getLocalizedMessage(), ex);
+            handleException("onStart ", ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onStart - End Secs:" + sw.stop());
     }
 
     @Override
     public void onResume() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onResume - Begin");
         try {
             super.onResume();
             if (presenter != null) {
@@ -108,10 +122,13 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
         } catch (Exception ex) {
             handleException("onResume ",ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onResume - End Secs:" + sw.stop());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
             if (presenter != null) {
@@ -120,10 +137,13 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
         } catch (Exception ex) {
             handleException("onSaveInstanceState ",ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onSaveInstanceState - End Secs:" + sw.stop());
     }
 
     @Override
     public void onPause() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onPause - Begin");
         try {
             if (presenter != null) {
                 presenter.onPause();
@@ -132,10 +152,13 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
         } catch (Exception ex) {
             handleException("onPause ",ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onPause - End Secs:" + sw.stop());
     }
 
     @Override
     public void onStop() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className +" onStop - Begin");
         try {
             if (presenter != null) {
                 presenter.onStop();
@@ -144,10 +167,13 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
         } catch (Exception ex) {
             handleException("onStop",ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onStop - End Secs:" + sw.stop());
     }
 
     @Override
     public void onDestroy() {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             if (presenter != null) {
                 presenter.onDestroy();
@@ -156,10 +182,13 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
             handleException("onDestroy",ex.getLocalizedMessage(), ex);
         }
         super.onDestroy();
+        Log.i(TAG, this.className + " onDestroy - End Secs:" + sw.stop());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        StopWatch sw = StopWatch.getInstance();
+        Log.d(TAG, this.className + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {
             if (presenter != null) {
@@ -168,6 +197,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
         } catch (Exception ex) {
             handleException("onActivityResult",ex.getLocalizedMessage(), ex);
         }
+        Log.i(TAG, this.className + " onActivityResult - End Secs:" + sw.stop());
     }
 
 }

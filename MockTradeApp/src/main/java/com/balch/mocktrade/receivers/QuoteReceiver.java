@@ -31,7 +31,7 @@ import android.util.Log;
 import com.balch.mocktrade.services.QuoteService;
 
 public class QuoteReceiver extends BroadcastReceiver {
-    private static final String TAG = QuoteReceiver.class.getName();
+    private static final String TAG = QuoteReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

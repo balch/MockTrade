@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public class QuoteGoogleFinance implements Quote {
-    static private final String TAG = QuoteGoogleFinance.class.getName();
+    static private final String TAG = QuoteGoogleFinance.class.getSimpleName();
 
     protected Map<String, String> data = new HashMap<String, String>();
 

@@ -46,8 +46,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class OrderSqliteModel extends SqliteModel implements SqlMapper<Order>, OrderModel, OrderManager.OrderManagerListener {
-    private static final String TAG = OrderSqliteModel.class.getName();
+public class OrderSqliteModel extends SqliteModel
+        implements SqlMapper<Order>, OrderModel, OrderManager.OrderManagerListener {
+    private static final String TAG = OrderSqliteModel.class.getSimpleName();
 
     public static final String TABLE_NAME = "[order]";
 

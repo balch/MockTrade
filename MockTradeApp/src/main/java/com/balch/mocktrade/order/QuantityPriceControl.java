@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuantityPriceControl extends LinearLayout implements EditControl, TextWatcher {
-    private static final String TAG = QuantityPriceControl.class.getName();
+    private static final String TAG = QuantityPriceControl.class.getSimpleName();
     protected static final int TEXT_CHANGE_DELAY_MS = 500;
 
     protected TextView label;

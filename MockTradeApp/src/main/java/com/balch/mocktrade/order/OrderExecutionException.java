@@ -23,7 +23,7 @@
 package com.balch.mocktrade.order;
 
 public class OrderExecutionException extends Exception {
-    private static final String TAG = OrderExecutionException.class.getName();
+    private static final String TAG = OrderExecutionException.class.getSimpleName();
 
     public OrderExecutionException() {
         super();

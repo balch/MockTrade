@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 public class OrderService extends IntentService {
-    private static final String TAG = OrderService.class.getName();
+    private static final String TAG = OrderService.class.getSimpleName();
 
     public static final String WAKE_LOCK_TAG = "OrderServiceWakeLockTag";
 

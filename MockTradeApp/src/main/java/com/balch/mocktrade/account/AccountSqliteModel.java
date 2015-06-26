@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account> {
-    private static final String TAG = AccountSqliteModel.class.getName();
+    private static final String TAG = AccountSqliteModel.class.getSimpleName();
 
     public static final String TABLE_NAME = "account";
 

@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringEditControl extends LinearLayout implements EditControl, TextWatcher {
-    private static final String TAG = StringEditControl.class.getName();
+    private static final String TAG = StringEditControl.class.getSimpleName();
     protected static final int TEXT_CHANGE_DELAY_MS = 500;
 
     protected TextView label;

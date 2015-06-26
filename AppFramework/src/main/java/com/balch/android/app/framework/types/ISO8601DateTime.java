@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class ISO8601DateTime implements Serializable {
-    private static final String TAG = ISO8601DateTime.class.getName();
+    private static final String TAG = ISO8601DateTime.class.getSimpleName();
 
     private static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
     private static final String ISO_8601_DATE_TIME_FORMAT_1 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";

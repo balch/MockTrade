@@ -57,7 +57,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" OnCreate - Begin");
 
         try {
@@ -79,12 +79,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("OnCreate ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " OnCreate - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " OnCreate - End (ms):" + sw.stop());
     }
 
     @Override
     public void onStart() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onStart - Begin");
 
         try {
@@ -95,12 +95,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onStart ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onStart - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onStart - End (ms):" + sw.stop());
     }
 
     @Override
     public void onResume() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onResume - Begin");
 
         try {
@@ -111,12 +111,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onResume ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onResume - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onResume - End (ms):" + sw.stop());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onSaveInstanceState - Begin");
 
         try {
@@ -127,12 +127,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onSaveInstanceState - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onSaveInstanceState - End (ms):" + sw.stop());
     }
 
     @Override
     public void onPause() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onPause - Begin");
         try {
             if (this.presenter != null) {
@@ -142,12 +142,12 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onPause ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onPause - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onPause - End (ms):" + sw.stop());
     }
 
     @Override
     public void onStop() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onStop - Begin");
         try {
             if (this.presenter != null) {
@@ -162,7 +162,7 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
 
     @Override
     public void onDestroy() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             if (this.presenter != null) {
@@ -171,13 +171,13 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
         } catch (Exception ex) {
             handleException("onDestroy", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onDestroy - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onDestroy - End (ms):" + sw.stop());
         super.onDestroy();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onActivityResult - Begin");
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -191,6 +191,6 @@ public abstract class BaseActivity<V extends View & BaseView> extends Activity {
             handleException("onActivityResult",ex.getLocalizedMessage(), ex);
         }
 
-        Log.i(TAG, this.className + " onActivityResult - End Millis:" + sw.stop());
+        Log.i(TAG, this.className + " onActivityResult - End (ms):" + sw.stop());
     }
 }

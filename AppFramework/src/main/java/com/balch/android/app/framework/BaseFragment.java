@@ -75,7 +75,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onCreateView - Begin");
         try {
             V view = this.createView();
@@ -97,7 +97,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onStart() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onStart - Begin");
         try {
             super.onStart();
@@ -112,7 +112,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onResume() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onResume - Begin");
         try {
             super.onResume();
@@ -127,7 +127,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
@@ -142,7 +142,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onPause() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onPause - Begin");
         try {
             if (presenter != null) {
@@ -157,7 +157,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onStop() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onStop - Begin");
         try {
             if (presenter != null) {
@@ -172,7 +172,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onDestroy() {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             if (presenter != null) {
@@ -187,7 +187,7 @@ public abstract class BaseFragment<P extends BasePresenter, V extends View & Bas
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {

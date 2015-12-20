@@ -67,7 +67,7 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     public <T extends DomainObject> List<T> query(SqlMapper mapper, Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
 
         List<T> results = new ArrayList<T>();
 

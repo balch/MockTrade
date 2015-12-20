@@ -27,11 +27,11 @@ public class StopWatch {
     protected long stopTime = 0;
     protected boolean running = false;
 
-    public static StopWatch getInstance() {
-        return StopWatch.getInstance(true);
+    public static StopWatch newInstance() {
+        return StopWatch.newInstance(true);
     }
 
-    public static StopWatch getInstance(boolean startRunning) {
+    public static StopWatch newInstance(boolean startRunning) {
         StopWatch sw = new StopWatch();
         if (startRunning) {
             sw.start();

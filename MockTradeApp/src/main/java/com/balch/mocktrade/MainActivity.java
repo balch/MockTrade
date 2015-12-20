@@ -1,8 +1,8 @@
 package com.balch.mocktrade;
 
-import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import com.balch.android.app.framework.NavBarActivity;
 import com.balch.android.app.framework.nav.NavBar;
@@ -18,7 +18,6 @@ public class MainActivity extends NavBarActivity {
 
     private Map<NavButton, Fragment> buttonMap = new HashMap<>();
 
-
     @Override
     public void configureNavBar(NavBar navBar, Bundle savedInstanceState) {
         showProgress();
@@ -28,7 +27,6 @@ public class MainActivity extends NavBarActivity {
         setBackground(resources.getDrawable(R.drawable.main_bmp_rpt));
 
         navBar.setBackground(resources.getDrawable(R.drawable.navbar_bkg));
-
         navBar.configure(resources.getColor(R.color.nav_on_color), resources.getColor(R.color.nav_off_color));
 
         Fragment mainFragment = new PortfolioFragment();

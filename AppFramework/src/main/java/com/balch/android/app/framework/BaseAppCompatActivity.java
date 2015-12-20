@@ -67,7 +67,7 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             this.presenter = this.createPresenter(view);
             if (this.presenter != null) {
                 this.presenter.setApplication(this.getApplication());
-                this.presenter.setLoaderManager(this.getLoaderManager());
+                this.presenter.setLoaderManager(this.getSupportLoaderManager());
                 this.presenter.initialize(savedInstanceState);
             }
 

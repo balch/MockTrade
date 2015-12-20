@@ -26,10 +26,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.balch.android.app.framework.BaseActivity;
+import com.balch.android.app.framework.BaseAppCompatActivity;
 import com.balch.android.app.framework.BasePresenter;
 
-public class EditActivity extends BaseActivity<EditView> {
+public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
     protected static final String EXTRA_VALIDATOR = "validator";

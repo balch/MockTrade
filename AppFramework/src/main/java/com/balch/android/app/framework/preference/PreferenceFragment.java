@@ -23,7 +23,6 @@
 package com.balch.android.app.framework.preference;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -34,6 +33,7 @@ import android.os.Message;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,12 +42,6 @@ import android.widget.ListView;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-/**
- * A PreferenceFragment for the support library. Based on the platform's code with some removed features and a basic ListView layout.
- *
- * @author Christophe Beyls
- *
- */
 public abstract class PreferenceFragment extends Fragment {
 
     private static final int FIRST_REQUEST_CODE = 100;

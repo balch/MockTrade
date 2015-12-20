@@ -23,7 +23,6 @@
 package com.balch.mocktrade;
 
 import android.app.Application;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.os.StrictMode;
 
@@ -57,7 +56,6 @@ public class TradeApplication extends Application implements ModelProvider {
     private SqliteSourceProvider sqliteScheme;
     private YQLSourceProvider yqlScheme;
     private ModelFactory modelFactory;
-
 
     @Override
     public void onCreate() {
@@ -132,10 +130,6 @@ public class TradeApplication extends Application implements ModelProvider {
         return settings;
     }
 
-
-    public void closeCurrentView(FragmentManager fragmentManager) {
-        fragmentManager.popBackStack();
-    }
 
     @Override
     public RequestQueue getRequestQueue() {

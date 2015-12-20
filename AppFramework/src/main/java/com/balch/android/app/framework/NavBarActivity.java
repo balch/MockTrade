@@ -22,12 +22,12 @@
 
 package com.balch.android.app.framework;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,8 +36,7 @@ import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.nav.NavBar;
 
-
-public abstract class NavBarActivity extends Activity implements ActivityProvider {
+public abstract class NavBarActivity extends AppCompatActivity implements ActivityProvider {
     protected NavBar navBar;
     protected LinearLayout rootLayout;
     protected FrameLayout frameLayout;
@@ -49,7 +48,7 @@ public abstract class NavBarActivity extends Activity implements ActivityProvide
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
 
@@ -63,12 +62,13 @@ public abstract class NavBarActivity extends Activity implements ActivityProvide
         if (savedInstanceState == null) {
         }
 
-        getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                int backStackCount = getFragmentManager().getBackStackEntryCount();
+                int backStackCount = fragmentManager.getBackStackEntryCount();
                 if (backStackCount > 0) {
-                    int selectedIndex = Integer.parseInt(getFragmentManager().getBackStackEntryAt(backStackCount - 1).getName());
+                    int selectedIndex = Integer.parseInt(fragmentManager.getBackStackEntryAt(backStackCount - 1).getName());
                     if (selectedIndex != NavBarActivity.this.navBar.getSelectedIndex()) {
                         NavBarActivity.this.navBar.setSelectedIndex(selectedIndex);
                     }
@@ -93,7 +93,7 @@ public abstract class NavBarActivity extends Activity implements ActivityProvide
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_bar_menu_refresh) {
-            Fragment fragment = getFragmentManager().findFragmentById(R.id.template_place_holder);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.template_place_holder);
 
             if (fragment instanceof Refreshable) {
                 ((Refreshable) fragment).refresh();
@@ -128,7 +128,7 @@ public abstract class NavBarActivity extends Activity implements ActivityProvide
 
     @Override
     public void showView(Fragment fragment) {
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.template_place_holder, fragment)
                 .addToBackStack(String.valueOf(this.navBar.getSelectedIndex()))
                 .commit();
@@ -138,7 +138,7 @@ public abstract class NavBarActivity extends Activity implements ActivityProvide
 
     @Override
     public FragmentManager getFragManager() {
-        return getFragmentManager();
+        return getSupportFragmentManager();
     }
 
     public void setBackground(Drawable background) {

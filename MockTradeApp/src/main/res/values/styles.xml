@@ -1,14 +1,9 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
     </style>
-
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="12sp"
-    android:textColor="@android:color/primary_text_dark"
 
     <style name="OrderItemValue">
         <item name="android:layout_width">wrap_content</item>

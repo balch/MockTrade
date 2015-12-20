@@ -24,16 +24,16 @@ package com.balch.mocktrade.portfolio;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -202,8 +202,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
     }
 
     @Override
-    public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
-
+    public void onLoadFinished(android.support.v4.content.Loader<PortfolioData> loader, PortfolioData data) {
         PerformanceItem performanceItem = new PerformanceItem(new Money(), new Money(), new Money());
 
         int accountsWithTotals = 0;
@@ -240,10 +239,9 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
     }
 
     @Override
-    public void onLoaderReset(Loader<PortfolioData> loader) {
+    public void onLoaderReset(android.support.v4.content.Loader<PortfolioData> loader) {
         this.portfolioAdapter.clear();
     }
-
 
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
         protected PortfolioModel model;

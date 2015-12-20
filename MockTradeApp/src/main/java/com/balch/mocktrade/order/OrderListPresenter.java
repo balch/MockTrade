@@ -23,13 +23,13 @@
 package com.balch.mocktrade.order;
 
 import android.app.AlertDialog;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Loader;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -52,7 +52,6 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
     protected ActivityProvider activity;
 
     final Handler handler = new Handler();
-
 
     public OrderListPresenter(ActivityProvider activity, Long accountId, OrderModel model, OrderListView view) {
         this.accountId = accountId;
@@ -100,13 +99,13 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Order>> loader, List<Order> data) {
+    public void onLoadFinished(android.support.v4.content.Loader<List<Order>> loader, List<Order> data) {
 
         if (data.size() == 0) {
             this.handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    application.closeCurrentView(OrderListPresenter.this.activity.getFragManager());
+                    OrderListPresenter.this.activity.getFragManager().popBackStack();
                 }
             });
             return;
@@ -118,6 +117,7 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
         this.loaderManager.destroyLoader(ORDER_LOADER_ID);
+
     }
 
     @Override

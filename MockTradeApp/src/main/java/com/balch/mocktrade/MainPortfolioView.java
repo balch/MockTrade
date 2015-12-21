@@ -26,6 +26,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.view.BaseView;
@@ -38,7 +39,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
-    protected AccountItemView mTotalsView;
+
+    protected SummaryAdapter mSummaryAdapter;
+    protected RecyclerView mPortfolioSummary;
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -57,6 +60,15 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         inflate(getContext(), R.layout.main_portfolio_view, this);
         mPortfolioList = (RecyclerView)findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mSummaryAdapter = new SummaryAdapter();
+
+        mPortfolioSummary = (RecyclerView)findViewById(R.id.portfolio_view_summary_view);
+        // specify a LinearLayoutManager that supports wrap content
+        mPortfolioSummary.setLayoutManager(new org.solovyev.android.views.llm.LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mPortfolioSummary.setHasFixedSize(true);
+        mPortfolioSummary.setAdapter(mSummaryAdapter);
+
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -66,20 +78,45 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
 
     public void setTotals(boolean showTotals, Account totals, PerformanceItem performanceItem) {
-        if (showTotals) {
-            if (mTotalsView == null) {
-                mTotalsView = new AccountItemView(mPortfolioList, null);
-                mPortfolioAdapter.addFooterView(mTotalsView);
-            }
-            mTotalsView.bind(totals, performanceItem, 0);
 
-        } else {
-            if (mTotalsView != null) {
-                mPortfolioAdapter.removeFooterView(mTotalsView);
-                mTotalsView = null;
-            }
+        mPortfolioSummary.setVisibility(showTotals ? VISIBLE : GONE);
+
+        if (showTotals) {
+            mSummaryAdapter.bind(totals, performanceItem);
         }
     }
 
+    private static class SummaryAdapter extends RecyclerView.Adapter<AccountItemView> {
+
+        private Account mTotals;
+        private PerformanceItem mPerformanceItem;
+
+        public SummaryAdapter() {
+        }
+
+        public void bind(Account totals, PerformanceItem performanceItem) {
+            mTotals = totals;
+            mPerformanceItem = performanceItem;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemCount() {
+            return 1;
+        }
+
+        @Override
+        public AccountItemView onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new AccountItemView(parent, null);
+        }
+
+        @Override
+        public void onBindViewHolder(AccountItemView holder, int position) {
+            if (mTotals != null) {
+                holder.bind(mTotals, mPerformanceItem, 0);
+            }
+        }
+
+    }
 
 }

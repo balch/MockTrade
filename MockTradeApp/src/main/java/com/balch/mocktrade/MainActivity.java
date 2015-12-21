@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -19,6 +21,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
@@ -43,13 +50,17 @@ import com.balch.mocktrade.settings.SettingsActivity;
 import java.util.List;
 
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
-            implements LoaderManager.LoaderCallbacks<PortfolioData> {
+            implements LoaderManager.LoaderCallbacks<PortfolioData>,
+                         AppBarLayout.OnOffsetChangedListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     protected static final int ACCOUNT_LOADER_ID = 0;
 
     protected static final int NEW_ACCOUNT_RESULT = 0;
     protected static final int NEW_ORDER_RESULT = 1;
+    private static final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR = 0.9f;
+    private static final float PERCENTAGE_TO_HIDE_TITLE_DETAILS = 0.3f;
+    private static final int ALPHA_ANIMATIONS_DURATION = 200;
 
     protected PortfolioModel mPortfolioModel;
     protected MainPortfolioView mMainPortfolioView;
@@ -57,15 +68,34 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected PortfolioAdapter mPortfolioAdapter;
     protected QuoteUpdateReceiver mQuoteUpdateReceiver;
 
+    private boolean mIsTheTitleVisible = false;
+    private boolean mIsTheTitleContainerVisible = true;
+
+    private LinearLayout mTitleContainer;
+    private TextView mTitle;
+
+    private View mImageViewParallax;
+    private FrameLayout mFrameViewParallax;
+
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
 
     @Override
     protected void onCreateBase(Bundle bundle) {
-        ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
+        ModelFactory modelFactory = ((ModelProvider) this.getApplication()).getModelFactory();
         mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
+        mImageViewParallax = findViewById(R.id.portfolio_view_image_view_parallax);
+        mFrameViewParallax = (FrameLayout) findViewById(R.id.portfolio_view_frame_layout_parallax);
+        mTitle = (TextView) findViewById(R.id.portfolio_view_toolbar_title);
+        mTitleContainer = (LinearLayout) findViewById(R.id.portfolio_view_toolbar_title_container);
+
+      
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
+        toolbar.setTitle("");
+
+        ((AppBarLayout) findViewById(R.id.portfolio_view_app_bar)).addOnOffsetChangedListener(this);
+
         setSupportActionBar(toolbar);
 
         // tint the overflow icon
@@ -77,6 +107,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
         mQuoteUpdateReceiver = new QuoteUpdateReceiver();
+
+        startAlphaAnimation(mTitle, 0, View.INVISIBLE);
+        initParallaxValues();
 
         setupAdapter();
     }
@@ -365,5 +398,73 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
     }
+
+    private void initParallaxValues() {
+        CollapsingToolbarLayout.LayoutParams petDetailsLp =
+                (CollapsingToolbarLayout.LayoutParams) mImageViewParallax.getLayoutParams();
+
+        CollapsingToolbarLayout.LayoutParams petBackgroundLp =
+                (CollapsingToolbarLayout.LayoutParams) mFrameViewParallax.getLayoutParams();
+
+        petDetailsLp.setParallaxMultiplier(0.9f);
+        petBackgroundLp.setParallaxMultiplier(0.3f);
+
+        mImageViewParallax.setLayoutParams(petDetailsLp);
+        mFrameViewParallax.setLayoutParams(petBackgroundLp);
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+        int maxScroll = appBarLayout.getTotalScrollRange();
+        float percentage = (float) Math.abs(offset) / (float) maxScroll;
+
+        handleAlphaOnTitle(percentage);
+        handleToolbarTitleVisibility(percentage);
+    }
+
+    private void handleToolbarTitleVisibility(float percentage) {
+        if (percentage >= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
+
+            if (!mIsTheTitleVisible) {
+                startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+                mIsTheTitleVisible = true;
+            }
+
+        } else {
+
+            if (mIsTheTitleVisible) {
+                startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+                mIsTheTitleVisible = false;
+            }
+        }
+    }
+
+    private void handleAlphaOnTitle(float percentage) {
+        if (percentage >= PERCENTAGE_TO_HIDE_TITLE_DETAILS) {
+            if (mIsTheTitleContainerVisible) {
+                startAlphaAnimation(mTitleContainer, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+                mIsTheTitleContainerVisible = false;
+            }
+
+        } else {
+
+            if (!mIsTheTitleContainerVisible) {
+                startAlphaAnimation(mTitleContainer, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+                mIsTheTitleContainerVisible = true;
+            }
+        }
+    }
+
+    public static void startAlphaAnimation(View v, long duration, int visibility) {
+        AlphaAnimation alphaAnimation = (visibility == View.VISIBLE)
+                ? new AlphaAnimation(0f, 1f)
+                : new AlphaAnimation(1f, 0f);
+
+        alphaAnimation.setDuration(duration);
+        alphaAnimation.setFillAfter(true);
+        v.startAnimation(alphaAnimation);
+    }
+
+
 }
 

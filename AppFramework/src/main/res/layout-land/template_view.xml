@@ -1,22 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/template_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <com.balch.android.app.framework.nav.NavBar
-        android:id="@+id/nav_bar_main"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        />
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppBarOverlay">
 
-    <FrameLayout
-        android:id="@+id/template_place_holder"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/template_toolbar"
+            style="@style/Widget.AppCompat.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:titleTextColor="?attr/colorAccent"
+            app:titleTextColor="?attr/colorAccent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            app:popupTheme="@style/PopupOverlay" >
+
+            <ImageView
+                android:id="@+id/template_refresh_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:tint="?attr/colorAccent"
+                android:tintMode="multiply"
+                android:src="@drawable/ic_refresh"/>
+
+            <ProgressBar
+                android:id="@+id/template_progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:visibility="gone"/>
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:measureAllChildren="true"/>
+        android:orientation="horizontal">
 
+        <com.balch.android.app.framework.nav.NavBar
+            android:id="@+id/nav_bar_main"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            />
 
+        <FrameLayout
+            android:id="@+id/template_place_holder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:measureAllChildren="true"/>
+
+    </LinearLayout>
 </LinearLayout>

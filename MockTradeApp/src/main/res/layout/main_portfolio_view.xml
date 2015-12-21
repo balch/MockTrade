@@ -32,15 +32,17 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:tint="?attr/colorAccent"
-                android:tintMode="multiply"
+                android:tintMode="src_in"
                 android:src="@drawable/ic_refresh"/>
 
             <ProgressBar
                 android:id="@+id/portfolio_view_progress_bar"
                 style="@style/Widget.AppCompat.ProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="end"
+                android:indeterminateTint="?attr/colorAccent"
+                android:indeterminateTintMode="src_in"
                 android:visibility="gone"/>
 
             <ImageView
@@ -51,7 +53,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
                 android:tint="?attr/colorAccent"
-                android:tintMode="multiply"
+                android:tintMode="src_in"
                 android:src="@drawable/ic_settings"/>
 
 

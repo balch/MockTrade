@@ -11,7 +11,21 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        debug {
+            storeFile file("../keystore/debug_key.jks")
+            storePassword "android"
+            keyAlias "mocktrade"
+            keyPassword "android"
+        }
+    }
     buildTypes {
+        debug {
+            // sign debug build with a common key to facilitate develop from multiple
+            // computers w/o having to reinstall
+            signingConfig signingConfigs.debug
+        }
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

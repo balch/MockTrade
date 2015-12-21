@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/9/14 9:57 AM
+ * Created: 9/4/14 12:26 AM
  *
  * This file is part of MockTrade.
  *
@@ -20,28 +20,29 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
 import android.content.Context;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.balch.android.app.framework.R;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.types.Money;
 
-public class NumberEditControl extends StringEditControl {
+public class MoneyEditLayout extends StringEditLayout {
+    protected boolean hideCents = false;
 
-    public NumberEditControl(Context context) {
+    public MoneyEditLayout(Context context) {
         super(context);
     }
 
-    public NumberEditControl(Context context, AttributeSet attrs) {
+    public MoneyEditLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public NumberEditControl(Context context, AttributeSet attrs, int defStyle) {
+    public MoneyEditLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -49,15 +50,14 @@ public class NumberEditControl extends StringEditControl {
     protected void initialize() {
         super.initialize();
         this.value.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        this.value.setHint(R.string.control_money_hint);
     }
 
     @Override
     public void bind(ColumnDescriptor descriptor) {
         for (ViewHint hint : descriptor.getHints()) {
-            if (hint.getHint() == ViewHint.Hint.PERCENT) {
-                this.value.setHint(hint.getBoolValue() ?
-                        R.string.control_percent_hint :
-                        R.string.control_number_hint);
+            if (hint.getHint() == ViewHint.Hint.HIDE_CENTS) {
+                this.hideCents = hint.getBoolValue();
             }
         }
         super.bind(descriptor);
@@ -68,17 +68,13 @@ public class NumberEditControl extends StringEditControl {
     protected String getValueAsString(Object obj) {
         String value = "";
         if (obj != null) {
-            value = obj.toString();
+            value = ((Money) obj).getCurrencyNoGroupSep(hideCents?0:2);
         }
         return value;
     }
 
     @Override
     public Object getValue() {
-        String val = super.getValue().toString();
-        if (TextUtils.isEmpty(val)) {
-            val = "0";
-        }
-        return Double.valueOf(val);
+        return new Money(super.getValue().toString());
     }
 }

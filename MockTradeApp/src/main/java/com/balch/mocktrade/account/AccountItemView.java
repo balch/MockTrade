@@ -42,15 +42,15 @@ public class AccountItemView extends LinearLayout {
         void onShowOpenOrdersClicked(Account account);
     }
 
-    protected AccountItemViewListener accountItemViewListener;
-    protected TextView name;
-    protected TextView currentBalance;
-    protected Button openOrders;
-    protected TextView dayPerformance;
-    protected TextView totalPerformance;
-    protected LinearLayout valueLayout;
-    protected Button   tradeButton;
-    protected Account account;
+    protected AccountItemViewListener mAccountItemViewListener;
+    protected TextView mName;
+    protected TextView mCurrentBalance;
+    protected Button mOpenOrders;
+    protected TextView mDayPerformance;
+    protected TextView mTotalPerformance;
+    protected LinearLayout mValueLayout;
+    protected Button mTradeButton;
+    protected Account mAccount;
 
     public AccountItemView(Context context) {
         super(context);
@@ -69,69 +69,69 @@ public class AccountItemView extends LinearLayout {
 
     protected void initialize() {
         inflate(getContext(), R.layout.account_item_view, this);
-        this.name = (TextView)findViewById(R.id.account_item_name);
-        this.currentBalance = (TextView)findViewById(R.id.account_item_current_balance);
-        this.dayPerformance = (TextView)findViewById(R.id.account_item_day_performance);
-        this.totalPerformance = (TextView)findViewById(R.id.account_item_total_performance);
-        this.tradeButton = (Button)findViewById(R.id.account_item_trade_button);
-        this.openOrders = (Button)findViewById(R.id.account_item_open_order_button);
-        this.valueLayout = (LinearLayout)findViewById(R.id.account_item_value_layout);
+        this.mName = (TextView)findViewById(R.id.account_item_name);
+        this.mCurrentBalance = (TextView)findViewById(R.id.account_item_current_balance);
+        this.mDayPerformance = (TextView)findViewById(R.id.account_item_day_performance);
+        this.mTotalPerformance = (TextView)findViewById(R.id.account_item_total_performance);
+        this.mTradeButton = (Button)findViewById(R.id.account_item_trade_button);
+        this.mOpenOrders = (Button)findViewById(R.id.account_item_open_order_button);
+        this.mValueLayout = (LinearLayout)findViewById(R.id.account_item_value_layout);
 
-        this.tradeButton.setOnClickListener(new OnClickListener() {
+        this.mTradeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (accountItemViewListener != null) {
-                    accountItemViewListener.onTradeButtonClicked(account);
+                if (mAccountItemViewListener != null) {
+                    mAccountItemViewListener.onTradeButtonClicked(mAccount);
                 }
             }
         });
 
-        this.openOrders.setOnClickListener(new OnClickListener() {
+        this.mOpenOrders.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (accountItemViewListener != null) {
-                    accountItemViewListener.onShowOpenOrdersClicked(account);
+                if (mAccountItemViewListener != null) {
+                    mAccountItemViewListener.onShowOpenOrdersClicked(mAccount);
                 }
             }
         });
 
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {
-            LayoutParams layoutParams = (LayoutParams) this.valueLayout.getLayoutParams();
+            LayoutParams layoutParams = (LayoutParams) this.mValueLayout.getLayoutParams();
             layoutParams.weight = 2;
-            this.valueLayout.setLayoutParams(layoutParams);
+            this.mValueLayout.setLayoutParams(layoutParams);
         }
     }
 
     public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
-        this.account = account;
-        this.name.setText(account.getName());
-        this.currentBalance.setText(performanceItem.getValue().getFormatted());
+        this.mAccount = account;
+        this.mName.setText(account.getName());
+        this.mCurrentBalance.setText(performanceItem.getValue().getFormatted());
 
-        this.name.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
-        this.currentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+        this.mName.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+        this.mCurrentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
 
-        this.totalPerformance.setText(TextFormatUtils.getLongChangePercentText(this.getContext(),
+        this.mTotalPerformance.setText(TextFormatUtils.getLongChangePercentText(this.getContext(),
                 performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
-        this.dayPerformance.setText(TextFormatUtils.getShortChangeText(this.getContext(),
+        this.mDayPerformance.setText(TextFormatUtils.getShortChangeText(this.getContext(),
                 performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
 
         boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));
-        this.tradeButton.setVisibility(allowTrade?VISIBLE:GONE);
+        this.mTradeButton.setVisibility(allowTrade ? VISIBLE : GONE);
 
-        this.openOrders.setVisibility((openOrderCount > 0) ? VISIBLE : GONE);
+        this.mOpenOrders.setVisibility((openOrderCount > 0) ? VISIBLE : GONE);
         if (openOrderCount > 0) {
-            this.openOrders.setText(String.format(getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
+            this.mOpenOrders.setText(String.format(getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
         }
     }
 
 
     public Account getAccount() {
-        return this.account;
+        return this.mAccount;
     }
 
     public void setAccountItemViewListener(AccountItemViewListener accountItemViewListener) {
-        this.accountItemViewListener = accountItemViewListener;
+        this.mAccountItemViewListener = accountItemViewListener;
     }
 }
 

@@ -49,19 +49,19 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected static final int NEW_ACCOUNT_RESULT = 0;
     protected static final int NEW_ORDER_RESULT = 1;
 
-    protected PortfolioModel model;
-    protected MainPortfolioView view;
+    protected PortfolioModel mPortfolioModel;
+    protected MainPortfolioView mMainPortfolioView;
 
-    private ProgressBar progressBar;
-    private ImageView refreshImageButton;
+    private ProgressBar mProgressBar;
+    private ImageView mRefreshImageButton;
 
-    protected PortfolioAdapter portfolioAdapter;
-    protected QuoteUpdateReceiver quoteUpdateReceiver;
+    protected PortfolioAdapter mPortfolioAdapter;
+    protected QuoteUpdateReceiver mQuoteUpdateReceiver;
 
     @Override
     protected void onCreateBase(Bundle bundle) {
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-        model = modelFactory.getModel(PortfolioModel.class);
+        mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         setSupportActionBar(toolbar);
@@ -73,13 +73,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         });
 
-        progressBar = (ProgressBar)findViewById(R.id.portfolio_view_progress_bar);
+        mProgressBar = (ProgressBar)findViewById(R.id.portfolio_view_progress_bar);
 
-        refreshImageButton = (ImageView) findViewById(R.id.portfolio_view_refresh_button);
-        refreshImageButton.setOnClickListener(new View.OnClickListener() {
+        mRefreshImageButton = (ImageView) findViewById(R.id.portfolio_view_refresh_button);
+        mRefreshImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               refresh();
+                refresh();
             }
         });
 
@@ -90,7 +90,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         });
 
-        this.quoteUpdateReceiver = new QuoteUpdateReceiver();
+        this.mQuoteUpdateReceiver = new QuoteUpdateReceiver();
 
         setupAdapter();
         reload(true);
@@ -99,25 +99,25 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     protected MainPortfolioView createView() {
-        this.view = new MainPortfolioView(this);
-        return this.view;
+        this.mMainPortfolioView = new MainPortfolioView(this);
+        return this.mMainPortfolioView;
     }
 
     @Override
     protected void onStartBase() {
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(quoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.class.getName()));
+                .registerReceiver(mQuoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.class.getName()));
     }
 
     @Override
     protected void onStopBase() {
         LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(quoteUpdateReceiver);
+                .unregisterReceiver(mQuoteUpdateReceiver);
     }
 
     protected void setupAdapter() {
-        this.portfolioAdapter = new PortfolioAdapter(this);
-        this.portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
+        this.mPortfolioAdapter = new PortfolioAdapter(this);
+        this.mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -127,13 +127,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
-                                    model.deleteAccount(account);
+                                    mPortfolioModel.deleteAccount(account);
                                     reload(true);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Deleting account", ex);
                                     Toast.makeText(MainActivity.this, "Error deleting account", Toast.LENGTH_LONG).show();
                                 }
-                            }})
+                            }
+                        })
                         .setNegativeButton(android.R.string.no, null).show();
                 return true;
             }
@@ -145,7 +146,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         });
 
-        this.portfolioAdapter.setAccountItemViewListener(new AccountItemView.AccountItemViewListener() {
+        this.mPortfolioAdapter.setAccountItemViewListener(new AccountItemView.AccountItemViewListener() {
             @Override
             public void onTradeButtonClicked(Account account) {
                 showNewBuyOrderActivity(account);
@@ -156,7 +157,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 startActivity(OrderListActivity.newIntent(MainActivity.this, account.getId()));
             }
         });
-        this.view.setPortfolioAdapter(this.portfolioAdapter);
+        this.mMainPortfolioView.setPortfolioAdapter(this.mPortfolioAdapter);
     }
 
     /**
@@ -184,7 +185,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-        return new PortfolioLoader(this, this.model);
+        return new PortfolioLoader(this, this.mPortfolioModel);
     }
 
     @Override
@@ -204,14 +205,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         }
 
-        this.view.setTotals((accountsWithTotals > 1), totals, performanceItem);
-        this.portfolioAdapter.bind(data);
-        portfolioAdapter.notifyDataSetChanged();
+        this.mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
+        this.mPortfolioAdapter.bind(data);
+        mPortfolioAdapter.notifyDataSetChanged();
 
-        this.view.post(new Runnable() {
+        this.mMainPortfolioView.post(new Runnable() {
             @Override
             public void run() {
-                view.expandList();
+                mMainPortfolioView.expandList();
                 hideProgress();
             }
         });
@@ -223,7 +224,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<PortfolioData> loader) {
-        this.portfolioAdapter.clear();
+        this.mPortfolioAdapter.clear();
     }
 
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
@@ -260,7 +261,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     protected void showNewAccountActivity() {
-        Intent intent = EditActivity.getIntent(this.view.getContext(), R.string.account_create_title,
+        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(), R.string.account_create_title,
                 new Account("", "", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
@@ -272,7 +273,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         order.setAccount(account);
         order.setAction(Order.OrderAction.BUY);
         order.setStrategy(Order.OrderStrategy.MARKET);
-        Intent intent = EditActivity.getIntent(this.view.getContext(), R.string.order_create_buy_title,
+        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(), R.string.order_create_buy_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
         startActivityForResult(intent, NEW_ORDER_RESULT);
@@ -286,7 +287,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         order.setAction(Order.OrderAction.SELL);
         order.setStrategy(Order.OrderStrategy.MARKET);
 
-        Intent intent = EditActivity.getIntent(this.view.getContext(),
+        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(),
                 R.string.order_create_sell_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
@@ -300,17 +301,17 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 Account account = EditActivity.getResult(data);
                 if (account != null) {
                     // create a new Account instance to make sure the account is initialized correctly
-                    model.createAccount(new Account(account.getName(), account.getDescription(),
+                    mPortfolioModel.createAccount(new Account(account.getName(), account.getDescription(),
                             account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals()));
                     reload(true);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
                 if (order != null) {
-                    model.createOrder(order);
+                    mPortfolioModel.createOrder(order);
                     reload(true);
 
-                    model.processOrders(this,
+                    mPortfolioModel.processOrders(this,
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
                 }
             }
@@ -318,13 +319,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     public void showProgress() {
-        this.progressBar.setVisibility(View.VISIBLE);
-        this.refreshImageButton.setVisibility(View.GONE);
+        this.mProgressBar.setVisibility(View.VISIBLE);
+        this.mRefreshImageButton.setVisibility(View.GONE);
     }
 
     public void hideProgress() {
-        this.progressBar.setVisibility(View.GONE);
-        this.refreshImageButton.setVisibility(View.VISIBLE);
+        this.mProgressBar.setVisibility(View.GONE);
+        this.mRefreshImageButton.setVisibility(View.VISIBLE);
     }
 
 

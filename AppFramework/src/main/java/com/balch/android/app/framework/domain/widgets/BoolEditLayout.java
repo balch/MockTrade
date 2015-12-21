@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -33,26 +33,26 @@ import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.ValidatorException;
 
-public class BoolEditControl extends LinearLayout implements EditControl, View.OnClickListener {
-    private static final String TAG = BoolEditControl.class.getSimpleName();
+public class BoolEditLayout extends LinearLayout implements EditLayout, View.OnClickListener {
+    private static final String TAG = BoolEditLayout.class.getSimpleName();
 
     protected CheckBox checkBox;
 
     protected ColumnDescriptor descriptor;
-    protected EditControlListener editControlListener;
+    protected EditLayoutListener editLayoutListener;
     protected ControlMapper controlMapper;
 
-    public BoolEditControl(Context context) {
+    public BoolEditLayout(Context context) {
         super(context);
         initialize();
     }
 
-    public BoolEditControl(Context context, AttributeSet attrs) {
+    public BoolEditLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize();
     }
 
-    public BoolEditControl(Context context, AttributeSet attrs, int defStyle) {
+    public BoolEditLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize();
     }
@@ -101,7 +101,7 @@ public class BoolEditControl extends LinearLayout implements EditControl, View.O
 
     @Override
     public Object getValue() {
-        return Boolean.valueOf(this.checkBox.isChecked());
+        return this.checkBox.isChecked();
     }
 
     @Override
@@ -110,8 +110,8 @@ public class BoolEditControl extends LinearLayout implements EditControl, View.O
     }
 
     @Override
-    public void setEditControlListener(EditControlListener listener) {
-        this.editControlListener = listener;
+    public void setEditControlListener(EditLayoutListener listener) {
+        this.editLayoutListener = listener;
     }
 
     @Override
@@ -125,9 +125,9 @@ public class BoolEditControl extends LinearLayout implements EditControl, View.O
             hasError = true;
         }
 
-        if (this.editControlListener != null) {
+        if (this.editLayoutListener != null) {
             try {
-                this.editControlListener.onChanged(this.descriptor, this.getValue(), hasError);
+                this.editLayoutListener.onChanged(this.descriptor, this.getValue(), hasError);
             } catch (ValidatorException e) {
                 this.checkBox.setError(e.getMessage());
             }

@@ -40,35 +40,35 @@ public class PortfolioAdapter extends BaseExpandableListAdapter {
         boolean onLongClickAccount(Account account);
         boolean onLongClickInvestment(Investment investment);
     }
-    protected AccountItemView.AccountItemViewListener accountItemViewListener;
+    protected AccountItemView.AccountItemViewListener mAccountItemViewListener;
 
-    protected Context context;
-    protected PortfolioAdapterListener listener;
-    protected PortfolioData portfolioData = new PortfolioData();
+    protected Context mContext;
+    protected PortfolioAdapterListener mPortfolioAdapterListener;
+    protected PortfolioData mPortfolioData = new PortfolioData();
 
     public PortfolioAdapter(Context context) {
-        this.context = context;
+        this.mContext = context;
     }
 
     @Override
     public int getGroupCount() {
-        return this.portfolioData.getAccounts().size();
+        return this.mPortfolioData.getAccounts().size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        List<Investment> investments = this.portfolioData.getInvestments(this.getGroupId(groupPosition));
+        List<Investment> investments = this.mPortfolioData.getInvestments(this.getGroupId(groupPosition));
         return (investments != null) ? investments.size() : 0;
     }
 
     @Override
     public Account getGroup(int groupPosition) {
-        return this.portfolioData.getAccounts().get(groupPosition);
+        return this.mPortfolioData.getAccounts().get(groupPosition);
     }
 
     @Override
     public Investment getChild(int groupPosition, int childPosition) {
-        List<Investment> investments = this.portfolioData.getInvestments(this.getGroupId(groupPosition));
+        List<Investment> investments = this.mPortfolioData.getInvestments(this.getGroupId(groupPosition));
         return investments.get(childPosition);
     }
 
@@ -92,31 +92,31 @@ public class PortfolioAdapter extends BaseExpandableListAdapter {
         AccountItemView accountItemView;
 
         if (convertView == null) {
-            accountItemView = new AccountItemView(this.context);
+            accountItemView = new AccountItemView(this.mContext);
 
             accountItemView.setLongClickable(true);
             accountItemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     boolean consumed = false;
-                    if (listener != null) {
-                        consumed = listener.onLongClickAccount(((AccountItemView) v).getAccount());
+                    if (mPortfolioAdapterListener != null) {
+                        consumed = mPortfolioAdapterListener.onLongClickAccount(((AccountItemView) v).getAccount());
                     }
                     return consumed;
                 }
             });
 
-            if (accountItemViewListener != null) {
-                accountItemView.setAccountItemViewListener(accountItemViewListener);
+            if (mAccountItemViewListener != null) {
+                accountItemView.setAccountItemViewListener(mAccountItemViewListener);
             }
         } else {
             accountItemView = (AccountItemView) convertView;
         }
 
         Account account = this.getGroup(groupPosition);
-        List<Investment> investments = this.portfolioData.getInvestments(account.getId());
+        List<Investment> investments = this.mPortfolioData.getInvestments(account.getId());
         PerformanceItem performanceItem = account.getPerformanceItem(investments);
-        accountItemView.bind(account, performanceItem, this.portfolioData.getOpenOrderCount(account.getId()));
+        accountItemView.bind(account, performanceItem, this.mPortfolioData.getOpenOrderCount(account.getId()));
         return accountItemView;
     }
 
@@ -125,15 +125,15 @@ public class PortfolioAdapter extends BaseExpandableListAdapter {
         InvestmentItemView investmentItemView;
 
         if (convertView == null) {
-            investmentItemView = new InvestmentItemView(this.context);
+            investmentItemView = new InvestmentItemView(this.mContext);
 
             investmentItemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     boolean consumed = false;
-                    if (listener != null) {
+                    if (mPortfolioAdapterListener != null) {
                         Investment investment = ((InvestmentItemView) v).getInvestment();
-                        consumed = listener.onLongClickInvestment(investment);
+                        consumed = mPortfolioAdapterListener.onLongClickInvestment(investment);
                     }
                     return consumed;
                 }
@@ -156,18 +156,18 @@ public class PortfolioAdapter extends BaseExpandableListAdapter {
     }
 
     public void bind(PortfolioData portfolioData) {
-        this.portfolioData = portfolioData;
+        this.mPortfolioData = portfolioData;
     }
 
     public void clear() {
-        this.portfolioData = new PortfolioData();
+        this.mPortfolioData = new PortfolioData();
     }
 
     public void setAccountItemViewListener(AccountItemView.AccountItemViewListener accountItemViewListener) {
-        this.accountItemViewListener = accountItemViewListener;
+        this.mAccountItemViewListener = accountItemViewListener;
     }
 
     public void setListener(PortfolioAdapterListener listener) {
-        this.listener = listener;
+        this.mPortfolioAdapterListener = listener;
     }
 }

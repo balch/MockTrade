@@ -25,46 +25,46 @@ package com.balch.mocktrade.portfolio;
 import com.balch.android.app.framework.types.Money;
 
 public class PerformanceItem {
-    protected final Money costBasis;
-    protected final Money value;
-    protected final Money todayChange;
+    protected final Money mCostBasis;
+    protected final Money mValue;
+    protected final Money mTodayChange;
 
     public PerformanceItem(Money costBasis, Money value, Money todayChange) {
-        this.costBasis = costBasis;
-        this.value = value;
-        this.todayChange = todayChange;
+        this.mCostBasis = costBasis;
+        this.mValue = value;
+        this.mTodayChange = todayChange;
     }
 
     public Money getCostBasis() {
-        return costBasis;
+        return mCostBasis;
     }
 
     public Money getValue() {
-        return value;
+        return mValue;
     }
 
-    public Money getTodayChange() {
-        return todayChange;
+    public Money getmTodayChange() {
+        return mTodayChange;
     }
 
     public void aggregate(PerformanceItem performanceItem) {
-        this.costBasis.add(performanceItem.getCostBasis());
-        this.todayChange.add(performanceItem.getTodayChange());
-        this.value.add(performanceItem.getValue());
+        this.mCostBasis.add(performanceItem.getCostBasis());
+        this.mTodayChange.add(performanceItem.getmTodayChange());
+        this.mValue.add(performanceItem.getValue());
     }
 
     public Money getDailyChange() {
-        return this.todayChange;
+        return this.mTodayChange;
     }
 
 
     public Money getTotalChange() {
-        return Money.subtract(this.value, this.costBasis);
+        return Money.subtract(this.mValue, this.mCostBasis);
     }
 
     public float getTotalChangePercent() {
-        float percent = (this.costBasis.getMicroCents() != 0) ?
-                Money.subtract(this.value, this.costBasis).getMicroCents() / (float) this.costBasis.getMicroCents() :
+        float percent = (this.mCostBasis.getMicroCents() != 0) ?
+                Money.subtract(this.mValue, this.mCostBasis).getMicroCents() / (float) this.mCostBasis.getMicroCents() :
                 1.0f;
 
         return percent * 100.0f;

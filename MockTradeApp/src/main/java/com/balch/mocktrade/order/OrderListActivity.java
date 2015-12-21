@@ -50,9 +50,9 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
     protected static final int ORDER_LOADER_ID = 0;
     private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
 
-    protected OrderModel model;
-    protected OrderListView view;
-    protected Long accountId;
+    protected OrderModel mOrderModel;
+    protected OrderListView mOrderListView;
+    protected Long mAccountId;
 
     public static Intent newIntent(Context context, long accountId) {
         Intent intent = new Intent(context, OrderListActivity.class);
@@ -75,9 +75,9 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
         }
 
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-        model = modelFactory.getModel(OrderModel.class);
+        mOrderModel = modelFactory.getModel(OrderModel.class);
 
-        this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
+        this.mOrderListView.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
             public boolean onCancelOrder(final Order order) {
                 new AlertDialog.Builder(OrderListActivity.this)
@@ -87,7 +87,7 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
-                                    model.cancelOrder(order);
+                                    mOrderModel.cancelOrder(order);
                                     reload(true);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Canceling Order", ex);
@@ -106,8 +106,8 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
 
     @Override
     protected OrderListView createView() {
-        this.view = new OrderListView(this);
-        return this.view;
+        this.mOrderListView = new OrderListView(this);
+        return this.mOrderListView;
     }
 
     public void reload(boolean showProgress) {
@@ -119,7 +119,7 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
 
     @Override
     public Loader<List<Order>> onCreateLoader(int id, Bundle args) {
-        return new OrderLoader(this, this.accountId, this.model);
+        return new OrderLoader(this, this.mAccountId, this.mOrderModel);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
             return;
         }
 
-        this.view.bind(data);
+        this.mOrderListView.bind(data);
         hideProgress();
 
         // hack to prevent onLoadFinished being called twice
@@ -141,7 +141,7 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
 
     @Override
     public void onLoaderReset(Loader<List<Order>> loader) {
-        this.view.bind(new ArrayList<Order>());
+        this.mOrderListView.bind(new ArrayList<Order>());
     }
 
     protected static class OrderLoader extends AsyncTaskLoader<List<Order>> {

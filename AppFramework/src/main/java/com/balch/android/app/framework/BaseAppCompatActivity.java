@@ -41,7 +41,7 @@ import com.balch.android.app.framework.view.BaseView;
 public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
     private static final String TAG = BaseAppCompatActivity.class.getSimpleName();
 
-    private String className;
+    private String mClassName;
 
     abstract protected V createView();
 
@@ -56,7 +56,7 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     protected void onActivityResultBase(int requestCode, int resultCode, Intent data) {}
 
     public BaseAppCompatActivity() {
-        this.className = this.getClass().getSimpleName();
+        this.mClassName = this.getClass().getSimpleName();
     }
 
     protected void handleException(String logMsg, String displayMsg, Exception ex) {
@@ -71,7 +71,7 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     @Override
     final protected void onCreate(Bundle savedInstanceState) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className +" OnCreate - Begin");
+        Log.d(TAG, this.mClassName +" OnCreate - Begin");
         try {
             super.onCreate(savedInstanceState);
             V view = this.createView();
@@ -83,65 +83,65 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         } catch (Exception ex) {
             handleException("OnCreate ",ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " OnCreate - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " OnCreate - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onStart() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className +" onStart - Begin");
+        Log.d(TAG, this.mClassName +" onStart - Begin");
         try {
             super.onStart();
             onStartBase();
         } catch (Exception ex) {
             handleException("onStart ",ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onStart - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onStart - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onResume() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className +" onResume - Begin");
+        Log.d(TAG, this.mClassName +" onResume - Begin");
         try {
             super.onResume();
             onResumeBase();
         } catch (Exception ex) {
             handleException("onResume ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onResume - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onResume - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onSaveInstanceState(Bundle outState) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className +" onSaveInstanceState - Begin");
+        Log.d(TAG, this.mClassName +" onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
             onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onSaveInstanceState - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onSaveInstanceState - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onPause() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className + " onPause - Begin");
+        Log.d(TAG, this.mClassName + " onPause - Begin");
         try {
             onPauseBase();
             super.onPause();
         } catch (Exception ex) {
             handleException("onPause ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onPause - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onPause - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onStop() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className + " onStop - Begin");
+        Log.d(TAG, this.mClassName + " onStop - Begin");
 
         try {
             onStopBase();
@@ -149,33 +149,33 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         } catch (Exception ex) {
             handleException("onStop", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onStop - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onStop - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onDestroy() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className + " onDestroy - Begin");
+        Log.d(TAG, this.mClassName + " onDestroy - Begin");
         try {
             onDestroyBase();
         } catch (Exception ex) {
             handleException("onDestroy",ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onDestroy - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onDestroy - End (ms):" + sw.stop());
         super.onDestroy();
     }
 
     @Override
     final public void onActivityResult(int requestCode, int resultCode, Intent data) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.className + " onActivityResult - Begin");
+        Log.d(TAG, this.mClassName + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {
                 onActivityResultBase(requestCode, resultCode, data);
         } catch (Exception ex) {
             handleException("onActivityResult",ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onActivityResult - End (ms):" + sw.stop());
+        Log.i(TAG, this.mClassName + " onActivityResult - End (ms):" + sw.stop());
     }
 
 }

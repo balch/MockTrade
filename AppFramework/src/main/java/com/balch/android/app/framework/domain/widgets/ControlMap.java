@@ -20,8 +20,28 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
-public interface ControlMapper {
-    ControlMap getControlMap();
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class ControlMap {
+    protected Map<String, EditLayout> mFieldNameToControlMap = new HashMap<>();
+
+    public EditLayout put(String key, EditLayout control) {
+        return this.mFieldNameToControlMap.put(key, control);
+    }
+
+    public <T extends EditLayout> T get(String key) {
+        return (T) this.mFieldNameToControlMap.get(key);
+    }
+
+    public void clear() {
+        this.mFieldNameToControlMap.clear();
+    }
+
+    public Set<Map.Entry<String,EditLayout>> entrySet() {
+        return this.mFieldNameToControlMap.entrySet();
+    }
 }

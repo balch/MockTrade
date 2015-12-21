@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -31,23 +31,23 @@ import com.balch.android.app.framework.R;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ValidatorException;
 
-public class UnsupportedEditControl extends LinearLayout implements EditControl {
+public class UnsupportedEditLayout extends LinearLayout implements EditLayout {
 
     protected ColumnDescriptor descriptor;
     protected TextView label;
     protected TextView value;
 
-    public UnsupportedEditControl(Context context) {
+    public UnsupportedEditLayout(Context context) {
         super(context);
         initialize();
     }
 
-    public UnsupportedEditControl(Context context, AttributeSet attrs) {
+    public UnsupportedEditLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize();
     }
 
-    public UnsupportedEditControl(Context context, AttributeSet attrs, int defStyle) {
+    public UnsupportedEditLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize();
     }
@@ -86,7 +86,7 @@ public class UnsupportedEditControl extends LinearLayout implements EditControl 
     }
 
     @Override
-    public void setEditControlListener(EditControlListener listener) {
+    public void setEditControlListener(EditLayoutListener listener) {
 
     }
 

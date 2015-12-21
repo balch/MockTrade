@@ -49,13 +49,13 @@ public class TradeApplication extends Application implements ModelProvider {
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
-    private SqlConnection sqlConnection;
-    private RequestQueue requestQueue;
-    private Settings settings;
+    private SqlConnection mSqlConnection;
+    private RequestQueue mRequestQueue;
+    private Settings mSettings;
 
-    private SqliteSourceProvider sqliteScheme;
-    private YQLSourceProvider yqlScheme;
-    private ModelFactory modelFactory;
+    private SqliteSourceProvider mSqliteScheme;
+    private YQLSourceProvider mYqlScheme;
+    private ModelFactory mModelFactory;
 
     @Override
     public void onCreate() {
@@ -77,12 +77,12 @@ public class TradeApplication extends Application implements ModelProvider {
 
         }
 
-        this.settings = new Settings(this);
+        this.mSettings = new Settings(this);
 
-        this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
+        this.mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                 DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
 
-        this.requestQueue = VolleyBackground.newRequestQueue(this, 10);
+        this.mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
 
         this.configureModelFactory();
 
@@ -93,7 +93,7 @@ public class TradeApplication extends Application implements ModelProvider {
 
     @Override
     public ModelFactory getModelFactory() {
-        return modelFactory;
+        return mModelFactory;
     }
 
     @Override
@@ -102,37 +102,37 @@ public class TradeApplication extends Application implements ModelProvider {
     }
 
     public SqliteSourceProvider getSqliteScheme() {
-        return sqliteScheme;
+        return mSqliteScheme;
     }
 
     public YQLSourceProvider getYqlScheme() {
-        return yqlScheme;
+        return mYqlScheme;
     }
 
     private void configureModelFactory() {
-        this.modelFactory = new ModelFactory();
+        this.mModelFactory = new ModelFactory();
 
-        this.sqliteScheme = new SqliteSourceProvider(this);
-        this.yqlScheme = new YQLSourceProvider(this);
+        this.mSqliteScheme = new SqliteSourceProvider(this);
+        this.mYqlScheme = new YQLSourceProvider(this);
 
-        this.modelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, this.sqliteScheme, true);
-        this.modelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, this.sqliteScheme, true);
-        this.modelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, this.yqlScheme, true);
+        this.mModelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, this.mSqliteScheme, true);
+        this.mModelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, this.mSqliteScheme, true);
+        this.mModelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, this.mYqlScheme, true);
     }
 
     @Override
     public SqlConnection getSqlConnection() {
-        return sqlConnection;
+        return mSqlConnection;
     }
 
     @Override
     public Settings getSettings() {
-        return settings;
+        return mSettings;
     }
 
 
     @Override
     public RequestQueue getRequestQueue() {
-        return this.requestQueue;
+        return this.mRequestQueue;
     }
 }

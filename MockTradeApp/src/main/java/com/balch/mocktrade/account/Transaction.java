@@ -41,19 +41,19 @@ public class Transaction extends DomainObject implements SqlMapper<Transaction>,
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_NOTES = "notes";
 
-    protected Account account;
-    protected Money amount;
-    protected TransactionType type;
-    protected String notes;
+    protected Account mAccount;
+    protected Money mAmount;
+    protected TransactionType mTransactionType;
+    protected String mNotes;
 
     public Transaction() {
     }
 
     public Transaction(Account account, Money amount, TransactionType type, String notes) {
-        this.account = account;
-        this.amount = amount;
-        this.type = type;
-        this.notes = notes;
+        this.mAccount = account;
+        this.mAmount = amount;
+        this.mTransactionType = type;
+        this.mNotes = notes;
     }
 
     @Override
@@ -63,49 +63,49 @@ public class Transaction extends DomainObject implements SqlMapper<Transaction>,
 
     public enum TransactionType  {
         DEPOSIT,
-        WITHDRAWAL;
+        WITHDRAWAL
     }
 
     public Account getAccount() {
-        return account;
+        return mAccount;
     }
 
     public void setAccount(Account account) {
-        this.account = account;
+        this.mAccount = account;
     }
 
     public Money getAmount() {
-        return amount;
+        return mAmount;
     }
 
     public void setAmount(Money amount) {
-        this.amount = amount;
+        this.mAmount = amount;
     }
 
     public TransactionType getType() {
-        return type;
+        return mTransactionType;
     }
 
     public void setType(TransactionType type) {
-        this.type = type;
+        this.mTransactionType = type;
     }
 
     public String getNotes() {
-        return notes;
+        return mNotes;
     }
 
     public void setNotes(String notes) {
-        this.notes = notes;
+        this.mNotes = notes;
     }
 
     @Override
     public ContentValues getContentValues(Transaction transaction) {
         ContentValues values = new ContentValues();
 
-        values.put(COLUMN_ACCOUNT_ID, transaction.account.getId());
-        values.put(COLUMN_AMOUNT, transaction.amount.getMicroCents());
-        values.put(COLUMN_TYPE, transaction.type.name());
-        values.put(COLUMN_NOTES, transaction.notes);
+        values.put(COLUMN_ACCOUNT_ID, transaction.mAccount.getId());
+        values.put(COLUMN_AMOUNT, transaction.mAmount.getMicroCents());
+        values.put(COLUMN_TYPE, transaction.mTransactionType.name());
+        values.put(COLUMN_NOTES, transaction.mNotes);
 
         return values;
     }
@@ -113,11 +113,11 @@ public class Transaction extends DomainObject implements SqlMapper<Transaction>,
     @Override
     public void populate(Transaction transaction, Cursor cursor, Map<String, Integer> columnMap) {
         transaction.id = cursor.getLong(columnMap.get(COLUMN_ID));
-        transaction.account = new Account();
-        transaction.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        transaction.amount = new Money(cursor.getLong(columnMap.get(COLUMN_AMOUNT)));
-        transaction.type = TransactionType.valueOf(cursor.getString(columnMap.get(COLUMN_TYPE)));
-        transaction.notes = cursor.getString(columnMap.get(COLUMN_NOTES));
+        transaction.mAccount = new Account();
+        transaction.mAccount.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        transaction.mAmount = new Money(cursor.getLong(columnMap.get(COLUMN_AMOUNT)));
+        transaction.mTransactionType = TransactionType.valueOf(cursor.getString(columnMap.get(COLUMN_TYPE)));
+        transaction.mNotes = cursor.getString(columnMap.get(COLUMN_NOTES));
     }
 
 }

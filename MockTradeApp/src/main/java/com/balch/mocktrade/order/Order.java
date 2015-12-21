@@ -46,7 +46,7 @@ public class Order  extends DomainObject implements Serializable {
     protected Account account;
 
     @ColumnEdit(order = 1, state = EditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    @ColumnNew(order = 1, customControl = StockSymbolControl.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
+    @ColumnNew(order = 1, customControl = StockSymbolLayout.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
     protected String symbol;
 
     protected OrderStatus status;
@@ -73,8 +73,8 @@ public class Order  extends DomainObject implements Serializable {
     @ColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
     protected Double stopPercent;
 
-    @ColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
-    @ColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceControl.class)
+    @ColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceLayout.class)
+    @ColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceLayout.class)
     protected Long quantity;
 
     protected Money highestPrice;

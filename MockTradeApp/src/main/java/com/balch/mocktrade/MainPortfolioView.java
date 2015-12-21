@@ -36,9 +36,9 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
-    protected PortfolioAdapter portfolioAdapter;
-    protected ExpandableListView portfolioList;
-    protected AccountItemView totalsView;
+    protected PortfolioAdapter mPortfolioAdapter;
+    protected ExpandableListView mPortfolioList;
+    protected AccountItemView mTotalsView;
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -55,20 +55,20 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     @Override
     public void initializeLayout() {
         inflate(getContext(), R.layout.main_portfolio_view, this);
-        this.portfolioList = (ExpandableListView)findViewById(R.id.portfolio_list);
+        this.mPortfolioList = (ExpandableListView)findViewById(R.id.portfolio_list);
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
-        this.portfolioAdapter = portfolioAdapter;
-        this.portfolioList.setAdapter(portfolioAdapter);
+        this.mPortfolioAdapter = portfolioAdapter;
+        this.mPortfolioList.setAdapter(portfolioAdapter);
     }
 
     public void expandList() {
-        for (int i = 0; i < this.portfolioAdapter.getGroupCount(); i++) {
-            this.portfolioList.expandGroup(i);
+        for (int i = 0; i < this.mPortfolioAdapter.getGroupCount(); i++) {
+            this.mPortfolioList.expandGroup(i);
         }
 
-        this.portfolioList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        this.mPortfolioList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 return true;
@@ -78,16 +78,16 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public void setTotals(boolean showTotals, Account totals, PerformanceItem performanceItem) {
         if (showTotals) {
-            if (this.totalsView == null) {
-                this.totalsView = new AccountItemView(this.getContext());
-                this.portfolioList.addFooterView(this.totalsView);
+            if (this.mTotalsView == null) {
+                this.mTotalsView = new AccountItemView(this.getContext());
+                this.mPortfolioList.addFooterView(this.mTotalsView);
             }
-            totalsView.bind(totals, performanceItem, 0);
+            mTotalsView.bind(totals, performanceItem, 0);
 
         } else {
-            if (this.totalsView != null) {
-                this.portfolioList.removeFooterView(this.totalsView);
-                this.totalsView = null;
+            if (this.mTotalsView != null) {
+                this.mPortfolioList.removeFooterView(this.mTotalsView);
+                this.mTotalsView = null;
             }
         }
     }

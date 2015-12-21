@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.poll_interval))) {
-            ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
+            ModelFactory modelFactory = ((ModelProvider) this.getApplication()).getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             financeModel.setQuoteServiceAlarm();
         }
@@ -84,11 +84,9 @@ public class SettingsActivity extends AppCompatActivity
         super.onPause();
     }
 
-    public static class SettingsPreferenceFragment extends PreferenceFragment
-    {
+    public static class SettingsPreferenceFragment extends PreferenceFragment {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_pref_screen);
         }

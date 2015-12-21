@@ -20,10 +20,12 @@
  * Copyright (C) 2014
  */
 
-package com.balch.mocktrade.order;
+package com.balch.android.app.framework.domain.widgets;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -34,39 +36,27 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.balch.android.app.framework.R;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.ViewHint;
-import com.balch.android.app.framework.domain.controls.ControlMapper;
-import com.balch.android.app.framework.domain.controls.EditControl;
-import com.balch.android.app.framework.model.ModelFactory;
-import com.balch.android.app.framework.model.RequestListener;
-import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.R;
-import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.Quote;
-import com.balch.mocktrade.model.ModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StockSymbolControl extends LinearLayout implements EditControl, TextWatcher {
-    private static final String TAG = StockSymbolControl.class.getSimpleName();
+public class StringEditLayout extends LinearLayout implements EditLayout, TextWatcher {
+    private static final String TAG = StringEditLayout.class.getSimpleName();
     protected static final int TEXT_CHANGE_DELAY_MS = 500;
 
     protected TextView label;
     protected EditText value;
-    protected TextView description;
-    protected TextView price;
 
     protected ColumnDescriptor descriptor;
-    protected EditControlListener editControlListener;
+    protected EditLayoutListener editLayoutListener;
     protected ControlMapper controlMapper;
 
-    protected FinanceModel financeModel;
-
-    protected boolean allowEmpty;
+    protected boolean allowEmpty = true;
 
     protected Handler textChangeHandler = new Handler();
     protected Runnable txtChangeRunnable = new Runnable() {
@@ -75,49 +65,37 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
             try {
                 doTextChanged();
             } catch (Exception ex) {
-                Log.e(TAG, "Exception in TextChanged Runnable", ex);
+                Log.e(TAG, "Exception on TextChanged Runnable", ex);
             }
+
         }
     };
 
-    public StockSymbolControl(Context context) {
+    public StringEditLayout(Context context) {
         super(context);
         initialize();
     }
 
-    public StockSymbolControl(Context context, AttributeSet attrs) {
+    public StringEditLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize();
     }
 
-    public StockSymbolControl(Context context, AttributeSet attrs, int defStyle) {
+    public StringEditLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize();
     }
 
     protected void initialize() {
-        inflate(getContext(), com.balch.mocktrade.R.layout.symbol_edit_control, this);
-        this.label = (TextView) findViewById(R.id.symbol_edit_label);
-        this.value = (EditText) findViewById(R.id.symbol_edit_value);
-        this.description = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
-        this.price = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
+        inflate(getContext(), R.layout.edit_control_string, this);
+        this.label = (TextView) findViewById(R.id.string_edit_control_label);
+        this.value = (EditText) findViewById(R.id.string_edit_control_value);
 
-        ModelFactory modelFactory;
-        modelFactory = ((ModelProvider)this.getContext().getApplicationContext()).getModelFactory();
-        this.financeModel = modelFactory.getModel(FinanceModel.class);
-
-        this.value.setHint(R.string.order_symbol_hint);
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        this.value.setEnabled(enabled);
-    }
-
-    protected void setInvestmentData(String description, Money price) {
-        this.description.setText(description);
-        this.price.setText((price != null) ? price.getFormatted(2) : "");
+        // manage saving the state from this class
+        // the controls had the same id value which was
+        // causing problems with the auto restore
+        // see http://stackoverflow.com/a/9444190
+        this.value.setSaveEnabled(false);
     }
 
     @Override
@@ -143,6 +121,10 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
                     this.value.setLines(hint.getIntValue());
                 } else if (hint.getHint() == ViewHint.Hint.NOT_EMPTY) {
                     this.allowEmpty = !hint.getBoolValue();
+                } else if (hint.getHint() == ViewHint.Hint.INIT_EMPTY) {
+                    if (hint.getBoolValue()) {
+                        this.value.setText("");
+                    }
                 }
             }
         } catch (IllegalAccessException e) {
@@ -152,13 +134,25 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
         this.value.setEnabled(enabled);
         this.value.setFilters(filters.toArray(new InputFilter[filters.size()]));
 
-        if (!TextUtils.isEmpty(this.value.getText())) {
-            doTextChanged();
-        }
-
         this.value.addTextChangedListener(this);
     }
 
+    @Override
+    public void setControlMapper(ControlMapper controlMapper) {
+        this.controlMapper = controlMapper;
+    }
+
+    @Override
+    public void validate() throws ValidatorException {
+        String val = this.value.getText().toString();
+        // empty string validation
+        if (!this.allowEmpty) {
+            if (TextUtils.isEmpty(val)) {
+                throw new ValidatorException(getResources().getString(R.string.error_empty_string));
+            }
+        }
+
+    }
 
     protected List<InputFilter> getInputFilters() {
         return new ArrayList<>();
@@ -178,17 +172,6 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
     }
 
     @Override
-    public void validate() throws ValidatorException {
-        String val = this.value.getText().toString();
-        // empty string validation
-        if (!this.allowEmpty) {
-            if (TextUtils.isEmpty(val)) {
-                throw new ValidatorException(getResources().getString(R.string.error_empty_string));
-            }
-        }
-    }
-
-    @Override
     public Object getValue() {
         return this.value.getText().toString();
     }
@@ -199,13 +182,8 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
     }
 
     @Override
-    public void setEditControlListener(EditControlListener listener) {
-        this.editControlListener = listener;
-    }
-
-    @Override
-    public void setControlMapper(ControlMapper controlMapper) {
-        this.controlMapper = controlMapper;
+    public void setEditControlListener(EditLayoutListener listener) {
+        this.editLayoutListener = listener;
     }
 
     @Override
@@ -220,16 +198,29 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
 
     @Override
     public void afterTextChanged(Editable s) {
-        for (int x = 0; x < s.length(); x++) {
-            char c = s.charAt(x);
-            if (Character.isLowerCase(c)) {
-                s.replace(x, x+1, String.valueOf(Character.toUpperCase(c)));
-            }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState ss = new SavedState(superState);
+        ss.value = this.value.getText().toString();
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if(!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
         }
+
+        SavedState ss = (SavedState)state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        this.value.setText(ss.value);
     }
 
     protected void doTextChanged() {
-        final String symbol = value.getText().toString();
 
         boolean hasError = false;
         try {
@@ -240,57 +231,42 @@ public class StockSymbolControl extends LinearLayout implements EditControl, Tex
             hasError = true;
         }
 
-
-        if (!hasError) {
-            financeModel.getQuote(symbol, new RequestListener<Quote>() {
-                @Override
-                public void onResponse(final Quote response) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setInvestmentData(response.getName(), response.getPrice());
-                            value.setError(null);
-
-                            callListenerOnChanged(false);
-                        }
-                    });
-                }
-
-                @Override
-                public void onErrorResponse(final String error) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setInvestmentData("", null);
-
-                            String display = error;
-                            int pos = display.indexOf('.');
-                            if (pos != -1) {
-                                display = display.substring(0, pos + 1);
-                            }
-                            value.setError(display);
-                            callListenerOnChanged(true);
-                            editControlListener.onError(descriptor, symbol, error);
-//                        Toast.makeText(activity, error, Toast.LENGTH_LONG);
-                        }});
-
-                    }
-                });
-
-        }
-    }
-
-    protected void callListenerOnChanged(boolean hasError) {
-        if (this.editControlListener != null) {
+        if (this.editLayoutListener != null) {
             try {
-                this.editControlListener.onChanged(this.descriptor, this.getValue(), hasError);
+                this.editLayoutListener.onChanged(this.descriptor, this.getValue(), hasError);
             } catch (ValidatorException e) {
                 this.value.setError(e.getMessage());
             }
         }
     }
 
-    public Money getPrice() {
-        return new Money(price.getText().toString());
+    static class SavedState extends BaseSavedState {
+        protected String value;
+
+        SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            this.value = in.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeString(value);
+        }
+
+        //required field that makes Parcelables from a Parcel
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
     }
 }

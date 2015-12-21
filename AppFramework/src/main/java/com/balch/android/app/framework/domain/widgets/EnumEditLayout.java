@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -42,29 +42,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnumEditControl extends LinearLayout implements EditControl {
-    private static final String TAG = EnumEditControl.class.getSimpleName();
+public class EnumEditLayout extends LinearLayout implements EditLayout {
+    private static final String TAG = EnumEditLayout.class.getSimpleName();
 
     protected TextView label;
     protected Spinner value;
 
     protected ColumnDescriptor descriptor;
-    protected EditControlListener editControlListener;
+    protected EditLayoutListener editLayoutListener;
     protected ControlMapper controlMapper;
 
     protected List<Object> enumValues;
 
-    public EnumEditControl(Context context) {
+    public EnumEditLayout(Context context) {
         super(context);
         initialize();
     }
 
-    public EnumEditControl(Context context, AttributeSet attrs) {
+    public EnumEditLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize();
     }
 
-    public EnumEditControl(Context context, AttributeSet attrs, int defStyle) {
+    public EnumEditLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize();
     }
@@ -83,9 +83,9 @@ public class EnumEditControl extends LinearLayout implements EditControl {
         this.value.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (editControlListener != null) {
+                if (editLayoutListener != null) {
                     try {
-                        editControlListener.onChanged(descriptor, getValue(), false);
+                        editLayoutListener.onChanged(descriptor, getValue(), false);
                     } catch (ValidatorException e) {
                         Log.e(TAG, "Error changing value", e);
                     }
@@ -100,7 +100,7 @@ public class EnumEditControl extends LinearLayout implements EditControl {
         boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
         try {
             Object obj = descriptor.getField().get(descriptor.getItem());
-            List<String> displayValues = new ArrayList<String>();
+            List<String> displayValues = new ArrayList<>();
             Object[] enumValues =  ((Enum)obj).getDeclaringClass().getEnumConstants();
             if (obj instanceof MetadataUtils.EnumResource) {
                 int resId = ((MetadataUtils.EnumResource) obj).getListResId();
@@ -122,7 +122,7 @@ public class EnumEditControl extends LinearLayout implements EditControl {
 
    public void setOptions(List<Object> enumValues, List<String> displayValues, int selectedIndex) {
        this.enumValues = enumValues;
-       ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_item,
+       ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item,
                displayValues);
        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -151,9 +151,8 @@ public class EnumEditControl extends LinearLayout implements EditControl {
 
     @Override
     public Object getValue() {
-        Object obj = null;
         try {
-            obj = descriptor.getField().get(descriptor.getItem());
+            descriptor.getField().get(descriptor.getItem());
         } catch (IllegalAccessException e) {
             Log.e(TAG, "Error Creating enum", e);
             return null;
@@ -172,8 +171,8 @@ public class EnumEditControl extends LinearLayout implements EditControl {
     }
 
     @Override
-    public void setEditControlListener(EditControlListener listener) {
-        this.editControlListener = listener;
+    public void setEditControlListener(EditLayoutListener listener) {
+        this.editLayoutListener = listener;
     }
 
 }

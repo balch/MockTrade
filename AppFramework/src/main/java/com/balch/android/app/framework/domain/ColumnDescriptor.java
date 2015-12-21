@@ -22,7 +22,9 @@
 
 package com.balch.android.app.framework.domain;
 
-import com.balch.android.app.framework.domain.controls.EditControl;
+import android.support.annotation.NonNull;
+
+import com.balch.android.app.framework.domain.widgets.EditLayout;
 
 import java.lang.reflect.Field;
 
@@ -33,12 +35,12 @@ public class ColumnDescriptor implements Comparable<ColumnDescriptor> {
     protected final EditState state;
     protected final ViewHint[] hints;
     protected final int order;
-    protected final Class<? extends EditControl> customControl;
+    protected final Class<? extends EditLayout> customControl;
 
 
     public ColumnDescriptor(DomainObject item, Field field, int labelResId,
                             EditState state, ViewHint[] hints, int order,
-                            Class<? extends EditControl> customControl) {
+                            Class<? extends EditLayout> customControl) {
         this.item = item;
         this.field = field;
         this.labelResId = labelResId;
@@ -72,12 +74,12 @@ public class ColumnDescriptor implements Comparable<ColumnDescriptor> {
         return item;
     }
 
-    public Class<? extends EditControl> getCustomControl() {
+    public Class<? extends EditLayout> getCustomControl() {
         return customControl;
     }
 
     @Override
-    public int compareTo(ColumnDescriptor another) {
+    public int compareTo(@NonNull ColumnDescriptor another) {
         return (this.order < another.order) ? -1 : ((this.order == another.order) ? 0 : 1);
     }
 }

@@ -41,7 +41,7 @@ import java.util.TimeZone;
 public class QuoteGoogleFinance implements Quote {
     static private final String TAG = QuoteGoogleFinance.class.getSimpleName();
 
-    protected Map<String, String> data = new HashMap<String, String>();
+    protected Map<String, String> mData = new HashMap<>();
 
     protected final static String LastTradePriceOnly="l_cur";
     protected final static String Symbol="t";
@@ -49,17 +49,17 @@ public class QuoteGoogleFinance implements Quote {
 
     @Override
     public Money getPrice() {
-        return new Money(this.data.get(this.LastTradePriceOnly));
+        return new Money(this.mData.get(LastTradePriceOnly));
     }
 
     @Override
     public void setPrice(Money price) {
-        this.data.put(this.LastTradePriceOnly, String.valueOf(price.getDollars()));
+        this.mData.put(LastTradePriceOnly, String.valueOf(price.getDollars()));
     }
 
     @Override
     public String getSymbol() {
-        return this.data.get(this.Symbol);
+        return this.mData.get(Symbol);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class QuoteGoogleFinance implements Quote {
         Calendar ny_cal = Calendar.getInstance(ny_tz);
         int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET))/60000;
 
-        String dateStr = this.data.get(LastTradeTime);
+        String dateStr = this.mData.get(LastTradeTime);
         dateStr = dateStr.replace("Z", String.format("%s%02d:%02d",(offset_mins>=0)?"+":"-", Math.abs(offset_mins/60), Math.abs(offset_mins%60)));
         try {
             return ISO8601DateTime.toDate(dateStr);
@@ -104,7 +104,7 @@ public class QuoteGoogleFinance implements Quote {
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if (!jsonObject.isNull(key)) {
-                quote.data.put(key, jsonObject.getString(key));
+                quote.mData.put(key, jsonObject.getString(key));
             }
         }
 

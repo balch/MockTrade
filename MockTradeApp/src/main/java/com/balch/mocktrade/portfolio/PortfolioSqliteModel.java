@@ -54,8 +54,8 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
         this.orderModel = new OrderSqliteModel(modelProvider);
 
-        // this model is more generic then the sqlite models above and is
-        // registered with the model factory
+        // this mPortfolioModel is more generic then the sqlite models above and is
+        // registered with the mPortfolioModel factory
         this.financeModel = this.getModelFactory().getModel(FinanceModel.class);
     }
 
@@ -116,7 +116,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     public void scheduleOrderServiceAlarmIfNeeded() {
         List<Order> openOrders = this.getOpenOrders();
         if (openOrders.size() > 0) {
-            this.scheduleOrderServiceAlarm();;
+            this.scheduleOrderServiceAlarm();
         }
     }
 

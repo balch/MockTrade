@@ -39,14 +39,14 @@ public class OrderItemView extends LinearLayout {
         boolean onCancelOrder(Order order);
     }
 
-    protected OrderItemViewListener listener;
-    protected TextView orderId;
-    protected TextView symbol;
-    protected TextView action;
-    protected TextView createDate;
-    protected TextView strategy;
-    protected TextView quantity;
-    protected Order order;
+    protected OrderItemViewListener mOrderItemViewListener;
+    protected TextView mOrderId;
+    protected TextView mSymbol;
+    protected TextView mAction;
+    protected TextView mCreateDate;
+    protected TextView mStrategy;
+    protected TextView mQuantity;
+    protected Order mOrder;
 
     public OrderItemView(Context context) {
         super(context);
@@ -66,20 +66,20 @@ public class OrderItemView extends LinearLayout {
     protected void initialize() {
         inflate(getContext(), R.layout.order_item_view, this);
 
-        this.orderId = (TextView)findViewById(R.id.order_item_id);
-        this.symbol = (TextView)findViewById(R.id.order_item_symbol);
-        this.action = (TextView)findViewById(R.id.order_item_action);
-        this.createDate = (TextView)findViewById(R.id.order_item_created);
-        this.strategy = (TextView)findViewById(R.id.order_item_strategy);
-        this.quantity = (TextView)findViewById(R.id.order_item_quantity);
+        this.mOrderId = (TextView)findViewById(R.id.order_item_id);
+        this.mSymbol = (TextView)findViewById(R.id.order_item_symbol);
+        this.mAction = (TextView)findViewById(R.id.order_item_action);
+        this.mCreateDate = (TextView)findViewById(R.id.order_item_created);
+        this.mStrategy = (TextView)findViewById(R.id.order_item_strategy);
+        this.mQuantity = (TextView)findViewById(R.id.order_item_quantity);
 
         this.setLongClickable(true);
         this.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 boolean handled = false;
-                if (listener != null) {
-                    handled = listener.onCancelOrder(order);
+                if (mOrderItemViewListener != null) {
+                    handled = mOrderItemViewListener.onCancelOrder(mOrder);
                 }
                 return handled;
             }
@@ -88,19 +88,19 @@ public class OrderItemView extends LinearLayout {
     }
 
     public void bind(Order order) {
-        this.order = order;
+        this.mOrder = order;
 
-        this.orderId.setText(order.getId().toString());
-        this.symbol.setText(order.getSymbol());
-        this.action.setText(order.getAction().toString());
-        this.createDate.setText(DateFormat.getDateTimeInstance().format(order.getCreateTime().getDate()));
-        this.strategy.setText(order.getStrategy().toString());
-        this.quantity.setText(order.getQuantity().toString());
+        this.mOrderId.setText(order.getId().toString());
+        this.mSymbol.setText(order.getSymbol());
+        this.mAction.setText(order.getAction().toString());
+        this.mCreateDate.setText(DateFormat.getDateTimeInstance().format(order.getCreateTime().getDate()));
+        this.mStrategy.setText(order.getStrategy().toString());
+        this.mQuantity.setText(order.getQuantity().toString());
 
     }
 
     public void setOrderItemViewListener(OrderItemViewListener listener) {
-        this.listener = listener;
+        this.mOrderItemViewListener = listener;
     }
 }
 

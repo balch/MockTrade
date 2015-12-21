@@ -52,28 +52,28 @@ class OrderManager {
         boolean updateOrder(Order order) throws IllegalAccessException;
     }
 
-    protected final FinanceModel financeModel;
-    protected final Context context;
-    protected final Settings settings;
-    protected final OrderManagerListener listener;
+    protected final FinanceModel mFinanceModel;
+    protected final Context mContext;
+    protected final Settings mSettings;
+    protected final OrderManagerListener mOrderManagerListener;
 
     public OrderManager(Context context, FinanceModel financeModel, Settings settings,
                         OrderManagerListener listener) {
-        this.settings = settings;
-        this.context = context;
-        this.financeModel = financeModel;
-        this.listener = listener;
+        this.mSettings = settings;
+        this.mContext = context;
+        this.mFinanceModel = financeModel;
+        this.mOrderManagerListener = listener;
     }
 
     public void scheduleOrderServiceAlarm(boolean isMarketOpen){
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = OrderReceiver.getIntent(context);
+        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = OrderReceiver.getIntent(mContext);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Date startTime = isMarketOpen ?
-                new Date(System.currentTimeMillis() + settings.getPollOrderInterval()*1000) :
-                this.financeModel.nextMarketOpen();
+                new Date(System.currentTimeMillis() + mSettings.getPollOrderInterval()*1000) :
+                this.mFinanceModel.nextMarketOpen();
         alarmManager.set(AlarmManager.RTC_WAKEUP,
                 startTime.getTime(),
                 pendingIntent);
@@ -96,7 +96,7 @@ class OrderManager {
                 break;
 
             case MANUAL:
-                result = this.listener.executeOrder(order, quote, order.getLimitPrice());
+                result = this.mOrderManagerListener.executeOrder(order, quote, order.getLimitPrice());
                 break;
 
             case LIMIT:
@@ -121,7 +121,7 @@ class OrderManager {
 
     protected boolean isQuoteValid(Quote quote)  {
         Date tradeDate = quote.getLastTradeTime();
-        return (financeModel.isMarketOpen() && isToday(tradeDate));
+        return (mFinanceModel.isMarketOpen() && isToday(tradeDate));
     }
 
     protected boolean isToday(Date date) {
@@ -134,7 +134,7 @@ class OrderManager {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
             if ( ((order.getAction() == Order.OrderAction.BUY)  && (compareQuoteToLimit <= 0)) ||
                     ((order.getAction() == Order.OrderAction.SELL) && (compareQuoteToLimit >= 0))) {
-                orderResult = this.listener.executeOrder(order, quote, quote.getPrice());
+                orderResult = this.mOrderManagerListener.executeOrder(order, quote, quote.getPrice());
             }
         }
 
@@ -149,7 +149,7 @@ class OrderManager {
         boolean highestPriceChanged = false;
 
         if (order.getHighestPrice().getDollars() == 0.0) {
-            Investment investment = listener.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
+            Investment investment = mOrderManagerListener.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
             if (investment == null) {
                 throw new IllegalArgumentException("Can't sell and investment you don't own");
             }
@@ -177,13 +177,13 @@ class OrderManager {
                 }
 
                 if (executeOrder) {
-                    orderResult = this.listener.executeOrder(order, quote, quote.getPrice());
+                    orderResult = this.mOrderManagerListener.executeOrder(order, quote, quote.getPrice());
                 }
             }
         }
 
         if (highestPriceChanged) {
-            if (!listener.updateOrder(order)) {
+            if (!mOrderManagerListener.updateOrder(order)) {
                 throw new IllegalArgumentException("Error updating order");
             }
         }
@@ -200,7 +200,7 @@ class OrderManager {
         if (this.isQuoteValid(quote)) {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
             if (compareQuoteToLimit <= 0) {
-                orderResult = this.listener.executeOrder(order, quote, quote.getPrice());
+                orderResult = this.mOrderManagerListener.executeOrder(order, quote, quote.getPrice());
             }
         }
 
@@ -210,7 +210,7 @@ class OrderManager {
     protected OrderResult executeMarketOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
-            orderResult = this.listener.executeOrder(order, quote, quote.getPrice());
+            orderResult = this.mOrderManagerListener.executeOrder(order, quote, quote.getPrice());
         }
 
         return orderResult;

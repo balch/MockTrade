@@ -20,13 +20,13 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.controls;
+package com.balch.android.app.framework.domain.widgets;
 
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ValidatorException;
 
-public interface EditControl {
-    interface EditControlListener {
+public interface EditLayout {
+    interface EditLayoutListener {
         void onChanged(ColumnDescriptor descriptor, Object value, boolean hasError) throws ValidatorException;
         void onError(ColumnDescriptor descriptor, Object value, String errorMsg);
     }
@@ -36,7 +36,7 @@ public interface EditControl {
     void validate() throws ValidatorException;
     Object getValue();
     void setValue(Object value);
-    void setEditControlListener(EditControlListener listener);
+    void setEditControlListener(EditLayoutListener listener);
     void setControlMapper(ControlMapper controlMapper);
     void setEnabled(boolean enabled);
 }

@@ -52,7 +52,7 @@ public class QuoteService extends IntentService {
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 
     protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
-    protected static String lastUpdateDate = "";  // move this to shared prefs?
+    protected static String LAST_UPDATE_TIME = "";  // move this to shared prefs?
 
     public QuoteService() {
         super(QuoteService.class.getName());
@@ -78,14 +78,14 @@ public class QuoteService extends IntentService {
                     accountMap.put(a.getId(), a);
                 }
 
-                final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<Long, List<Investment>>(accounts.size());
-                List<String> symbols = new ArrayList<String>(investments.size());
+                final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<>(accounts.size());
+                List<String> symbols = new ArrayList<>(investments.size());
                 for (Investment i : investments) {
                     symbols.add(i.getSymbol());
 
                     List<Investment> list = accountIdToInvestmentMap.get(i.getAccount().getId());
                     if (list == null) {
-                        list = new ArrayList<Investment>();
+                        list = new ArrayList<>();
                         accountIdToInvestmentMap.put(i.getAccount().getId(), list);
                     }
                     list.add(i);
@@ -153,8 +153,8 @@ public class QuoteService extends IntentService {
                                             Map<String, Quote> quoteMap) {
         boolean doDailyUpdate = false;
         String today = DATE_FORMATTER.format(new Date());
-        if (!today.equals(lastUpdateDate)) {
-            lastUpdateDate = today;
+        if (!today.equals(LAST_UPDATE_TIME)) {
+            LAST_UPDATE_TIME = today;
             doDailyUpdate = true;
         }
 

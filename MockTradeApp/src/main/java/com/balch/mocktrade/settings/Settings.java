@@ -32,19 +32,19 @@ import java.util.TimeZone;
 
 public class Settings {
 
-    protected Application context;
+    protected Application mContext;
 
     public Settings(Application context) {
-        this.context = context;
-        PreferenceManager.setDefaultValues(this.context, R.xml.settings_pref_screen, false);
+        this.mContext = context;
+        PreferenceManager.setDefaultValues(this.mContext, R.xml.settings_pref_screen, false);
     }
 
     protected SharedPreferences getSharedPrefs() {
-        return PreferenceManager.getDefaultSharedPreferences(this.context);
+        return PreferenceManager.getDefaultSharedPreferences(this.mContext);
     }
 
     protected String getPrefKey(int resID) {
-        return this.context.getResources().getString(resID);
+        return this.mContext.getResources().getString(resID);
     }
 
     // Polls start time is in HH:mm format in PST

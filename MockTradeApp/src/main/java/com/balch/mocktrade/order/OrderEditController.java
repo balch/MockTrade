@@ -29,9 +29,9 @@ import android.view.ViewGroup;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ExternalController;
 import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.controls.ControlMap;
-import com.balch.android.app.framework.domain.controls.EditControl;
-import com.balch.android.app.framework.domain.controls.EnumEditControl;
+import com.balch.android.app.framework.domain.widgets.ControlMap;
+import com.balch.android.app.framework.domain.widgets.EditLayout;
+import com.balch.android.app.framework.domain.widgets.EnumEditLayout;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -54,7 +54,7 @@ public class OrderEditController implements ExternalController<Order> {
 
     @Override
     public void validate(Context context, Order order, ControlMap controlMap) throws ValidatorException {
-        StockSymbolControl symbolControl = controlMap.get(Order.FLD_SYMBOL);
+        StockSymbolLayout symbolControl = controlMap.get(Order.FLD_SYMBOL);
         Money price = symbolControl.getPrice();
         if (order.getStrategy() == Order.OrderStrategy.MANUAL) {
             price = order.getLimitPrice();
@@ -64,7 +64,7 @@ public class OrderEditController implements ExternalController<Order> {
         boolean hasAvailableFunds = ((order.getAction() == Order.OrderAction.SELL) ||
                 (cost.getDollars() <= order.getAccount().getAvailableFunds().getDollars()));
 
-        QuantityPriceControl quantityControl = controlMap.get(Order.FLD_QUANTITY);
+        QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setCost(cost, hasAvailableFunds);
 
         if (!hasAvailableFunds) {
@@ -82,17 +82,17 @@ public class OrderEditController implements ExternalController<Order> {
         ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
         FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
 
-        QuantityPriceControl quantityControl = controlMap.get(Order.FLD_QUANTITY);
+        QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);
         quantityControl.setMarketIsOpen(financeModel.isMarketOpen());
         quantityControl.setAccountInfo(order.account);
         quantityControl.setEnabled(controlEnabled);
 
-        EditControl control = controlMap.get(Order.FLD_SYMBOL);
+        EditLayout control = controlMap.get(Order.FLD_SYMBOL);
         control.setEnabled(controlEnabled);
     }
 
-    protected void showControl(EditControl control, boolean visible) {
+    protected void showControl(EditLayout control, boolean visible) {
         if (control != null) {
             if (control instanceof ViewGroup) {
                 ((ViewGroup) control).setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -127,8 +127,8 @@ public class OrderEditController implements ExternalController<Order> {
     }
 
     protected void onChangeAction(Context context, Order.OrderAction action, ControlMap controlMap) {
-        EditControl control = controlMap.get(Order.FLD_STRATEGY);
-        if (control instanceof EnumEditControl) {
+        EditLayout control = controlMap.get(Order.FLD_STRATEGY);
+        if (control instanceof EnumEditLayout) {
             int selectionIndex = 0;
             Order.OrderStrategy strategy = (Order.OrderStrategy) control.getValue();
             List<Object> enumValues = new ArrayList<>();
@@ -148,7 +148,7 @@ public class OrderEditController implements ExternalController<Order> {
                 }
             }
 
-            ((EnumEditControl)control).setOptions(enumValues, displayValues, selectionIndex);
+            ((EnumEditLayout)control).setOptions(enumValues, displayValues, selectionIndex);
         }
 
     }

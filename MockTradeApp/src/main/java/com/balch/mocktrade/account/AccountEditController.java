@@ -27,8 +27,8 @@ import android.content.Context;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ExternalController;
 import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.controls.ControlMap;
-import com.balch.android.app.framework.domain.controls.EditControl;
+import com.balch.android.app.framework.domain.widgets.ControlMap;
+import com.balch.android.app.framework.domain.widgets.EditLayout;
 
 public class AccountEditController implements ExternalController<Account> {
     @Override
@@ -37,7 +37,7 @@ public class AccountEditController implements ExternalController<Account> {
             Account.Strategy strategy = (Account.Strategy)value;
             if (strategy != Account.Strategy.NONE) {
                 String [] displayVals = context.getResources().getStringArray(strategy.getListResId());
-                EditControl control = controlMap.get(Account.FLD_NAME);
+                EditLayout control = controlMap.get(Account.FLD_NAME);
                 control.setValue(displayVals[strategy.ordinal()]);
             }
         }

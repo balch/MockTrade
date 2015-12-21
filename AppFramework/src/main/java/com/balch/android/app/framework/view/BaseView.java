@@ -23,8 +23,5 @@
 package com.balch.android.app.framework.view;
 
 public interface BaseView {
-
-    void initializeLayout();
-    void destroy();
-
+   void initializeLayout();
 }

@@ -100,11 +100,6 @@ public class EditView extends ScrollView implements BaseView, ControlMapper {
         return this.controlMap;
     }
 
-    @Override
-    public void destroy() {
-
-    }
-
     public void bind(DomainObject domainObject, boolean isNew, ExternalController controller,
                      int okButtonResId, int cancelButtonResId) {
         this.item = domainObject;

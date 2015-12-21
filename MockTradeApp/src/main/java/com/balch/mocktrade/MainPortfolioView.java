@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.mocktrade.portfolio;
+package com.balch.mocktrade;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -30,11 +30,12 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.view.BaseView;
-import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountItemView;
+import com.balch.mocktrade.portfolio.PerformanceItem;
+import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
-public class PortfolioView extends LinearLayout implements BaseView {
+public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public interface PortfolioViewListener {
         void onCreateNewAccount();
@@ -46,21 +47,21 @@ public class PortfolioView extends LinearLayout implements BaseView {
     protected Button createAccountButton;
     protected AccountItemView totalsView;
 
-    public PortfolioView(Context context) {
+    public MainPortfolioView(Context context) {
         super(context);
     }
 
-    public PortfolioView(Context context, AttributeSet attrs) {
+    public MainPortfolioView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PortfolioView(Context context, AttributeSet attrs, int defStyle) {
+    public MainPortfolioView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @Override
     public void initializeLayout() {
-        inflate(getContext(), R.layout.portfolio_view, this);
+        inflate(getContext(), R.layout.main_portfolio_view, this);
         this.portfolioList = (ExpandableListView)findViewById(R.id.portfolio_list);
 
         View headerView = inflate(getContext(), R.layout.portfolio_view_header, null);
@@ -70,16 +71,11 @@ public class PortfolioView extends LinearLayout implements BaseView {
         this.createAccountButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PortfolioView.this.portfolioViewListener != null) {
-                    PortfolioView.this.portfolioViewListener.onCreateNewAccount();
+                if (MainPortfolioView.this.portfolioViewListener != null) {
+                    MainPortfolioView.this.portfolioViewListener.onCreateNewAccount();
                 }
             }
         });
-    }
-
-    @Override
-    public void destroy() {
-
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -87,7 +83,7 @@ public class PortfolioView extends LinearLayout implements BaseView {
         this.portfolioList.setAdapter(portfolioAdapter);
     }
 
-    public void explandList() {
+    public void expandList() {
         for (int i = 0; i < this.portfolioAdapter.getGroupCount(); i++) {
             this.portfolioList.expandGroup(i);
         }
@@ -119,5 +115,7 @@ public class PortfolioView extends LinearLayout implements BaseView {
     public void setPortfolioViewListener(PortfolioViewListener portfolioViewListener) {
         this.portfolioViewListener = portfolioViewListener;
     }
+
+
 
 }

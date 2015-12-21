@@ -32,15 +32,28 @@ import android.widget.Toast;
 
 import com.balch.android.app.framework.view.BaseView;
 
+/**
+ * This class enhances the AppCompatActivity functionality by providing View creation abstraction
+ * and error handling.
+ *
+ * @param <V> Type of BaseView to create
+ */
 public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
     private static final String TAG = BaseAppCompatActivity.class.getSimpleName();
 
     private String className;
-    protected BasePresenter presenter;
 
-    abstract protected void initialize(Bundle savedInstanceState);
-    abstract protected BasePresenter createPresenter(V view);
     abstract protected V createView();
+
+    // override-able activity functions
+    protected void onCreateBase(Bundle savedInstanceState) {}
+    protected void onResumeBase(){ }
+    protected void onPauseBase(){ }
+    protected void onStartBase(){ }
+    protected void onStopBase(){ }
+    protected void onDestroyBase(){ }
+    protected void onSaveInstanceStateBase(Bundle outState) { }
+    protected void onActivityResultBase(int requestCode, int resultCode, Intent data) {}
 
     public BaseAppCompatActivity() {
         this.className = this.getClass().getSimpleName();
@@ -56,7 +69,7 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    final protected void onCreate(Bundle savedInstanceState) {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" OnCreate - Begin");
         try {
@@ -64,15 +77,8 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             V view = this.createView();
             view.initializeLayout();
 
-            this.presenter = this.createPresenter(view);
-            if (this.presenter != null) {
-                this.presenter.setApplication(this.getApplication());
-                this.presenter.setLoaderManager(this.getSupportLoaderManager());
-                this.presenter.initialize(savedInstanceState);
-            }
-
             this.setContentView(view);
-            this.initialize(savedInstanceState);
+            this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {
             handleException("OnCreate ",ex.getLocalizedMessage(), ex);
@@ -81,14 +87,12 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onStart() {
+    final public void onStart() {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onStart - Begin");
         try {
             super.onStart();
-            if (this.presenter != null) {
-                presenter.onStart();
-            }
+            onStartBase();
         } catch (Exception ex) {
             handleException("onStart ",ex.getLocalizedMessage(), ex);
         }
@@ -96,14 +100,12 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onResume() {
+    final public void onResume() {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onResume - Begin");
         try {
             super.onResume();
-            if (this.presenter != null) {
-                presenter.onResume();
-            }
+            onResumeBase();
         } catch (Exception ex) {
             handleException("onResume ", ex.getLocalizedMessage(), ex);
         }
@@ -111,14 +113,12 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    final public void onSaveInstanceState(Bundle outState) {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className +" onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
-            if (this.presenter != null) {
-                presenter.onSaveInstanceState(outState);
-            }
+            onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
         }
@@ -126,13 +126,11 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onPause() {
+    final public void onPause() {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onPause - Begin");
         try {
-            if (this.presenter != null) {
-                presenter.onPause();
-            }
+            onPauseBase();
             super.onPause();
         } catch (Exception ex) {
             handleException("onPause ", ex.getLocalizedMessage(), ex);
@@ -141,14 +139,12 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onStop() {
+    final public void onStop() {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onStop - Begin");
 
         try {
-            if (this.presenter != null) {
-                presenter.onStop();
-            }
+            onStopBase();
             super.onStop();
         } catch (Exception ex) {
             handleException("onStop", ex.getLocalizedMessage(), ex);
@@ -157,13 +153,11 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onDestroy() {
+    final public void onDestroy() {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onDestroy - Begin");
         try {
-            if (this.presenter != null) {
-                presenter.onDestroy();
-            }
+            onDestroyBase();
         } catch (Exception ex) {
             handleException("onDestroy",ex.getLocalizedMessage(), ex);
         }
@@ -172,16 +166,12 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    final public void onActivityResult(int requestCode, int resultCode, Intent data) {
         StopWatch sw = StopWatch.newInstance();
         Log.d(TAG, this.className + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            if (this.presenter != null) {
-                // could have result code collisions
-                // make sure to also check for existence of result
-                presenter.onActivityResult(requestCode, resultCode, data);
-            }
+                onActivityResultBase(requestCode, resultCode, data);
         } catch (Exception ex) {
             handleException("onActivityResult",ex.getLocalizedMessage(), ex);
         }

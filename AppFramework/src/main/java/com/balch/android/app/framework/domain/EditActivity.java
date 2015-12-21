@@ -25,8 +25,10 @@ package com.balch.android.app.framework.domain;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
+import com.balch.android.app.framework.R;
 
 public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
@@ -51,6 +53,9 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
         if (titleResId != 0) {
             this.setTitle(titleResId);
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.edit_view_toolbar);
+        setSupportActionBar(toolbar);
 
         this.validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
         this.item = (DomainObject) intent.getSerializableExtra(EXTRA_ITEM);

@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.MetadataUtils;
@@ -42,7 +41,7 @@ import com.balch.android.app.framework.view.BaseView;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class EditView extends ScrollView implements BaseView, ControlMapper {
+public class EditView extends LinearLayout implements BaseView, ControlMapper {
     private static final String TAG = EditView.class.getSimpleName();
 
     public interface EditViewListener {

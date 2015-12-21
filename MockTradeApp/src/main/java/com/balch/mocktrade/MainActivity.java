@@ -36,6 +36,7 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.services.QuoteService;
+import com.balch.mocktrade.settings.SettingsActivity;
 
 import java.util.List;
 
@@ -64,6 +65,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         setSupportActionBar(toolbar);
+
+        findViewById(R.id.portfolio_view_settings_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(SettingsActivity.newIntent(MainActivity.this));
+            }
+        });
 
         progressBar = (ProgressBar)findViewById(R.id.portfolio_view_progress_bar);
 

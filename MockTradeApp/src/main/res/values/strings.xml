@@ -126,5 +126,6 @@
     <string name="notification_order_sell_success_format">Sell order for %1$s executed %2$d shares at %3$s for a total value of %4$s. (Profit: %5$s)</string>
     <string name="notification_order_error_format">Order %1$d for %2$s failed to executed. Error: %3$s</string>
     <string name="order_list_activity_label">Open Orders</string>
+    <string name="setting_activity_label">Settings</string>
 
 </resources>

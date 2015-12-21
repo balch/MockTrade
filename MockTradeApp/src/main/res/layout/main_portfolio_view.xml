@@ -22,8 +22,8 @@
             android:layout_height="?attr/actionBarSize"
             android:titleTextColor="?attr/colorAccent"
             app:titleTextColor="?attr/colorAccent"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
             app:popupTheme="@style/PopupOverlay" >
 
             <ImageView
@@ -37,10 +37,24 @@
 
             <ProgressBar
                 android:id="@+id/portfolio_view_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/portfolio_view_settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:tint="?attr/colorAccent"
+                android:tintMode="multiply"
+                android:src="@drawable/ic_settings"/>
+
+
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

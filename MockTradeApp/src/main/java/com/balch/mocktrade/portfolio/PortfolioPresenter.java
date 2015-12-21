@@ -23,8 +23,8 @@
 package com.balch.mocktrade.portfolio;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,11 +34,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
-import com.balch.android.app.framework.NavBarActivity;
 import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
@@ -57,45 +57,31 @@ import java.util.List;
 public class PortfolioPresenter extends BasePresenter<TradeApplication> implements LoaderManager.LoaderCallbacks<PortfolioData> {
     private static final String TAG = PortfolioPresenter.class.getSimpleName();
 
+    public interface PortfolioPresenterListener {
+        void onStartActivityForResult(Intent intent, int resultCode);
+        void showView(Fragment fragment);
+        void showProgress();
+        void hideProgress();
+        ComponentName onStartService(Intent intent);
+        Context getContext();
+    }
+
     protected static final int ACCOUNT_LOADER_ID = 0;
 
     protected static final int NEW_ACCOUNT_RESULT = 0;
     protected static final int NEW_ORDER_RESULT = 1;
 
-    protected PortfolioModel model;
-    protected PortfolioView view;
-    protected Activity parentActivity;
-    protected Fragment parentFragment;
+    final protected PortfolioModel model;
+    final protected PortfolioView view;
+    final protected PortfolioPresenterListener portfolioPresenterListener;
 
     protected PortfolioAdapter portfolioAdapter;
     protected QuoteUpdateReceiver quoteUpdateReceiver;
 
-    public PortfolioPresenter(Activity activity, PortfolioModel model, PortfolioView view) {
-        this(model, view);
-        this.parentActivity = activity;
-    }
-
-    public PortfolioPresenter(Fragment fragment, PortfolioModel model, PortfolioView view) {
-        this(model, view);
-        this.parentFragment = fragment;
-    }
-
-    public PortfolioPresenter(PortfolioModel model, PortfolioView view) {
+    public PortfolioPresenter(PortfolioModel model, PortfolioView view, PortfolioPresenterListener portfolioPresenterListener) {
         this.model = model;
         this.view = view;
-    }
-
-
-    public void setParent(Activity activity) {
-        this.parentActivity = activity;
-    }
-
-    public void setParent(Fragment fragment) {
-        this.parentFragment = fragment;
-    }
-
-    private NavBarActivity getNavBarActivity() {
-        return (this.parentActivity != null) ? (NavBarActivity)this.parentActivity : (NavBarActivity)this.parentFragment.getActivity();
+        this.portfolioPresenterListener = portfolioPresenterListener;
     }
 
     @Override
@@ -127,7 +113,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         this.portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
-                new AlertDialog.Builder(PortfolioPresenter.this.getNavBarActivity())
+                new AlertDialog.Builder(portfolioPresenterListener.getContext())
                         .setTitle(R.string.account_delete_dlg_title)
                         .setMessage(String.format(getString(R.string.account_delete_dlg_message_format), account.getName()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -160,9 +146,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
 
             @Override
             public void onShowOpenOrdersClicked(Account account) {
-                if (getNavBarActivity() != null) {
-                    getNavBarActivity().showView(new OrderListFragment().setCustomArguments(account.getId()));
-                }
+                portfolioPresenterListener.showView(new OrderListFragment().setCustomArguments(account.getId()));
             }
         });
         this.view.setPortfolioAdapter(this.portfolioAdapter);
@@ -173,9 +157,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      */
     private void reload(boolean showProgress) {
         if (showProgress) {
-            if (getNavBarActivity() != null) {
-                getNavBarActivity().showProgress();
-            }
+            portfolioPresenterListener.showProgress();
         }
         this.loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
     }
@@ -185,11 +167,8 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
      * to update the UI once the quotes are fetched
      */
     public void refresh() {
-        NavBarActivity navBarActivity = getNavBarActivity();
-        if (navBarActivity != null) {
-            navBarActivity.showProgress();
-            navBarActivity.startService(QuoteService.getIntent(this.application));
-        }
+        portfolioPresenterListener.showProgress();
+        portfolioPresenterListener.onStartService(QuoteService.getIntent(this.application));
     }
 
     static public void updateView(Context context) {
@@ -226,10 +205,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
             @Override
             public void run() {
                 view.explandList();
-                NavBarActivity navBarActivity = getNavBarActivity();
-                if (navBarActivity != null) {
-                    navBarActivity.hideProgress();
-                }
+                portfolioPresenterListener.hideProgress();
             }
         });
 
@@ -281,11 +257,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                 new Account("", "", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
-        if (this.parentActivity != null) {
-            this.parentActivity.startActivityForResult(intent, NEW_ACCOUNT_RESULT);
-        } else if (this.parentFragment != null) {
-            this.parentFragment.startActivityForResult(intent, NEW_ACCOUNT_RESULT);
-        }
+        this.portfolioPresenterListener.onStartActivityForResult(intent, NEW_ACCOUNT_RESULT);
     }
 
     protected void showNewBuyOrderActivity(Account account) {
@@ -296,11 +268,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
         Intent intent = EditActivity.getIntent(this.view.getContext(), R.string.order_create_buy_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
-        if (this.parentActivity != null) {
-            this.parentActivity.startActivityForResult(intent, NEW_ORDER_RESULT);
-        } else if (this.parentFragment != null) {
-            this.parentFragment.startActivityForResult(intent, NEW_ORDER_RESULT);
-        }
+        this.portfolioPresenterListener.onStartActivityForResult(intent, NEW_ORDER_RESULT);
     }
 
     protected void showNewSellOrderActivity(Investment investment) {
@@ -315,11 +283,7 @@ public class PortfolioPresenter extends BasePresenter<TradeApplication> implemen
                 R.string.order_create_sell_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
-        if (this.parentActivity != null) {
-            this.parentActivity.startActivityForResult(intent, NEW_ORDER_RESULT);
-        } else if (this.parentFragment != null) {
-            this.parentFragment.startActivityForResult(intent, NEW_ORDER_RESULT);
-        }
+        this.portfolioPresenterListener.onStartActivityForResult(intent, NEW_ORDER_RESULT);
     }
 
     @Override

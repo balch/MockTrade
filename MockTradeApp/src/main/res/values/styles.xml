@@ -1,9 +1,14 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="AppTheme.Base" />
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">#ff333333</item>
+        <item name="colorPrimaryDark">#FF000000</item>
+        <item name="colorAccent">#ff27db4e</item>
     </style>
+
 
     <style name="OrderItemValue">
         <item name="android:layout_width">wrap_content</item>
@@ -25,6 +30,5 @@
         <item name="android:paddingTop">5dp</item>
         <item name="android:paddingBottom">5dp</item>
     </style>
-
 
 </resources>

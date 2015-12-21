@@ -245,7 +245,7 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
 
         try {
             final String request = this.getYQLQueryUrl(sql.toString());
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, request, null,
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, request,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {

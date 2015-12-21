@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">AppFramework</string>
-
     <string name="picker_preference_positive">Set</string>
     <string name="picker_preference_negative">Cancel</string>
 

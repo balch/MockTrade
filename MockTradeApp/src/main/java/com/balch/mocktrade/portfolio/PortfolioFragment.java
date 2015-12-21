@@ -22,17 +22,24 @@
 
 package com.balch.mocktrade.portfolio;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
+
 import com.balch.android.app.framework.BaseFragment;
 import com.balch.android.app.framework.model.ModelFactory;
+import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.model.ModelProvider;
 
-public class PortfolioFragment extends BaseFragment<PortfolioPresenter, PortfolioView> {
+public class PortfolioFragment extends BaseFragment<PortfolioPresenter, PortfolioView>
+        implements PortfolioPresenter.PortfolioPresenterListener{
 
     @Override
     protected PortfolioPresenter createPresenter(PortfolioView view) {
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
         PortfolioModel model = modelFactory.getModel(PortfolioModel.class);
-        return new PortfolioPresenter(this, model, view);
+        return new PortfolioPresenter(model, view, this);
     }
 
     @Override
@@ -48,5 +55,35 @@ public class PortfolioFragment extends BaseFragment<PortfolioPresenter, Portfoli
     @Override
     public void refresh() {
         this.presenter.refresh();
+    }
+
+    @Override
+    public void onStartActivityForResult(Intent intent, int resultCode) {
+        startActivityForResult(intent, resultCode);
+    }
+
+    @Override
+    public void showView(Fragment fragment) {
+        ((MainActivity)getActivity()).showView(fragment);
+    }
+
+    @Override
+    public void showProgress() {
+        ((MainActivity)getActivity()).showProgress();
+    }
+
+    @Override
+    public void hideProgress() {
+        ((MainActivity)getActivity()).hideProgress();
+    }
+
+    @Override
+    public ComponentName onStartService(Intent intent) {
+        return getActivity().startService(intent);
+    }
+
+    @Override
+    public Context getContext() {
+        return getActivity();
     }
 }

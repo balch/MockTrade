@@ -26,21 +26,23 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.balch.android.app.framework.nav.NavBar;
 
 public abstract class NavBarActivity extends AppCompatActivity implements ActivityProvider {
+
+    private ProgressBar progressBar;
+    private ImageView refreshImageButton;
     protected NavBar navBar;
     protected LinearLayout rootLayout;
     protected FrameLayout frameLayout;
-    protected Menu optionsMenu;
 
     abstract protected void configureNavBar(NavBar navBar, Bundle savedInstanceState);
 
@@ -48,11 +50,24 @@ public abstract class NavBarActivity extends AppCompatActivity implements Activi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-
         setContentView(R.layout.template_view);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.template_toolbar);
+        setSupportActionBar(toolbar);
+
+        progressBar = (ProgressBar)findViewById(R.id.template_progress_bar);
+
+        refreshImageButton = (ImageView) findViewById(R.id.template_refresh_button);
+        refreshImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.template_place_holder);
+                if (fragment instanceof Refreshable) {
+                    ((Refreshable) fragment).refresh();
+                }
+            }
+        });
+
         this.navBar = (NavBar)findViewById(R.id.nav_bar_main);
         this.rootLayout = (LinearLayout)findViewById(R.id.template_layout);
         this.frameLayout = (FrameLayout)findViewById(R.id.template_place_holder);
@@ -82,48 +97,22 @@ public abstract class NavBarActivity extends AppCompatActivity implements Activi
         this.navBar.completeConfiguration();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        this.optionsMenu = menu;
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_bar_menu_refresh) {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.template_place_holder);
-
-            if (fragment instanceof Refreshable) {
-                ((Refreshable) fragment).refresh();
-            }
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     protected void showRefreshMenuOption(boolean show) {
-        if (this.optionsMenu != null) {
-            this.optionsMenu.findItem(R.id.action_bar_menu_refresh).setVisible(show);
-        }
+        refreshImageButton.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void showProgress() {
-        if (this.optionsMenu != null) {
-            MenuItem menuItem = this.optionsMenu.findItem(R.id.action_bar_menu_refresh);
-            menuItem.setActionView(R.layout.action_bar_progress);
-            menuItem.expandActionView();
-        }
+        this.progressBar.setVisibility(View.VISIBLE);
+        this.refreshImageButton.setVisibility(View.GONE);
     }
 
     @Override
     public void hideProgress() {
-        if (this.optionsMenu != null) {
-            MenuItem menuItem = this.optionsMenu.findItem(R.id.action_bar_menu_refresh);
-            menuItem.collapseActionView();
-            menuItem.setActionView(null);        }
+        this.progressBar.setVisibility(View.GONE);
+        this.refreshImageButton.setVisibility(View.VISIBLE);
     }
 
     @Override

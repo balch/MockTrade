@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
-import com.balch.android.app.framework.BasePresenter;
 
 public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
@@ -38,49 +37,53 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_CANCEL_BUTTON_RESID = "cancelButtonResId";
     protected static final String EXTRA_RESULT = "EditActivityResult";
 
+    protected EditView view;
+    protected ExternalController validator;
+    protected DomainObject item;
+    protected boolean isNew;
+    protected int okButtonResId;
+    protected int cancelButtonResId;
 
     @Override
-    protected void initialize(Bundle savedInstanceState) {
-    }
-
-    @Override
-    protected BasePresenter createPresenter(EditView view) {
-
+    protected void onCreateBase(Bundle savedInstanceState) {
         Intent intent = this.getIntent();
         int titleResId = intent.getIntExtra(EXTRA_TITLE_RESID, 0);
         if (titleResId != 0) {
             this.setTitle(titleResId);
         }
 
-        ExternalController validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
-        DomainObject domainObject = (DomainObject) intent.getSerializableExtra(EXTRA_ITEM);
-        boolean  isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
-        int okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
-        int cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
+        this.validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
+        this.item = (DomainObject) intent.getSerializableExtra(EXTRA_ITEM);
+        this.isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
+        this.okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
+        this.cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
 
-        return new EditPresenter(view, isNew, domainObject, validator,
-                okButtonResId, cancelButtonResId,
-                new EditView.EditViewListener() {
-                    @Override
-                    public void onSave(DomainObject item) {
-                        Intent intent = getIntent();
-                        intent.putExtra(EXTRA_RESULT, item);
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
+        this.view.setEditViewListener(new EditView.EditViewListener() {
+            @Override
+            public void onSave(DomainObject item) {
+                Intent intent = getIntent();
+                intent.putExtra(EXTRA_RESULT, item);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
 
-                    @Override
-                    public void onCancel() {
-                        Intent intent = getIntent();
-                        setResult(RESULT_CANCELED, intent);
-                        finish();
-                    }
-                });
+            @Override
+            public void onCancel() {
+                Intent intent = getIntent();
+                setResult(RESULT_CANCELED, intent);
+                finish();
+            }
+        });
+
+        this.view.bind(this.item, this.isNew, this.validator,
+                this.okButtonResId, this.cancelButtonResId);
+
     }
 
     @Override
     protected EditView createView() {
-        return new EditView(this);
+        this.view = new EditView(this);
+        return this.view;
     }
 
     public static Intent getIntent(Context context, int titleResId, DomainObject domainObject, ExternalController externalController,

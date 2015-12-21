@@ -41,7 +41,6 @@ import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
-import com.balch.mocktrade.portfolio.PortfolioPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +108,7 @@ public class OrderService extends IntentService {
                             }
 
                             if (updateView) {
-                                PortfolioPresenter.updateView(OrderService.this);
+                                MainActivity.updateView(OrderService.this);
                             }
 
                             if (reschedule) {

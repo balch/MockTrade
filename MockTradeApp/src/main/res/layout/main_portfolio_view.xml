@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<LinearLayout
+    android:id="@+id/portfolio_view_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/template_layout"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="RtlHardcoded"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -12,7 +16,7 @@
         android:theme="@style/AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/template_toolbar"
+            android:id="@+id/portfolio_view_toolbar"
             style="@style/Widget.AppCompat.Toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -23,7 +27,7 @@
             app:popupTheme="@style/PopupOverlay" >
 
             <ImageView
-                android:id="@+id/template_refresh_button"
+                android:id="@+id/portfolio_view_refresh_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -32,7 +36,7 @@
                 android:src="@drawable/ic_refresh"/>
 
             <ProgressBar
-                android:id="@+id/template_progress_bar"
+                android:id="@+id/portfolio_view_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -41,17 +45,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/template_place_holder"
-        android:layout_weight="1.0"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:measureAllChildren="true"/>
 
-    <com.balch.android.app.framework.nav.NavBar
-        android:id="@+id/nav_bar_main"
+    <ExpandableListView
+        android:id="@+id/portfolio_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="match_parent"
+        android:groupIndicator="@null"/>
 
 </LinearLayout>
+
+
+

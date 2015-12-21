@@ -59,11 +59,6 @@ public class OrderListView extends LinearLayout implements BaseView {
         this.list = (ListView)findViewById(R.id.order_list);
     }
 
-    @Override
-    public void destroy() {
-
-    }
-
     public void setOrderItemViewListener(OrderItemView.OrderItemViewListener listener) {
         this.listener = listener;
     }

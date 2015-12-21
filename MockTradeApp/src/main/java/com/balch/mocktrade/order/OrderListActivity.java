@@ -25,47 +25,62 @@ package com.balch.mocktrade.order;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.balch.android.app.framework.ActivityProvider;
-import com.balch.android.app.framework.BasePresenter;
+import com.balch.android.app.framework.BaseAppCompatActivity;
+import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.TradeApplication;
+import com.balch.mocktrade.model.ModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderListPresenter extends BasePresenter<TradeApplication> implements LoaderManager.LoaderCallbacks<List<Order>> {
-    private static final String TAG = OrderListPresenter.class.getSimpleName();
+public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
+        implements LoaderManager.LoaderCallbacks<List<Order>>{
+    private static final String TAG = OrderListActivity.class.getSimpleName();
 
     protected static final int ORDER_LOADER_ID = 0;
+    private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
 
     protected OrderModel model;
     protected OrderListView view;
     protected Long accountId;
-    protected ActivityProvider activity;
 
-    final Handler handler = new Handler();
+    public static Intent newIntent(Context context, long accountId) {
+        Intent intent = new Intent(context, OrderListActivity.class);
+        intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
 
-    public OrderListPresenter(ActivityProvider activity, Long accountId, OrderModel model, OrderListView view) {
-        this.accountId = accountId;
-        this.model = model;
-        this.view = view;
-        this.activity = activity;
+        intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
+        return intent;
     }
 
     @Override
-    public void initialize(Bundle savedInstanceState) {
+    protected void onCreateBase(Bundle bundle) {
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.order_list_view_toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
+        model = modelFactory.getModel(OrderModel.class);
+
         this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
             public boolean onCancelOrder(final Order order) {
-                new AlertDialog.Builder( OrderListPresenter.this.view.getContext())
+                new AlertDialog.Builder(OrderListActivity.this)
                         .setTitle(R.string.order_cancel_dlg_title)
                         .setMessage(getString(R.string.order_cancel_dlg_message_format, order.getId(), order.getSymbol()))
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -76,47 +91,51 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
                                     reload(true);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Canceling Order", ex);
-                                    Toast.makeText(application, "Error Canceling Order", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(OrderListActivity.this, "Error Canceling Order", Toast.LENGTH_LONG).show();
                                 }
-                            }})
+                            }
+                        })
                         .setNegativeButton(android.R.string.no, null).show();
                 return true;
             }
         });
         reload(true);
+
+    }
+
+
+    @Override
+    protected OrderListView createView() {
+        this.view = new OrderListView(this);
+        return this.view;
     }
 
     public void reload(boolean showProgress) {
         if (showProgress) {
-            this.activity.showProgress();
+            showProgress();
         }
-        this.loaderManager.initLoader(ORDER_LOADER_ID, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(ORDER_LOADER_ID, null, this).forceLoad();
     }
 
     @Override
     public Loader<List<Order>> onCreateLoader(int id, Bundle args) {
-        return new OrderLoader(this.application, this.accountId, this.model);
+        return new OrderLoader(this, this.accountId, this.model);
     }
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<List<Order>> loader, List<Order> data) {
 
         if (data.size() == 0) {
-            this.handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    OrderListPresenter.this.activity.getFragManager().popBackStack();
-                }
-            });
+            finish();
             return;
         }
 
         this.view.bind(data);
-        this.activity.hideProgress();
+        hideProgress();
 
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
-        this.loaderManager.destroyLoader(ORDER_LOADER_ID);
+        getSupportLoaderManager().destroyLoader(ORDER_LOADER_ID);
 
     }
 
@@ -140,6 +159,17 @@ public class OrderListPresenter extends BasePresenter<TradeApplication> implemen
         public List<Order> loadInBackground() {
             return model.getOpenOrders(this.accountId);
         }
+    }
+
+
+    public void showProgress() {
+//        this.progressBar.setVisibility(View.VISIBLE);
+//        this.refreshImageButton.setVisibility(View.GONE);
+    }
+
+    public void hideProgress() {
+//        this.progressBar.setVisibility(View.GONE);
+//        this.refreshImageButton.setVisibility(View.VISIBLE);
     }
 
 }

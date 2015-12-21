@@ -83,12 +83,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         });
 
-        this.view.setPortfolioViewListener(new MainPortfolioView.PortfolioViewListener() {
+        findViewById(R.id.portfolio_view_new_portfolio_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCreateNewAccount() {
+            public void onClick(View v) {
                 showNewAccountActivity();
             }
         });
+
         this.quoteUpdateReceiver = new QuoteUpdateReceiver();
 
         setupAdapter();
@@ -103,13 +104,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     @Override
-    protected void onResumeBase() {
+    protected void onStartBase() {
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(quoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.class.getName()));
     }
 
     @Override
-    protected void onPauseBase() {
+    protected void onStopBase() {
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(quoteUpdateReceiver);
     }

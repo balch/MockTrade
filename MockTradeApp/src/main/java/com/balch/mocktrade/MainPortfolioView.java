@@ -25,7 +25,6 @@ package com.balch.mocktrade;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 
@@ -37,14 +36,8 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
-    public interface PortfolioViewListener {
-        void onCreateNewAccount();
-    }
-
-    protected PortfolioViewListener portfolioViewListener;
     protected PortfolioAdapter portfolioAdapter;
     protected ExpandableListView portfolioList;
-    protected Button createAccountButton;
     protected AccountItemView totalsView;
 
     public MainPortfolioView(Context context) {
@@ -63,19 +56,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     public void initializeLayout() {
         inflate(getContext(), R.layout.main_portfolio_view, this);
         this.portfolioList = (ExpandableListView)findViewById(R.id.portfolio_list);
-
-        View headerView = inflate(getContext(), R.layout.portfolio_view_header, null);
-        this.portfolioList.addHeaderView(headerView);
-        this.portfolioList.setHeaderDividersEnabled(false);
-        this.createAccountButton = (Button)headerView.findViewById(R.id.account_add_button);
-        this.createAccountButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MainPortfolioView.this.portfolioViewListener != null) {
-                    MainPortfolioView.this.portfolioViewListener.onCreateNewAccount();
-                }
-            }
-        });
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -111,11 +91,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             }
         }
     }
-
-    public void setPortfolioViewListener(PortfolioViewListener portfolioViewListener) {
-        this.portfolioViewListener = portfolioViewListener;
-    }
-
 
 
 }

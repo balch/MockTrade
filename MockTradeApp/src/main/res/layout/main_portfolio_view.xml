@@ -56,6 +56,17 @@
                 android:tintMode="src_in"
                 android:src="@drawable/ic_settings"/>
 
+            <ImageView
+                android:id="@+id/portfolio_view_new_portfolio_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:tint="?attr/colorAccent"
+                android:tintMode="src_in"
+                android:src="@drawable/ic_new_portfolio"/>
+
 
         </android.support.v7.widget.Toolbar>
 

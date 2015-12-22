@@ -23,9 +23,9 @@
 package com.balch.mocktrade;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.view.BaseView;
@@ -37,7 +37,7 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
     protected PortfolioAdapter mPortfolioAdapter;
-    protected ExpandableListView mPortfolioList;
+    protected RecyclerView mPortfolioList;
     protected AccountItemView mTotalsView;
 
     public MainPortfolioView(Context context) {
@@ -55,39 +55,28 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     @Override
     public void initializeLayout() {
         inflate(getContext(), R.layout.main_portfolio_view, this);
-        this.mPortfolioList = (ExpandableListView)findViewById(R.id.portfolio_list);
+        mPortfolioList = (RecyclerView)findViewById(R.id.portfolio_list);
+        mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
-        this.mPortfolioAdapter = portfolioAdapter;
-        this.mPortfolioList.setAdapter(portfolioAdapter);
+        mPortfolioAdapter = portfolioAdapter;
+        mPortfolioList.setAdapter(portfolioAdapter);
     }
 
-    public void expandList() {
-        for (int i = 0; i < this.mPortfolioAdapter.getGroupCount(); i++) {
-            this.mPortfolioList.expandGroup(i);
-        }
-
-        this.mPortfolioList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                return true;
-            }
-        });
-    }
 
     public void setTotals(boolean showTotals, Account totals, PerformanceItem performanceItem) {
         if (showTotals) {
-            if (this.mTotalsView == null) {
-                this.mTotalsView = new AccountItemView(this.getContext());
-                this.mPortfolioList.addFooterView(this.mTotalsView);
+            if (mTotalsView == null) {
+                mTotalsView = new AccountItemView(mPortfolioList, null);
+                mPortfolioAdapter.addFooterView(mTotalsView);
             }
             mTotalsView.bind(totals, performanceItem, 0);
 
         } else {
-            if (this.mTotalsView != null) {
-                this.mPortfolioList.removeFooterView(this.mTotalsView);
-                this.mTotalsView = null;
+            if (mTotalsView != null) {
+                mPortfolioAdapter.removeFooterView(mTotalsView);
+                mTotalsView = null;
             }
         }
     }

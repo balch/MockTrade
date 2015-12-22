@@ -79,8 +79,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         mQuoteUpdateReceiver = new QuoteUpdateReceiver();
 
         setupAdapter();
-        reload(true);
-
     }
 
     @Override
@@ -142,9 +140,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 .unregisterReceiver(mQuoteUpdateReceiver);
     }
 
+    @Override
+    protected void onResumeBase() {
+        reload(true);
+    }
+
     protected void setupAdapter() {
-        this.mPortfolioAdapter = new PortfolioAdapter(this);
-        this.mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
+        mPortfolioAdapter = new PortfolioAdapter(this);
+        mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -173,7 +176,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         });
 
-        this.mPortfolioAdapter.setAccountItemViewListener(new AccountItemView.AccountItemViewListener() {
+        mPortfolioAdapter.setAccountItemViewListener(new AccountItemView.AccountItemViewListener() {
             @Override
             public void onTradeButtonClicked(Account account) {
                 showNewBuyOrderActivity(account);
@@ -184,7 +187,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 startActivity(OrderListActivity.newIntent(MainActivity.this, account.getId()));
             }
         });
-        this.mMainPortfolioView.setPortfolioAdapter(this.mPortfolioAdapter);
+        this.mMainPortfolioView.setPortfolioAdapter(mPortfolioAdapter);
     }
 
     /**
@@ -232,43 +235,36 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         }
 
-        this.mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
-        this.mPortfolioAdapter.bind(data);
-        mPortfolioAdapter.notifyDataSetChanged();
+        mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
+        mPortfolioAdapter.bind(data);
 
-        this.mMainPortfolioView.post(new Runnable() {
-            @Override
-            public void run() {
-                mMainPortfolioView.expandList();
-                hideProgress();
-            }
-        });
+        hideProgress();
 
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
-        getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
+//        getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
     }
 
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<PortfolioData> loader) {
-        this.mPortfolioAdapter.clear();
+        mPortfolioAdapter.clear(true);
     }
 
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
-        protected PortfolioModel model;
+        protected PortfolioModel mPortfolioModel;
 
         public PortfolioLoader(Context context, PortfolioModel model) {
             super(context);
-            this.model = model;
+            mPortfolioModel = model;
         }
 
         @Override
         public PortfolioData loadInBackground() {
             PortfolioData portfolioData = new PortfolioData();
-            portfolioData.addAccounts(model.getAllAccounts());
-            portfolioData.addInvestments(model.getAllInvestments());
+            portfolioData.addAccounts(mPortfolioModel.getAllAccounts());
+            portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
 
-            List<Order> openOrders = model.getOpenOrders();
+            List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {
                 portfolioData.addToOpenOrderCount(o.getAccount().getId());
             }
@@ -288,7 +284,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     protected void showNewAccountActivity() {
-        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(), R.string.account_create_title,
+        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(), R.string.account_create_title,
                 new Account("", "", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
@@ -300,7 +296,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         order.setAccount(account);
         order.setAction(Order.OrderAction.BUY);
         order.setStrategy(Order.OrderStrategy.MARKET);
-        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(), R.string.order_create_buy_title,
+        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(), R.string.order_create_buy_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
         startActivityForResult(intent, NEW_ORDER_RESULT);
@@ -314,7 +310,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         order.setAction(Order.OrderAction.SELL);
         order.setStrategy(Order.OrderStrategy.MARKET);
 
-        Intent intent = EditActivity.getIntent(this.mMainPortfolioView.getContext(),
+        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(),
                 R.string.order_create_sell_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 

@@ -22,10 +22,11 @@
 
 package com.balch.mocktrade.account;
 
-import android.content.Context;
 import android.graphics.Typeface;
-import android.util.AttributeSet;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.utils.TextFormatUtils;
 
 
-public class AccountItemView extends LinearLayout {
+public class AccountItemView extends RecyclerView.ViewHolder {
 
     public interface AccountItemViewListener {
         void onTradeButtonClicked(Account account);
@@ -52,32 +53,42 @@ public class AccountItemView extends LinearLayout {
     protected Button mTradeButton;
     protected Account mAccount;
 
-    public AccountItemView(Context context) {
-        super(context);
-        initialize();
+    public AccountItemView(ViewGroup parent, AccountItemViewListener listener) {
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.account_item_view, parent, false));
+        mAccountItemViewListener = listener;
+
+        mName = (TextView) itemView.findViewById(R.id.account_item_name);
+        mCurrentBalance = (TextView) itemView.findViewById(R.id.account_item_current_balance);
+        mDayPerformance = (TextView) itemView.findViewById(R.id.account_item_day_performance);
+        mTotalPerformance = (TextView) itemView.findViewById(R.id.account_item_total_performance);
+        mTradeButton = (Button) itemView.findViewById(R.id.account_item_trade_button);
+        mOpenOrders = (Button) itemView.findViewById(R.id.account_item_open_order_button);
+        mValueLayout = (LinearLayout) itemView.findViewById(R.id.account_item_value_layout);
+
     }
 
-    public AccountItemView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initialize();
-    }
+    public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
+        mAccount = account;
+        mName.setText(account.getName());
+        mCurrentBalance.setText(performanceItem.getValue().getFormatted());
 
-    public AccountItemView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        initialize();
-    }
+        mName.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+        mCurrentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
 
-    protected void initialize() {
-        inflate(getContext(), R.layout.account_item_view, this);
-        this.mName = (TextView)findViewById(R.id.account_item_name);
-        this.mCurrentBalance = (TextView)findViewById(R.id.account_item_current_balance);
-        this.mDayPerformance = (TextView)findViewById(R.id.account_item_day_performance);
-        this.mTotalPerformance = (TextView)findViewById(R.id.account_item_total_performance);
-        this.mTradeButton = (Button)findViewById(R.id.account_item_trade_button);
-        this.mOpenOrders = (Button)findViewById(R.id.account_item_open_order_button);
-        this.mValueLayout = (LinearLayout)findViewById(R.id.account_item_value_layout);
+        mTotalPerformance.setText(TextFormatUtils.getLongChangePercentText(itemView.getContext(),
+                performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
+        mDayPerformance.setText(TextFormatUtils.getShortChangeText(itemView.getContext(),
+                performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
 
-        this.mTradeButton.setOnClickListener(new OnClickListener() {
+        boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));
+        mTradeButton.setVisibility(allowTrade ? View.VISIBLE : View.GONE);
+
+        mOpenOrders.setVisibility((openOrderCount > 0) ? View.VISIBLE : View.GONE);
+        if (openOrderCount > 0) {
+            mOpenOrders.setText(String.format(itemView.getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
+        }
+
+        this.mTradeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mAccountItemViewListener != null) {
@@ -86,7 +97,7 @@ public class AccountItemView extends LinearLayout {
             }
         });
 
-        this.mOpenOrders.setOnClickListener(new OnClickListener() {
+        this.mOpenOrders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mAccountItemViewListener != null) {
@@ -95,43 +106,17 @@ public class AccountItemView extends LinearLayout {
             }
         });
 
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+        boolean isTablet = itemView.getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {
-            LayoutParams layoutParams = (LayoutParams) this.mValueLayout.getLayoutParams();
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mValueLayout.getLayoutParams();
             layoutParams.weight = 2;
-            this.mValueLayout.setLayoutParams(layoutParams);
+            mValueLayout.setLayoutParams(layoutParams);
         }
     }
-
-    public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
-        this.mAccount = account;
-        this.mName.setText(account.getName());
-        this.mCurrentBalance.setText(performanceItem.getValue().getFormatted());
-
-        this.mName.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
-        this.mCurrentBalance.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);
-
-        this.mTotalPerformance.setText(TextFormatUtils.getLongChangePercentText(this.getContext(),
-                performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
-        this.mDayPerformance.setText(TextFormatUtils.getShortChangeText(this.getContext(),
-                performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
-
-        boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));
-        this.mTradeButton.setVisibility(allowTrade ? VISIBLE : GONE);
-
-        this.mOpenOrders.setVisibility((openOrderCount > 0) ? VISIBLE : GONE);
-        if (openOrderCount > 0) {
-            this.mOpenOrders.setText(String.format(getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
-        }
-    }
-
 
     public Account getAccount() {
-        return this.mAccount;
+        return mAccount;
     }
 
-    public void setAccountItemViewListener(AccountItemViewListener accountItemViewListener) {
-        this.mAccountItemViewListener = accountItemViewListener;
-    }
 }
 

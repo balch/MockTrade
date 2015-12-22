@@ -33,11 +33,11 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <ExpandableListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/portfolio_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:groupIndicator="@null"/>
+        android:layout_height="match_parent"/>
+
 
 </LinearLayout>
 

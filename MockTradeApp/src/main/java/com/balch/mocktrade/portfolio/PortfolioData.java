@@ -43,17 +43,21 @@ public class PortfolioData {
 
     public PortfolioData(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap,
                          Map<Long, Integer> accountToOpenOrderCountMap) {
-        this.mAccounts = accounts;
-        this.mAccountToInvestmentMap = accountToInvestmentMap;
-        this.mAccountToOpenOrderCountMap = accountToOpenOrderCountMap;
+        mAccounts = accounts;
+        mAccountToInvestmentMap = accountToInvestmentMap;
+        mAccountToOpenOrderCountMap = accountToOpenOrderCountMap;
     }
 
     public List<Account> getAccounts() {
-        return this.mAccounts;
+        return mAccounts;
     }
 
     public List<Investment> getInvestments(Long accountId) {
-        return this.mAccountToInvestmentMap.get(accountId);
+        List<Investment> investments = mAccountToInvestmentMap.get(accountId);
+        if (investments == null) {
+            investments = new ArrayList<>();
+        }
+        return investments;
     }
 
     public void addAccount(Account account) {

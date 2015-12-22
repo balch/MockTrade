@@ -14,9 +14,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.view.Menu;
+import android.view.MenuItem;
+
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
@@ -52,43 +52,19 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected PortfolioModel mPortfolioModel;
     protected MainPortfolioView mMainPortfolioView;
 
-    private ProgressBar mProgressBar;
-    private ImageView mRefreshImageButton;
-
     protected PortfolioAdapter mPortfolioAdapter;
     protected QuoteUpdateReceiver mQuoteUpdateReceiver;
 
+    private MenuItem mMenuProgressBar;
+    
     @Override
     protected void onCreateBase(Bundle bundle) {
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
         mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
+      
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         setSupportActionBar(toolbar);
-
-        findViewById(R.id.portfolio_view_settings_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(SettingsActivity.newIntent(MainActivity.this));
-            }
-        });
-
-        mProgressBar = (ProgressBar)findViewById(R.id.portfolio_view_progress_bar);
-
-        mRefreshImageButton = (ImageView) findViewById(R.id.portfolio_view_refresh_button);
-        mRefreshImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refresh();
-            }
-        });
-
-        findViewById(R.id.portfolio_view_new_portfolio_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNewAccountActivity();
-            }
-        });
 
         this.mQuoteUpdateReceiver = new QuoteUpdateReceiver();
 
@@ -103,6 +79,34 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         return this.mMainPortfolioView;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        mMenuProgressBar = menu.findItem(R.id.menu_progress_bar);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        boolean handled = false;
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                startActivity(SettingsActivity.newIntent(this));
+                handled = true;
+                break;
+            case R.id.menu_refresh:
+                refresh();
+                handled = true;
+                break;
+            case R.id.menu_new_portfolio:
+                showNewAccountActivity();
+                handled = true;
+                break;
+        }
+
+        return handled;
+    }
     @Override
     protected void onStartBase() {
         LocalBroadcastManager.getInstance(this)
@@ -319,15 +323,16 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     public void showProgress() {
-        this.mProgressBar.setVisibility(View.VISIBLE);
-        this.mRefreshImageButton.setVisibility(View.GONE);
+        if (mMenuProgressBar != null) {
+            mMenuProgressBar.setVisible(true);
+        }
     }
 
     public void hideProgress() {
-        this.mProgressBar.setVisibility(View.GONE);
-        this.mRefreshImageButton.setVisibility(View.VISIBLE);
+        if (mMenuProgressBar != null) {
+            mMenuProgressBar.setVisible(false);
+        }
     }
-
 
     public class QuoteUpdateReceiver extends BroadcastReceiver {
         private QuoteUpdateReceiver() {

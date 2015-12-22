@@ -16,7 +16,9 @@
 
     <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" >
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
 
 
 </resources>

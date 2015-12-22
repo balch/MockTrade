@@ -24,7 +24,9 @@
             app:titleTextColor="?attr/colorAccent"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            app:popupTheme="@style/PopupOverlay" >
+            app:popupTheme="@style/PopupOverlay"
+            android:logo="@drawable/ic_launcher"
+            app:logo="@drawable/ic_launcher">
 
         </android.support.v7.widget.Toolbar>
 

@@ -6,17 +6,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
@@ -56,17 +58,25 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected QuoteUpdateReceiver mQuoteUpdateReceiver;
 
     private MenuItem mMenuProgressBar;
-    
+    private MenuItem mMenuRefreshButton;
+
     @Override
     protected void onCreateBase(Bundle bundle) {
         ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
         mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
-      
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         setSupportActionBar(toolbar);
 
-        this.mQuoteUpdateReceiver = new QuoteUpdateReceiver();
+        // tint the overflow icon
+        ColorStateList colorSelector = getResources().getColorStateList(R.color.nav_on_color);
+        Drawable icon = toolbar.getOverflowIcon();
+        if (icon != null) {
+            DrawableCompat.setTintList(icon, colorSelector);
+            toolbar.setOverflowIcon(icon);
+        }
+
+        mQuoteUpdateReceiver = new QuoteUpdateReceiver();
 
         setupAdapter();
         reload(true);
@@ -75,14 +85,27 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     protected MainPortfolioView createView() {
-        this.mMainPortfolioView = new MainPortfolioView(this);
-        return this.mMainPortfolioView;
+        mMainPortfolioView = new MainPortfolioView(this);
+        return mMainPortfolioView;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         mMenuProgressBar = menu.findItem(R.id.menu_progress_bar);
+        mMenuRefreshButton = menu.findItem(R.id.menu_refresh);
+
+        // tint all the menu item icons
+        ColorStateList colorSelector = getResources().getColorStateList(R.color.nav_on_color);
+        for (int x = 0; x < menu.size(); x++) {
+            MenuItem item = menu.getItem(x);
+            Drawable icon = item.getIcon();
+            if (icon != null) {
+                DrawableCompat.setTintList(icon, colorSelector);
+                item.setIcon(icon);
+            }
+        }
+
         return true;
     }
 
@@ -325,12 +348,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     public void showProgress() {
         if (mMenuProgressBar != null) {
             mMenuProgressBar.setVisible(true);
+            mMenuRefreshButton.setVisible(false);
         }
     }
 
     public void hideProgress() {
         if (mMenuProgressBar != null) {
             mMenuProgressBar.setVisible(false);
+            mMenuRefreshButton.setVisible(true);
         }
     }
 

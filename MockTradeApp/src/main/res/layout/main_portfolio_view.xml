@@ -95,9 +95,11 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <Space
+                <ImageView
                     android:layout_width="32dp"
-                    android:layout_height="32dp"/>
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_launcher"/>
 
                 <TextView
                     android:id="@+id/portfolio_view_toolbar_title"
@@ -113,13 +115,6 @@
             </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_launcher"
-            app:layout_behavior="com.balch.mocktrade.AvatarImageBehavior" />
 
     </android.support.design.widget.CoordinatorLayout>
 

@@ -24,10 +24,14 @@
 
 
     <item
+        android:id="@+id/menu_backup_db"
+        app:showAsAction="never"
+        android:title="@string/menu_backup_db" />
+
+    <item
         android:id="@+id/menu_settings"
         android:icon="@drawable/ic_settings"
         app:showAsAction="never"
         android:title="@string/menu_settings" />
-
 
 </menu>

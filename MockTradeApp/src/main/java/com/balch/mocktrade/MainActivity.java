@@ -9,9 +9,11 @@ import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -30,12 +32,12 @@ import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountEditController;
-import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
 import com.balch.mocktrade.order.OrderListActivity;
+import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
@@ -43,6 +45,11 @@ import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.SettingsActivity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
@@ -143,10 +150,21 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 showNewAccountActivity();
                 handled = true;
                 break;
+            case R.id.menu_backup_db:
+                boolean success = backupDatabaseToSDCard();
+                String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
+
+                Snackbar.make(mMainPortfolioView, msg, Snackbar.LENGTH_LONG)
+                        .setActionTextColor(getResources().getColor(success ? R.color.success : R.color.failure))
+                        .show();
+
+                handled = true;
+                break;
         }
 
         return handled;
     }
+
     @Override
     protected void onStartBase() {
         LocalBroadcastManager.getInstance(this)
@@ -164,6 +182,49 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         if (mPortfolioModel != null) {
             reload(true);
         }
+    }
+
+    private boolean backupDatabaseToSDCard() {
+
+        boolean success = false;
+        FileChannel src = null;
+        FileChannel dst = null;
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                String currentDBPath = "/data/data/" + getPackageName() + "/databases/"+TradeApplication.DATABASE_NAME;
+                String backupDBPath = "backup_"+TradeApplication.DATABASE_NAME;
+                File currentDB = new File(currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                if (currentDB.exists()) {
+                    src = new FileInputStream(currentDB).getChannel();
+                    dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+
+                    success = true;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error backing up to Database", e);
+        } finally {
+            if (src != null) {
+                try {
+                    src.close();
+                } catch (IOException e) {
+                }
+            }
+
+            if (dst != null)
+                try {
+                    dst.close();
+                } catch (IOException e) {
+                }
+        }
+
+        return success;
     }
 
     protected void setupAdapter() {

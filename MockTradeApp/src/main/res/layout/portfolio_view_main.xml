@@ -10,6 +10,7 @@
     tools:ignore="RtlHardcoded">
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/portfolio_view_coordinator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">

@@ -133,5 +133,9 @@
     <string name="menu_refresh">Refresh</string>
     <string name="portfolio_view_intro_header">Get Started</string>
     <string name="portfolio_view_create_portfolio">Create Portfolio</string>
+    <string name="menu_backup_db">Backup Database</string>
+
+    <string name="menu_backup_db_success">Backup Successful</string>
+    <string name="menu_backup_db_fail">Backup Failed</string>
 
 </resources>

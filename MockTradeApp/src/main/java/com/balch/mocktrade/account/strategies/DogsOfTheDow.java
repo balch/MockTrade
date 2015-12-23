@@ -52,7 +52,7 @@ public class DogsOfTheDow extends BaseStrategy {
         this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS), new RequestListener<Map<String, Quote>>() {
             @Override
             public void onResponse(Map<String, Quote> response) {
-                SortedMap<Money, Quote> sortedQuoteMap = new TreeMap<Money, Quote>();
+                SortedMap<Money, Quote> sortedQuoteMap = new TreeMap<>();
                 for (Quote quote : response.values()) {
                     sortedQuoteMap.put(quote.getDividendPerShare(), quote);
                 }

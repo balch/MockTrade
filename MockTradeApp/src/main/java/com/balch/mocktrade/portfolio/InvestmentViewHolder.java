@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.mocktrade.investment;
+package com.balch.mocktrade.portfolio;
 
 import android.content.res.Configuration;
 import android.support.v7.widget.RecyclerView;
@@ -33,10 +33,11 @@ import android.widget.TextView;
 
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.utils.TextFormatUtils;
 
 
-public class InvestmentItemView extends RecyclerView.ViewHolder {
+public class InvestmentViewHolder extends RecyclerView.ViewHolder {
 
     protected TextView mSymbol;
     protected TextView mDescription;
@@ -48,8 +49,8 @@ public class InvestmentItemView extends RecyclerView.ViewHolder {
     protected LinearLayout mPriceLayout;
     protected Investment mInvestment;
 
-    public InvestmentItemView(ViewGroup parent) {
-        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.investment_item_view, parent, false));
+    public InvestmentViewHolder(ViewGroup parent) {
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_investment, parent, false));
         mSymbol = (TextView) itemView.findViewById(R.id.investment_item_symbol);
         mDescription = (TextView) itemView.findViewById(R.id.investment_item_description);
         mPrice = (TextView) itemView.findViewById(R.id.investment_item_price);

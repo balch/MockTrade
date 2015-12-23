@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.mocktrade.account;
+package com.balch.mocktrade.portfolio;
 
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
@@ -32,11 +32,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.portfolio.PerformanceItem;
+import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.utils.TextFormatUtils;
 
 
-public class AccountItemView extends RecyclerView.ViewHolder {
+public class AccountViewHolder extends RecyclerView.ViewHolder {
 
     public interface AccountItemViewListener {
         void onTradeButtonClicked(Account account);
@@ -53,8 +53,8 @@ public class AccountItemView extends RecyclerView.ViewHolder {
     protected Button mTradeButton;
     protected Account mAccount;
 
-    public AccountItemView(ViewGroup parent, AccountItemViewListener listener) {
-        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.account_item_view, parent, false));
+    public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener) {
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_account, parent, false));
         mAccountItemViewListener = listener;
 
         mName = (TextView) itemView.findViewById(R.id.account_item_name);

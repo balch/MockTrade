@@ -30,7 +30,7 @@ import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountEditController;
-import com.balch.mocktrade.account.AccountItemView;
+import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
@@ -195,9 +195,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 showNewSellOrderActivity(investment);
                 return true;
             }
+
+            @Override
+            public void createNewAccount() {
+                showNewAccountActivity();
+            }
         });
 
-        mPortfolioAdapter.setAccountItemViewListener(new AccountItemView.AccountItemViewListener() {
+        mPortfolioAdapter.setAccountItemViewListener(new AccountViewHolder.AccountItemViewListener() {
             @Override
             public void onTradeButtonClicked(Account account) {
                 showNewBuyOrderActivity(account);

@@ -24,13 +24,13 @@ package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.account.AccountItemView;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.investment.InvestmentItemView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +39,15 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private static final int VIEW_TYPE_ACCOUNT_HEADER = 0;
     private static final int VIEW_TYPE_PORTFOLIO_ITEM = 1;
+    private static final int VIEW_TYPE_NEW_ACCOUNT_ITEM = 2;
 
     public interface PortfolioAdapterListener {
         boolean onLongClickAccount(Account account);
         boolean onLongClickInvestment(Investment investment);
+        void createNewAccount();
     }
-    protected AccountItemView.AccountItemViewListener mAccountItemViewListener;
+
+    protected AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
 
     protected Context mContext;
     protected PortfolioAdapterListener mPortfolioAdapterListener;
@@ -77,7 +80,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public void setAccountItemViewListener(AccountItemView.AccountItemViewListener accountItemViewListener) {
+    public void setAccountItemViewListener(AccountViewHolder.AccountItemViewListener accountItemViewListener) {
         mAccountItemViewListener = accountItemViewListener;
     }
 
@@ -87,13 +90,19 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        return (mDataList.get(position) instanceof  Investment) ?
-                VIEW_TYPE_PORTFOLIO_ITEM : VIEW_TYPE_ACCOUNT_HEADER;
+        return isEmpty() ? VIEW_TYPE_NEW_ACCOUNT_ITEM :
+                (mDataList.get(position) instanceof Investment) ?
+                        VIEW_TYPE_PORTFOLIO_ITEM : VIEW_TYPE_ACCOUNT_HEADER;
     }
 
     @Override
     public int getItemCount() {
-        return (mDataList != null) ? mDataList.size() : 0;
+        // ensure that we always have one so we can show the empty view
+        return (!isEmpty()) ? mDataList.size() : 1;
+    }
+
+    public boolean isEmpty() {
+        return ((mDataList == null) || (mDataList.size() == 0));
     }
 
     @Override
@@ -101,10 +110,13 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ACCOUNT_HEADER:
-                viewHolder = new AccountItemView(parent, mAccountItemViewListener);
+                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener);
                 break;
             case VIEW_TYPE_PORTFOLIO_ITEM:
-                viewHolder = new InvestmentItemView(parent);
+                viewHolder = new InvestmentViewHolder(parent);
+                break;
+            case VIEW_TYPE_NEW_ACCOUNT_ITEM:
+                viewHolder = new NewAccountViewHolder(parent, mPortfolioAdapterListener);
                 break;
         }
 
@@ -114,17 +126,18 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if (holder instanceof AccountItemView) {
-            AccountItemView accountItemView = (AccountItemView) holder;
+        if (holder instanceof NewAccountViewHolder) {
+        } else if (holder instanceof AccountViewHolder) {
+            AccountViewHolder accountViewHolder = (AccountViewHolder) holder;
 
             final Account account = (Account) mDataList.get(position);
 
             List<Investment> investments = mPortfolioData.getInvestments(account.getId());
             PerformanceItem performanceItem = account.getPerformanceItem(investments);
 
-            accountItemView.bind(account, performanceItem, mPortfolioData.getOpenOrderCount(account.getId()));
+            accountViewHolder.bind(account, performanceItem, mPortfolioData.getOpenOrderCount(account.getId()));
 
-            View view = accountItemView.itemView;
+            View view = accountViewHolder.itemView;
             view.setLongClickable(true);
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -139,7 +152,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         } else {
 
-            InvestmentItemView investmentItemView = (InvestmentItemView) holder;
+            InvestmentViewHolder investmentItemView = (InvestmentViewHolder) holder;
 
             final Investment investment = (Investment) mDataList.get(position);
             investmentItemView.bind(investment);
@@ -157,6 +170,24 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             });
 
+        }
+    }
+
+    public static class NewAccountViewHolder extends RecyclerView.ViewHolder {
+
+        public NewAccountViewHolder(ViewGroup parent, final PortfolioAdapterListener listener) {
+            super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_empty, parent, false));
+
+            itemView.findViewById(R.id.portfolio_view_holder_empty_create)
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (listener != null) {
+                                listener.createNewAccount();
+                            }
+
+                        }
+                    });
         }
     }
 }

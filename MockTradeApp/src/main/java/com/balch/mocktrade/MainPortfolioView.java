@@ -31,7 +31,7 @@ import android.widget.LinearLayout;
 
 import com.balch.android.app.framework.view.BaseView;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.account.AccountItemView;
+import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
@@ -57,7 +57,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     @Override
     public void initializeLayout() {
-        inflate(getContext(), R.layout.main_portfolio_view, this);
+        inflate(getContext(), R.layout.portfolio_view_main, this);
         mPortfolioList = (RecyclerView)findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -86,7 +86,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         }
     }
 
-    private static class SummaryAdapter extends RecyclerView.Adapter<AccountItemView> {
+    private static class SummaryAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
         private Account mTotals;
         private PerformanceItem mPerformanceItem;
@@ -106,12 +106,12 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         }
 
         @Override
-        public AccountItemView onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new AccountItemView(parent, null);
+        public AccountViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new AccountViewHolder(parent, null);
         }
 
         @Override
-        public void onBindViewHolder(AccountItemView holder, int position) {
+        public void onBindViewHolder(AccountViewHolder holder, int position) {
             if (mTotals != null) {
                 holder.bind(mTotals, mPerformanceItem, 0);
             }

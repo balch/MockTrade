@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
@@ -80,6 +82,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
 
+    private Handler mUIHandler = new Handler(Looper.getMainLooper());
+
     @Override
     protected void onCreateBase(Bundle bundle) {
         ModelFactory modelFactory = ((ModelProvider) this.getApplication()).getModelFactory();
@@ -90,11 +94,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         mTitle = (TextView) findViewById(R.id.portfolio_view_toolbar_title);
         mTitleContainer = (LinearLayout) findViewById(R.id.portfolio_view_toolbar_title_container);
 
-      
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         toolbar.setTitle("");
 
-        ((AppBarLayout) findViewById(R.id.portfolio_view_app_bar)).addOnOffsetChangedListener(this);
+        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.portfolio_view_app_bar);
+        appBarLayout.addOnOffsetChangedListener(this);
 
         setSupportActionBar(toolbar);
 
@@ -112,6 +116,18 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         initParallaxValues();
 
         setupAdapter();
+
+        if (bundle == null) {
+            mUIHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    appBarLayout.setExpanded(false);
+                }
+            }, 500);
+        } else {
+            appBarLayout.setExpanded(false, false);
+        }
+
     }
 
     @Override

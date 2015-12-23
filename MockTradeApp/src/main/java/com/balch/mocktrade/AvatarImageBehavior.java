@@ -10,7 +10,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Thank you https://github.com/saulmm/CoordinatorBehaviorExample !!!!
+ *
+ *  TODO: investigate buggy behavior when AppBarLayout is not initially expanded
+ *
  */
+
+
 
 @SuppressWarnings("unused")
 public class AvatarImageBehavior extends CoordinatorLayout.Behavior<CircleImageView> {

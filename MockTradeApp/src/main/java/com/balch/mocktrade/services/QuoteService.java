@@ -66,6 +66,7 @@ public class QuoteService extends IntentService {
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
+            // get the investment list from the db
             ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
@@ -73,16 +74,13 @@ public class QuoteService extends IntentService {
 
             if (investments.size() > 0) {
                 final List<Account> accounts = portfolioModel.getAllAccounts();
-                Map<Long, Account> accountMap = new HashMap<>(accounts.size());
-                for (Account a : accounts ) {
-                    accountMap.put(a.getId(), a);
-                }
 
                 final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<>(accounts.size());
                 List<String> symbols = new ArrayList<>(investments.size());
                 for (Investment i : investments) {
                     symbols.add(i.getSymbol());
 
+                    // aggregate investments by account
                     List<Investment> list = accountIdToInvestmentMap.get(i.getAccount().getId());
                     if (list == null) {
                         list = new ArrayList<>();
@@ -91,6 +89,7 @@ public class QuoteService extends IntentService {
                     list.add(i);
                 }
 
+                // get quotes over the wire
                 financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
                     @Override
                     public void onResponse(Map<String, Quote> quoteMap) {
@@ -107,6 +106,9 @@ public class QuoteService extends IntentService {
                                     Log.e(TAG, "updateInvestment exception", ex);
                                 }
                             }
+
+                            //TODO: need to add summary purge mechanism
+                            portfolioModel.createSummaryItem(investments);
 
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
                         } finally {
@@ -140,7 +142,6 @@ public class QuoteService extends IntentService {
             if (completeWakefulIntentOnExit) {
                 releaseWakeLock();
             }
-
         }
     }
 
@@ -182,7 +183,5 @@ public class QuoteService extends IntentService {
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
-
     }
-
 }

@@ -151,22 +151,22 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
 
     @Override
     public boolean isMarketOpen() {
-        return this.mFinanceManager.isMarketOpen();
+        return mFinanceManager.isMarketOpen();
     }
 
     @Override
     public Date nextMarketOpen() {
-        return this.mFinanceManager.nextMarketOpen();
+        return mFinanceManager.nextMarketOpen();
     }
 
     @Override
     public boolean isInPollTime() {
-        return this.mFinanceManager.isInPollTime();
+        return mFinanceManager.isInPollTime();
     }
 
     @Override
     public void setQuoteServiceAlarm() {
-        this.mFinanceManager.setQuoteServiceAlarm();
+        mFinanceManager.setQuoteServiceAlarm();
     }
 
     protected String getDelimitedSymbols(List<String> symbols) {
@@ -294,6 +294,4 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
             throw new RuntimeException(e);
         }
     }
-
-
 }

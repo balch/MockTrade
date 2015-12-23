@@ -45,7 +45,7 @@ public class TradeApplication extends Application implements ModelProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
     private static final String DATABASE_NAME = "mocktrade.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
@@ -74,17 +74,16 @@ public class TradeApplication extends Application implements ModelProvider {
                     .penaltyLog()
                     .penaltyDeath()
                     .build());
-
         }
 
-        this.mSettings = new Settings(this);
+        mSettings = new Settings(this);
 
-        this.mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
+        mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                 DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
 
-        this.mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
+        mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
 
-        this.configureModelFactory();
+        configureModelFactory();
 
         FinanceModel financeModel = getModelFactory().getModel(FinanceModel.class);
         financeModel.setQuoteServiceAlarm();
@@ -110,14 +109,14 @@ public class TradeApplication extends Application implements ModelProvider {
     }
 
     private void configureModelFactory() {
-        this.mModelFactory = new ModelFactory();
+        mModelFactory = new ModelFactory();
 
-        this.mSqliteScheme = new SqliteSourceProvider(this);
-        this.mYqlScheme = new YQLSourceProvider(this);
+        mSqliteScheme = new SqliteSourceProvider(this);
+        mYqlScheme = new YQLSourceProvider(this);
 
-        this.mModelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, this.mSqliteScheme, true);
-        this.mModelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, this.mSqliteScheme, true);
-        this.mModelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, this.mYqlScheme, true);
+        mModelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, mSqliteScheme, true);
+        mModelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, mSqliteScheme, true);
+        mModelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, mYqlScheme, true);
     }
 
     @Override
@@ -130,9 +129,8 @@ public class TradeApplication extends Application implements ModelProvider {
         return mSettings;
     }
 
-
     @Override
     public RequestQueue getRequestQueue() {
-        return this.mRequestQueue;
+        return mRequestQueue;
     }
 }

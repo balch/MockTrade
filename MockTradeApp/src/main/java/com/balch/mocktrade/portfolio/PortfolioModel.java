@@ -60,5 +60,7 @@ public interface PortfolioModel extends BaseModel {
 
     void scheduleOrderServiceAlarmIfNeeded();
 
+    void createSummaryItem(List<Investment> investments);
+
 }
 

@@ -116,7 +116,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
                 holder.bind(mTotals, mPerformanceItem, 0);
             }
         }
-
     }
 
 }

@@ -23,13 +23,16 @@
 package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
+import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.investment.InvestmentSqliteModel;
+import com.balch.mocktrade.investment.SummaryItemMapper;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 import com.balch.mocktrade.order.Order;
@@ -38,9 +41,10 @@ import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
 
+import java.sql.SQLException;
 import java.util.List;
 
-public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel  {
+public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel {
 
     protected AccountSqliteModel accounteModel;
     protected InvestmentSqliteModel investmentModel;
@@ -117,6 +121,28 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         List<Order> openOrders = this.getOpenOrders();
         if (openOrders.size() > 0) {
             this.scheduleOrderServiceAlarm();
+        }
+    }
+
+    @Override
+    public void createSummaryItem(List<Investment> investments) {
+
+        SqlConnection sqlConnection = getSqlConnection();
+        SQLiteDatabase db = sqlConnection.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            SummaryItemMapper mapper = new SummaryItemMapper();
+            for (Investment investment : investments) {
+                mapper.deleteSummaryItemByTradeTime(investment, db);
+                sqlConnection.insert(mapper, investment, db);
+            }
+
+            db.setTransactionSuccessful();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            db.endTransaction();
         }
     }
 

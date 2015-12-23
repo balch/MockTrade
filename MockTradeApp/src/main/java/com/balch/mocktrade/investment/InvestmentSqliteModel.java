@@ -54,7 +54,6 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
     public static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
     public static final String COLUMN_QUANTITY = "quantity";
 
-
     public InvestmentSqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
     }
@@ -141,9 +140,4 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         investment.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
         investment.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
     }
-
-
-
-
-
 }

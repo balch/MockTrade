@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class Transaction extends DomainObject implements SqlMapper<Transaction>,  Serializable {
-    static public final String TABLE_NAME = "[transaction]";
+    public static final String TABLE_NAME = "[transaction]";
 
     public static final String COLUMN_ACCOUNT_ID = "account_id";
     public static final String COLUMN_AMOUNT = "amount";

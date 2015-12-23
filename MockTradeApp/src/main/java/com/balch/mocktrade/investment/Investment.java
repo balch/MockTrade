@@ -170,7 +170,4 @@ public class Investment extends DomainObject {
             return R.array.order_strategy_display_values;
         }
     }
-
-
-
 }

@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -327,11 +328,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         PerformanceItem performanceItem = new PerformanceItem(new Money(), new Money(), new Money());
 
         int accountsWithTotals = 0;
-        Account totals = new Account(this.getString(R.string.account_totals_label), "", new Money(0), Account.Strategy.NONE, false);
 
         for (Account account : data.getAccounts()) {
             if (!account.getExcludeFromTotals()) {
-                totals.aggregate(account);
                 List<Investment> investments = data.getInvestments(account.getId());
                 performanceItem.aggregate(account.getPerformanceItem(investments));
 
@@ -340,7 +339,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
         mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
-        mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
+
+        boolean showTotals = (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) &&
+                (accountsWithTotals > 1);
+        mMainPortfolioView.setTotals(showTotals, performanceItem);
+
         mPortfolioAdapter.bind(data);
 
         hideProgress();

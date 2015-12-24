@@ -11,6 +11,7 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/portfolio_view_coordinator"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -19,11 +20,11 @@
             android:id="@+id/portfolio_view_app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
             app:expanded="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <android.support.v7.widget.CardView
+                android:fitsSystemWindows="true"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
@@ -36,6 +37,7 @@
                 app:cardElevation="8dp"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
+<!--
                 <com.balch.mocktrade.portfolio.DailyGraphView
                     android:id="@+id/portfolio_view_daily_graph"
                     android:layout_width="match_parent"
@@ -49,15 +51,13 @@
                     android:background="@android:color/transparent"
                     app:labelColor="@android:color/white"/>
 
+-->
             </android.support.v7.widget.CardView>
-
             <android.support.v7.widget.Toolbar
                 android:id="@+id/portfolio_view_toolbar"
-                style="@style/Widget.AppCompat.Toolbar"
+                android:fitsSystemWindows="true"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:titleTextColor="?attr/colorAccent"
-                app:popupTheme="@style/PopupOverlay"
                 app:titleTextColor="?attr/colorAccent"
                 android:background="?attr/colorPrimary">
 
@@ -90,13 +90,14 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/portfolio_list"
+            android:fitsSystemWindows="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <com.balch.mocktrade.portfolio.SummaryTotalsView
         android:id="@+id/portfolio_view_summary_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

@@ -1,3 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="DailyGraphView">
+        <attr name="labelColor" format="color"/>
+        <attr name="labelPosition" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+        </attr>
+        <attr name="labelWidth" format="dimension"/>
+        <attr name="labelY" format="dimension"/>
+        <attr name="labelHeight" format="dimension"/>
+    </declare-styleable>
 </resources>

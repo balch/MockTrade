@@ -139,5 +139,6 @@
     <string name="menu_backup_db_fail">Backup Failed</string>
     <string name="portfolio_view_last_sync">Last Sync: %1$s</string>
     <string name="portfolio_view_last_quote">Last Quote: %1$s</string>
+    <string name="menu_hide_exclude_accounts">Hide Exclude Accounts</string>
 
 </resources>

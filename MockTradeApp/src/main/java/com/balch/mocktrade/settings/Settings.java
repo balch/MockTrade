@@ -32,6 +32,8 @@ import java.util.TimeZone;
 
 public class Settings {
 
+    private static final String PREF_HIDE_EXCLUDE_ACCOUNTS = "pref_hide_exclude_accounts";
+
     protected Application mContext;
 
     public Settings(Application context) {
@@ -69,6 +71,17 @@ public class Settings {
 
     public TimeZone getSavedSettingsTimeZone() {
         return TimeZone.getTimeZone("America/Los_Angeles");
+    }
+
+    public boolean getHideExcludeAccounts() {
+        return getSharedPrefs().getBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, false);
+    }
+
+    public void setHideExcludeAccounts(boolean hideExcludeAccounts) {
+        getSharedPrefs()
+                .edit()
+                .putBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts)
+                .apply();
     }
 
 

@@ -66,8 +66,8 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
-    public List<Account> getAllAccounts() {
-        return accounteModel.getAllAccounts();
+    public List<Account> getAccounts(boolean allAccounts) {
+        return accounteModel.getAccounts(allAccounts);
     }
 
     @Override

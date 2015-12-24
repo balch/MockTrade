@@ -35,6 +35,19 @@
                 app:cardElevation="8dp"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
+                <com.balch.mocktrade.portfolio.DailyGraphView
+                    android:id="@+id/portfolio_view_daily_graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_weight="100"
+                    app:labelHeight="20dp"
+                    app:labelWidth="110dp"
+                    app:labelY="85dp"
+                    app:labelPosition="left"
+                    android:background="@android:color/transparent"
+                    app:labelColor="@android:color/white"/>
+
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.Toolbar

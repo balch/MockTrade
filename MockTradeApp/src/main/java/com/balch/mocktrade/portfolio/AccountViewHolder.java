@@ -22,6 +22,7 @@
 
 package com.balch.mocktrade.portfolio;
 
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -70,6 +71,12 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
     public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
         mAccount = account;
         mName.setText(account.getName());
+
+        int flags = (account.getExcludeFromTotals()) ?
+                mName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG :
+                mName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG;
+        mName.setPaintFlags(flags);
+
         mCurrentBalance.setText(performanceItem.getValue().getFormatted());
 
         mName.setTypeface(null, account.getExcludeFromTotals() ? Typeface.BOLD_ITALIC : Typeface.BOLD);

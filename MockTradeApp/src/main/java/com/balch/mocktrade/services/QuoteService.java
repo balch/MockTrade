@@ -73,7 +73,7 @@ public class QuoteService extends IntentService {
             final List<Investment> investments = portfolioModel.getAllInvestments();
 
             if (investments.size() > 0) {
-                final List<Account> accounts = portfolioModel.getAllAccounts();
+                final List<Account> accounts = portfolioModel.getAccounts(true);
 
                 final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<>(accounts.size());
                 List<String> symbols = new ArrayList<>(investments.size());

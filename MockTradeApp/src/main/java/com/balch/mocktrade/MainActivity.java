@@ -43,6 +43,7 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.services.QuoteService;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
 
 import java.io.File;
@@ -69,12 +70,18 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
+    private MenuItem mMenuHideExcludeAccounts;
 
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
+    private Settings mSettings;
 
     @Override
     protected void onCreateBase(Bundle bundle) {
-        ModelFactory modelFactory = ((ModelProvider) this.getApplication()).getModelFactory();
+
+        ModelProvider modelProvider = ((ModelProvider) this.getApplication());
+
+        mSettings = modelProvider.getSettings();
+        ModelFactory modelFactory = modelProvider.getModelFactory();
         mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
@@ -118,6 +125,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         getMenuInflater().inflate(R.menu.main_menu, menu);
         mMenuProgressBar = menu.findItem(R.id.menu_progress_bar);
         mMenuRefreshButton = menu.findItem(R.id.menu_refresh);
+        mMenuHideExcludeAccounts = menu.findItem(R.id.menu_hide_exclude_accounts);
+        mMenuHideExcludeAccounts.setChecked(mSettings.getHideExcludeAccounts());
 
         // tint all the menu item icons
         ColorStateList colorSelector = getResources().getColorStateList(R.color.nav_on_color);
@@ -160,6 +169,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
                 handled = true;
                 break;
+            case R.id.menu_hide_exclude_accounts:
+                boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
+                mSettings.setHideExcludeAccounts(hideExcludeAccounts);
+                mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
+                reload(false);
+                handled = true;
+                break;
+
         }
 
         return handled;
@@ -191,7 +208,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         FileChannel dst = null;
         try {
             File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
 
             if (sd.canWrite()) {
                 String currentDBPath = "/data/data/" + getPackageName() + "/databases/"+TradeApplication.DATABASE_NAME;
@@ -284,7 +300,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         if (showProgress) {
             showProgress();
         }
-        getSupportLoaderManager().initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
+        LoaderManager loaderManager = getSupportLoaderManager();
+        loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
     }
 
     /**
@@ -302,7 +319,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-        return new PortfolioLoader(this, mPortfolioModel);
+        return new PortfolioLoader(this, mPortfolioModel, mSettings);
     }
 
     @Override
@@ -330,7 +347,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
-//        getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
+        getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
     }
 
     @Override
@@ -339,17 +356,19 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
-        protected PortfolioModel mPortfolioModel;
+        protected final PortfolioModel mPortfolioModel;
+        protected final Settings mSettings;
 
-        public PortfolioLoader(Context context, PortfolioModel model) {
+        public PortfolioLoader(Context context, PortfolioModel model, Settings settings) {
             super(context);
             mPortfolioModel = model;
+            mSettings = settings;
         }
 
         @Override
         public PortfolioData loadInBackground() {
             PortfolioData portfolioData = new PortfolioData();
-            portfolioData.addAccounts(mPortfolioModel.getAllAccounts());
+            portfolioData.addAccounts(mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts()));
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
             portfolioData.setLastSyncTime(mPortfolioModel.getLastSyncTime());
             portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());

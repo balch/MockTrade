@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.balch.android.app.framework.view.BaseView;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.portfolio.AccountViewHolder;
+import com.balch.mocktrade.portfolio.DailyGraphView;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
@@ -41,7 +42,6 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
-
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
@@ -52,6 +52,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected TextView mLastQuoteTime;
     protected TextView mLastSyncTime;
 
+    protected DailyGraphView mDailyGraphView;
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -81,6 +82,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         mLastQuoteTime = (TextView) findViewById(R.id.portfolio_view_last_quote);
         mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
+
+        mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
+
 
     }
 

@@ -37,7 +37,7 @@ import java.util.List;
 
 public interface PortfolioModel extends BaseModel {
 
-    List<Account> getAllAccounts();
+    List<Account> getAccounts(boolean allAccounts);
 
     Account getAccount(long accountID);
 

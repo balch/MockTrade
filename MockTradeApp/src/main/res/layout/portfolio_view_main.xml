@@ -56,6 +56,8 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/portfolio_view_toolbar"
                 android:fitsSystemWindows="true"
+                style="@style/Widget.AppCompat.Toolbar"
+                app:popupTheme="@style/PopupOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:titleTextColor="?attr/colorAccent"

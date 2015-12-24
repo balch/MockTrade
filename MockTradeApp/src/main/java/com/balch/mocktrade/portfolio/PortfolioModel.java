@@ -32,6 +32,7 @@ import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 
+import java.util.Date;
 import java.util.List;
 
 public interface PortfolioModel extends BaseModel {
@@ -62,5 +63,8 @@ public interface PortfolioModel extends BaseModel {
 
     void createSummaryItem(List<Investment> investments);
 
+    Date getLastSyncTime();
+
+    Date getLastTradeTime();
 }
 

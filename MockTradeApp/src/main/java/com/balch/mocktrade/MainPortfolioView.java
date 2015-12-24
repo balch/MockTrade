@@ -23,11 +23,13 @@
 package com.balch.mocktrade;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.balch.android.app.framework.view.BaseView;
 import com.balch.mocktrade.account.Account;
@@ -35,13 +37,21 @@ import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class MainPortfolioView extends LinearLayout implements BaseView {
+
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
 
     protected SummaryAdapter mSummaryAdapter;
     protected RecyclerView mPortfolioSummary;
+
+    protected TextView mLastTradeTime;
+    protected TextView mLastSyncTime;
+
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -69,6 +79,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mPortfolioSummary.setHasFixedSize(true);
         mPortfolioSummary.setAdapter(mSummaryAdapter);
 
+        mLastTradeTime = (TextView) findViewById(R.id.portfolio_view_last_trade);
+        mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
+
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -78,12 +91,29 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
 
     public void setTotals(boolean showTotals, Account totals, PerformanceItem performanceItem) {
-
         mPortfolioSummary.setVisibility(showTotals ? VISIBLE : GONE);
 
         if (showTotals) {
             mSummaryAdapter.bind(totals, performanceItem);
         }
+    }
+
+    public void setSyncTimes(Date lastSync, Date lastTrade) {
+        Resources resources = getResources();
+        mLastSyncTime.setText(resources.getString(R.string.portfolio_view_last_sync, getDateTimeString(lastSync)));
+        mLastTradeTime.setText(resources.getString(R.string.portfolio_view_last_trade, getDateTimeString(lastTrade)));
+    }
+
+    private String getDateTimeString(Date date) {
+        String result = "";
+        if (date != null) {
+            result = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
+            String today = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date());
+            if (today.equals(result)) {
+                result = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+            }
+        }
+        return result;
     }
 
     private static class SummaryAdapter extends RecyclerView.Adapter<AccountViewHolder> {

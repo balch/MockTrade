@@ -76,7 +76,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
 
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
         try {
-            String where = String.format("%s = ? AND %s = ?", COLUMN_SYMBOL, COLUMN_ACCOUNT_ID);
+            String where = COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
             String [] whereArgs = new String[]{symbol, accountId.toString()};
             List<Investment> investments = this.getSqlConnection().query(this, Investment.class, where, whereArgs, null);
 

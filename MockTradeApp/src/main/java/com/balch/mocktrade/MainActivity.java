@@ -306,7 +306,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<PortfolioData> loader, PortfolioData data) {
+    public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
         PerformanceItem performanceItem = new PerformanceItem(new Money(), new Money(), new Money());
 
         int accountsWithTotals = 0;
@@ -322,6 +322,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         }
 
+        mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastTradeTime());
         mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
         mPortfolioAdapter.bind(data);
 
@@ -333,7 +334,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     @Override
-    public void onLoaderReset(android.support.v4.content.Loader<PortfolioData> loader) {
+    public void onLoaderReset(Loader<PortfolioData> loader) {
         mPortfolioAdapter.clear(true);
     }
 
@@ -350,6 +351,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             PortfolioData portfolioData = new PortfolioData();
             portfolioData.addAccounts(mPortfolioModel.getAllAccounts());
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
+            portfolioData.setLastSyncTime(mPortfolioModel.getLastSyncTime());
+            portfolioData.setLastTradeTime(mPortfolioModel.getLastTradeTime());
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {
@@ -452,7 +455,5 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
     }
-
-
 }
 

@@ -26,6 +26,7 @@ import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +35,13 @@ public class PortfolioData {
     protected List<Account> mAccounts;
     protected Map<Long, List<Investment>> mAccountToInvestmentMap;
     protected Map<Long, Integer> mAccountToOpenOrderCountMap;
+    protected Date mLastSyncTime;
+    protected Date mLastTradeTime;
 
     public PortfolioData() {
         mAccounts = new ArrayList<>();
         mAccountToInvestmentMap = new HashMap<>();
         mAccountToOpenOrderCountMap = new HashMap<>();
-    }
-
-    public PortfolioData(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap,
-                         Map<Long, Integer> accountToOpenOrderCountMap) {
-        mAccounts = accounts;
-        mAccountToInvestmentMap = accountToInvestmentMap;
-        mAccountToOpenOrderCountMap = accountToOpenOrderCountMap;
     }
 
     public List<Account> getAccounts() {
@@ -93,5 +89,20 @@ public class PortfolioData {
                 this.mAccountToOpenOrderCountMap.get(accountId) : 0;
     }
 
+    public Date getLastSyncTime() {
+        return mLastSyncTime;
+    }
+
+    public void setLastSyncTime(Date lastSyncTime) {
+        mLastSyncTime = lastSyncTime;
+    }
+
+    public Date getLastTradeTime() {
+        return mLastTradeTime;
+    }
+
+    public void setLastTradeTime(Date lastTradeTime) {
+        mLastTradeTime = lastTradeTime;
+    }
 
 }

@@ -137,5 +137,7 @@
 
     <string name="menu_backup_db_success">Backup Successful</string>
     <string name="menu_backup_db_fail">Backup Failed</string>
+    <string name="portfolio_view_last_sync">Last Sync: %1$s</string>
+    <string name="portfolio_view_last_trade">Last Trade: %1$s</string>
 
 </resources>

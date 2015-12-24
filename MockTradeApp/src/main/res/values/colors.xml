@@ -6,4 +6,6 @@
     <color name="success">#FF00BB00</color>
     <color name="failure">#FFBB0000</color>
 
+    <color name="snackbar_background">#EE003300</color>
+
 </resources>

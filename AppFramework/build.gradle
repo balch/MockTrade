@@ -24,7 +24,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
 
-
     testCompile 'com.android.support.test:runner:0.2'
     testCompile 'com.android.support.test:rules:0.2'
 
@@ -49,3 +48,6 @@ uploadArchives {
 
 
 
+dependencies {
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+}

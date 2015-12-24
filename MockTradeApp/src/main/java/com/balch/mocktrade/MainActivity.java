@@ -17,11 +17,13 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -90,7 +92,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         setSupportActionBar(toolbar);
 
         // tint the overflow icon
-        ColorStateList colorSelector = getResources().getColorStateList(R.color.nav_on_color);
+        ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
         Drawable icon = toolbar.getOverflowIcon();
         if (icon != null) {
             DrawableCompat.setTintList(icon, colorSelector);
@@ -130,7 +132,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         mMenuHideExcludeAccounts.setChecked(mSettings.getHideExcludeAccounts());
 
         // tint all the menu item icons
-        ColorStateList colorSelector = getResources().getColorStateList(R.color.nav_on_color);
+        ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
         for (int x = 0; x < menu.size(); x++) {
             MenuItem item = menu.getItem(x);
             Drawable icon = item.getIcon();
@@ -164,9 +166,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 boolean success = backupDatabaseToSDCard();
                 String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
 
-                Snackbar.make(mMainPortfolioView, msg, Snackbar.LENGTH_LONG)
-                        .setActionTextColor(getResources().getColor(success ? R.color.success : R.color.failure))
-                        .show();
+                getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
+                        R.color.snackbar_background,
+                        success ? R.color.success : R.color.failure,
+                        android.support.design.R.id.snackbar_text)
+                    .show();
 
                 handled = true;
                 break;
@@ -202,6 +206,20 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
     }
 
+    @Override
+    protected void onHandleException(String logMsg, String displayMsg, Exception ex) {
+        if (TextUtils.isEmpty(displayMsg)) {
+            displayMsg = ex.toString();
+        }
+
+        getSnackbar(mMainPortfolioView, displayMsg, Snackbar.LENGTH_LONG,
+                R.color.snackbar_background,
+                R.color.failure,
+                android.support.design.R.id.snackbar_text)
+            .show();
+
+    }
+
     private boolean backupDatabaseToSDCard() {
 
         boolean success = false;
@@ -211,14 +229,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             File sd = Environment.getExternalStorageDirectory();
 
             if (sd.canWrite()) {
-                String currentDBPath = "/data/data/" + getPackageName() + "/databases/"+TradeApplication.DATABASE_NAME;
-                String backupDBPath = "backup_"+TradeApplication.DATABASE_NAME;
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
+                File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
 
-                if (currentDB.exists()) {
-                    src = new FileInputStream(currentDB).getChannel();
-                    dst = new FileOutputStream(backupDB).getChannel();
+                String backupDBPath = System.currentTimeMillis()+"_"+TradeApplication.DATABASE_NAME;
+                File backupDBFile = new File(sd, backupDBPath);
+
+                if (dbFile.exists()) {
+                    src = new FileInputStream(dbFile).getChannel();
+                    dst = new FileOutputStream(backupDBFile).getChannel();
                     dst.transferFrom(src, 0, src.size());
 
                     success = true;
@@ -230,14 +248,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             if (src != null) {
                 try {
                     src.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
 
             if (dst != null)
                 try {
                     dst.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
         }
 

@@ -45,7 +45,7 @@ public class TradeApplication extends Application implements ModelProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
     public static final String DATABASE_NAME = "mocktrade.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 

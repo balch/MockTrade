@@ -24,16 +24,14 @@ package com.balch.mocktrade.investment;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlMapper;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
-import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -113,7 +111,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         values.put(COLUMN_EXCHANGE, investment.exchange);
         values.put(COLUMN_COST_BASIS, investment.costBasis.getMicroCents());
         values.put(COLUMN_PRICE, investment.price.getMicroCents());
-        values.put(COLUMN_LAST_TRADE_TIME, investment.lastTradeTime.toString());
+        values.put(COLUMN_LAST_TRADE_TIME, investment.lastTradeTime.getTime());
         values.put(COLUMN_PREV_DAY_CLOSE, investment.prevDayClose.getMicroCents());
         values.put(COLUMN_QUANTITY, investment.quantity);
 
@@ -131,12 +129,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         investment.exchange = cursor.getString(columnMap.get(COLUMN_EXCHANGE));
         investment.costBasis = new Money(cursor.getLong(columnMap.get(COLUMN_COST_BASIS)));
         investment.price = new Money(cursor.getLong(columnMap.get(COLUMN_PRICE)));
-
-        try {
-            investment.lastTradeTime = new ISO8601DateTime(cursor.getString(columnMap.get(COLUMN_LAST_TRADE_TIME)));
-        } catch (ParseException ex) {
-            Log.e(TAG, "Error reading LastTrade time", ex);
-        }
+        investment.lastTradeTime = new Date(cursor.getLong(columnMap.get(COLUMN_LAST_TRADE_TIME)));
         investment.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
         investment.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
     }

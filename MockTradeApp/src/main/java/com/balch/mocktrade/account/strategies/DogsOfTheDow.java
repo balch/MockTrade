@@ -96,7 +96,7 @@ public class DogsOfTheDow extends BaseStrategy {
                             Map<String, Quote> quoteMap) {
         if ((investments != null) && (investments.size() > 0)) {
             Calendar createDate = new GregorianCalendar();
-            createDate.setTime(investments.get(0).getCreateTime().getDate());
+            createDate.setTime(investments.get(0).getCreateTime());
 
             Calendar now = new GregorianCalendar();
             if (createDate.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {

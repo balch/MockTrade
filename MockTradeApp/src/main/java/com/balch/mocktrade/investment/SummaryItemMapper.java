@@ -57,7 +57,7 @@ public class SummaryItemMapper implements SqlMapper<Investment>,  Serializable {
         values.put(COLUMN_SYMBOL, investment.getSymbol());
         values.put(COLUMN_COST_BASIS, investment.getCostBasis().getMicroCents());
         values.put(COLUMN_PRICE, investment.getPrice().getMicroCents());
-        values.put(COLUMN_TRADE_TIME, investment.getLastTradeTime().toString());
+        values.put(COLUMN_TRADE_TIME, investment.getLastTradeTime().getTime());
         values.put(COLUMN_QUANTITY, investment.getQuantity());
 
         return values;
@@ -72,6 +72,7 @@ public class SummaryItemMapper implements SqlMapper<Investment>,  Serializable {
         db.delete(TABLE_NAME,
                 COLUMN_ACCOUNT_ID+"=? AND "+ COLUMN_SYMBOL+"=? AND "+COLUMN_TRADE_TIME+"=?",
                 new String[]{investment.getAccount().getId().toString(),
-                        investment.getSymbol(), investment.getLastTradeTime().toString()});
+                        investment.getSymbol(),
+                        String.valueOf(investment.getLastTradeTime().getTime())});
     }
 }

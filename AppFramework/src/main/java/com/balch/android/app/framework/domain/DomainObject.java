@@ -1,13 +1,12 @@
 package com.balch.android.app.framework.domain;
 
-import com.balch.android.app.framework.types.ISO8601DateTime;
-
 import java.io.Serializable;
+import java.util.Date;
 
 public abstract class DomainObject implements Serializable {
     protected Long id;
-    protected ISO8601DateTime createTime;
-    protected ISO8601DateTime updateTime;
+    protected Date createTime;
+    protected Date updateTime;
 
     public Long getId() {
         return id;
@@ -17,19 +16,19 @@ public abstract class DomainObject implements Serializable {
         this.id = id;
     }
 
-    public ISO8601DateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(ISO8601DateTime createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public ISO8601DateTime getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(ISO8601DateTime updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 

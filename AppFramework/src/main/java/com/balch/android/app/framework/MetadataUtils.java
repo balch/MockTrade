@@ -40,7 +40,6 @@ import com.balch.android.app.framework.domain.widgets.NumberEditLayout;
 import com.balch.android.app.framework.domain.widgets.StringEditLayout;
 import com.balch.android.app.framework.domain.widgets.UnsupportedEditLayout;
 import com.balch.android.app.framework.domain.DomainObject;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 
 import java.lang.reflect.Field;
@@ -60,7 +59,6 @@ public class MetadataUtils {
     public enum FrameworkType {
         MONEY(Money.class, MoneyEditLayout.class),
         ENUM(Enum.class, EnumEditLayout.class),
-        ISO8601DATETIME(ISO8601DateTime.class, null),
         DATE(Date.class, null),
         DOMAINOBJECT(DomainObject.class, null),
         STRING(String.class, StringEditLayout.class),
@@ -85,8 +83,6 @@ public class MetadataUtils {
         boolean handleMoney(Field field);
 
         boolean handleEnum(Field field);
-
-        boolean handleISO8601DateTime(Field field);
 
         boolean handleDate(Field field);
 
@@ -121,8 +117,6 @@ public class MetadataUtils {
             handled = handler.handleMoney(field);
         } else if (frameworkType == FrameworkType.ENUM) {
             handled = handler.handleEnum(field);
-        } else if (frameworkType == FrameworkType.ISO8601DATETIME) {
-            handled = handler.handleISO8601DateTime(field);
         } else if (frameworkType == FrameworkType.DATE) {
             handled = handler.handleDate(field);
         } else if (frameworkType == FrameworkType.DOMAINOBJECT) {

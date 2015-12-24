@@ -26,7 +26,6 @@ import android.text.format.DateUtils;
 
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.domain.DomainObject;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
@@ -44,7 +43,7 @@ public class Investment extends DomainObject {
     protected String exchange;
     protected Money costBasis;
     protected Money price;
-    protected ISO8601DateTime lastTradeTime;
+    protected Date lastTradeTime;
     protected Money prevDayClose;
     protected Long quantity;
 
@@ -63,7 +62,7 @@ public class Investment extends DomainObject {
         this.price = price;
         this.prevDayClose = price.clone();
         this.quantity = quantity;
-        this.lastTradeTime = new ISO8601DateTime(lastTradeTime);
+        this.lastTradeTime = lastTradeTime;
     }
 
     public Account getAccount() {
@@ -120,7 +119,7 @@ public class Investment extends DomainObject {
 
     public void setPrice(Money price, Date lastTradeTime) {
         this.price = price;
-        this.lastTradeTime = new ISO8601DateTime(lastTradeTime);
+        this.lastTradeTime = lastTradeTime;
     }
 
     public Long getQuantity() {
@@ -147,7 +146,7 @@ public class Investment extends DomainObject {
         this.prevDayClose = prevDayClose;
     }
 
-    public ISO8601DateTime getLastTradeTime() {
+    public Date getLastTradeTime() {
         return lastTradeTime;
     }
 
@@ -158,7 +157,7 @@ public class Investment extends DomainObject {
     }
 
     public boolean isPriceCurrent() {
-        return DateUtils.isToday(this.lastTradeTime.getDate().getTime());
+        return DateUtils.isToday(this.lastTradeTime.getTime());
     }
 
     public enum InvestmentStatus implements MetadataUtils.EnumResource {

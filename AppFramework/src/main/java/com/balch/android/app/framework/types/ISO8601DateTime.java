@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -38,38 +37,9 @@ public class ISO8601DateTime implements Serializable {
     private static final String ISO_8601_DATE_TIME_FORMAT_1 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'00:00:00Z";
 
-    private Date date;
-
-    public ISO8601DateTime() {
-        this(new Date(), false);
+    private ISO8601DateTime() {
     }
 
-    public ISO8601DateTime(boolean dateOnly) {
-        this(new Date(), dateOnly);
-    }
-
-    public ISO8601DateTime(Date date) {
-        this(date, false);
-    }
-
-    public ISO8601DateTime(Date date, boolean dateOnly) {
-        this.date = date;
-        if (dateOnly) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-
-            this.date = cal.getTime();
-        }
-    }
-
-    public ISO8601DateTime(String iso8601string) throws ParseException{
-        this(ISO8601DateTime.toDate(iso8601string));
-    }
 
     public static String toISO8601(Date date) {
         return toISO8601(date, false);
@@ -82,11 +52,6 @@ public class ISO8601DateTime implements Serializable {
         return df.format(date);
     }
 
-    @Override
-    public String toString() {
-        return ISO8601DateTime.toISO8601(this.date);
-    }
-
     public static Date toDate(String iso8601string) throws ParseException {
         String s = iso8601string.replace("Z", "+00:00");
         return new SimpleDateFormat(getDateFormat(false, iso8601string), Locale.getDefault()).parse(s);
@@ -96,9 +61,5 @@ public class ISO8601DateTime implements Serializable {
         return dataOnly ? ISO_8601_DATE_FORMAT :
                 ((iso8601String != null) && iso8601String.contains("."))
                         ? ISO_8601_DATE_TIME_FORMAT_1 : ISO_8601_DATE_TIME_FORMAT;
-    }
-
-    public Date getDate() {
-        return date;
     }
 }

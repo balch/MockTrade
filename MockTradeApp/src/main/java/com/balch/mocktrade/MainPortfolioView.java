@@ -49,7 +49,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected SummaryAdapter mSummaryAdapter;
     protected RecyclerView mPortfolioSummary;
 
-    protected TextView mLastTradeTime;
+    protected TextView mLastQuoteTime;
     protected TextView mLastSyncTime;
 
 
@@ -79,7 +79,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mPortfolioSummary.setHasFixedSize(true);
         mPortfolioSummary.setAdapter(mSummaryAdapter);
 
-        mLastTradeTime = (TextView) findViewById(R.id.portfolio_view_last_trade);
+        mLastQuoteTime = (TextView) findViewById(R.id.portfolio_view_last_quote);
         mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
 
     }
@@ -98,10 +98,10 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         }
     }
 
-    public void setSyncTimes(Date lastSync, Date lastTrade) {
+    public void setSyncTimes(Date lastSync, Date lastQuote) {
         Resources resources = getResources();
         mLastSyncTime.setText(resources.getString(R.string.portfolio_view_last_sync, getDateTimeString(lastSync)));
-        mLastTradeTime.setText(resources.getString(R.string.portfolio_view_last_trade, getDateTimeString(lastTrade)));
+        mLastQuoteTime.setText(resources.getString(R.string.portfolio_view_last_quote, getDateTimeString(lastQuote)));
     }
 
     private String getDateTimeString(Date date) {

@@ -65,6 +65,6 @@ public interface PortfolioModel extends BaseModel {
 
     Date getLastSyncTime();
 
-    Date getLastTradeTime();
+    Date getLastQuoteTime();
 }
 

@@ -36,7 +36,7 @@ public class PortfolioData {
     protected Map<Long, List<Investment>> mAccountToInvestmentMap;
     protected Map<Long, Integer> mAccountToOpenOrderCountMap;
     protected Date mLastSyncTime;
-    protected Date mLastTradeTime;
+    protected Date mLastQuoteTime;
 
     public PortfolioData() {
         mAccounts = new ArrayList<>();
@@ -97,12 +97,12 @@ public class PortfolioData {
         mLastSyncTime = lastSyncTime;
     }
 
-    public Date getLastTradeTime() {
-        return mLastTradeTime;
+    public Date getLastQuoteTime() {
+        return mLastQuoteTime;
     }
 
-    public void setLastTradeTime(Date lastTradeTime) {
-        mLastTradeTime = lastTradeTime;
+    public void setLastQuoteTime(Date lastQuoteTime) {
+        mLastQuoteTime = lastQuoteTime;
     }
 
 }

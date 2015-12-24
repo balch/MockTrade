@@ -322,7 +322,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             }
         }
 
-        mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastTradeTime());
+        mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
         mMainPortfolioView.setTotals((accountsWithTotals > 1), totals, performanceItem);
         mPortfolioAdapter.bind(data);
 
@@ -352,7 +352,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             portfolioData.addAccounts(mPortfolioModel.getAllAccounts());
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
             portfolioData.setLastSyncTime(mPortfolioModel.getLastSyncTime());
-            portfolioData.setLastTradeTime(mPortfolioModel.getLastTradeTime());
+            portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {

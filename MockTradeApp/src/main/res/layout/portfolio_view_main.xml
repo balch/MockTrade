@@ -105,7 +105,7 @@
             android:ellipsize="end"/>
 
         <TextView
-            android:id="@+id/portfolio_view_last_trade"
+            android:id="@+id/portfolio_view_last_quote"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

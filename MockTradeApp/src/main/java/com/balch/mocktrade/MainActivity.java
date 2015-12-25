@@ -369,6 +369,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
         getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
+
+        mMainPortfolioView.animateGraph();
     }
 
     @Override

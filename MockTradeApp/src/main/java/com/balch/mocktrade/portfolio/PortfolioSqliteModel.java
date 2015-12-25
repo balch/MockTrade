@@ -138,7 +138,8 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
                 sqlConnection.insert(summaryModel,
                         new SummaryItem(investment.getAccount(), investment.getSymbol(),
                                 investment.getCostBasis(), investment.getPrice(),
-                                investment.getLastTradeTime(), investment.getQuantity()),
+                                investment.getLastTradeTime(), investment.getQuantity(),
+                                investment.getPrevDayClose()),
                         db);
             }
 

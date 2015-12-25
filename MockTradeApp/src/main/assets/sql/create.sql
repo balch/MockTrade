@@ -67,6 +67,7 @@ CREATE TABLE summary_current (
     price INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     cost_basis INTEGER NOT NULL,
+    prev_day_close INTEGER NOT NULL,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL
 );

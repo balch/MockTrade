@@ -27,13 +27,10 @@ import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.view.BaseView;
-import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.portfolio.DailyGraphView;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
@@ -69,17 +66,15 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     @Override
     public void initializeLayout() {
         inflate(getContext(), R.layout.portfolio_view_main, this);
-        mPortfolioList = (RecyclerView)findViewById(R.id.portfolio_list);
+        mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mPortfolioSummary = (SummaryTotalsView)findViewById(R.id.portfolio_view_summary_view);
+        mPortfolioSummary = (SummaryTotalsView) findViewById(R.id.portfolio_view_summary_view);
 
         mLastQuoteTime = (TextView) findViewById(R.id.portfolio_view_last_quote);
         mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
 
         mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
-
-
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -114,36 +109,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         return result;
     }
 
-    private static class SummaryAdapter extends RecyclerView.Adapter<AccountViewHolder> {
-
-        private Account mTotals;
-        private PerformanceItem mPerformanceItem;
-
-        public SummaryAdapter() {
-        }
-
-        public void bind(Account totals, PerformanceItem performanceItem) {
-            mTotals = totals;
-            mPerformanceItem = performanceItem;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getItemCount() {
-            return 1;
-        }
-
-        @Override
-        public AccountViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new AccountViewHolder(parent, null);
-        }
-
-        @Override
-        public void onBindViewHolder(AccountViewHolder holder, int position) {
-            if (mTotals != null) {
-                holder.bind(mTotals, mPerformanceItem, 0);
-            }
-        }
+    public void animateGraph() {
+        mDailyGraphView.animateGraph();
     }
 
 }

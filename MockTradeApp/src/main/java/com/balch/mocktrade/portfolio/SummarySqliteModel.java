@@ -50,6 +50,7 @@ public class SummarySqliteModel extends SqliteModel
     public static final String COLUMN_PRICE = "price";
     public static final String COLUMN_QUANTITY = "quantity";
     public static final String COLUMN_COST_BASIS = "cost_basis";
+    public static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
 
     public SummarySqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
@@ -70,6 +71,7 @@ public class SummarySqliteModel extends SqliteModel
         values.put(COLUMN_PRICE, summaryItem.getPrice().getMicroCents());
         values.put(COLUMN_TRADE_TIME, summaryItem.getTradeTime().getTime());
         values.put(COLUMN_QUANTITY, summaryItem.getQuantity());
+        values.put(COLUMN_PREV_DAY_CLOSE, summaryItem.getPrevDayClose().getMicroCents());
 
         return values;
     }
@@ -84,6 +86,7 @@ public class SummarySqliteModel extends SqliteModel
         summaryItem.price = new Money(cursor.getLong(columnMap.get(COLUMN_PRICE)));
         summaryItem.tradeTime = new Date(cursor.getLong(columnMap.get(COLUMN_TRADE_TIME)));
         summaryItem.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
+        summaryItem.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
     }
 
     public void deleteSummaryItemByTradeTime(Investment investment, SQLiteDatabase db) {

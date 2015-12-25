@@ -15,17 +15,20 @@ public class SummaryItem extends DomainObject {
     protected Money price;
     protected Date tradeTime;
     protected Long quantity;
+    protected Money prevDayClose;
 
     public SummaryItem() {
     }
 
-    public SummaryItem(Account account, String symbol, Money costBasis, Money price, Date tradeTime, Long quantity) {
+    public SummaryItem(Account account, String symbol, Money costBasis, Money price, Date tradeTime, Long quantity,
+                       Money prevDayClose) {
         this.account = account;
         this.symbol = symbol;
         this.costBasis = costBasis;
         this.price = price;
         this.tradeTime = tradeTime;
         this.quantity = quantity;
+        this.prevDayClose = prevDayClose;
     }
 
     public Account getAccount() {
@@ -74,5 +77,13 @@ public class SummaryItem extends DomainObject {
 
     public void setQuantity(Long quantity) {
         this.quantity = quantity;
+    }
+
+    public Money getPrevDayClose() {
+        return prevDayClose;
+    }
+
+    public void setPrevDayClose(Money prevDayClose) {
+        this.prevDayClose = prevDayClose;
     }
 }

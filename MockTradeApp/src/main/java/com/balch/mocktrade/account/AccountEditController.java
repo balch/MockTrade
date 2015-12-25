@@ -27,8 +27,8 @@ import android.content.Context;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ExternalController;
 import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.widgets.ControlMap;
-import com.balch.android.app.framework.domain.widgets.EditLayout;
+import com.balch.android.app.framework.domain.widget.ControlMap;
+import com.balch.android.app.framework.domain.widget.EditLayout;
 
 public class AccountEditController implements ExternalController<Account> {
     @Override

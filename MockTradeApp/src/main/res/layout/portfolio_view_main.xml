@@ -35,23 +35,39 @@
                 app:cardBackgroundColor="?attr/colorPrimaryDark"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="8dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                >
 
-<!--
-                <com.balch.mocktrade.portfolio.DailyGraphView
-                    android:id="@+id/portfolio_view_daily_graph"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:layout_weight="100"
-                    app:labelHeight="20dp"
-                    app:labelWidth="110dp"
-                    app:labelY="85dp"
-                    app:labelPosition="left"
-                    android:background="@android:color/transparent"
-                    app:labelColor="@android:color/white"/>
+                    android:layout_height="match_parent"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="20dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:orientation="vertical">
 
--->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Today"
+                        android:textColor="#FF0000FF"
+                        android:shadowRadius="3"
+                        android:shadowDx=".5"
+                        android:shadowDy=".5"
+                        android:shadowColor="#FF000066"
+                        android:textSize="24sp"/>
+
+                    <com.balch.mocktrade.portfolio.DailyGraphView
+                        android:id="@+id/portfolio_view_daily_graph"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:background="#2200CC00"/>
+                </LinearLayout>
+
             </android.support.v7.widget.CardView>
             <android.support.v7.widget.Toolbar
                 android:id="@+id/portfolio_view_toolbar"

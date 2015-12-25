@@ -24,7 +24,7 @@ package com.balch.android.app.framework.domain;
 
 import android.content.Context;
 
-import com.balch.android.app.framework.domain.widgets.ControlMap;
+import com.balch.android.app.framework.domain.widget.ControlMap;
 
 import java.io.Serializable;
 

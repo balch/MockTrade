@@ -23,7 +23,7 @@
 package com.balch.android.app.framework.domain.annotations;
 
 import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.widgets.EditLayout;
+import com.balch.android.app.framework.domain.widget.EditLayout;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.widgets;
+package com.balch.android.app.framework.domain.widget;
 
 import java.util.HashMap;
 import java.util.Map;

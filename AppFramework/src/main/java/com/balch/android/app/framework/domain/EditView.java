@@ -32,10 +32,10 @@ import android.widget.Toast;
 
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.domain.widgets.ControlMap;
-import com.balch.android.app.framework.domain.widgets.ControlMapper;
-import com.balch.android.app.framework.domain.widgets.EditLayout;
-import com.balch.android.app.framework.domain.widgets.UnsupportedEditLayout;
+import com.balch.android.app.framework.domain.widget.ControlMap;
+import com.balch.android.app.framework.domain.widget.ControlMapper;
+import com.balch.android.app.framework.domain.widget.EditLayout;
+import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
 import com.balch.android.app.framework.view.BaseView;
 
 import java.lang.reflect.Field;

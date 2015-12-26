@@ -34,6 +34,7 @@ import com.balch.mocktrade.order.OrderResult;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface PortfolioModel extends BaseModel {
 
@@ -61,7 +62,7 @@ public interface PortfolioModel extends BaseModel {
 
     void scheduleOrderServiceAlarmIfNeeded();
 
-    void createSummaryItem(List<Investment> investments);
+    void createSnapshotTotals(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap);
 
     Date getLastSyncTime();
 

@@ -54,6 +54,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
@@ -343,14 +344,15 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
-        PerformanceItem performanceItem = new PerformanceItem(new Money(), new Money(), new Money());
+        PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
 
         int accountsWithTotals = 0;
 
+        Date timestamp = new Date();
         for (Account account : data.getAccounts()) {
             if (!account.getExcludeFromTotals()) {
                 List<Investment> investments = data.getInvestments(account.getId());
-                performanceItem.aggregate(account.getPerformanceItem(investments));
+                performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
 
                 accountsWithTotals++;
             }

@@ -22,14 +22,25 @@
 
 package com.balch.mocktrade.portfolio;
 
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 
-public class PerformanceItem {
-    protected final Money mCostBasis;
-    protected final Money mValue;
-    protected final Money mTodayChange;
+import java.util.Date;
 
-    public PerformanceItem(Money costBasis, Money value, Money todayChange) {
+public class PerformanceItem extends DomainObject{
+    protected long mAccountId;
+    protected Date mTimestamp;
+    protected Money mCostBasis;
+    protected Money mValue;
+    protected Money mTodayChange;
+
+    public PerformanceItem() {
+    }
+
+    public PerformanceItem(long accountId, Date timestamp,
+                           Money costBasis, Money value, Money todayChange) {
+        this.mAccountId = accountId;
+        this.mTimestamp = timestamp;
         this.mCostBasis = costBasis;
         this.mValue = value;
         this.mTodayChange = todayChange;
@@ -43,13 +54,13 @@ public class PerformanceItem {
         return mValue;
     }
 
-    public Money getmTodayChange() {
+    public Money getTodayChange() {
         return mTodayChange;
     }
 
     public void aggregate(PerformanceItem performanceItem) {
         this.mCostBasis.add(performanceItem.getCostBasis());
-        this.mTodayChange.add(performanceItem.getmTodayChange());
+        this.mTodayChange.add(performanceItem.getTodayChange());
         this.mValue.add(performanceItem.getValue());
     }
 
@@ -70,5 +81,31 @@ public class PerformanceItem {
         return percent * 100.0f;
     }
 
+    public long getAccountId() {
+        return mAccountId;
+    }
 
+    public Date getTimestamp() {
+        return mTimestamp;
+    }
+
+    public void setAccountId(long accountId) {
+        this.mAccountId = accountId;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.mTimestamp = timestamp;
+    }
+
+    public void setCostBasis(Money costBasis) {
+        this.mCostBasis = costBasis;
+    }
+
+    public void setValue(Money value) {
+        this.mValue = value;
+    }
+
+    public void setTodayChange(Money todayChange) {
+        this.mTodayChange = todayChange;
+    }
 }

@@ -59,19 +59,17 @@ CREATE TABLE [transaction] (
 
 CREATE INDEX transaction_account_idx ON [transaction](account_id);
 
-CREATE TABLE summary_current (
+CREATE TABLE snapshot_totals (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER  NOT NULL REFERENCES account(_id) ON DELETE CASCADE,
-    symbol TEXT NOT NULL,
-    trade_time INTEGER NOT NULL,
-    price INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    snapshot_time INTEGER NOT NULL,
     cost_basis INTEGER NOT NULL,
-    prev_day_close INTEGER NOT NULL,
+    total_value INTEGER NOT NULL,
+    today_change INTEGER NOT NULL,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL
 );
 
-CREATE INDEX summary_current_trade_time_idx ON [summary_current](trade_time);
-CREATE INDEX summary_current_daily_delete_idx ON [summary_current](account_id, symbol, trade_time);
-CREATE INDEX summary_current_account_idx ON [summary_current](account_id);
+
+CREATE INDEX snapshot_totals_snapshot_time_idx ON [snapshot_totals](snapshot_time);
+CREATE INDEX snapshot_totals_account_idx ON [snapshot_totals](account_id);

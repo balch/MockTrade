@@ -108,7 +108,7 @@ public class QuoteService extends IntentService {
                             }
 
                             //TODO: need to add summary purge mechanism
-                            portfolioModel.createSummaryItem(investments);
+                            portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
 
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
                         } finally {

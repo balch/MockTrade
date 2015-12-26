@@ -133,4 +133,24 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         investment.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
         investment.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
     }
+
+    public Date getLastTradeTime() {
+        Date date = null;
+        Cursor cursor = null;
+        try {
+            cursor = getSqlConnection().getReadableDatabase().
+                    rawQuery("select max("+COLUMN_LAST_TRADE_TIME+") from "+TABLE_NAME, new String[0]);
+            if (cursor.moveToNext()) {
+                date = new Date(cursor.getLong(0));
+            }
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return date;
+    }
+
 }

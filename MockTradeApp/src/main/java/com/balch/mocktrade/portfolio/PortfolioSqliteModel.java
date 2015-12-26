@@ -43,6 +43,7 @@ import com.balch.mocktrade.services.OrderService;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel {
 
@@ -50,7 +51,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     protected InvestmentSqliteModel investmentModel;
     protected OrderSqliteModel orderModel;
     protected FinanceModel financeModel;
-    protected SummarySqliteModel summaryModel;
+    protected SnapshotTotalsSqliteModel snapshotTotalsModel;
 
     @Override
     public void initialize(ModelProvider modelProvider) {
@@ -58,7 +59,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         this.accounteModel = new AccountSqliteModel(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
         this.orderModel = new OrderSqliteModel(modelProvider);
-        this.summaryModel = new SummarySqliteModel(modelProvider);
+        this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(modelProvider);
 
         // this mPortfolioModel is more generic then the sqlite models above and is
         // registered with the mPortfolioModel factory
@@ -127,22 +128,20 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
-    public void createSummaryItem(List<Investment> investments) {
+    public void createSnapshotTotals(List<Account> accounts,
+            Map<Long, List<Investment>> accountToInvestmentMap) {
 
+        Date now = new Date();
         SqlConnection sqlConnection = getSqlConnection();
         SQLiteDatabase db = sqlConnection.getWritableDatabase();
         db.beginTransaction();
         try {
-            for (Investment investment : investments) {
-                summaryModel.deleteSummaryItemByTradeTime(investment, db);
-                sqlConnection.insert(summaryModel,
-                        new SummaryItem(investment.getAccount(), investment.getSymbol(),
-                                investment.getCostBasis(), investment.getPrice(),
-                                investment.getLastTradeTime(), investment.getQuantity(),
-                                investment.getPrevDayClose()),
-                        db);
-            }
 
+            for (Account account : accounts) {
+                PerformanceItem performanceItem =
+                        account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
+                sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+            }
             db.setTransactionSuccessful();
 
         } catch (SQLException e) {
@@ -154,12 +153,12 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
 
     @Override
     public Date getLastSyncTime() {
-        return summaryModel.getLastSyncTime();
+        return snapshotTotalsModel.getLastSyncTime();
     }
 
     @Override
     public Date getLastQuoteTime() {
-        return summaryModel.getLastTradeTime();
+        return investmentModel.getLastTradeTime();
     }
 
     @Override

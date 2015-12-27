@@ -51,14 +51,19 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     public static final String COLUMN_COST_BASIS = "cost_basis";
     public static final String COLUMN_TODAY_CHANGE = "today_change";
 
-    // create SQL to only include account we want to see in totals
+    // create SQL to aggregate accounts we want to see in totals
     private static final String SQL_ACCOUNTS_INCLUDED_TOTALS =
-            "SELECT * FROM "+ TABLE_NAME +" AS t1," +
-            " account AS t2" +
-            " WHERE t1.account_id = t2._id AND and t2.exclude_from_totals = 0" +
-            " AND " + COLUMN_SNAPSHOT_TIME + " >= ?" +
-            " AND " + COLUMN_SNAPSHOT_TIME + " < ?" +
-            " ORDER BY " + COLUMN_SNAPSHOT_TIME + " ASC";
+            "SELECT -1 AS " + COLUMN_ACCOUNT_ID + ", " +
+                    COLUMN_SNAPSHOT_TIME + "," +
+                    " SUM(" + COLUMN_TOTAL_VALUE + ") AS " + COLUMN_TOTAL_VALUE + "," +
+                    " SUM(" + COLUMN_COST_BASIS + ") AS " + COLUMN_COST_BASIS + "," +
+                    " SUM(" + COLUMN_TODAY_CHANGE + ") AS " + COLUMN_TODAY_CHANGE + " " +
+                " FROM " + TABLE_NAME + " AS t1, account AS t2" +
+                " WHERE t1.account_id = t2._id AND and t2.exclude_from_totals = 0" +
+                    " AND " + COLUMN_SNAPSHOT_TIME + " >= ?" +
+                    " AND " + COLUMN_SNAPSHOT_TIME + " < ?" +
+                " GROUP BY " + COLUMN_SNAPSHOT_TIME +
+                " ORDER BY " + COLUMN_SNAPSHOT_TIME + " ASC";
 
     private static final String SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID =
             COLUMN_ACCOUNT_ID + "=? AND " +
@@ -96,7 +101,6 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         performanceItem.setTodayChange(new Money(cursor.getLong(columnMap.get(COLUMN_TODAY_CHANGE))));
     }
 
-
     public PerformanceItem getLastSnapshot(long accountId) {
         String where = COLUMN_ACCOUNT_ID + "=?";
         String[] whereArgs = new String[]{String.valueOf(accountId)};
@@ -104,9 +108,9 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         PerformanceItem performanceItem = null;
         try {
             List<PerformanceItem> performanceItems =
-                    getSqlConnection().query(this, PerformanceItem.class, where,
-                                            whereArgs, COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
-            if ((performanceItems != null) && (performanceItems.size() > 0) ) {
+                    getSqlConnection().query(this, PerformanceItem.class, where, whereArgs,
+                            COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
+            if ((performanceItems != null) && (performanceItems.size() > 0)) {
                 performanceItem = performanceItems.get(0);
             }
         } catch (Exception e) {
@@ -117,13 +121,14 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         return performanceItem;
     }
 
-    public List<PerformanceItem> getSnapshots(long accountId, long startTime, long endTimeExclusive) {
+    public List<PerformanceItem> getSnapshots(long accountId, long startTime,
+                                              long endTimeExclusive) {
 
-        String[] whereArgs = new String[]{String.valueOf(accountId),
-                    String.valueOf(startTime),
-                    String.valueOf(endTimeExclusive)
-                };
-
+        String[] whereArgs = new String[] {
+                String.valueOf(accountId),
+                String.valueOf(startTime),
+                String.valueOf(endTimeExclusive)
+        };
 
         List<PerformanceItem> performanceItems;
         try {
@@ -140,8 +145,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
 
     public List<PerformanceItem> getSnapshots(long startTime, long endTimeExclusive) {
 
-
-        String[] whereArgs = new String[]{
+        String[] whereArgs = new String[] {
                 String.valueOf(startTime),
                 String.valueOf(endTimeExclusive)
         };
@@ -164,7 +168,6 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         }
 
         return performanceItems;
-
     }
 
 }

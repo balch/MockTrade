@@ -41,6 +41,7 @@ import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +174,29 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     @Override
     public Date getLastQuoteTime() {
         return investmentModel.getLastTradeTime();
+    }
+
+    @Override
+    public List<PerformanceItem> getCurrentSnapshot() {
+        List<PerformanceItem> snapshot = null;
+
+        Date lastQuoteTime = getLastQuoteTime();
+        if (lastQuoteTime != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(lastQuoteTime);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            long startTime = cal.getTimeInMillis();
+
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+            long endTime = cal.getTimeInMillis();
+
+            snapshot = snapshotTotalsModel.getSnapshots(startTime, endTime);
+        }
+        return snapshot;
     }
 
     @Override

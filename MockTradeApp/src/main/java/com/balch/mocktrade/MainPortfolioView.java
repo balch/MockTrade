@@ -38,6 +38,7 @@ import com.balch.mocktrade.portfolio.SummaryTotalsView;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
@@ -50,6 +51,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected TextView mLastSyncTime;
 
     protected DailyGraphView mDailyGraphView;
+    protected TextView mEmptyGraphView;
+    protected LinearLayout mGraphLayout;
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -75,6 +78,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
 
         mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
+        mEmptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
+        mGraphLayout = (LinearLayout) findViewById(R.id.portfolio_view_daily_graph_layout);
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -111,6 +116,18 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public void animateGraph() {
         mDailyGraphView.animateGraph();
+    }
+
+    public void setDailyGraphData(List<PerformanceItem> performanceItems) {
+        if ((performanceItems != null) && (performanceItems.size() >= 2)) {
+            mDailyGraphView.bind(performanceItems);
+            mEmptyGraphView.setVisibility(GONE);
+            mGraphLayout.setVisibility(VISIBLE);
+
+        } else {
+            mGraphLayout.setVisibility(GONE);
+            mEmptyGraphView.setVisibility(VISIBLE);
+        }
     }
 
 }

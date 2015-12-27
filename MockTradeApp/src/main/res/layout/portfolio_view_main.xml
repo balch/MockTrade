@@ -27,24 +27,34 @@
                 android:fitsSystemWindows="true"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="@dimen/portfolio_view_header_height"
+                android:layout_marginTop="@dimen/portfolio_view_header_margin"
+                android:layout_marginBottom="@dimen/portfolio_view_header_margin"
+                android:layout_marginStart="@dimen/portfolio_view_header_margin"
+                android:layout_marginEnd="@dimen/portfolio_view_header_margin"
                 app:cardBackgroundColor="?attr/colorPrimaryDark"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="8dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-                >
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/portfolio_view_daily_graph_empty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="20dp"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
+                    android:gravity="center"
+                    android:text="@string/portfolio_view_empty_graph_text"
+                    android:textColor="?attr/colorAccent"
+                    android:textSize="30sp"
+                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:id="@+id/portfolio_view_daily_graph_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="@dimen/portfolio_view_graph_container_padding"
+                    android:paddingBottom="@dimen/portfolio_view_graph_container_padding"
+                    android:paddingStart="@dimen/portfolio_view_graph_container_padding"
+                    android:paddingEnd="@dimen/portfolio_view_graph_container_padding"
                     android:orientation="vertical">
 
                     <TextView
@@ -52,21 +62,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:text="Today"
-                        android:textColor="#FF0000FF"
+                        android:textColor="@color/portfolio_view_graph_title"
                         android:shadowRadius="3"
                         android:shadowDx=".5"
                         android:shadowDy=".5"
-                        android:shadowColor="#FF000066"
-                        android:textSize="24sp"/>
+                        android:shadowColor="@color/portfolio_view_graph_title_shadow"
+                        android:textSize="@dimen/portfolio_view_graph_title_size"/>
 
                     <com.balch.mocktrade.portfolio.DailyGraphView
                         android:id="@+id/portfolio_view_daily_graph"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:layout_marginTop="10dp"
-                        android:background="#2200CC00"/>
+                        android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
+                        android:background="@color/portfolio_view_graph_background"/>
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
@@ -86,8 +95,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/toolbar_logo_size"
+                        android:layout_height="@dimen/toolbar_logo_size"
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/ic_launcher"/>
 
@@ -123,7 +132,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="14sp"
+        android:layout_height="@dimen/portfolio_view_status_container_height"
         android:orientation="horizontal">
 
         <TextView
@@ -131,9 +140,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textColor="#FF999999"
-            android:textSize="12sp"
-            android:background="@android:color/black"
+            android:textColor="@color/portfolio_view_status_text"
+            android:textSize="@dimen/portfolio_view_status_text_size"
+            android:background="@color/portfolio_view_status_background"
             android:singleLine="true"
             android:maxLines="1"
             android:ellipsize="end"/>
@@ -143,9 +152,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textColor="#FF999999"
-            android:textSize="12sp"
-            android:background="@android:color/black"
+            android:textColor="@color/portfolio_view_status_text"
+            android:textSize="@dimen/portfolio_view_status_text_size"
+            android:background="@color/portfolio_view_status_background"
             android:singleLine="true"
             android:maxLines="1"
             android:ellipsize="end"

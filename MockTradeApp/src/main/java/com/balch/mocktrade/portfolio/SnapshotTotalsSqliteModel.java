@@ -59,7 +59,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
                     " SUM(" + COLUMN_COST_BASIS + ") AS " + COLUMN_COST_BASIS + "," +
                     " SUM(" + COLUMN_TODAY_CHANGE + ") AS " + COLUMN_TODAY_CHANGE + " " +
                 " FROM " + TABLE_NAME + " AS t1, account AS t2" +
-                " WHERE t1.account_id = t2._id AND and t2.exclude_from_totals = 0" +
+                " WHERE t1.account_id = t2._id AND t2.exclude_from_totals = 0" +
                     " AND " + COLUMN_SNAPSHOT_TIME + " >= ?" +
                     " AND " + COLUMN_SNAPSHOT_TIME + " < ?" +
                 " GROUP BY " + COLUMN_SNAPSHOT_TIME +

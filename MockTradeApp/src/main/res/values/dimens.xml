@@ -8,4 +8,12 @@
     <dimen name="spacing_normal">16dp</dimen>
     <dimen name="image_width">120dp</dimen>
     <dimen name="image_final_width">32dp</dimen>
+    <dimen name="portfolio_view_header_height">200dp</dimen>
+    <dimen name="portfolio_view_header_margin">10dp</dimen>
+    <dimen name="portfolio_view_graph_container_padding">20dp</dimen>
+    <dimen name="portfolio_view_graph_title_size">24sp</dimen>
+    <dimen name="portfolio_view_graph_margin_top">10dp</dimen>
+    <dimen name="toolbar_logo_size">32dp</dimen>
+    <dimen name="portfolio_view_status_container_height">14sp</dimen>
+    <dimen name="portfolio_view_status_text_size">12sp</dimen>
 </resources>

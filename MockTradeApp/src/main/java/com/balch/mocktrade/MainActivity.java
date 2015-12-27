@@ -366,13 +366,16 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         mPortfolioAdapter.bind(data);
 
+//        List<PerformanceItem> performanceItems = new ArrayList<>();
+//        mMainPortfolioView.setDailyGraphData(performanceItems);
+        mMainPortfolioView.setDailyGraphData(data.getGraphData());
+
         hideProgress();
 
         // hack to prevent onLoadFinished being called twice
         // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
         getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
 
-        mMainPortfolioView.animateGraph();
     }
 
     @Override
@@ -397,6 +400,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
             portfolioData.setLastSyncTime(new Date(mSettings.getLastSyncTime()));
             portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
+            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot());
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {

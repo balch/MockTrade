@@ -52,6 +52,12 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
     public static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
     public static final String COLUMN_QUANTITY = "quantity";
 
+    public static final String SQL_LAST_TRADE_TIME =
+            "SELECT MAX(" + COLUMN_LAST_TRADE_TIME + ") FROM "+TABLE_NAME;
+
+    public static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
+             COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
+
     public InvestmentSqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
     }
@@ -76,9 +82,9 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
 
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
         try {
-            String where = COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
             String [] whereArgs = new String[]{symbol, accountId.toString()};
-            List<Investment> investments = this.getSqlConnection().query(this, Investment.class, where, whereArgs, null);
+            List<Investment> investments = this.getSqlConnection().query(this, Investment.class,
+                    SQL_WHERE_BY_ACCOUNT_AND_SYMBOL, whereArgs, null);
 
             return (investments.size() == 1) ? investments.get(0) : null;
 
@@ -138,8 +144,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         Date date = null;
         Cursor cursor = null;
         try {
-            cursor = getSqlConnection().getReadableDatabase().
-                    rawQuery("select max("+COLUMN_LAST_TRADE_TIME+") from "+TABLE_NAME, new String[0]);
+            cursor = getSqlConnection().getReadableDatabase().rawQuery(SQL_LAST_TRADE_TIME, null);
             if (cursor.moveToNext()) {
                 date = new Date(cursor.getLong(0));
             }

@@ -38,6 +38,7 @@ import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.settings.Settings;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +53,8 @@ public class QuoteService extends IntentService {
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 
     protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
-    protected static String LAST_UPDATE_TIME = "";  // move this to shared prefs?
+
+    private Settings mSettings;
 
     public QuoteService() {
         super(QuoteService.class.getName());
@@ -71,6 +73,7 @@ public class QuoteService extends IntentService {
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Investment> investments = portfolioModel.getAllInvestments();
+            mSettings = ((ModelProvider)this.getApplication()).getSettings();
 
             if (investments.size() > 0) {
                 final List<Account> accounts = portfolioModel.getAccounts(true);
@@ -107,10 +110,12 @@ public class QuoteService extends IntentService {
                                 }
                             }
 
+
                             //TODO: need to add summary purge mechanism
                             portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
 
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
+                            mSettings.setLastSyncTime(System.currentTimeMillis());
                         } finally {
                             MainActivity.updateView(QuoteService.this);
                             releaseWakeLock();
@@ -154,8 +159,9 @@ public class QuoteService extends IntentService {
                                             Map<String, Quote> quoteMap) {
         boolean doDailyUpdate = false;
         String today = DATE_FORMATTER.format(new Date());
-        if (!today.equals(LAST_UPDATE_TIME)) {
-            LAST_UPDATE_TIME = today;
+        String lastSyncTime = DATE_FORMATTER.format(mSettings.getLastSyncTime());
+
+        if (!today.equals(lastSyncTime)) {
             doDailyUpdate = true;
         }
 

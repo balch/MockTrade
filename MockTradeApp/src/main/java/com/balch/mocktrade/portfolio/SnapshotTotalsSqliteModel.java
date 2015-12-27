@@ -27,12 +27,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,20 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     public static final String COLUMN_TOTAL_VALUE = "total_value";
     public static final String COLUMN_COST_BASIS = "cost_basis";
     public static final String COLUMN_TODAY_CHANGE = "today_change";
+
+    // create SQL to only include account we want to see in totals
+    private static final String SQL_ACCOUNTS_INCLUDED_TOTALS =
+            "SELECT * FROM "+ TABLE_NAME +" AS t1," +
+            " account AS t2" +
+            " WHERE t1.account_id = t2._id AND and t2.exclude_from_totals = 0" +
+            " AND " + COLUMN_SNAPSHOT_TIME + " >= ?" +
+            " AND " + COLUMN_SNAPSHOT_TIME + " < ?" +
+            " ORDER BY " + COLUMN_SNAPSHOT_TIME + " ASC";
+
+    private static final String SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID =
+            COLUMN_ACCOUNT_ID + "=? AND " +
+            COLUMN_SNAPSHOT_TIME + " >= ? AND " +
+            COLUMN_SNAPSHOT_TIME + " < ?";
 
     public SnapshotTotalsSqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
@@ -81,25 +97,6 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     }
 
 
-    public Date getLastSyncTime() {
-        Date date = null;
-        Cursor cursor = null;
-        try {
-            cursor = getSqlConnection().getReadableDatabase().
-                    rawQuery("select max("+COLUMN_SNAPSHOT_TIME+") from "+TABLE_NAME, new String[0]);
-            if (cursor.moveToNext()) {
-                date = new Date(cursor.getLong(0));
-            }
-
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-
-        return date;
-    }
-
     public PerformanceItem getLastSnapshot(long accountId) {
         String where = COLUMN_ACCOUNT_ID + "=?";
         String[] whereArgs = new String[]{String.valueOf(accountId)};
@@ -119,4 +116,55 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
 
         return performanceItem;
     }
+
+    public List<PerformanceItem> getSnapshots(long accountId, long startTime, long endTimeExclusive) {
+
+        String[] whereArgs = new String[]{String.valueOf(accountId),
+                    String.valueOf(startTime),
+                    String.valueOf(endTimeExclusive)
+                };
+
+
+        List<PerformanceItem> performanceItems;
+        try {
+            performanceItems =
+                    getSqlConnection().query(this, PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                            whereArgs, COLUMN_SNAPSHOT_TIME + " ASC");
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getSnapshots(accountId)", e);
+            throw new RuntimeException(e);
+        }
+
+        return performanceItems;
+    }
+
+    public List<PerformanceItem> getSnapshots(long startTime, long endTimeExclusive) {
+
+
+        String[] whereArgs = new String[]{
+                String.valueOf(startTime),
+                String.valueOf(endTimeExclusive)
+        };
+
+        SqlConnection sqlConnection = getSqlConnection();
+        Cursor cursor = null;
+        List<PerformanceItem> performanceItems = new ArrayList<>();
+        try {
+
+            cursor = sqlConnection.getReadableDatabase().rawQuery(SQL_ACCOUNTS_INCLUDED_TOTALS, whereArgs);
+            sqlConnection.processCursor(this, cursor, PerformanceItem.class, performanceItems);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getSnapshots()", e);
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return performanceItems;
+
+    }
+
 }

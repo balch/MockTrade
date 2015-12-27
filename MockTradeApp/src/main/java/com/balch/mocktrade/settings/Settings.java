@@ -33,6 +33,7 @@ import java.util.TimeZone;
 public class Settings {
 
     private static final String PREF_HIDE_EXCLUDE_ACCOUNTS = "pref_hide_exclude_accounts";
+    private static final String PREF_LAST_SYNC_TIME = "pref_last_sync_time";
 
     protected Application mContext;
 
@@ -84,5 +85,15 @@ public class Settings {
                 .apply();
     }
 
+    public long getLastSyncTime() {
+        return getSharedPrefs().getLong(PREF_LAST_SYNC_TIME, 0);
+    }
+
+    public void setLastSyncTime(long syncTime) {
+        getSharedPrefs()
+                .edit()
+                .putLong(PREF_LAST_SYNC_TIME, syncTime)
+                .apply();
+    }
 
 }

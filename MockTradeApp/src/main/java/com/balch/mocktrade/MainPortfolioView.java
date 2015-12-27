@@ -99,7 +99,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     private String getDateTimeString(Date date) {
         String result = "";
-        if (date != null) {
+        if ((date != null) && (date.getTime() > 0)) {
             result = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
             String today = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date());
             if (today.equals(result)) {

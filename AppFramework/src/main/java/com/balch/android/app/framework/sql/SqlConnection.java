@@ -70,25 +70,12 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         List<T> results = new ArrayList<T>();
 
-        Constructor<T> ctor = clazz.getConstructor();
         String table = mapper.getTableName();
 
         Cursor cursor = null;
         try {
             cursor = this.getReadableDatabase().query(table, null, where, whereArgs, null, null, orderBy);
-            Map<String, Integer> columnMap = getColumnMap(cursor);
-            while (cursor.moveToNext()) {
-                T item = ctor.newInstance();
-                Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
-                item.setCreateTime(date);
-
-                date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
-                item.setUpdateTime(date);
-
-                mapper.populate(item, cursor, columnMap);
-                results.add(item);
-
-            }
+            processCursor(mapper, cursor, clazz, results);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -100,6 +87,26 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         return results;
     }
+
+    public <T extends DomainObject> void processCursor(SqlMapper mapper, Cursor cursor,
+                                                       Class<T> clazz, List<T> results)
+                    throws IllegalAccessException, InvocationTargetException,
+                            InstantiationException, NoSuchMethodException {
+        Map<String, Integer> columnMap = getColumnMap(cursor);
+        Constructor<T> ctor = clazz.getConstructor();
+        while (cursor.moveToNext()) {
+            T item = ctor.newInstance();
+            Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
+            item.setCreateTime(date);
+
+            date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
+            item.setUpdateTime(date);
+
+            mapper.populate(item, cursor, columnMap);
+            results.add(item);
+        }
+    }
+
 
     public long insert(SqlMapper mapper, DomainObject item) throws SQLException {
         return insert(mapper, item, this.getWritableDatabase());
@@ -234,7 +241,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         return sql;
     }
 
-    private Map<String, Integer> getColumnMap(Cursor cursor) {
+    public Map<String, Integer> getColumnMap(Cursor cursor) {
         Map<String, Integer> columnMap = new Hashtable<>(cursor.getColumnCount());
 
         for (int x = 0; x < cursor.getColumnCount(); x++) {
@@ -243,6 +250,4 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         return columnMap;
     }
-
-
 }

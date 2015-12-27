@@ -171,11 +171,6 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
-    public Date getLastSyncTime() {
-        return snapshotTotalsModel.getLastSyncTime();
-    }
-
-    @Override
     public Date getLastQuoteTime() {
         return investmentModel.getLastTradeTime();
     }

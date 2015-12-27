@@ -395,7 +395,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             PortfolioData portfolioData = new PortfolioData();
             portfolioData.addAccounts(mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts()));
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
-            portfolioData.setLastSyncTime(mPortfolioModel.getLastSyncTime());
+            portfolioData.setLastSyncTime(new Date(mSettings.getLastSyncTime()));
             portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();

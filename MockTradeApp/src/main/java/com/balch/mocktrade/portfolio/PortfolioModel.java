@@ -64,8 +64,6 @@ public interface PortfolioModel extends BaseModel {
 
     void createSnapshotTotals(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap);
 
-    Date getLastSyncTime();
-
     Date getLastQuoteTime();
 }
 

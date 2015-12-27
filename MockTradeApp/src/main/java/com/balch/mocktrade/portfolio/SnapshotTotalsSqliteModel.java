@@ -25,6 +25,7 @@ package com.balch.mocktrade.portfolio;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
@@ -33,6 +34,7 @@ import com.balch.mocktrade.model.SqliteModel;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class SnapshotTotalsSqliteModel extends SqliteModel
@@ -98,5 +100,23 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         return date;
     }
 
+    public PerformanceItem getLastSnapshot(long accountId) {
+        String where = COLUMN_ACCOUNT_ID + "=?";
+        String[] whereArgs = new String[]{String.valueOf(accountId)};
 
+        PerformanceItem performanceItem = null;
+        try {
+            List<PerformanceItem> performanceItems =
+                    getSqlConnection().query(this, PerformanceItem.class, where,
+                                            whereArgs, COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
+            if ((performanceItems != null) && (performanceItems.size() > 0) ) {
+                performanceItem = performanceItems.get(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getLastSnapshot", e);
+            throw new RuntimeException(e);
+        }
+
+        return performanceItem;
+    }
 }

@@ -138,9 +138,28 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         try {
 
             for (Account account : accounts) {
-                PerformanceItem performanceItem =
-                        account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
-                sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+                List<Investment> investments = accountToInvestmentMap.get(account.getId());
+                boolean hasCurrent = false;
+                for (Investment investment : investments) {
+                    if (investment.isPriceCurrent()) {
+                        hasCurrent = true;
+                        break;
+                    }
+                }
+
+                if (hasCurrent) {
+                    PerformanceItem performanceItem =
+                            account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
+
+                    // make sure this snapshot is different from the last one
+                    PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
+                    if ( (lastPerformanceItem == null) ||
+                            (lastPerformanceItem.getValue() != performanceItem.getValue()) ||
+                            (lastPerformanceItem.getCostBasis() != performanceItem.getCostBasis()) ||
+                            (lastPerformanceItem.getTodayChange() != performanceItem.getTodayChange())) {
+                        sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+                    }
+                }
             }
             db.setTransactionSuccessful();
 

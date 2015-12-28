@@ -16,4 +16,6 @@
     <dimen name="toolbar_logo_size">32dp</dimen>
     <dimen name="portfolio_view_status_container_height">14sp</dimen>
     <dimen name="portfolio_view_status_text_size">12sp</dimen>
+    <dimen name="portfolio_view_graph_empty_text_size">28sp</dimen>
+    <dimen name="portfolio_view_graph_empty_padding">20dp</dimen>
 </resources>

@@ -44,7 +44,8 @@
                     android:gravity="center"
                     android:text="@string/portfolio_view_empty_graph_text"
                     android:textColor="?attr/colorAccent"
-                    android:textSize="30sp"
+                    android:textSize="@dimen/portfolio_view_graph_empty_text_size"
+                    android:padding="@dimen/portfolio_view_graph_empty_padding"
                     android:visibility="gone"/>
 
                 <LinearLayout

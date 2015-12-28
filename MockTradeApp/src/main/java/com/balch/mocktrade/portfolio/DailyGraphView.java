@@ -41,7 +41,7 @@ import java.util.TimeZone;
  * The x Axis will represent the entire day, starting 30 mins before
  * market open and ending 30 mins after market close (unless the last
  * quote time is after market close, in which case the the end of the graph
- * will be 30 minutes after the last quote time.
+ * will be after the last quote time.
  *
  */
 public class DailyGraphView extends View {
@@ -358,8 +358,13 @@ public class DailyGraphView extends View {
             case MotionEvent.ACTION_MOVE: {
                 long timestamp = (long) (eventX / mScaleX) + mOffsetX;
 
-                mExaminerRect = new RectF(eventX, GRAPH_PADDING_VERTICAL,
+                if (mExaminerRect == null) {
+                    mExaminerRect = new RectF();
+                }
+
+                mExaminerRect.set(eventX, GRAPH_PADDING_VERTICAL,
                         eventX + EXAMINER_WIDTH, mHeight - GRAPH_PADDING_VERTICAL);
+
                 mExaminerTime = DateFormat.getTimeInstance(DateFormat.SHORT)
                         .format(new Date(timestamp));
                 mExaminerTimePaint.getTextBounds(mExaminerTime, 0,
@@ -419,7 +424,6 @@ public class DailyGraphView extends View {
                     }
                     break;
                 }
-
             }
 
             if (money == null) {

@@ -20,9 +20,8 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.types;
+package com.balch.android.app.framework;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,7 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class ISO8601DateTime implements Serializable {
+public class ISO8601DateTime {
     private static final String TAG = ISO8601DateTime.class.getSimpleName();
 
     private static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";

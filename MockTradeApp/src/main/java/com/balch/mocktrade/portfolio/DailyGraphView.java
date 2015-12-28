@@ -2,6 +2,7 @@ package com.balch.mocktrade.portfolio;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -10,9 +11,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.Shader;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
@@ -37,7 +42,10 @@ import java.util.TimeZone;
 public class DailyGraphView extends View {
     private static final String TAG = DailyGraphView.class.getSimpleName();
 
-    private static final int ANIMATION_DURATION_MS = 1000;
+    private static final int ANIMATION_DURATION_MS = 700;
+
+    private static final int GRAPH_PADDING_VERTICAL = 30;
+    private static final int GRAPH_PADDING_HORIZONTAL = 30;
 
     private static final int[] LINEAR_GRADIENT_COLORS = new int[] {
             Color.argb(255, 0, 255, 0),
@@ -51,10 +59,14 @@ public class DailyGraphView extends View {
             0f, .475f, .5f, .525f, 1
     };
 
+    private static final int EXAMINER_WIDTH = 5;
+
     private Paint mPathPaint;
-    private Paint mMartketTimesPaint;
+    private Paint mMarketTimesPaint;
     private Path mPath;
     private float mPathLength;
+    private Paint mExaminerPaint;
+    private Rect mExaminerRect;
 
     private List<PerformanceItem> mPerformanceItems;
 
@@ -86,43 +98,56 @@ public class DailyGraphView extends View {
 
         if (mMarketStartTime != 0) {
             float marketStartX = scaleX(mMarketStartTime);
-            canvas.drawLine(marketStartX, 0, marketStartX, mHeight, mMartketTimesPaint);
+            canvas.drawLine(marketStartX, GRAPH_PADDING_VERTICAL,
+                    marketStartX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
         }
 
         if (mMarketEndTime != 0) {
             float marketEndX = scaleX(mMarketEndTime);
-            canvas.drawLine(marketEndX, 0, marketEndX, mHeight, mMartketTimesPaint);
+            canvas.drawLine(marketEndX, GRAPH_PADDING_VERTICAL,
+                    marketEndX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
         }
 
         if (mMarketEndTime != 0) {
             float centerY = scaleY(00.0f);
-            canvas.drawLine(0, centerY, mWidth, centerY, mMartketTimesPaint);
+            canvas.drawLine(GRAPH_PADDING_HORIZONTAL, centerY,
+                    mWidth - GRAPH_PADDING_HORIZONTAL, centerY, mMarketTimesPaint);
         }
 
         canvas.drawPath(mPath, mPathPaint);
+
+        if (mExaminerRect != null) {
+            canvas.drawRect(mExaminerRect, mExaminerPaint);
+        }
     }
 
     private void initialize() {
 
-        mMartketTimesPaint = new Paint();
-        mMartketTimesPaint.setStyle(Paint.Style.STROKE);
-        mMartketTimesPaint.setColor(Color.LTGRAY);
-        mMartketTimesPaint.setAlpha(128);
-        mMartketTimesPaint.setStrokeWidth(2);
-        mMartketTimesPaint.setAntiAlias(true);
-        mMartketTimesPaint.setPathEffect(new DashPathEffect(new float[]{4, 4}, 0));
+        mMarketTimesPaint = new Paint();
+        mMarketTimesPaint.setStyle(Paint.Style.STROKE);
+        mMarketTimesPaint.setColor(Color.LTGRAY);
+        mMarketTimesPaint.setAlpha(128);
+        mMarketTimesPaint.setStrokeWidth(2);
+        mMarketTimesPaint.setAntiAlias(true);
+        mMarketTimesPaint.setPathEffect(new DashPathEffect(new float[]{4, 4}, 0));
+
+        mExaminerPaint = new Paint();
+        mExaminerPaint.setColor(Color.argb(255, 168, 168, 168));
+        mExaminerPaint.setStyle(Paint.Style.FILL);
+        mExaminerPaint.setMaskFilter(new BlurMaskFilter(EXAMINER_WIDTH, BlurMaskFilter.Blur.NORMAL));
+        mExaminerPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DARKEN));
 
         mPathPaint = new Paint();
         mPathPaint.setStyle(Paint.Style.STROKE);
         mPathPaint.setColor(Color.WHITE);
-        mPathPaint.setStrokeWidth(3);
+        mPathPaint.setStrokeWidth(4);
         mPathPaint.setAntiAlias(true);
         mPathPaint.setStrokeCap(Paint.Cap.ROUND);
         mPathPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPathPaint.setShadowLayer(7, 0, 0, Color.LTGRAY);
+        mPathPaint.setShadowLayer(7, 0f, 0f, Color.LTGRAY);
 
         if (!isInEditMode() && Build.VERSION.SDK_INT >= 11) {
-            setLayerType(View.LAYER_TYPE_SOFTWARE, mPathPaint);
+            setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
 
         mPath = new Path();
@@ -167,7 +192,8 @@ public class DailyGraphView extends View {
             PathMeasure measure = new PathMeasure(mPath, false);
             mPathLength = measure.getLength();
 
-            Shader shader = new LinearGradient(0, 0, 0, mHeight,
+            Shader shader = new LinearGradient(0, GRAPH_PADDING_VERTICAL,
+                    0, mHeight - GRAPH_PADDING_VERTICAL,
                     LINEAR_GRADIENT_COLORS,
                     LINEAR_GRADIENT_POSITIONS,
                     Shader.TileMode.CLAMP);
@@ -192,7 +218,7 @@ public class DailyGraphView extends View {
                 deltaY = minDeltaY;
             }
 
-            mScaleY =  (float)mHeight / deltaY;
+            mScaleY =  (float)(mHeight - (2 * GRAPH_PADDING_HORIZONTAL)) / deltaY ;
             mOffsetY = mHeight / 2; // 0.0 will be the vertical center
 
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -226,8 +252,9 @@ public class DailyGraphView extends View {
                 endScaleX = lastX + 1000 * 60 * 30; // add 30 mins in ms
             }
 
-            mScaleX =  mWidth / ((float) (endScaleX - startScaleX));
+            mScaleX =  (mWidth - (2 * GRAPH_PADDING_HORIZONTAL)) / (float) (endScaleX - startScaleX);
             mOffsetX = startScaleX;
+
         }
     }
 
@@ -272,11 +299,38 @@ public class DailyGraphView extends View {
     }
 
     private float scaleX(float x) {
-        return  (x - mOffsetX) * mScaleX;
+        return  ((x - mOffsetX) * mScaleX);
     }
 
     private float scaleY(float y) {
-        return mOffsetY - (y * mScaleY);
+        return  mOffsetY - (y * mScaleY);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean handled = false;
+
+        float eventX = event.getX();
+        float eventY = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                mExaminerRect = new Rect((int)eventX, GRAPH_PADDING_VERTICAL, (int)eventX + EXAMINER_WIDTH, mHeight - GRAPH_PADDING_VERTICAL);
+                handled = true;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mExaminerRect = null;
+                handled = true;
+                break;
+        }
+
+        if (handled) {
+            invalidate();
+        }
+
+        return handled;
     }
 
 }

@@ -54,8 +54,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             implements LoaderManager.LoaderCallbacks<PortfolioData>  {
@@ -366,9 +368,32 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         mPortfolioAdapter.bind(data);
 
-//        List<PerformanceItem> performanceItems = new ArrayList<>();
-//        mMainPortfolioView.setDailyGraphData(performanceItems);
-        mMainPortfolioView.setDailyGraphData(data.getGraphData());
+        List<PerformanceItem> performanceItems = new ArrayList<>();
+
+        long currentTime = 1450967400000L;
+        long fiveMinutes = 1000L * 60 * 5;
+        double costBasis = 100000.0;
+        double value = 100000.0;
+        double todayChange = 0.0;
+        int onePercentCostBases = (int)(costBasis * .1);
+        int randomOffset = onePercentCostBases / 2;
+
+        Random random = new Random();
+        int samples = (int)(12 * 6.5f);
+
+        for (int x = 0; x < samples; x++) {
+            performanceItems.add(new PerformanceItem(-1L, new Date(currentTime),
+                    new Money(costBasis), new Money(value), new Money(todayChange)));
+
+            double randChange = randomOffset - (random.nextInt(onePercentCostBases*100) / 100.0);
+            todayChange += randChange;
+            value += randChange;
+            currentTime += fiveMinutes;
+        }
+
+
+        mMainPortfolioView.setDailyGraphData(performanceItems);
+//        mMainPortfolioView.setDailyGraphData(data.getGraphData());
 
         hideProgress();
 

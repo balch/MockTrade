@@ -93,7 +93,13 @@ public class DailyGraphView extends View {
             float marketEndX = scaleX(mMarketEndTime);
             canvas.drawLine(marketEndX, 0, marketEndX, mHeight, mMartketTimesPaint);
         }
-//        canvas.drawPath(mPath, mPathPaint);
+
+        if (mMarketEndTime != 0) {
+            float centerY = scaleY(00.0f);
+            canvas.drawLine(0, centerY, mWidth, centerY, mMartketTimesPaint);
+        }
+
+        canvas.drawPath(mPath, mPathPaint);
     }
 
     private void initialize() {
@@ -101,6 +107,7 @@ public class DailyGraphView extends View {
         mMartketTimesPaint = new Paint();
         mMartketTimesPaint.setStyle(Paint.Style.STROKE);
         mMartketTimesPaint.setColor(Color.LTGRAY);
+        mMartketTimesPaint.setAlpha(128);
         mMartketTimesPaint.setStrokeWidth(2);
         mMartketTimesPaint.setAntiAlias(true);
         mMartketTimesPaint.setPathEffect(new DashPathEffect(new float[]{4, 4}, 0));
@@ -108,7 +115,7 @@ public class DailyGraphView extends View {
         mPathPaint = new Paint();
         mPathPaint.setStyle(Paint.Style.STROKE);
         mPathPaint.setColor(Color.WHITE);
-        mPathPaint.setStrokeWidth(5);
+        mPathPaint.setStrokeWidth(3);
         mPathPaint.setAntiAlias(true);
         mPathPaint.setStrokeCap(Paint.Cap.ROUND);
         mPathPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -140,8 +147,13 @@ public class DailyGraphView extends View {
             List<PointF> points = new ArrayList<>(mPerformanceItems.size());
 
             for (PerformanceItem performanceItem : mPerformanceItems) {
-                points.add(new PointF(scaleX(performanceItem.getTimestamp().getTime()),
-                        scaleY(performanceItem.getTodayChange().getMicroCents())));
+                float xValue = (float)performanceItem.getTimestamp().getTime();
+                float yValue = (float)performanceItem.getTodayChange().getMicroCents();
+
+                float xScaleValue = scaleX(xValue);
+                float yScaleValue = scaleY(yValue);
+
+                points.add(new PointF(xScaleValue, yScaleValue));
             }
 
             mPath.moveTo(points.get(0).x, points.get(0).y);
@@ -165,40 +177,43 @@ public class DailyGraphView extends View {
     }
 
     private void calculateScale() {
-        long absMaxY = Math.abs(mMaxY);
-        long absMinY = Math.abs(mMinY);
-        long deltaY = (absMaxY > absMinY) ? 2 * absMaxY : 2 * absMinY;
 
-        long minDeltaY = (long)(.01f * mPerformanceItems.get(0).getValue().getMicroCents());
-        if (deltaY < minDeltaY) {
-            deltaY = minDeltaY;
+        if ( (mWidth != 0) && (mHeight != 0)) {
+            long absMaxY = Math.abs(mMaxY);
+            long absMinY = Math.abs(mMinY);
+            long deltaY = (absMaxY > absMinY) ? 2 * absMaxY : 2 * absMinY;
+
+            long minDeltaY = (long) (.01f * mPerformanceItems.get(0).getValue().getMicroCents());
+            if (deltaY < minDeltaY) {
+                deltaY = minDeltaY;
+            }
+            mScaleY =  (float)mHeight / deltaY;
+            mOffsetY = mHeight / 2; // 0.0 will be the vertical center
+
+            long minX = mPerformanceItems.get(0).getTimestamp().getTime();
+            long maxX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
+
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
+            cal.setTimeInMillis(minX);
+            cal.set(Calendar.HOUR_OF_DAY, 6);
+            cal.set(Calendar.MINUTE, 30);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            mMarketStartTime = cal.getTimeInMillis();
+            cal.set(Calendar.MINUTE, 0);
+            long startScaleX = cal.getTimeInMillis();
+
+            cal.set(Calendar.HOUR_OF_DAY, 13);
+            cal.set(Calendar.MINUTE, 0);
+            mMarketEndTime = cal.getTimeInMillis();
+
+            cal.set(Calendar.MINUTE, 30);
+            long endScaleX = cal.getTimeInMillis();
+
+            mScaleX =  mWidth / ((float) (endScaleX - startScaleX));
+            mOffsetX = startScaleX;
         }
-        mScaleY = mHeight / deltaY;
-        mOffsetY = mHeight / 2; // 0.0 will be the vertical center
-
-        long minX = mPerformanceItems.get(0).getTimestamp().getTime();
-        long maxX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
-
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
-        cal.setTimeInMillis(minX);
-        cal.set(Calendar.HOUR_OF_DAY, 6);
-        cal.set(Calendar.MINUTE, 30);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        mMarketStartTime = cal.getTimeInMillis();
-        cal.set(Calendar.MINUTE, 0);
-        long startScaleX = cal.getTimeInMillis();
-
-        cal.set(Calendar.HOUR_OF_DAY, 13);
-        cal.set(Calendar.MINUTE, 0);
-        mMarketEndTime = cal.getTimeInMillis();
-
-        cal.set(Calendar.MINUTE, 30);
-        long endScaleX = cal.getTimeInMillis();
-
-        mScaleX = mWidth / (float) (endScaleX - startScaleX);
-        mOffsetX = startScaleX;
     }
 
     public void animateGraph() {
@@ -239,7 +254,7 @@ public class DailyGraphView extends View {
     }
 
     private float scaleX(float x) {
-        return mOffsetX - (x * mScaleX);
+        return  (x - mOffsetX) * mScaleX;
     }
 
     private float scaleY(float y) {

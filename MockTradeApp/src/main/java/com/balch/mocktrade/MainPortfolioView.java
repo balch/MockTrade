@@ -129,5 +129,4 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             mEmptyGraphView.setVisibility(VISIBLE);
         }
     }
-
 }

@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -107,11 +108,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     private String getDateTimeString(Date date) {
         String result = "";
         if ((date != null) && (date.getTime() > 0)) {
-            result = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
-            String today = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date());
-            if (today.equals(result)) {
-                result = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
-            }
+            result = DateUtils.isToday(date.getTime()) ?
+                    DateFormat.getTimeInstance(DateFormat.SHORT).format(date) :
+                    DateFormat.getDateInstance(DateFormat.SHORT).format(date);
         }
         return result;
     }

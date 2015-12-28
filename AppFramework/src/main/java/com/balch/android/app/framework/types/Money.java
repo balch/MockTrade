@@ -188,4 +188,23 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
         }
         return compare;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Money money = (Money) o;
+
+        if (microCents != money.microCents) return false;
+        return !(currency != null ? !currency.equals(money.currency) : money.currency != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (microCents ^ (microCents >>> 32));
+        result = 31 * result + (currency != null ? currency.hashCode() : 0);
+        return result;
+    }
 }

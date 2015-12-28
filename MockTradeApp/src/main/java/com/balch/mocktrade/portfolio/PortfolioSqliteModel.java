@@ -155,9 +155,9 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
                     // make sure this snapshot is different from the last one
                     PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
                     if ( (lastPerformanceItem == null) ||
-                            (lastPerformanceItem.getValue() != performanceItem.getValue()) ||
-                            (lastPerformanceItem.getCostBasis() != performanceItem.getCostBasis()) ||
-                            (lastPerformanceItem.getTodayChange() != performanceItem.getTodayChange())) {
+                            !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
+                            !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
+                            !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
                         sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
                     }
                 }

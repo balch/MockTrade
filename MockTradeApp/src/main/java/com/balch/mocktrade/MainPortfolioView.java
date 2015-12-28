@@ -53,6 +53,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected DailyGraphView mDailyGraphView;
     protected TextView mEmptyGraphView;
     protected LinearLayout mGraphLayout;
+    protected TextView mGraphTitle;
 
     public MainPortfolioView(Context context) {
         super(context);
@@ -80,6 +81,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
         mEmptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
         mGraphLayout = (LinearLayout) findViewById(R.id.portfolio_view_daily_graph_layout);
+        mGraphTitle = (TextView) findViewById(R.id.portfolio_view_graph_title);
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -120,6 +122,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public void setDailyGraphData(List<PerformanceItem> performanceItems) {
         if ((performanceItems != null) && (performanceItems.size() >= 2)) {
+
+            mGraphTitle.setText("Today"); // TODO: fix this
             mDailyGraphView.bind(performanceItems);
             mEmptyGraphView.setVisibility(GONE);
             mGraphLayout.setVisibility(VISIBLE);

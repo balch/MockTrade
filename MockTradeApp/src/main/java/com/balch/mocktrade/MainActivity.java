@@ -117,7 +117,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         } else {
             appBarLayout.setExpanded(false, false);
         }
-
     }
 
     @Override
@@ -368,32 +367,10 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         mPortfolioAdapter.bind(data);
 
-        List<PerformanceItem> performanceItems = new ArrayList<>();
 
-        long currentTime = 1450967400000L;
-        long fiveMinutes = 1000L * 60 * 5;
-        double costBasis = 100000.0;
-        double value = 100000.0;
-        double todayChange = 0.0;
-        int onePercentCostBases = (int)(costBasis * .1);
-        int randomOffset = onePercentCostBases / 2;
-
-        Random random = new Random();
-        int samples = (int)(12 * 6.5f);
-
-        for (int x = 0; x < samples; x++) {
-            performanceItems.add(new PerformanceItem(-1L, new Date(currentTime),
-                    new Money(costBasis), new Money(value), new Money(todayChange)));
-
-            double randChange = randomOffset - (random.nextInt(onePercentCostBases*100) / 100.0);
-            todayChange += randChange;
-            value += randChange;
-            currentTime += fiveMinutes;
-        }
-
-
-        mMainPortfolioView.setDailyGraphData(performanceItems);
 //        mMainPortfolioView.setDailyGraphData(data.getGraphData());
+
+        mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
         hideProgress();
 
@@ -528,5 +505,33 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
     }
+
+    private List<PerformanceItem> generateRandomTestData() {
+        List<PerformanceItem> performanceItems = new ArrayList<>();
+
+        long currentTime = 1450967400000L;
+        long fiveMinutes = 1000L * 60 * 5;
+        double costBasis = 100000.0;
+        double value = 100000.0;
+        double todayChange = 0.0;
+        int onePercentCostBases = (int) (costBasis * .1);
+        int randomOffset = onePercentCostBases / 2;
+
+        Random random = new Random();
+        int samples = (int) (12 * 6.5f);
+
+        for (int x = 0; x < samples; x++) {
+            performanceItems.add(new PerformanceItem(-1L, new Date(currentTime),
+                    new Money(costBasis), new Money(value), new Money(todayChange)));
+
+            double randChange = randomOffset - (random.nextInt(onePercentCostBases * 100) / 100.0);
+            todayChange += randChange;
+            value += randChange;
+            currentTime += fiveMinutes;
+        }
+
+        return performanceItems;
+    }
+
 }
 

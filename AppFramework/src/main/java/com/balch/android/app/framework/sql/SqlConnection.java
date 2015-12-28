@@ -96,11 +96,16 @@ public class SqlConnection extends SQLiteOpenHelper {
         Constructor<T> ctor = clazz.getConstructor();
         while (cursor.moveToNext()) {
             T item = ctor.newInstance();
-            Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
-            item.setCreateTime(date);
 
-            date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
-            item.setUpdateTime(date);
+            if (columnMap.containsKey(SqlMapper.COLUMN_CREATE_TIME)) {
+                Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
+                item.setCreateTime(date);
+            }
+
+            if (columnMap.containsKey(SqlMapper.COLUMN_CREATE_TIME)) {
+                Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
+                item.setUpdateTime(date);
+            }
 
             mapper.populate(item, cursor, columnMap);
             results.add(item);

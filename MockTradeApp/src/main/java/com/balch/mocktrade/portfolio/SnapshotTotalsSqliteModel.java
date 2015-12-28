@@ -54,7 +54,10 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     // create SQL to aggregate accounts we want to see in totals
     private static final String SQL_ACCOUNTS_INCLUDED_TOTALS =
             "SELECT -1 AS " + COLUMN_ACCOUNT_ID + ", " +
-                    COLUMN_SNAPSHOT_TIME + "," +
+                    "t1." + COLUMN_ID + "," +
+                    "t1." + COLUMN_CREATE_TIME + "," +
+                    "t1." + COLUMN_UPDATE_TIME + "," +
+                    "t1." + COLUMN_SNAPSHOT_TIME + "," +
                     " SUM(" + COLUMN_TOTAL_VALUE + ") AS " + COLUMN_TOTAL_VALUE + "," +
                     " SUM(" + COLUMN_COST_BASIS + ") AS " + COLUMN_COST_BASIS + "," +
                     " SUM(" + COLUMN_TODAY_CHANGE + ") AS " + COLUMN_TODAY_CHANGE + " " +

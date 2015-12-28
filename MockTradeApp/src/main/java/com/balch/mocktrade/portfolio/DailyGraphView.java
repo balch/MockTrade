@@ -65,8 +65,8 @@ public class DailyGraphView extends View {
     private int mOffsetY;
     private long mOffsetX;
 
-    private long mMaxY = Long.MIN_VALUE;
-    private long mMinY = Long.MAX_VALUE;
+    private int mMaxYIndex = -1;
+    private int mMinYIndex = -1;
     private long mMarketStartTime;
     private long mMarketEndTime;
 
@@ -179,37 +179,52 @@ public class DailyGraphView extends View {
     private void calculateScale() {
 
         if ( (mWidth != 0) && (mHeight != 0)) {
-            long absMaxY = Math.abs(mMaxY);
-            long absMinY = Math.abs(mMinY);
+
+            // set the Y range so 0 is at the center, with room
+            // to accommodate the max gain or loss
+            long absMaxY = Math.abs(mPerformanceItems.get(mMaxYIndex).getTodayChange().getMicroCents());
+            long absMinY = Math.abs(mPerformanceItems.get(mMinYIndex).getTodayChange().getMicroCents());
             long deltaY = (absMaxY > absMinY) ? 2 * absMaxY : 2 * absMinY;
 
+            // set the min scale to 1% of current value.
             long minDeltaY = (long) (.01f * mPerformanceItems.get(0).getValue().getMicroCents());
             if (deltaY < minDeltaY) {
                 deltaY = minDeltaY;
             }
+
             mScaleY =  (float)mHeight / deltaY;
             mOffsetY = mHeight / 2; // 0.0 will be the vertical center
 
-            long minX = mPerformanceItems.get(0).getTimestamp().getTime();
-            long maxX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
-
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
-            cal.setTimeInMillis(minX);
+
+            // get market start time on same day of first x
+            long firstX = mPerformanceItems.get(0).getTimestamp().getTime();
+            cal.setTimeInMillis(firstX);
             cal.set(Calendar.HOUR_OF_DAY, 6);
             cal.set(Calendar.MINUTE, 30);
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
 
             mMarketStartTime = cal.getTimeInMillis();
+
+            // set the start to 30 mins b4 market close
             cal.set(Calendar.MINUTE, 0);
             long startScaleX = cal.getTimeInMillis();
 
+            // get the market end tme
             cal.set(Calendar.HOUR_OF_DAY, 13);
             cal.set(Calendar.MINUTE, 0);
             mMarketEndTime = cal.getTimeInMillis();
 
+            // set the end scale to 30 mins after market close
             cal.set(Calendar.MINUTE, 30);
             long endScaleX = cal.getTimeInMillis();
+
+            // see if there is a sample after the market close and extend the end if so
+            long lastX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
+            if (endScaleX < lastX) {
+                endScaleX = lastX + 1000 * 60 * 30; // add 30 mins in ms
+            }
 
             mScaleX =  mWidth / ((float) (endScaleX - startScaleX));
             mOffsetX = startScaleX;
@@ -236,16 +251,19 @@ public class DailyGraphView extends View {
     public void bind(List<PerformanceItem> performanceItems) {
         mPerformanceItems = performanceItems;
 
-        mMaxY = Long.MIN_VALUE;
-        mMinY = Long.MAX_VALUE;
-        for (PerformanceItem performanceItem : mPerformanceItems) {
+        long maxY = Long.MIN_VALUE;
+        long minY = Long.MAX_VALUE;
+        for (int idx = 0; idx < mPerformanceItems.size(); idx++) {
+            PerformanceItem performanceItem = mPerformanceItems.get(idx);
             long y = performanceItem.getTodayChange().getMicroCents();
-            if (y > mMaxY) {
-                mMaxY = y;
+            if (y > maxY) {
+                maxY = y;
+                mMaxYIndex = idx;
             }
 
-            if (y < mMinY) {
-                mMinY = y;
+            if (y < minY) {
+                minY = y;
+                mMinYIndex = idx;
             }
         }
 

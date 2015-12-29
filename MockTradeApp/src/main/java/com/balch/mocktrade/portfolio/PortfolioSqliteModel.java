@@ -190,10 +190,10 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     public List<PerformanceItem> getCurrentSnapshot(long accountId) {
         List<PerformanceItem> snapshot = null;
 
-        Date lastQuoteTime = getLastQuoteTime();
-        if (lastQuoteTime != null) {
+        long latestTimestamp = snapshotTotalsModel.getLatestGraphSnapshotTime();
+        if (latestTimestamp > 0) {
             Calendar cal = Calendar.getInstance();
-            cal.setTime(lastQuoteTime);
+            cal.setTimeInMillis(latestTimestamp);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);

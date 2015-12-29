@@ -68,6 +68,16 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
                 " GROUP BY " + COLUMN_SNAPSHOT_TIME +
                 " ORDER BY " + COLUMN_SNAPSHOT_TIME + " ASC";
 
+    private static final String SQL_LATEST_VALID_GRAPH_DATE =
+                "SELECT MAX("+ COLUMN_SNAPSHOT_TIME +") AS "+ COLUMN_SNAPSHOT_TIME +", " +
+                        "DATE("+ COLUMN_SNAPSHOT_TIME +"/1000, 'unixepoch') AS dt, " +
+                        "COUNT(DISTINCT("+ COLUMN_SNAPSHOT_TIME +")) as readings " +
+                " FROM " + TABLE_NAME +
+                " GROUP BY dt " +
+                " HAVING readings >= 3 " +
+                " ORDER BY dt DESC " +
+                " LIMIT 1";
+
     private static final String SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID =
             COLUMN_ACCOUNT_ID + "=? AND " +
             COLUMN_SNAPSHOT_TIME + " >= ? AND " +
@@ -176,5 +186,34 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
 
         return performanceItems;
     }
+
+    /**
+     * Returns the latest timestamp that can be graphed. This is based on the timestamp
+     * having at least 3 distinct readings for the day
+     */
+    public long getLatestGraphSnapshotTime() {
+
+        SqlConnection sqlConnection = getSqlConnection();
+        Cursor cursor = null;
+        long latestTimestamp = 0;
+        try {
+
+            cursor = sqlConnection.getReadableDatabase().rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
+            if (cursor.moveToNext()) {
+                latestTimestamp = cursor.getLong(0);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getLatestGraphSnapshotTime()", e);
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return latestTimestamp;
+    }
+
 
 }

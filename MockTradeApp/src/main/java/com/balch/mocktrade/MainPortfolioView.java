@@ -112,9 +112,11 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedPosition = position;
-                if (mMainPortfolioViewListener != null) {
-                    mMainPortfolioViewListener.onGraphSelectionChanged(getSelectedAccountId());
+                if (mSelectedPosition != position) {
+                    mSelectedPosition = position;
+                    if (mMainPortfolioViewListener != null) {
+                        mMainPortfolioViewListener.onGraphSelectionChanged(getSelectedAccountId());
+                    }
                 }
             }
 

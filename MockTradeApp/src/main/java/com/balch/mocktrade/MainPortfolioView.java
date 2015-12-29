@@ -50,8 +50,6 @@ import java.util.List;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
-    private static final int VIEW_ID = 969696969;
-
     public interface MainPortfolioViewListener {
         void onGraphSelectionChanged(long accountId);
     }
@@ -88,7 +86,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         inflate(getContext(), R.layout.portfolio_view_main, this);
 
         // id required for onSaveInstanceState to fire
-        setId(VIEW_ID);
+        setId(View.generateViewId());
 
         mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));

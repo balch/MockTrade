@@ -26,11 +26,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IdRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -46,13 +44,15 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.SummaryTotalsView;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
-    // id is required for onSaveInstanceState to be called
-    private static final @IdRes int VIEW_ID = 996969;
+    public interface MainPortfolioViewListener {
+        void onGraphSelectionChanged(long accountId);
+    }
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
@@ -69,27 +69,24 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected Spinner mGraphSpinner;
 
     protected ArrayAdapter<String> mGraphAccountAdapter;
+    protected List<Long> mAccountIds = new ArrayList<>();
 
     protected int mSelectedPosition = 0;
 
-    public MainPortfolioView(Context context) {
+    protected final MainPortfolioViewListener mMainPortfolioViewListener;
+
+    public MainPortfolioView(Context context, MainPortfolioViewListener mainPortfolioViewListener) {
         super(context);
-        setId(VIEW_ID);
-    }
-
-    public MainPortfolioView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setId(VIEW_ID);
-    }
-
-    public MainPortfolioView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        setId(VIEW_ID);
+        this.mMainPortfolioViewListener = mainPortfolioViewListener;
     }
 
     @Override
     public void initializeLayout() {
         inflate(getContext(), R.layout.portfolio_view_main, this);
+
+        // id required for onSaveInstanceState to fire
+        setId(R.id.portfolio_view_layout);
+
         mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -113,6 +110,12 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSelectedPosition = position;
+                if (mMainPortfolioViewListener != null) {
+
+                    long accountId =(mSelectedPosition < mAccountIds.size()) ?
+                            mAccountIds.get(mSelectedPosition) : -1L;
+                    mMainPortfolioViewListener.onGraphSelectionChanged(accountId);
+                }
             }
 
             @Override
@@ -122,11 +125,12 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         });
     }
 
+    public int getSelectedAccountIndex() { return  mSelectedPosition - 1; }
+
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
         mPortfolioAdapter = portfolioAdapter;
         mPortfolioList.setAdapter(portfolioAdapter);
     }
-
 
     public void setTotals(boolean showTotals, PerformanceItem performanceItem) {
         mPortfolioSummary.setVisibility(showTotals ? VISIBLE : GONE);
@@ -169,17 +173,25 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             mEmptyGraphView.setVisibility(GONE);
             mGraphLayout.setVisibility(VISIBLE);
 
-            mGraphAccountAdapter.setNotifyOnChange(false);
-            mGraphAccountAdapter.clear();
-            mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
-            for (Account account : accounts) {
-                mGraphAccountAdapter.add(account.getName());
-            }
-            mGraphAccountAdapter.setNotifyOnChange(true);
-            mGraphAccountAdapter.notifyDataSetChanged();
+            if (accounts != null) {
 
-            if (mSelectedPosition != AdapterView.INVALID_POSITION) {
-                mGraphSpinner.setSelection(mSelectedPosition);
+                mGraphAccountAdapter.setNotifyOnChange(false);
+                mGraphAccountAdapter.clear();
+                mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
+
+                mAccountIds.clear();
+                mAccountIds.add(-1L);
+
+                for (Account account : accounts) {
+                    mGraphAccountAdapter.add(account.getName());
+                    mAccountIds.add(account.getId());
+                }
+                mGraphAccountAdapter.setNotifyOnChange(true);
+                mGraphAccountAdapter.notifyDataSetChanged();
+
+                if (mSelectedPosition != AdapterView.INVALID_POSITION) {
+                    mGraphSpinner.setSelection(mSelectedPosition);
+                }
             }
 
         } else {

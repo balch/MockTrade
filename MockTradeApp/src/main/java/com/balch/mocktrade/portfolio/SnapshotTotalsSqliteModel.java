@@ -127,6 +127,10 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     public List<PerformanceItem> getSnapshots(long accountId, long startTime,
                                               long endTimeExclusive) {
 
+        if (accountId < 0) {
+            return getSnapshots(startTime, endTimeExclusive);
+        }
+
         String[] whereArgs = new String[] {
                 String.valueOf(accountId),
                 String.valueOf(startTime),

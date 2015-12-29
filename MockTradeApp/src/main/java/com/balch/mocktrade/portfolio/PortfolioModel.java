@@ -67,5 +67,7 @@ public interface PortfolioModel extends BaseModel {
     Date getLastQuoteTime();
 
     List<PerformanceItem> getCurrentSnapshot();
+
+    List<PerformanceItem> getCurrentSnapshot(long accountId);
 }
 

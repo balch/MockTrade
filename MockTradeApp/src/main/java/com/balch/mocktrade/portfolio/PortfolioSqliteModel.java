@@ -183,6 +183,11 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
 
     @Override
     public List<PerformanceItem> getCurrentSnapshot() {
+        return getCurrentSnapshot(-1);
+    }
+
+    @Override
+    public List<PerformanceItem> getCurrentSnapshot(long accountId) {
         List<PerformanceItem> snapshot = null;
 
         Date lastQuoteTime = getLastQuoteTime();
@@ -199,7 +204,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
             cal.add(Calendar.DAY_OF_YEAR, 1);
             long endTime = cal.getTimeInMillis();
 
-            snapshot = snapshotTotalsModel.getSnapshots(startTime, endTime);
+            snapshot = snapshotTotalsModel.getSnapshots(accountId, startTime, endTime);
         }
         return snapshot;
     }

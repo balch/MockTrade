@@ -121,7 +121,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     protected MainPortfolioView createView() {
-        mMainPortfolioView = new MainPortfolioView(this);
+        mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
+            @Override
+            public void onGraphSelectionChanged(long accountId) {
+                mMainPortfolioView.setDailyGraphData(mPortfolioModel.getCurrentSnapshot(accountId), null);
+            }
+        });
         return mMainPortfolioView;
     }
 
@@ -340,7 +345,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-        return new PortfolioLoader(this, mPortfolioModel, mSettings);
+        return new PortfolioLoader(this, mPortfolioModel, mSettings, mMainPortfolioView.getSelectedAccountIndex());
     }
 
     @Override
@@ -386,21 +391,33 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
         protected final PortfolioModel mPortfolioModel;
         protected final Settings mSettings;
+        protected final int mSelectedAccountIndex;
 
-        public PortfolioLoader(Context context, PortfolioModel model, Settings settings) {
+        public PortfolioLoader(Context context, PortfolioModel model, Settings settings,
+                               int selectedAccountIndex) {
             super(context);
             mPortfolioModel = model;
             mSettings = settings;
+            mSelectedAccountIndex = selectedAccountIndex;
         }
 
         @Override
         public PortfolioData loadInBackground() {
             PortfolioData portfolioData = new PortfolioData();
-            portfolioData.addAccounts(mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts()));
+
+            List<Account> accounts = mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts());
+
+            portfolioData.addAccounts(accounts);
             portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
             portfolioData.setLastSyncTime(new Date(mSettings.getLastSyncTime()));
             portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
-            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot());
+
+            long accountId = -1;
+            if ((mSelectedAccountIndex >= 0) && (mSelectedAccountIndex < accounts.size())) {
+                accountId = accounts.get(mSelectedAccountIndex).getId();
+            }
+
+            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot(accountId));
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {

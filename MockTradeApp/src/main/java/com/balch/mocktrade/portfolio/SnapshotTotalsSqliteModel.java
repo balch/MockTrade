@@ -25,6 +25,7 @@ package com.balch.mocktrade.portfolio;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
@@ -35,6 +36,7 @@ import com.balch.mocktrade.model.SqliteModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -215,5 +217,13 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         return latestTimestamp;
     }
 
+    public int purgeSnapshotTable(int days) {
+        SQLiteDatabase db = getSqlConnection().getWritableDatabase();
 
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, -days);
+        long timestamp = cal.getTimeInMillis();
+
+        return db.delete(TABLE_NAME, COLUMN_SNAPSHOT_TIME +"<=?", new String[] {String.valueOf(timestamp)});
+    }
 }

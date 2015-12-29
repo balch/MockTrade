@@ -130,6 +130,11 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
+    public int purgeSnapshots(int days) {
+        return snapshotTotalsModel.purgeSnapshotTable(days);
+    }
+
+    @Override
     public void createSnapshotTotals(List<Account> accounts,
             Map<Long, List<Investment>> accountToInvestmentMap) {
 

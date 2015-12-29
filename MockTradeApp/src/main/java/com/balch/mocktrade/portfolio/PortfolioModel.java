@@ -64,6 +64,8 @@ public interface PortfolioModel extends BaseModel {
 
     void createSnapshotTotals(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap);
 
+    int purgeSnapshots(int days);
+
     Date getLastQuoteTime();
 
     List<PerformanceItem> getCurrentSnapshot();

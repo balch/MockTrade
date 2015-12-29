@@ -26,6 +26,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
@@ -40,9 +41,7 @@ import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.settings.Settings;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +49,8 @@ import java.util.Map;
 public class QuoteService extends IntentService {
     private static final String TAG = QuoteService.class.getSimpleName();
 
+    public static final int SNAPSHOT_DAYS_TO_KEEP = 120;
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
-
-    protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
 
     private Settings mSettings;
 
@@ -110,11 +108,15 @@ public class QuoteService extends IntentService {
                                 }
                             }
 
+                            boolean isFirstSyncOfDay = !DateUtils.isToday(mSettings.getLastSyncTime());
+                            if (isFirstSyncOfDay) {
+                                portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
+                            }
 
-                            //TODO: need to add summary purge mechanism
                             portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
 
-                            processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
+                            processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
+
                             mSettings.setLastSyncTime(System.currentTimeMillis());
                         } finally {
                             MainActivity.updateView(QuoteService.this);
@@ -156,15 +158,7 @@ public class QuoteService extends IntentService {
 
     protected void processAccountStrategies(List<Account> accounts,
                                             Map<Long, List<Investment>> accountIdToInvestmentMap,
-                                            Map<String, Quote> quoteMap) {
-        boolean doDailyUpdate = false;
-        String today = DATE_FORMATTER.format(new Date());
-        String lastSyncTime = DATE_FORMATTER.format(mSettings.getLastSyncTime());
-
-        if (!today.equals(lastSyncTime)) {
-            doDailyUpdate = true;
-        }
-
+                                            Map<String, Quote> quoteMap, boolean doDailyUpdate) {
         for (Account account : accounts) {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
             if (strategyClazz != null) {

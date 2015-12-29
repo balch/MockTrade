@@ -41,6 +41,7 @@ import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -133,41 +134,45 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
             Map<Long, List<Investment>> accountToInvestmentMap) {
 
         Date now = new Date();
-        SqlConnection sqlConnection = getSqlConnection();
-        SQLiteDatabase db = sqlConnection.getWritableDatabase();
-        db.beginTransaction();
-        try {
 
-            for (Account account : accounts) {
-                List<Investment> investments = accountToInvestmentMap.get(account.getId());
-                boolean hasCurrent = false;
-                for (Investment investment : investments) {
-                    if (investment.isPriceCurrent()) {
-                        hasCurrent = true;
-                        break;
-                    }
-                }
+        // the accounts need to be added as an atomic bundle for the sums to add up
+        // this loop will set the isChanged to true if any account has totals that
+        // are different from last snapshot
+        List<PerformanceItem> performanceItems = new ArrayList<>(accounts.size());
+        boolean isChanged = false;
+        for (Account account : accounts) {
 
-                if (hasCurrent) {
-                    PerformanceItem performanceItem =
-                            account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
+            PerformanceItem performanceItem =
+                    account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
+            performanceItems.add(performanceItem);
 
-                    // make sure this snapshot is different from the last one
-                    PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
-                    if ( (lastPerformanceItem == null) ||
-                            !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
-                            !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
-                            !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
-                        sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
-                    }
+            if (!isChanged) {
+                PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
+                if ((lastPerformanceItem == null) ||
+                        !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
+                        !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
+                        !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
+                    isChanged = true;
                 }
             }
-            db.setTransactionSuccessful();
+        }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            db.endTransaction();
+        // if there is any change all accounts have to be inserted with this timestamp
+        if (isChanged) {
+            SqlConnection sqlConnection = getSqlConnection();
+            SQLiteDatabase db = sqlConnection.getWritableDatabase();
+            db.beginTransaction();
+            try {
+                for (PerformanceItem performanceItem : performanceItems) {
+                    sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+                }
+                db.setTransactionSuccessful();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                db.endTransaction();
+            }
         }
     }
 

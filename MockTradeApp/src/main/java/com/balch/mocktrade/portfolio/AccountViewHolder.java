@@ -82,7 +82,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
         mTotalPerformance.setText(TextFormatUtils.getLongChangePercentText(itemView.getContext(),
                 performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
         mDayPerformance.setText(TextFormatUtils.getShortChangeText(itemView.getContext(),
-                performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
+                performanceItem.getTodayChange().getDollars(), R.string.day_change_label));
 
         boolean allowTrade = ((account.getId() != null) && (account.getStrategy()== Account.Strategy.NONE));
         mTradeButton.setVisibility(allowTrade ? View.VISIBLE : View.GONE);

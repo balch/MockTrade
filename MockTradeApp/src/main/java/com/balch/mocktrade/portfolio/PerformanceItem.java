@@ -64,11 +64,6 @@ public class PerformanceItem extends DomainObject{
         this.mValue.add(performanceItem.getValue());
     }
 
-    public Money getDailyChange() {
-        return this.mTodayChange;
-    }
-
-
     public Money getTotalChange() {
         return Money.subtract(this.mValue, this.mCostBasis);
     }

@@ -64,7 +64,7 @@ public class SummaryTotalsView extends LinearLayout {
         mTotalPerformance.setText(TextFormatUtils.getLongChangePercentText(getContext(),
                 performanceItem.getTotalChange().getDollars(), performanceItem.getTotalChangePercent(), R.string.total_change_label));
         mDayPerformance.setText(TextFormatUtils.getShortChangeText(getContext(),
-                performanceItem.getDailyChange().getDollars(), R.string.day_change_label));
+                performanceItem.getTodayChange().getDollars(), R.string.day_change_label));
 
     }
 

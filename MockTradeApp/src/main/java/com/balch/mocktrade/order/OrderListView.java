@@ -37,9 +37,9 @@ import java.util.List;
 
 public class OrderListView extends LinearLayout implements BaseView {
 
-    protected OrderItemView.OrderItemViewListener listener;
-    protected OrderListAdapter adapter;
-    protected ListView list;
+    protected OrderItemView.OrderItemViewListener mOrderItemViewListener;
+    protected OrderListAdapter mAdapter;
+    protected ListView mOrderList;
 
     public OrderListView(Context context) {
         super(context);
@@ -56,21 +56,16 @@ public class OrderListView extends LinearLayout implements BaseView {
     @Override
     public void initializeLayout() {
         inflate(getContext(), R.layout.order_list_view, this);
-        this.list = (ListView)findViewById(R.id.order_list);
-    }
-
-    @Override
-    public void destroy() {
-
+        this.mOrderList = (ListView)findViewById(R.id.order_list);
     }
 
     public void setOrderItemViewListener(OrderItemView.OrderItemViewListener listener) {
-        this.listener = listener;
+        this.mOrderItemViewListener = listener;
     }
 
     public void bind(List<Order> orders) {
-        this.adapter = new OrderListAdapter(this.getContext(), orders);
-        this.list.setAdapter(adapter);
+        this.mAdapter = new OrderListAdapter(this.getContext(), orders);
+        this.mOrderList.setAdapter(mAdapter);
     }
 
     private class OrderListAdapter extends  ArrayAdapter<Order> {
@@ -86,7 +81,7 @@ public class OrderListView extends LinearLayout implements BaseView {
                 view = new OrderItemView(this.getContext());
             }
 
-            view.setOrderItemViewListener(listener);
+            view.setOrderItemViewListener(mOrderItemViewListener);
             view.bind(getItem(position));
             return view;
         }

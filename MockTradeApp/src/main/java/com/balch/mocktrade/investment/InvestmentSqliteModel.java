@@ -24,16 +24,14 @@ package com.balch.mocktrade.investment;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlMapper;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
-import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +52,11 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
     public static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
     public static final String COLUMN_QUANTITY = "quantity";
 
+    public static final String SQL_LAST_TRADE_TIME =
+            "SELECT MAX(" + COLUMN_LAST_TRADE_TIME + ") FROM "+TABLE_NAME;
+
+    public static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
+             COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
 
     public InvestmentSqliteModel(ModelProvider modelProvider) {
         super(modelProvider);
@@ -79,9 +82,9 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
 
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
         try {
-            String where = String.format("%s = ? AND %s = ?", COLUMN_SYMBOL, COLUMN_ACCOUNT_ID);
             String [] whereArgs = new String[]{symbol, accountId.toString()};
-            List<Investment> investments = this.getSqlConnection().query(this, Investment.class, where, whereArgs, null);
+            List<Investment> investments = this.getSqlConnection().query(this, Investment.class,
+                    SQL_WHERE_BY_ACCOUNT_AND_SYMBOL, whereArgs, null);
 
             return (investments.size() == 1) ? investments.get(0) : null;
 
@@ -114,7 +117,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         values.put(COLUMN_EXCHANGE, investment.exchange);
         values.put(COLUMN_COST_BASIS, investment.costBasis.getMicroCents());
         values.put(COLUMN_PRICE, investment.price.getMicroCents());
-        values.put(COLUMN_LAST_TRADE_TIME, investment.lastTradeTime.toString());
+        values.put(COLUMN_LAST_TRADE_TIME, investment.lastTradeTime.getTime());
         values.put(COLUMN_PREV_DAY_CLOSE, investment.prevDayClose.getMicroCents());
         values.put(COLUMN_QUANTITY, investment.quantity);
 
@@ -132,18 +135,27 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         investment.exchange = cursor.getString(columnMap.get(COLUMN_EXCHANGE));
         investment.costBasis = new Money(cursor.getLong(columnMap.get(COLUMN_COST_BASIS)));
         investment.price = new Money(cursor.getLong(columnMap.get(COLUMN_PRICE)));
-
-        try {
-            investment.lastTradeTime = new ISO8601DateTime(cursor.getString(columnMap.get(COLUMN_LAST_TRADE_TIME)));
-        } catch (ParseException ex) {
-            Log.e(TAG, "Error reading LastTrade time", ex);
-        }
+        investment.lastTradeTime = new Date(cursor.getLong(columnMap.get(COLUMN_LAST_TRADE_TIME)));
         investment.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
         investment.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
     }
 
+    public Date getLastTradeTime() {
+        Date date = null;
+        Cursor cursor = null;
+        try {
+            cursor = getSqlConnection().getReadableDatabase().rawQuery(SQL_LAST_TRADE_TIME, null);
+            if (cursor.moveToNext()) {
+                date = new Date(cursor.getLong(0));
+            }
 
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
 
-
+        return date;
+    }
 
 }

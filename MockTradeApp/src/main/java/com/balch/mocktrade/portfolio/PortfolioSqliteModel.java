@@ -23,7 +23,9 @@
 package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
+import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -38,14 +40,20 @@ import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel  {
+public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel {
 
     protected AccountSqliteModel accounteModel;
     protected InvestmentSqliteModel investmentModel;
     protected OrderSqliteModel orderModel;
     protected FinanceModel financeModel;
+    protected SnapshotTotalsSqliteModel snapshotTotalsModel;
 
     @Override
     public void initialize(ModelProvider modelProvider) {
@@ -53,15 +61,16 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         this.accounteModel = new AccountSqliteModel(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
         this.orderModel = new OrderSqliteModel(modelProvider);
+        this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(modelProvider);
 
-        // this model is more generic then the sqlite models above and is
-        // registered with the model factory
+        // this mPortfolioModel is more generic then the sqlite models above and is
+        // registered with the mPortfolioModel factory
         this.financeModel = this.getModelFactory().getModel(FinanceModel.class);
     }
 
     @Override
-    public List<Account> getAllAccounts() {
-        return accounteModel.getAllAccounts();
+    public List<Account> getAccounts(boolean allAccounts) {
+        return accounteModel.getAccounts(allAccounts);
     }
 
     @Override
@@ -116,8 +125,93 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     public void scheduleOrderServiceAlarmIfNeeded() {
         List<Order> openOrders = this.getOpenOrders();
         if (openOrders.size() > 0) {
-            this.scheduleOrderServiceAlarm();;
+            this.scheduleOrderServiceAlarm();
         }
+    }
+
+    @Override
+    public int purgeSnapshots(int days) {
+        return snapshotTotalsModel.purgeSnapshotTable(days);
+    }
+
+    @Override
+    public void createSnapshotTotals(List<Account> accounts,
+            Map<Long, List<Investment>> accountToInvestmentMap) {
+
+        Date now = new Date();
+
+        // the accounts need to be added as an atomic bundle for the sums to add up
+        // this loop will set the isChanged to true if any account has totals that
+        // are different from last snapshot
+        List<PerformanceItem> performanceItems = new ArrayList<>(accounts.size());
+        boolean isChanged = false;
+        for (Account account : accounts) {
+
+            PerformanceItem performanceItem =
+                    account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
+            performanceItems.add(performanceItem);
+
+            if (!isChanged) {
+                PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
+                if ((lastPerformanceItem == null) ||
+                        !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
+                        !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
+                        !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
+                    isChanged = true;
+                }
+            }
+        }
+
+        // if there is any change all accounts have to be inserted with this timestamp
+        if (isChanged) {
+            SqlConnection sqlConnection = getSqlConnection();
+            SQLiteDatabase db = sqlConnection.getWritableDatabase();
+            db.beginTransaction();
+            try {
+                for (PerformanceItem performanceItem : performanceItems) {
+                    sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+                }
+                db.setTransactionSuccessful();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    @Override
+    public Date getLastQuoteTime() {
+        return investmentModel.getLastTradeTime();
+    }
+
+    @Override
+    public List<PerformanceItem> getCurrentSnapshot() {
+        return getCurrentSnapshot(-1);
+    }
+
+    @Override
+    public List<PerformanceItem> getCurrentSnapshot(long accountId) {
+        List<PerformanceItem> snapshot = null;
+
+        long latestTimestamp = snapshotTotalsModel.getLatestGraphSnapshotTime();
+        if (latestTimestamp > 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(latestTimestamp);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            long startTime = cal.getTimeInMillis();
+
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+            long endTime = cal.getTimeInMillis();
+
+            snapshot = snapshotTotalsModel.getSnapshots(accountId, startTime, endTime);
+        }
+        return snapshot;
     }
 
     @Override

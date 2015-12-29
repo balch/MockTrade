@@ -23,7 +23,7 @@
 package com.balch.android.app.framework.model;
 
 public interface RequestListener<T> {
-    public void onResponse(T response);
-    public void onErrorResponse(String error);
+    void onResponse(T response);
+    void onErrorResponse(String error);
 }
 

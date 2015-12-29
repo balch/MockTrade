@@ -64,9 +64,9 @@ public class OrderSqliteModel extends SqliteModel
     public static final String COLUMN_QUANTITY = "quantity";
     public static final String COLUMN_HIGHEST_PRICE = "highest_price";
 
-    protected InvestmentSqliteModel investmentModel;
-    protected AccountSqliteModel accountModel;
-    protected OrderManager orderManager;
+    protected InvestmentSqliteModel mInvestmentModel;
+    protected AccountSqliteModel mAccountModel;
+    protected OrderManager mOrderManager;
 
     public OrderSqliteModel() {
     }
@@ -85,9 +85,9 @@ public class OrderSqliteModel extends SqliteModel
     @Override
     public void initialize(ModelProvider modelProvider) {
         super.initialize(modelProvider);
-        this.investmentModel = new InvestmentSqliteModel(modelProvider);
-        this.accountModel = new AccountSqliteModel(modelProvider);
-        this.orderManager = new OrderManager(modelProvider.getContext(),
+        this.mInvestmentModel = new InvestmentSqliteModel(modelProvider);
+        this.mAccountModel = new AccountSqliteModel(modelProvider);
+        this.mOrderManager = new OrderManager(modelProvider.getContext(),
                 (FinanceModel)getModelFactory().getModel(FinanceModel.class),
                 getSettings(), this);
     }
@@ -99,7 +99,7 @@ public class OrderSqliteModel extends SqliteModel
     public List<Order> getOpenOrders(Long accountId) {
         try {
             StringBuilder where = new StringBuilder(COLUMN_STATUS+"=?");
-            List<String> whereArgs = new ArrayList<String>();
+            List<String> whereArgs = new ArrayList<>();
             whereArgs.add(Order.OrderStatus.OPEN.name());
 
             if (accountId != null) {
@@ -149,7 +149,7 @@ public class OrderSqliteModel extends SqliteModel
 
     public OrderResult attemptExecuteOrder(Order order, Quote quote) throws OrderExecutionException {
         try {
-            return orderManager.attemptExecuteOrder(order, quote);
+            return mOrderManager.attemptExecuteOrder(order, quote);
         } catch (Exception ex) {
             if (order != null) {
                 order.setStatus(Order.OrderStatus.ERROR);
@@ -166,7 +166,7 @@ public class OrderSqliteModel extends SqliteModel
             Money cost = order.getCost(price);
             Money profit = new Money(0);
 
-            Account account = getSqlConnection().queryById(accountModel, Account.class, order.getAccount().getId());
+            Account account = getSqlConnection().queryById(mAccountModel, Account.class, order.getAccount().getId());
 
             Money transactionCost;
             Transaction.TransactionType transactionType;
@@ -183,11 +183,11 @@ public class OrderSqliteModel extends SqliteModel
             long transactionId = getSqlConnection().insert(transaction, transaction, db);
 
             account.getAvailableFunds().add(transactionCost);
-            if (!getSqlConnection().update(accountModel, account, db)) {
+            if (!getSqlConnection().update(mAccountModel, account, db)) {
                 throw new IllegalAccessException("Error updating account");
             }
 
-            Investment investment = investmentModel.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
+            Investment investment = mInvestmentModel.getInvestmentBySymbol(order.getSymbol(), order.getAccount().getId());
             if (investment == null) {
                 if (order.getAction() == Order.OrderAction.SELL) {
                     throw new IllegalAccessException("Can't sell and investment you don't own");
@@ -195,7 +195,7 @@ public class OrderSqliteModel extends SqliteModel
                 investment = new Investment(account, quote.getSymbol(),
                         Investment.InvestmentStatus.OPEN, quote.getName(), quote.getExchange(),
                         cost, price, new Date(0), order.getQuantity());
-                getSqlConnection().insert(investmentModel, investment, db);
+                getSqlConnection().insert(mInvestmentModel, investment, db);
             } else {
                 if (order.getAction() == Order.OrderAction.SELL) {
                     if (order.getQuantity() > investment.getQuantity()) {
@@ -207,12 +207,12 @@ public class OrderSqliteModel extends SqliteModel
 
                 investment.aggregateOrder(order, price);
                 if (investment.getQuantity() > 0) {
-                    if (!getSqlConnection().update(investmentModel, investment, db)) {
+                    if (!getSqlConnection().update(mInvestmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 } else {
                     // delete the investment if we sold everything
-                    if (!getSqlConnection().delete(investmentModel, investment, db)) {
+                    if (!getSqlConnection().delete(mInvestmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 }
@@ -233,7 +233,7 @@ public class OrderSqliteModel extends SqliteModel
 
     @Override
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
-        return investmentModel.getInvestmentBySymbol(symbol, accountId);
+        return mInvestmentModel.getInvestmentBySymbol(symbol, accountId);
     }
 
     @Override
@@ -242,7 +242,7 @@ public class OrderSqliteModel extends SqliteModel
     }
 
     public void scheduleOrderServiceAlarm(boolean isMarketOpen){
-        orderManager.scheduleOrderServiceAlarm(isMarketOpen);
+        mOrderManager.scheduleOrderServiceAlarm(isMarketOpen);
     }
 
     @Override

@@ -23,7 +23,7 @@
 package com.balch.android.app.framework.domain.annotations;
 
 import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.controls.EditControl;
+import com.balch.android.app.framework.domain.widget.EditLayout;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,5 +37,5 @@ public @interface ColumnEdit {
     EditState state() default EditState.CHANGEABLE;
     String [] hints() default {};
     int order();
-    Class<? extends EditControl> customControl() default EditControl.class;
+    Class<? extends EditLayout> customControl() default EditLayout.class;
 }

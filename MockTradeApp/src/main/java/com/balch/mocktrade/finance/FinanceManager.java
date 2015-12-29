@@ -42,12 +42,12 @@ import java.util.GregorianCalendar;
  */
 class FinanceManager {
 
-    protected final Settings settings;
-    protected final Context context;
+    protected final Settings mSettings;
+    protected final Context mContext;
 
     public FinanceManager(Context context, Settings settings) {
-        this.context = context;
-        this.settings = settings;
+        this.mContext = context.getApplicationContext();
+        this.mSettings = settings;
     }
 
     public boolean isMarketOpen() {
@@ -67,7 +67,7 @@ class FinanceManager {
      */
     protected int marketOpenCompareValue(boolean usePoll) {
         int val = 0; // assume open
-        Calendar now = new GregorianCalendar(settings.getSavedSettingsTimeZone());
+        Calendar now = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
         if ((now.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
             (now.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
 
@@ -117,10 +117,10 @@ class FinanceManager {
     }
 
     public void setQuoteServiceAlarm(){
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = QuoteReceiver.getIntent(context);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = QuoteReceiver.getIntent(mContext);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Date startTime = this.nextPollStart();
         if (startTime == null) {
@@ -129,28 +129,28 @@ class FinanceManager {
 
         alarmManager.setInexactRepeating(AlarmManager.RTC,
                 startTime.getTime(),
-                this.settings.getPollInterval() * 1000,
+                this.mSettings.getPollInterval() * 1000,
                 pendingIntent);
     }
 
     protected Calendar getPollStartTime() {
-        return getCalendarFromTime(settings.geMarketOpenTime(), -15);
+        return getCalendarFromTime(mSettings.geMarketOpenTime(), -15);
     }
 
     protected Calendar getMarketOpenTime() {
-        return getCalendarFromTime(settings.geMarketOpenTime(), 0);
+        return getCalendarFromTime(mSettings.geMarketOpenTime(), 0);
     }
 
     protected Calendar getPollEndTime() {
-        return getCalendarFromTime(settings.geMarketCloseTime(), 15);
+        return getCalendarFromTime(mSettings.geMarketCloseTime(), 15);
     }
 
     protected Calendar getMarketCloseTime() {
-        return getCalendarFromTime(settings.geMarketCloseTime(), 0);
+        return getCalendarFromTime(mSettings.geMarketCloseTime(), 0);
     }
 
     protected Calendar getCalendarFromTime(String time, int offsetMinutes) {
-        Calendar cal = new GregorianCalendar(settings.getSavedSettingsTimeZone());
+        Calendar cal = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
         String [] parts = time.split(":");
         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(parts[0]));
         cal.set(Calendar.MINUTE, Integer.parseInt(parts[1]));

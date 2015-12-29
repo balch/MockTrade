@@ -23,7 +23,6 @@
 package com.balch.mocktrade;
 
 import android.app.Application;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.os.StrictMode;
 
@@ -45,19 +44,18 @@ import com.balch.mocktrade.settings.Settings;
 public class TradeApplication extends Application implements ModelProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
-    private static final String DATABASE_NAME = "mocktrade.db";
-    private static final int DATABASE_VERSION = 3;
+    public static final String DATABASE_NAME = "mocktrade.db";
+    private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
-    private SqlConnection sqlConnection;
-    private RequestQueue requestQueue;
-    private Settings settings;
+    private SqlConnection mSqlConnection;
+    private RequestQueue mRequestQueue;
+    private Settings mSettings;
 
-    private SqliteSourceProvider sqliteScheme;
-    private YQLSourceProvider yqlScheme;
-    private ModelFactory modelFactory;
-
+    private SqliteSourceProvider mSqliteScheme;
+    private YQLSourceProvider mYqlScheme;
+    private ModelFactory mModelFactory;
 
     @Override
     public void onCreate() {
@@ -76,17 +74,16 @@ public class TradeApplication extends Application implements ModelProvider {
                     .penaltyLog()
                     .penaltyDeath()
                     .build());
-
         }
 
-        this.settings = new Settings(this);
+        mSettings = new Settings(this);
 
-        this.sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
+        mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                 DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
 
-        this.requestQueue = VolleyBackground.newRequestQueue(this, 10);
+        mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
 
-        this.configureModelFactory();
+        configureModelFactory();
 
         FinanceModel financeModel = getModelFactory().getModel(FinanceModel.class);
         financeModel.setQuoteServiceAlarm();
@@ -95,7 +92,7 @@ public class TradeApplication extends Application implements ModelProvider {
 
     @Override
     public ModelFactory getModelFactory() {
-        return modelFactory;
+        return mModelFactory;
     }
 
     @Override
@@ -104,41 +101,36 @@ public class TradeApplication extends Application implements ModelProvider {
     }
 
     public SqliteSourceProvider getSqliteScheme() {
-        return sqliteScheme;
+        return mSqliteScheme;
     }
 
     public YQLSourceProvider getYqlScheme() {
-        return yqlScheme;
+        return mYqlScheme;
     }
 
     private void configureModelFactory() {
-        this.modelFactory = new ModelFactory();
+        mModelFactory = new ModelFactory();
 
-        this.sqliteScheme = new SqliteSourceProvider(this);
-        this.yqlScheme = new YQLSourceProvider(this);
+        mSqliteScheme = new SqliteSourceProvider(this);
+        mYqlScheme = new YQLSourceProvider(this);
 
-        this.modelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, this.sqliteScheme, true);
-        this.modelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, this.sqliteScheme, true);
-        this.modelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, this.yqlScheme, true);
+        mModelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, mSqliteScheme, true);
+        mModelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, mSqliteScheme, true);
+        mModelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, mYqlScheme, true);
     }
 
     @Override
     public SqlConnection getSqlConnection() {
-        return sqlConnection;
+        return mSqlConnection;
     }
 
     @Override
     public Settings getSettings() {
-        return settings;
-    }
-
-
-    public void closeCurrentView(FragmentManager fragmentManager) {
-        fragmentManager.popBackStack();
+        return mSettings;
     }
 
     @Override
     public RequestQueue getRequestQueue() {
-        return this.requestQueue;
+        return mRequestQueue;
     }
 }

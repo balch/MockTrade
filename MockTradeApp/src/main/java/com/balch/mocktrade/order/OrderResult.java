@@ -25,22 +25,22 @@ package com.balch.mocktrade.order;
 import com.balch.android.app.framework.types.Money;
 
 public class OrderResult {
-    protected final boolean success;
+    protected final boolean mSuccess;
     protected final Money price;
-    protected final Money cost;
-    protected final Money profit;
-    protected final long confirmationId;
+    protected final Money mCost;
+    protected final Money mProfit;
+    protected final long mConfirmationId;
 
     public OrderResult(boolean success, Money price, Money cost, Money profit, long confirmationId) {
-        this.success = success;
+        this.mSuccess = success;
         this.price = price;
-        this.cost = cost;
-        this.profit = profit;
-        this.confirmationId = confirmationId;
+        this.mCost = cost;
+        this.mProfit = profit;
+        this.mConfirmationId = confirmationId;
     }
 
     public boolean isSuccess() {
-        return success;
+        return mSuccess;
     }
 
     public Money getPrice() {
@@ -48,19 +48,19 @@ public class OrderResult {
     }
 
     public Money getCost() {
-        return cost;
+        return mCost;
     }
 
     public Money getValue() {
-        return Money.multiply(cost, -1);
+        return Money.multiply(mCost, -1);
     }
 
     public Money getProfit() {
-        return profit;
+        return mProfit;
     }
 
     public long getConfirmationId() {
-        return confirmationId;
+        return mConfirmationId;
     }
 }
 

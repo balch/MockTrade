@@ -32,19 +32,22 @@ import java.util.TimeZone;
 
 public class Settings {
 
-    protected Application context;
+    private static final String PREF_HIDE_EXCLUDE_ACCOUNTS = "pref_hide_exclude_accounts";
+    private static final String PREF_LAST_SYNC_TIME = "pref_last_sync_time";
+
+    protected Application mContext;
 
     public Settings(Application context) {
-        this.context = context;
-        PreferenceManager.setDefaultValues(this.context, R.xml.settings_pref_screen, false);
+        this.mContext = context;
+        PreferenceManager.setDefaultValues(this.mContext, R.xml.settings_pref_screen, false);
     }
 
     protected SharedPreferences getSharedPrefs() {
-        return PreferenceManager.getDefaultSharedPreferences(this.context);
+        return PreferenceManager.getDefaultSharedPreferences(this.mContext);
     }
 
     protected String getPrefKey(int resID) {
-        return this.context.getResources().getString(resID);
+        return this.mContext.getResources().getString(resID);
     }
 
     // Polls start time is in HH:mm format in PST
@@ -71,5 +74,26 @@ public class Settings {
         return TimeZone.getTimeZone("America/Los_Angeles");
     }
 
+    public boolean getHideExcludeAccounts() {
+        return getSharedPrefs().getBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, false);
+    }
+
+    public void setHideExcludeAccounts(boolean hideExcludeAccounts) {
+        getSharedPrefs()
+                .edit()
+                .putBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts)
+                .apply();
+    }
+
+    public long getLastSyncTime() {
+        return getSharedPrefs().getLong(PREF_LAST_SYNC_TIME, 0);
+    }
+
+    public void setLastSyncTime(long syncTime) {
+        getSharedPrefs()
+                .edit()
+                .putLong(PREF_LAST_SYNC_TIME, syncTime)
+                .apply();
+    }
 
 }

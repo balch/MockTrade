@@ -32,15 +32,14 @@ import android.util.Log;
 
 import com.balch.android.app.framework.StopWatch;
 import com.balch.android.app.framework.domain.DomainObject;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -67,40 +66,16 @@ public class SqlConnection extends SQLiteOpenHelper {
 
     public <T extends DomainObject> List<T> query(SqlMapper mapper, Class<T> clazz, String where, String[] whereArgs, String orderBy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException {
 
-        StopWatch sw = StopWatch.getInstance();
+        StopWatch sw = StopWatch.newInstance();
 
         List<T> results = new ArrayList<T>();
 
-        Constructor<T> ctor = clazz.getConstructor();
         String table = mapper.getTableName();
 
         Cursor cursor = null;
         try {
             cursor = this.getReadableDatabase().query(table, null, where, whereArgs, null, null, orderBy);
-            Map<String, Integer> columnMap = getColumnMap(cursor);
-            while (cursor.moveToNext()) {
-                T item = ctor.newInstance();
-                ISO8601DateTime iso8601DateTime;
-                try {
-                    iso8601DateTime = new ISO8601DateTime(cursor.getString(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
-                } catch (ParseException ex) {
-                    iso8601DateTime = new ISO8601DateTime();
-                    Log.e(TAG, "Error reading CreateTime time", ex);
-                }
-                item.setCreateTime(iso8601DateTime);
-
-                try {
-                    iso8601DateTime = new ISO8601DateTime(cursor.getString(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
-                } catch (ParseException ex) {
-                    iso8601DateTime = new ISO8601DateTime();
-                    Log.e(TAG, "Error reading UpdateTime time", ex);
-                }
-                item.setUpdateTime(iso8601DateTime);
-
-                mapper.populate(item, cursor, columnMap);
-                results.add(item);
-
-            }
+            processCursor(mapper, cursor, clazz, results);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -113,6 +88,31 @@ public class SqlConnection extends SQLiteOpenHelper {
         return results;
     }
 
+    public <T extends DomainObject> void processCursor(SqlMapper mapper, Cursor cursor,
+                                                       Class<T> clazz, List<T> results)
+                    throws IllegalAccessException, InvocationTargetException,
+                            InstantiationException, NoSuchMethodException {
+        Map<String, Integer> columnMap = getColumnMap(cursor);
+        Constructor<T> ctor = clazz.getConstructor();
+        while (cursor.moveToNext()) {
+            T item = ctor.newInstance();
+
+            if (columnMap.containsKey(SqlMapper.COLUMN_CREATE_TIME)) {
+                Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_CREATE_TIME)));
+                item.setCreateTime(date);
+            }
+
+            if (columnMap.containsKey(SqlMapper.COLUMN_CREATE_TIME)) {
+                Date date = new Date(cursor.getLong(columnMap.get(SqlMapper.COLUMN_UPDATE_TIME)));
+                item.setUpdateTime(date);
+            }
+
+            mapper.populate(item, cursor, columnMap);
+            results.add(item);
+        }
+    }
+
+
     public long insert(SqlMapper mapper, DomainObject item) throws SQLException {
         return insert(mapper, item, this.getWritableDatabase());
     }
@@ -120,9 +120,9 @@ public class SqlConnection extends SQLiteOpenHelper {
     public long insert(SqlMapper mapper, DomainObject item, SQLiteDatabase db) throws SQLException {
         ContentValues values = mapper.getContentValues(item);
 
-        ISO8601DateTime now = new ISO8601DateTime();
-        values.put(SqlMapper.COLUMN_CREATE_TIME, now.toString());
-        values.put(SqlMapper.COLUMN_UPDATE_TIME, now.toString());
+        long currentMillis = System.currentTimeMillis();
+        values.put(SqlMapper.COLUMN_CREATE_TIME, currentMillis);
+        values.put(SqlMapper.COLUMN_UPDATE_TIME, currentMillis);
 
         long id = db.insert(mapper.getTableName(), null, values);
         if (id == -1) {
@@ -145,8 +145,7 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         ContentValues values = mapper.getContentValues(item);
 
-        ISO8601DateTime now = new ISO8601DateTime();
-        values.put(SqlMapper.COLUMN_UPDATE_TIME, now.toString());
+        values.put(SqlMapper.COLUMN_UPDATE_TIME, System.currentTimeMillis());
 
         StringBuilder where = new StringBuilder("_id=?");
         List<String> whereArgList = new ArrayList<String>();
@@ -247,7 +246,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         return sql;
     }
 
-    private Map<String, Integer> getColumnMap(Cursor cursor) {
+    public Map<String, Integer> getColumnMap(Cursor cursor) {
         Map<String, Integer> columnMap = new Hashtable<>(cursor.getColumnCount());
 
         for (int x = 0; x < cursor.getColumnCount(); x++) {
@@ -256,6 +255,4 @@ public class SqlConnection extends SQLiteOpenHelper {
 
         return columnMap;
     }
-
-
 }

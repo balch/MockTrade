@@ -32,11 +32,13 @@ import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface PortfolioModel extends BaseModel {
 
-    List<Account> getAllAccounts();
+    List<Account> getAccounts(boolean allAccounts);
 
     Account getAccount(long accountID);
 
@@ -60,5 +62,14 @@ public interface PortfolioModel extends BaseModel {
 
     void scheduleOrderServiceAlarmIfNeeded();
 
+    void createSnapshotTotals(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap);
+
+    int purgeSnapshots(int days);
+
+    Date getLastQuoteTime();
+
+    List<PerformanceItem> getCurrentSnapshot();
+
+    List<PerformanceItem> getCurrentSnapshot(long accountId);
 }
 

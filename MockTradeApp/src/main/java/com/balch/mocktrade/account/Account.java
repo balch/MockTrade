@@ -24,10 +24,10 @@ package com.balch.mocktrade.account;
 
 
 import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.annotations.ColumnEdit;
 import com.balch.android.app.framework.domain.annotations.ColumnNew;
-import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
@@ -36,6 +36,7 @@ import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public class Account extends DomainObject implements Serializable {
@@ -137,7 +138,7 @@ public class Account extends DomainObject implements Serializable {
         this.excludeFromTotals = excludeFromTotals;
     }
 
-    public PerformanceItem getPerformanceItem(List<Investment> investments) {
+    public PerformanceItem getPerformanceItem(List<Investment> investments, Date timestamp) {
         Money currentBalance = new Money(this.getAvailableFunds().getMicroCents());
         Money todayChange = new Money(0);
 
@@ -151,7 +152,7 @@ public class Account extends DomainObject implements Serializable {
             }
         }
 
-        return new PerformanceItem(this.initialBalance, currentBalance, todayChange);
+        return new PerformanceItem(this.getId(), timestamp, this.initialBalance, currentBalance, todayChange);
     }
 
     @Override

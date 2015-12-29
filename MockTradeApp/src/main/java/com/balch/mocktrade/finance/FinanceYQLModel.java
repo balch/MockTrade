@@ -38,7 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +57,7 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
     static private final String JSON_RESULTS = "results";
     static private final String JSON_QUOTE = "quote";
 
-    protected FinanceManager financeManager;
+    protected FinanceManager mFinanceManager;
 
     public FinanceYQLModel() {
     }
@@ -65,12 +65,12 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
     @Override
     public void initialize(ModelProvider modelProvider) {
         super.initialize(modelProvider);
-        this.financeManager = new FinanceManager(this.getContext(), this.geSettings());
+        this.mFinanceManager = new FinanceManager(this.getContext(), this.geSettings());
     }
 
     @Override
     public void getQuote(final String symbol, final RequestListener<Quote> listener) {
-        this.getQuotes(Arrays.asList(symbol), new RequestListener<Map<String, Quote>>() {
+        this.getQuotes(Collections.singletonList(symbol), new RequestListener<Map<String, Quote>>() {
             @Override
             public void onResponse(Map<String, Quote> response) {
                 listener.onResponse(response.get(symbol));
@@ -87,8 +87,8 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
     public void getQuotes(final List<String> symbols, final RequestListener<Map<String, Quote>> listener)  {
 
         final CountDownLatch latch = new CountDownLatch(2);
-        final Map<String, Quote> yqlQuotes = new HashMap<String, Quote>();
-        final Map<String, Quote> googleQuotes = new HashMap<String, Quote>();
+        final Map<String, Quote> yqlQuotes = new HashMap<>();
+        final Map<String, Quote> googleQuotes = new HashMap<>();
         final StringBuilder errorMessages = new StringBuilder();
 
         this.getYQLQuotes(symbols, new RequestListener<Map<String, Quote>>() {
@@ -144,34 +144,34 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
             } else {
                 listener.onErrorResponse(errorMessages.toString());
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 
 
     @Override
     public boolean isMarketOpen() {
-        return this.financeManager.isMarketOpen();
+        return mFinanceManager.isMarketOpen();
     }
 
     @Override
     public Date nextMarketOpen() {
-        return this.financeManager.nextMarketOpen();
+        return mFinanceManager.nextMarketOpen();
     }
 
     @Override
     public boolean isInPollTime() {
-        return this.financeManager.isInPollTime();
+        return mFinanceManager.isInPollTime();
     }
 
     @Override
     public void setQuoteServiceAlarm() {
-        this.financeManager.setQuoteServiceAlarm();
+        mFinanceManager.setQuoteServiceAlarm();
     }
 
     protected String getDelimitedSymbols(List<String> symbols) {
         StringBuilder builder = new StringBuilder();
-        Set<String> symbolSet = new HashSet<String>();
+        Set<String> symbolSet = new HashSet<>();
         boolean isFirst = true;
         for (String s : symbols) {
             if (symbolSet.contains(s)) {
@@ -205,7 +205,7 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
                                     response = response.substring(2);
                                 }
 
-                                Map<String, Quote> quoteMap = new HashMap<String, Quote>(symbols.size());
+                                Map<String, Quote> quoteMap = new HashMap<>(symbols.size());
                                 JSONArray jsonQuotes = new JSONArray(response);
                                 for (int x = 0; x < jsonQuotes.length(); x++) {
                                     try {
@@ -245,12 +245,12 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
 
         try {
             final String request = this.getYQLQueryUrl(sql.toString());
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, request, null,
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, request,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                                Map<String, Quote> quoteMap = new HashMap<String, Quote>(symbols.size());
+                                Map<String, Quote> quoteMap = new HashMap<>(symbols.size());
 
                                 JSONObject root = response.getJSONObject(JSON_QUERY);
                                 int count = root.getInt(JSON_COUNT);
@@ -294,6 +294,4 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
             throw new RuntimeException(e);
         }
     }
-
-
 }

@@ -43,7 +43,7 @@ import java.util.TimeZone;
 public class QuoteYahooFinance implements Quote {
     static private final String TAG = QuoteYahooFinance.class.getSimpleName();
 
-    protected Map<String, String> data = new HashMap<String, String>();
+    protected Map<String, String> mData = new HashMap<>();
 
     protected final static String Ask="Ask";
     protected final static String AverageDailyVolume="AverageDailyVolume";
@@ -110,34 +110,34 @@ public class QuoteYahooFinance implements Quote {
 
     @Override
     public Money getPrice() {
-        return new Money(this.data.get(this.LastTradePriceOnly));
+        return new Money(mData.get(LastTradePriceOnly));
     }
 
     @Override
     public void setPrice(Money price) {
-        this.data.put(this.LastTradePriceOnly, String.valueOf(price.getDollars()));
+        mData.put(LastTradePriceOnly, String.valueOf(price.getDollars()));
     }
 
     @Override
     public String getSymbol() {
-        return this.data.get(this.Symbol);
+        return mData.get(Symbol);
     }
 
     @Override
     public String getName() {
-        return this.data.get(this.Name);
+        return mData.get(Name);
     }
 
     @Override
     public String getExchange() {
-        return this.data.get(this.StockExchange);
+        return mData.get(StockExchange);
     }
 
     @Override
     public Date getLastTradeTime() {
         DateFormat df = new SimpleDateFormat("M/d/yy h:mma", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        String dateStr = this.data.get(LastTradeDate) + " " + this.data.get(LastTradeTime).toUpperCase();
+        String dateStr = mData.get(LastTradeDate) + " " + mData.get(LastTradeTime).toUpperCase();
         try {
             return df.parse(dateStr);
         } catch (ParseException e) {
@@ -153,14 +153,14 @@ public class QuoteYahooFinance implements Quote {
 
         String dateStr = df.format(time);
         String[] parts = dateStr.split(" ");
-        this.data.put(LastTradeDate, parts[0]);
-        this.data.put(LastTradeTime, parts[1]);
+        mData.put(LastTradeDate, parts[0]);
+        mData.put(LastTradeTime, parts[1]);
 
     }
 
     @Override
     public Money getPreviousClose() {
-        return new Money(this.data.get(this.PreviousClose));
+        return new Money(mData.get(PreviousClose));
     }
 
     public static QuoteYahooFinance fromJSONObject(JSONObject jsonObject) throws JSONException {
@@ -169,11 +169,11 @@ public class QuoteYahooFinance implements Quote {
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if (!jsonObject.isNull(key)) {
-                quote.data.put(key, jsonObject.getString(key));
+                quote.mData.put(key, jsonObject.getString(key));
             }
         }
 
-        String error = quote.data.get(QuoteYahooFinance.ErrorIndicationreturnedforsymbolchangedinvalid);
+        String error = quote.mData.get(QuoteYahooFinance.ErrorIndicationreturnedforsymbolchangedinvalid);
         if (!TextUtils.isEmpty(error)) {
             throw new JSONException(error);
         }
@@ -194,7 +194,7 @@ public class QuoteYahooFinance implements Quote {
 
     @Override
     public Money getDividendPerShare() {
-        return new Money(this.data.get(this.DividendShare));
+        return new Money(mData.get(DividendShare));
     }
 
 }

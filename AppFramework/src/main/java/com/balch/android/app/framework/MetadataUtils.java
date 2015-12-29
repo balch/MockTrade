@@ -32,15 +32,14 @@ import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.annotations.ColumnEdit;
 import com.balch.android.app.framework.domain.annotations.ColumnNew;
-import com.balch.android.app.framework.domain.controls.EditControl;
-import com.balch.android.app.framework.domain.controls.BoolEditControl;
-import com.balch.android.app.framework.domain.controls.EnumEditControl;
-import com.balch.android.app.framework.domain.controls.MoneyEditControl;
-import com.balch.android.app.framework.domain.controls.NumberEditControl;
-import com.balch.android.app.framework.domain.controls.StringEditControl;
-import com.balch.android.app.framework.domain.controls.UnsupportedEditControl;
+import com.balch.android.app.framework.domain.widget.EditLayout;
+import com.balch.android.app.framework.domain.widget.BoolEditLayout;
+import com.balch.android.app.framework.domain.widget.EnumEditLayout;
+import com.balch.android.app.framework.domain.widget.MoneyEditLayout;
+import com.balch.android.app.framework.domain.widget.NumberEditLayout;
+import com.balch.android.app.framework.domain.widget.StringEditLayout;
+import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
 import com.balch.android.app.framework.domain.DomainObject;
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 
 import java.lang.reflect.Field;
@@ -54,22 +53,21 @@ import java.util.Map;
 public class MetadataUtils {
     private static final String TAG = MetadataUtils.class.getSimpleName();
 
-    protected static Map<String, List<Field>> fieldCache = new HashMap<String, List<Field>>();
+    protected static Map<String, List<Field>> fieldCache = new HashMap<>();
 
     // TODO: more EditControl classes
     public enum FrameworkType {
-        MONEY(Money.class, MoneyEditControl.class),
-        ENUM(Enum.class, EnumEditControl.class),
-        ISO8601DATETIME(ISO8601DateTime.class, null),
+        MONEY(Money.class, MoneyEditLayout.class),
+        ENUM(Enum.class, EnumEditLayout.class),
         DATE(Date.class, null),
         DOMAINOBJECT(DomainObject.class, null),
-        STRING(String.class, StringEditControl.class),
-        BOOLEAN(Boolean.class, BoolEditControl.class),
+        STRING(String.class, StringEditLayout.class),
+        BOOLEAN(Boolean.class, BoolEditLayout.class),
         INTEGER(Integer.class, null),
         LONG(Long.class, null),
-        DOUBLE(Double.class, NumberEditControl.class),
-        FLOAT(Float.class, NumberEditControl.class),
-        UNSUPPORTED(null, UnsupportedEditControl.class);
+        DOUBLE(Double.class, NumberEditLayout.class),
+        FLOAT(Float.class, NumberEditLayout.class),
+        UNSUPPORTED(null, UnsupportedEditLayout.class);
 
         protected final Class<?> clazz;
         protected final Class<? extends ViewGroup> editViewClazz;
@@ -85,8 +83,6 @@ public class MetadataUtils {
         boolean handleMoney(Field field);
 
         boolean handleEnum(Field field);
-
-        boolean handleISO8601DateTime(Field field);
 
         boolean handleDate(Field field);
 
@@ -121,8 +117,6 @@ public class MetadataUtils {
             handled = handler.handleMoney(field);
         } else if (frameworkType == FrameworkType.ENUM) {
             handled = handler.handleEnum(field);
-        } else if (frameworkType == FrameworkType.ISO8601DATETIME) {
-            handled = handler.handleISO8601DateTime(field);
         } else if (frameworkType == FrameworkType.DATE) {
             handled = handler.handleDate(field);
         } else if (frameworkType == FrameworkType.DOMAINOBJECT) {
@@ -148,15 +142,15 @@ public class MetadataUtils {
 
     static public List<ColumnDescriptor> getColumnDescriptors(DomainObject domainObject, boolean isNew) {
 
-        List<ColumnDescriptor> descriptors = new ArrayList<ColumnDescriptor>();
+        List<ColumnDescriptor> descriptors = new ArrayList<>();
 
         List<Field> fields = getAllFields(((Object)domainObject).getClass());
         for (Field field : fields) {
             if (isNew) {
                 final ColumnNew newable = field.getAnnotation(ColumnNew.class);
                 if ((newable != null) && (newable.state() != EditState.HIDDEN)) {
-                    Class<? extends EditControl> customControl = newable.customControl();
-                    if (EditControl.class.equals(customControl)) {
+                    Class<? extends EditLayout> customControl = newable.customControl();
+                    if (EditLayout.class.equals(customControl)) {
                         customControl = null;
                     }
 
@@ -168,8 +162,8 @@ public class MetadataUtils {
             } else {
                 final ColumnEdit editable = field.getAnnotation(ColumnEdit.class);
                 if ((editable != null) && (editable.state() != EditState.HIDDEN)) {
-                    Class<? extends EditControl> customControl = editable.customControl();
-                    if (EditControl.class.equals(customControl)) {
+                    Class<? extends EditLayout> customControl = editable.customControl();
+                    if (EditLayout.class.equals(customControl)) {
                         customControl = null;
                     }
 

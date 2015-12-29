@@ -2,4 +2,17 @@
 <resources>
     <color name="nav_on_color">#ff27db4e</color>
     <color name="nav_off_color">#ff666666</color>
+
+    <color name="success">#FF00BB00</color>
+    <color name="failure">#FFBB0000</color>
+
+    <color name="snackbar_background">#EE003300</color>
+
+    <color name="portfolio_view_graph_title">#FF0000FF</color>
+    <color name="portfolio_view_graph_title_shadow">#FF000066</color>
+
+    <color name="portfolio_view_graph_background">#2200CC00</color>
+    <color name="portfolio_view_status_text">#FF999999</color>
+    <color name="portfolio_view_status_background">#FF000000</color>
+
 </resources>

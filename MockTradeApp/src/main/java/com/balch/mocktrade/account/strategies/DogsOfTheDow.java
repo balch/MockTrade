@@ -26,11 +26,11 @@ import android.util.Log;
 
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
-import com.balch.mocktrade.portfolio.PortfolioPresenter;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -52,7 +52,7 @@ public class DogsOfTheDow extends BaseStrategy {
         this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS), new RequestListener<Map<String, Quote>>() {
             @Override
             public void onResponse(Map<String, Quote> response) {
-                SortedMap<Money, Quote> sortedQuoteMap = new TreeMap<Money, Quote>();
+                SortedMap<Money, Quote> sortedQuoteMap = new TreeMap<>();
                 for (Quote quote : response.values()) {
                     sortedQuoteMap.put(quote.getDividendPerShare(), quote);
                 }
@@ -80,7 +80,7 @@ public class DogsOfTheDow extends BaseStrategy {
                         }
                     }
 
-                    PortfolioPresenter.updateView(context);
+                    MainActivity.updateView(context);
                 }
             }
 
@@ -96,7 +96,7 @@ public class DogsOfTheDow extends BaseStrategy {
                             Map<String, Quote> quoteMap) {
         if ((investments != null) && (investments.size() > 0)) {
             Calendar createDate = new GregorianCalendar();
-            createDate.setTime(investments.get(0).getCreateTime().getDate());
+            createDate.setTime(investments.get(0).getCreateTime());
 
             Calendar now = new GregorianCalendar();
             if (createDate.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {

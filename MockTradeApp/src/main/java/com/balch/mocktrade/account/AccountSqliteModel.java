@@ -52,9 +52,15 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
         super(modelProvider);
     }
 
-    public List<Account> getAllAccounts() {
+    public List<Account> getAccounts(boolean allAccounts) {
         try {
-            return getSqlConnection().query(this, Account.class, null, null, COLUMN_NAME + " COLLATE NOCASE");
+            String where = null;
+            String [] args = null;
+            if (!allAccounts) {
+                where = COLUMN_EXCLUDE_FROM_TOTALS + "=?";
+                args = new String[]{"0"};
+            }
+            return getSqlConnection().query(this, Account.class, where, args, COLUMN_NAME + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

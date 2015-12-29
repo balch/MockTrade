@@ -6,10 +6,13 @@ MockTrade
 
 * Open Source Android Trading Simulator
 * AppFramework Library
-    * TemplateActivity with built in MVP
+    * BaseAppCompatActivity with built in MVP
         * ModelFactory!!!!
         * Error Handling
     * Annotation Driven List/Create/Edit Layouts
+    * SqlConnection Encapsulation
+        * Domain Objects
+        * SqlMapper pattern
 * MockTrade Application
     * Proving Ground for AppFramework
     * Trading Simulation Business Logic
@@ -39,7 +42,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
 
 * SqlConnection Service
     * sqlite encapsulation
-    * Annotation based column declaration
+    * SqlMapper pattern
     * auto id, create_time, and update_time column management
     * use reflection to translate java types to sql (and back)
 * Model/View/Presenter Support
@@ -51,7 +54,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
         * caches controls (ViewHolder pattern)
         * provides Listener interfaces to communicate with Presenter
         * facilitates binding to Business/Domain Object patterns
-    * Presenter - facade pattern for the Activity/Fragment classes
+    * Presenter - BaseAppCompatActiivty classes to facilitate MVP
         * coordinates interactions between the View and Model 
         * error handling framework for exceptions thrown from the Presenter. 
         * provide system services to business logic
@@ -68,11 +71,13 @@ explore some Application Architecture ideas and apply them to the Android platfo
 ### Screenshots
 ![Screen Shot 1](./Mocktrade_ss1.png)
 
-![Screen Shot 2](./Mocktrade_ss2.png)
+![Screen Shot 2](./Mocktrade_ss5.png)
 
-![Screen Shot 3](./Mocktrade_ss3.png)
+![Screen Shot 3](./Mocktrade_ss2.png)
 
-![Screen Shot 4](./Mocktrade_ss4.png)
+![Screen Shot 4](./Mocktrade_ss3.png)
+
+![Screen Shot 5](./Mocktrade_ss4.png)
 
 ### Attributions
 * Awesome icon site: http://www.iconarchive.com/

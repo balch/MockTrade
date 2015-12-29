@@ -125,5 +125,23 @@
     <string name="notification_order_buy_success_format">Buy order for %1$s executed %2$d shares at %3$s for a total cost of %4$s.</string>
     <string name="notification_order_sell_success_format">Sell order for %1$s executed %2$d shares at %3$s for a total value of %4$s. (Profit: %5$s)</string>
     <string name="notification_order_error_format">Order %1$d for %2$s failed to executed. Error: %3$s</string>
+    <string name="order_list_activity_label">Open Orders</string>
+    <string name="setting_activity_label">Settings</string>
+    <string name="menu_new_portfolio">New Portfolio</string>
+    <string name="menu_loading">Loading...</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="portfolio_view_intro_header">Get Started</string>
+    <string name="portfolio_view_create_portfolio">Create Portfolio</string>
+    <string name="menu_backup_db">Backup Database</string>
+
+    <string name="menu_backup_db_success">Backup Successful</string>
+    <string name="menu_backup_db_fail">Backup Failed</string>
+    <string name="portfolio_view_last_sync">Last Sync: %1$s</string>
+    <string name="portfolio_view_last_quote">Last Quote: %1$s</string>
+    <string name="menu_hide_exclude_accounts">Hide Exclude Accounts</string>
+    <string name="portfolio_view_empty_graph_text">Nothing to see here.\nCreate a portfolio and come back during market hours.</string>
+    <string name="portfolio_view_time_title_today">Today</string>
+    <string name="portfolio_view_graph_spinner_totals">Totals</string>
 
 </resources>

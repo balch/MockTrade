@@ -24,168 +24,202 @@ package com.balch.android.app.framework;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.balch.android.app.framework.view.BaseView;
 
+/**
+ * This class enhances the AppCompatActivity functionality by providing View creation abstraction
+ * and error handling.
+ *
+ * @param <V> Type of BaseView to create
+ */
 public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
     private static final String TAG = BaseAppCompatActivity.class.getSimpleName();
 
-    private String className;
-    protected BasePresenter presenter;
+    private String mClassName;
 
-    abstract protected void initialize(Bundle savedInstanceState);
-    abstract protected BasePresenter createPresenter(V view);
     abstract protected V createView();
 
-    public BaseAppCompatActivity() {
-        this.className = this.getClass().getSimpleName();
+    // override-able activity functions
+    protected void onCreateBase(Bundle savedInstanceState) {
     }
 
-    protected void handleException(String logMsg, String displayMsg, Exception ex) {
-        if (TextUtils.isEmpty(displayMsg)) {
-            displayMsg = ex.toString();
-        }
+    protected void onResumeBase() {
+    }
 
-        Toast.makeText(this, logMsg + ": "+ displayMsg, Toast.LENGTH_LONG).show();
+    protected void onPauseBase() {
+    }
+
+    protected void onStartBase() {
+    }
+
+    protected void onStopBase() {
+    }
+
+    protected void onDestroyBase() {
+    }
+
+    protected void onSaveInstanceStateBase(Bundle outState) {
+    }
+
+    protected void onActivityResultBase(int requestCode, int resultCode, Intent data) {
+    }
+
+
+    protected void onHandleException(String logMsg, String displayMsg, Exception ex) {
+    }
+
+
+    public BaseAppCompatActivity() {
+        this.mClassName = this.getClass().getSimpleName();
+    }
+
+    private void handleException(String logMsg, String displayMsg, Exception ex) {
         Log.e(TAG, logMsg, ex);
+        onHandleException(logMsg, displayMsg, ex);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className +" OnCreate - Begin");
+    final protected void onCreate(Bundle savedInstanceState) {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " OnCreate - Begin");
         try {
             super.onCreate(savedInstanceState);
             V view = this.createView();
             view.initializeLayout();
 
-            this.presenter = this.createPresenter(view);
-            if (this.presenter != null) {
-                this.presenter.setApplication(this.getApplication());
-                this.presenter.setLoaderManager(this.getLoaderManager());
-                this.presenter.initialize(savedInstanceState);
-            }
-
             this.setContentView(view);
-            this.initialize(savedInstanceState);
+            this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {
-            handleException("OnCreate ",ex.getLocalizedMessage(), ex);
+            handleException("OnCreate ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " OnCreate - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " OnCreate - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onStart() {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className +" onStart - Begin");
+    final public void onStart() {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onStart - Begin");
         try {
             super.onStart();
-            if (this.presenter != null) {
-                presenter.onStart();
-            }
+            onStartBase();
         } catch (Exception ex) {
-            handleException("onStart ",ex.getLocalizedMessage(), ex);
+            handleException("onStart ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onStart - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onStart - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onResume() {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className +" onResume - Begin");
+    final public void onResume() {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onResume - Begin");
         try {
             super.onResume();
-            if (this.presenter != null) {
-                presenter.onResume();
-            }
+            onResumeBase();
         } catch (Exception ex) {
             handleException("onResume ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onResume - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onResume - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className +" onSaveInstanceState - Begin");
+    final public void onSaveInstanceState(Bundle outState) {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
-            if (this.presenter != null) {
-                presenter.onSaveInstanceState(outState);
-            }
+            onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onSaveInstanceState - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onSaveInstanceState - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onPause() {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className + " onPause - Begin");
+    final public void onPause() {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onPause - Begin");
         try {
-            if (this.presenter != null) {
-                presenter.onPause();
-            }
+            onPauseBase();
             super.onPause();
         } catch (Exception ex) {
             handleException("onPause ", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onPause - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onPause - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onStop() {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className + " onStop - Begin");
+    final public void onStop() {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onStop - Begin");
 
         try {
-            if (this.presenter != null) {
-                presenter.onStop();
-            }
+            onStopBase();
             super.onStop();
         } catch (Exception ex) {
             handleException("onStop", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onStop - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onStop - End (ms):" + sw.stop());
     }
 
     @Override
-    public void onDestroy() {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className + " onDestroy - Begin");
+    final public void onDestroy() {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onDestroy - Begin");
         try {
-            if (this.presenter != null) {
-                presenter.onDestroy();
-            }
+            onDestroyBase();
         } catch (Exception ex) {
-            handleException("onDestroy",ex.getLocalizedMessage(), ex);
+            handleException("onDestroy", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onDestroy - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onDestroy - End (ms):" + sw.stop());
         super.onDestroy();
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        StopWatch sw = StopWatch.getInstance();
-        Log.d(TAG, this.className + " onActivityResult - Begin");
+    final public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        StopWatch sw = StopWatch.newInstance();
+        Log.d(TAG, this.mClassName + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            if (this.presenter != null) {
-                // could have result code collisions
-                // make sure to also check for existence of result
-                presenter.onActivityResult(requestCode, resultCode, data);
-            }
+            onActivityResultBase(requestCode, resultCode, data);
         } catch (Exception ex) {
-            handleException("onActivityResult",ex.getLocalizedMessage(), ex);
+            handleException("onActivityResult", ex.getLocalizedMessage(), ex);
         }
-        Log.i(TAG, this.className + " onActivityResult - End Millis:" + sw.stop());
+        Log.i(TAG, this.mClassName + " onActivityResult - End (ms):" + sw.stop());
+    }
+
+    public Snackbar getSnackbar(View parent, String msg, int length) {
+        return Snackbar.make(parent, msg, length);
+    }
+
+    public Snackbar getSnackbar(View parent, String msg, int length, int backgroundColorId) {
+        Snackbar snackbar = getSnackbar(parent, msg, length);
+        ViewGroup group = (ViewGroup) snackbar.getView();
+        group.setBackgroundColor(ContextCompat.getColor(this, backgroundColorId));
+        return snackbar;
+    }
+
+    /**
+     * TODO: figure out why android.support.design.R.id.snackbar_text
+     * does not resolve in aar
+     */
+    public Snackbar getSnackbar(View parent, String msg, int length,
+                                int backgroundColorId, int textColorId, int snackBarTextId) {
+        Snackbar snackbar = getSnackbar(parent, msg, length, backgroundColorId);
+        ViewGroup group = (ViewGroup) snackbar.getView();
+
+        ((TextView) group.findViewById(snackBarTextId))
+                .setTextColor(ContextCompat.getColor(this, textColorId));
+
+        return snackbar;
     }
 
 }

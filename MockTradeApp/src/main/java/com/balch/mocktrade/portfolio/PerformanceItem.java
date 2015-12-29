@@ -22,53 +22,85 @@
 
 package com.balch.mocktrade.portfolio;
 
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 
-public class PerformanceItem {
-    protected final Money costBasis;
-    protected final Money value;
-    protected final Money todayChange;
+import java.util.Date;
 
-    public PerformanceItem(Money costBasis, Money value, Money todayChange) {
-        this.costBasis = costBasis;
-        this.value = value;
-        this.todayChange = todayChange;
+public class PerformanceItem extends DomainObject{
+    protected long mAccountId;
+    protected Date mTimestamp;
+    protected Money mCostBasis;
+    protected Money mValue;
+    protected Money mTodayChange;
+
+    public PerformanceItem() {
+    }
+
+    public PerformanceItem(long accountId, Date timestamp,
+                           Money costBasis, Money value, Money todayChange) {
+        this.mAccountId = accountId;
+        this.mTimestamp = timestamp;
+        this.mCostBasis = costBasis;
+        this.mValue = value;
+        this.mTodayChange = todayChange;
     }
 
     public Money getCostBasis() {
-        return costBasis;
+        return mCostBasis;
     }
 
     public Money getValue() {
-        return value;
+        return mValue;
     }
 
     public Money getTodayChange() {
-        return todayChange;
+        return mTodayChange;
     }
 
     public void aggregate(PerformanceItem performanceItem) {
-        this.costBasis.add(performanceItem.getCostBasis());
-        this.todayChange.add(performanceItem.getTodayChange());
-        this.value.add(performanceItem.getValue());
+        this.mCostBasis.add(performanceItem.getCostBasis());
+        this.mTodayChange.add(performanceItem.getTodayChange());
+        this.mValue.add(performanceItem.getValue());
     }
-
-    public Money getDailyChange() {
-        return this.todayChange;
-    }
-
 
     public Money getTotalChange() {
-        return Money.subtract(this.value, this.costBasis);
+        return Money.subtract(this.mValue, this.mCostBasis);
     }
 
     public float getTotalChangePercent() {
-        float percent = (this.costBasis.getMicroCents() != 0) ?
-                Money.subtract(this.value, this.costBasis).getMicroCents() / (float) this.costBasis.getMicroCents() :
+        float percent = (this.mCostBasis.getMicroCents() != 0) ?
+                Money.subtract(this.mValue, this.mCostBasis).getMicroCents() / (float) this.mCostBasis.getMicroCents() :
                 1.0f;
 
         return percent * 100.0f;
     }
 
+    public long getAccountId() {
+        return mAccountId;
+    }
 
+    public Date getTimestamp() {
+        return mTimestamp;
+    }
+
+    public void setAccountId(long accountId) {
+        this.mAccountId = accountId;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.mTimestamp = timestamp;
+    }
+
+    public void setCostBasis(Money costBasis) {
+        this.mCostBasis = costBasis;
+    }
+
+    public void setValue(Money value) {
+        this.mValue = value;
+    }
+
+    public void setTodayChange(Money todayChange) {
+        this.mTodayChange = todayChange;
+    }
 }

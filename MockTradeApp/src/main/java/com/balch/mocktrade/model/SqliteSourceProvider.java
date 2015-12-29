@@ -26,15 +26,15 @@ import com.balch.android.app.framework.model.ModelSourceProvider;
 
 public class SqliteSourceProvider extends ModelSourceProvider<SqliteModel> {
 
-    protected ModelProvider modelProvider;
+    protected ModelProvider mModelProvider;
 
     public SqliteSourceProvider(ModelProvider modelProvider) {
         super(SqliteModel.class);
-        this.modelProvider = modelProvider;
+        this.mModelProvider = modelProvider;
     }
 
     @Override
     public void initialize(SqliteModel model) {
-        model.initialize(modelProvider);
+        model.initialize(mModelProvider);
     }
 }

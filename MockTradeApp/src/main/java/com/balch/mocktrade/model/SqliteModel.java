@@ -31,37 +31,37 @@ import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.settings.Settings;
 
 public abstract class SqliteModel implements ModelInitializer<ModelProvider> {
-    protected ModelProvider modelProvider;
+    protected ModelProvider mModelProvider;
 
     public SqliteModel() {
     }
 
     public SqliteModel(ModelProvider modelProvider) {
-        this.modelProvider = modelProvider;
+        this.mModelProvider = modelProvider;
     }
 
     @Override
     public void initialize(ModelProvider modelProvider) {
-        this.modelProvider = modelProvider;
+        this.mModelProvider = modelProvider;
     }
 
     public Context getContext() {
-        return modelProvider.getContext();
+        return mModelProvider.getContext();
     }
 
     public Settings getSettings() {
-        return modelProvider.getSettings();
+        return mModelProvider.getSettings();
     }
 
     public ModelFactory getModelFactory() {
-        return modelProvider.getModelFactory();
+        return mModelProvider.getModelFactory();
     }
 
     public SqlConnection getSqlConnection() {
-        return modelProvider.getSqlConnection();
+        return mModelProvider.getSqlConnection();
     }
 
     public ModelProvider getModelProvider() {
-        return modelProvider;
+        return mModelProvider;
     }
 }

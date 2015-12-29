@@ -26,16 +26,16 @@ import com.balch.android.app.framework.model.ModelSourceProvider;
 
 public class YQLSourceProvider extends ModelSourceProvider<YQLModel> {
 
-    protected final ModelProvider modelProvider;
+    protected final ModelProvider mModelProvider;
 
     public YQLSourceProvider(ModelProvider modelProvider) {
         super(YQLModel.class);
-        this.modelProvider = modelProvider;
+        this.mModelProvider = modelProvider;
     }
 
     @Override
     public void initialize(YQLModel model) {
-        model.initialize(this.modelProvider);
+        model.initialize(this.mModelProvider);
     }
 
 }

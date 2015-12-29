@@ -26,10 +26,12 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
+import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -37,11 +39,9 @@ import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
-import com.balch.mocktrade.portfolio.PortfolioPresenter;
+import com.balch.mocktrade.settings.Settings;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +49,10 @@ import java.util.Map;
 public class QuoteService extends IntentService {
     private static final String TAG = QuoteService.class.getSimpleName();
 
+    public static final int SNAPSHOT_DAYS_TO_KEEP = 120;
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 
-    protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
-    protected static String lastUpdateDate = "";  // move this to shared prefs?
+    private Settings mSettings;
 
     public QuoteService() {
         super(QuoteService.class.getName());
@@ -66,31 +66,31 @@ public class QuoteService extends IntentService {
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
+            // get the investment list from the db
             ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
             FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
             final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
             final List<Investment> investments = portfolioModel.getAllInvestments();
+            mSettings = ((ModelProvider)this.getApplication()).getSettings();
 
             if (investments.size() > 0) {
-                final List<Account> accounts = portfolioModel.getAllAccounts();
-                Map<Long, Account> accountMap = new HashMap<>(accounts.size());
-                for (Account a : accounts ) {
-                    accountMap.put(a.getId(), a);
-                }
+                final List<Account> accounts = portfolioModel.getAccounts(true);
 
-                final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<Long, List<Investment>>(accounts.size());
-                List<String> symbols = new ArrayList<String>(investments.size());
+                final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<>(accounts.size());
+                List<String> symbols = new ArrayList<>(investments.size());
                 for (Investment i : investments) {
                     symbols.add(i.getSymbol());
 
+                    // aggregate investments by account
                     List<Investment> list = accountIdToInvestmentMap.get(i.getAccount().getId());
                     if (list == null) {
-                        list = new ArrayList<Investment>();
+                        list = new ArrayList<>();
                         accountIdToInvestmentMap.put(i.getAccount().getId(), list);
                     }
                     list.add(i);
                 }
 
+                // get quotes over the wire
                 financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
                     @Override
                     public void onResponse(Map<String, Quote> quoteMap) {
@@ -108,9 +108,18 @@ public class QuoteService extends IntentService {
                                 }
                             }
 
-                            processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap);
+                            boolean isFirstSyncOfDay = !DateUtils.isToday(mSettings.getLastSyncTime());
+                            if (isFirstSyncOfDay) {
+                                portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
+                            }
+
+                            portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
+
+                            processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
+
+                            mSettings.setLastSyncTime(System.currentTimeMillis());
                         } finally {
-                            PortfolioPresenter.updateView(QuoteService.this);
+                            MainActivity.updateView(QuoteService.this);
                             releaseWakeLock();
                         }
                     }
@@ -119,13 +128,13 @@ public class QuoteService extends IntentService {
                     public void onErrorResponse(String error) {
                         // failed to return quotes
                         // Error has been logged
-                        PortfolioPresenter.updateView(QuoteService.this);
+                        MainActivity.updateView(QuoteService.this);
                         releaseWakeLock();
                     }
                 });
             } else {
                 completeWakefulIntentOnExit = true;
-                PortfolioPresenter.updateView(QuoteService.this);
+                MainActivity.updateView(QuoteService.this);
             }
 
             // if the market is closed reset alarm to next market open time
@@ -140,7 +149,6 @@ public class QuoteService extends IntentService {
             if (completeWakefulIntentOnExit) {
                 releaseWakeLock();
             }
-
         }
     }
 
@@ -150,14 +158,7 @@ public class QuoteService extends IntentService {
 
     protected void processAccountStrategies(List<Account> accounts,
                                             Map<Long, List<Investment>> accountIdToInvestmentMap,
-                                            Map<String, Quote> quoteMap) {
-        boolean doDailyUpdate = false;
-        String today = DATE_FORMATTER.format(new Date());
-        if (!today.equals(lastUpdateDate)) {
-            lastUpdateDate = today;
-            doDailyUpdate = true;
-        }
-
+                                            Map<String, Quote> quoteMap, boolean doDailyUpdate) {
         for (Account account : accounts) {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
             if (strategyClazz != null) {
@@ -182,7 +183,5 @@ public class QuoteService extends IntentService {
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
-
     }
-
 }

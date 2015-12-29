@@ -25,8 +25,6 @@ package com.balch.android.app.framework.view;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.http.AndroidHttpClient;
-import android.os.Build;
 
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
@@ -34,7 +32,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.ResponseDelivery;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
 
@@ -56,14 +53,7 @@ public class VolleyBackground {
         } catch (PackageManager.NameNotFoundException e) {
         }
 
-        HttpStack stack;
-        if (Build.VERSION.SDK_INT >= 9) {
-            stack = new HurlStack();
-        } else {
-            // Prior to Gingerbread, HttpUrlConnection was unreliable.
-            // See: http://android-developers.blogspot.com/2011/09/androids-http-clients.html
-            stack = new HttpClientStack(AndroidHttpClient.newInstance(userAgent));
-        }
+        HttpStack stack = new HurlStack();
 
         Network network = new BasicNetwork(stack);
 

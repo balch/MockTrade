@@ -23,151 +23,172 @@
 package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 
+import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.account.AccountItemView;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.investment.InvestmentItemView;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class PortfolioAdapter extends BaseExpandableListAdapter {
+public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int VIEW_TYPE_ACCOUNT_HEADER = 0;
+    private static final int VIEW_TYPE_PORTFOLIO_ITEM = 1;
+    private static final int VIEW_TYPE_NEW_ACCOUNT_ITEM = 2;
 
     public interface PortfolioAdapterListener {
         boolean onLongClickAccount(Account account);
         boolean onLongClickInvestment(Investment investment);
+        void createNewAccount();
     }
-    protected AccountItemView.AccountItemViewListener accountItemViewListener;
 
-    protected Context context;
-    protected PortfolioAdapterListener listener;
-    protected PortfolioData portfolioData = new PortfolioData();
+    protected AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
+
+    protected Context mContext;
+    protected PortfolioAdapterListener mPortfolioAdapterListener;
+    protected PortfolioData mPortfolioData = new PortfolioData();
+
+    protected List<Object> mDataList;
 
     public PortfolioAdapter(Context context) {
-        this.context = context;
-    }
-
-    @Override
-    public int getGroupCount() {
-        return this.portfolioData.getAccounts().size();
-    }
-
-    @Override
-    public int getChildrenCount(int groupPosition) {
-        List<Investment> investments = this.portfolioData.getInvestments(this.getGroupId(groupPosition));
-        return (investments != null) ? investments.size() : 0;
-    }
-
-    @Override
-    public Account getGroup(int groupPosition) {
-        return this.portfolioData.getAccounts().get(groupPosition);
-    }
-
-    @Override
-    public Investment getChild(int groupPosition, int childPosition) {
-        List<Investment> investments = this.portfolioData.getInvestments(this.getGroupId(groupPosition));
-        return investments.get(childPosition);
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return this.getGroup(groupPosition).getId();
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return this.getChild(groupPosition,childPosition).getId();
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        AccountItemView accountItemView;
-
-        if (convertView == null) {
-            accountItemView = new AccountItemView(this.context);
-
-            accountItemView.setLongClickable(true);
-            accountItemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    boolean consumed = false;
-                    if (listener != null) {
-                        consumed = listener.onLongClickAccount(((AccountItemView) v).getAccount());
-                    }
-                    return consumed;
-                }
-            });
-
-            if (accountItemViewListener != null) {
-                accountItemView.setAccountItemViewListener(accountItemViewListener);
-            }
-        } else {
-            accountItemView = (AccountItemView) convertView;
-        }
-
-        Account account = this.getGroup(groupPosition);
-        List<Investment> investments = this.portfolioData.getInvestments(account.getId());
-        PerformanceItem performanceItem = account.getPerformanceItem(investments);
-        accountItemView.bind(account, performanceItem, this.portfolioData.getOpenOrderCount(account.getId()));
-        return accountItemView;
-    }
-
-    @Override
-    public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        InvestmentItemView investmentItemView;
-
-        if (convertView == null) {
-            investmentItemView = new InvestmentItemView(this.context);
-
-            investmentItemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    boolean consumed = false;
-                    if (listener != null) {
-                        Investment investment = ((InvestmentItemView) v).getInvestment();
-                        consumed = listener.onLongClickInvestment(investment);
-                    }
-                    return consumed;
-                }
-            });
-        } else {
-            investmentItemView = (InvestmentItemView) convertView;
-        }
-
-        Investment investment = this.getChild(groupPosition, childPosition);
-        investmentItemView.bind(investment);
-
-        // only allow selling the investment if it is not part of an account strategy
-        investmentItemView.setLongClickable(investment.getAccount().getStrategy() == Account.Strategy.NONE);
-        return investmentItemView;
-    }
-
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        mContext = context;
     }
 
     public void bind(PortfolioData portfolioData) {
-        this.portfolioData = portfolioData;
+
+        mPortfolioData = portfolioData;
+        mDataList = new ArrayList<>();
+
+        for (Account account : portfolioData.getAccounts()) {
+            mDataList.add(account);
+            mDataList.addAll(portfolioData.getInvestments(account.getId()));
+        }
+
+        notifyDataSetChanged();
     }
 
-    public void clear() {
-        this.portfolioData = new PortfolioData();
+    public void clear(boolean notify) {
+        mDataList = null;
+        mPortfolioData = null;
+        if (notify) {
+            notifyDataSetChanged();
+        }
     }
 
-    public void setAccountItemViewListener(AccountItemView.AccountItemViewListener accountItemViewListener) {
-        this.accountItemViewListener = accountItemViewListener;
+    public void setAccountItemViewListener(AccountViewHolder.AccountItemViewListener accountItemViewListener) {
+        mAccountItemViewListener = accountItemViewListener;
     }
 
     public void setListener(PortfolioAdapterListener listener) {
-        this.listener = listener;
+        mPortfolioAdapterListener = listener;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isEmpty() ? VIEW_TYPE_NEW_ACCOUNT_ITEM :
+                (mDataList.get(position) instanceof Investment) ?
+                        VIEW_TYPE_PORTFOLIO_ITEM : VIEW_TYPE_ACCOUNT_HEADER;
+    }
+
+    @Override
+    public int getItemCount() {
+        // ensure that we always have one so we can show the empty view
+        return (!isEmpty()) ? mDataList.size() : 1;
+    }
+
+    public boolean isEmpty() {
+        return ((mDataList == null) || (mDataList.size() == 0));
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        switch (viewType) {
+            case VIEW_TYPE_ACCOUNT_HEADER:
+                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener);
+                break;
+            case VIEW_TYPE_PORTFOLIO_ITEM:
+                viewHolder = new InvestmentViewHolder(parent);
+                break;
+            case VIEW_TYPE_NEW_ACCOUNT_ITEM:
+                viewHolder = new NewAccountViewHolder(parent, mPortfolioAdapterListener);
+                break;
+        }
+
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof NewAccountViewHolder) {
+        } else if (holder instanceof AccountViewHolder) {
+            AccountViewHolder accountViewHolder = (AccountViewHolder) holder;
+
+            final Account account = (Account) mDataList.get(position);
+
+            List<Investment> investments = mPortfolioData.getInvestments(account.getId());
+            PerformanceItem performanceItem = account.getPerformanceItem(investments, new Date());
+
+            accountViewHolder.bind(account, performanceItem, mPortfolioData.getOpenOrderCount(account.getId()));
+
+            View view = accountViewHolder.itemView;
+            view.setLongClickable(true);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    boolean consumed = false;
+                    if (mPortfolioAdapterListener != null) {
+                        consumed = mPortfolioAdapterListener.onLongClickAccount(account);
+                    }
+                    return consumed;
+                }
+            });
+
+        } else {
+
+            InvestmentViewHolder investmentItemView = (InvestmentViewHolder) holder;
+
+            final Investment investment = (Investment) mDataList.get(position);
+            investmentItemView.bind(investment);
+
+            View view = investmentItemView.itemView;
+            view.setLongClickable(true);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    boolean consumed = false;
+                    if (mPortfolioAdapterListener != null) {
+                        consumed = mPortfolioAdapterListener.onLongClickInvestment(investment);
+                    }
+                    return consumed;
+                }
+            });
+
+        }
+    }
+
+    public static class NewAccountViewHolder extends RecyclerView.ViewHolder {
+
+        public NewAccountViewHolder(ViewGroup parent, final PortfolioAdapterListener listener) {
+            super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_empty, parent, false));
+
+            itemView.findViewById(R.id.portfolio_view_holder_empty_create)
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (listener != null) {
+                                listener.createNewAccount();
+                            }
+
+                        }
+                    });
+        }
     }
 }

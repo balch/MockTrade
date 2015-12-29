@@ -38,7 +38,7 @@ public abstract class YQLModel implements ModelInitializer<ModelProvider> {
 
     protected final static String GOOGLE_BASE_URL = "http://finance.google.com/finance/info?client=ig&q=";
 
-    protected ModelProvider modelProvider;
+    protected ModelProvider mModelProvider;
 
     public YQLModel() {
     }
@@ -49,7 +49,7 @@ public abstract class YQLModel implements ModelInitializer<ModelProvider> {
 
     @Override
     public void initialize(ModelProvider modelProvider) {
-        this.modelProvider = modelProvider;
+        this.mModelProvider = modelProvider;
     }
 
     protected String getYQLQueryUrl(String query) throws UnsupportedEncodingException {
@@ -63,15 +63,15 @@ public abstract class YQLModel implements ModelInitializer<ModelProvider> {
     }
 
     public RequestQueue getRequestQueue() {
-        return modelProvider.getRequestQueue();
+        return mModelProvider.getRequestQueue();
     }
 
     public Context getContext() {
-        return modelProvider.getContext();
+        return mModelProvider.getContext();
     }
 
     public Settings geSettings() {
-        return modelProvider.getSettings();
+        return mModelProvider.getSettings();
     }
 
 }

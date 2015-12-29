@@ -112,7 +112,9 @@ public class PortfolioData {
     }
 
     public void addGraphData(List<PerformanceItem> graphData) {
-        mGraphData.addAll(graphData);
+        if (graphData != null) {
+            mGraphData.addAll(graphData);
+        }
     }
 
     public void clearGraphData() {

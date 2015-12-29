@@ -124,7 +124,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId) {
-                mMainPortfolioView.setDailyGraphData(mPortfolioModel.getCurrentSnapshot(accountId), null);
+                mMainPortfolioView.setDailyGraphData(mPortfolioModel.getCurrentSnapshot(accountId));
             }
         });
         return mMainPortfolioView;
@@ -185,6 +185,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
                 mSettings.setHideExcludeAccounts(hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
+                mMainPortfolioView.resetSelectedAccountID();
                 reload(false);
                 handled = true;
                 break;
@@ -345,7 +346,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     @Override
     public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-        return new PortfolioLoader(this, mPortfolioModel, mSettings, mMainPortfolioView.getSelectedAccountIndex());
+        return new PortfolioLoader(this, mPortfolioModel, mSettings, mMainPortfolioView.getSelectedAccountId());
     }
 
     @Override
@@ -372,7 +373,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         mPortfolioAdapter.bind(data);
 
-        mMainPortfolioView.setDailyGraphData(data.getGraphData(), data.getAccounts());
+        mMainPortfolioView.setDailyGraphDataAccounts(data.getAccounts());
+        mMainPortfolioView.setDailyGraphData(data.getGraphData());
 //        mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
         hideProgress();
@@ -391,14 +393,14 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
         protected final PortfolioModel mPortfolioModel;
         protected final Settings mSettings;
-        protected final int mSelectedAccountIndex;
+        protected final long mSelectedAccountId;
 
         public PortfolioLoader(Context context, PortfolioModel model, Settings settings,
-                               int selectedAccountIndex) {
+                               long selectedAccountId) {
             super(context);
             mPortfolioModel = model;
             mSettings = settings;
-            mSelectedAccountIndex = selectedAccountIndex;
+            mSelectedAccountId = selectedAccountId;
         }
 
         @Override
@@ -412,12 +414,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             portfolioData.setLastSyncTime(new Date(mSettings.getLastSyncTime()));
             portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
 
-            long accountId = -1;
-            if ((mSelectedAccountIndex >= 0) && (mSelectedAccountIndex < accounts.size())) {
-                accountId = accounts.get(mSelectedAccountIndex).getId();
-            }
-
-            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot(accountId));
+            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot(mSelectedAccountId));
 
             List<Order> openOrders = mPortfolioModel.getOpenOrders();
             for (Order o : openOrders) {

@@ -50,6 +50,8 @@ import java.util.List;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
 
+    private static final int VIEW_ID = 969696969;
+
     public interface MainPortfolioViewListener {
         void onGraphSelectionChanged(long accountId);
     }
@@ -69,8 +71,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected Spinner mGraphSpinner;
 
     protected ArrayAdapter<String> mGraphAccountAdapter;
-    protected List<Long> mAccountIds = new ArrayList<>();
 
+    // variables that need to be persisted
+    protected List<Long> mAccountIds = new ArrayList<>();
     protected int mSelectedPosition = 0;
 
     protected final MainPortfolioViewListener mMainPortfolioViewListener;
@@ -85,7 +88,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         inflate(getContext(), R.layout.portfolio_view_main, this);
 
         // id required for onSaveInstanceState to fire
-        setId(R.id.portfolio_view_layout);
+        setId(VIEW_ID);
 
         mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -111,10 +114,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSelectedPosition = position;
                 if (mMainPortfolioViewListener != null) {
-
-                    long accountId =(mSelectedPosition < mAccountIds.size()) ?
-                            mAccountIds.get(mSelectedPosition) : -1L;
-                    mMainPortfolioViewListener.onGraphSelectionChanged(accountId);
+                    mMainPortfolioViewListener.onGraphSelectionChanged(getSelectedAccountId());
                 }
             }
 
@@ -125,7 +125,18 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         });
     }
 
-    public int getSelectedAccountIndex() { return  mSelectedPosition - 1; }
+    public long getSelectedAccountId() {
+        long accountId = -1;
+        if (mSelectedPosition < mAccountIds.size()) {
+            accountId = mAccountIds.get(mSelectedPosition);
+        }
+
+        return accountId;
+    }
+
+    public void resetSelectedAccountID() {
+        mSelectedPosition = 0;
+    }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
         mPortfolioAdapter = portfolioAdapter;
@@ -160,7 +171,32 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mDailyGraphView.animateGraph();
     }
 
-    public void setDailyGraphData(List<PerformanceItem> performanceItems, List<Account> accounts) {
+
+    public void setDailyGraphDataAccounts(List<Account> accounts) {
+        if (accounts != null) {
+
+            mGraphAccountAdapter.setNotifyOnChange(false);
+            mGraphAccountAdapter.clear();
+            mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
+
+            mAccountIds.clear();
+            mAccountIds.add(-1L);
+
+            for (Account account : accounts) {
+                mGraphAccountAdapter.add(account.getName());
+                mAccountIds.add(account.getId());
+            }
+            mGraphAccountAdapter.setNotifyOnChange(true);
+            mGraphAccountAdapter.notifyDataSetChanged();
+
+            if (mSelectedPosition != AdapterView.INVALID_POSITION) {
+                mGraphSpinner.setSelection(mSelectedPosition);
+            }
+        }
+
+    }
+
+    public void setDailyGraphData(List<PerformanceItem> performanceItems) {
         if ((performanceItems != null) && (performanceItems.size() >= 2)) {
 
             Date timestamp =  performanceItems.get(0).getTimestamp();
@@ -173,26 +209,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             mEmptyGraphView.setVisibility(GONE);
             mGraphLayout.setVisibility(VISIBLE);
 
-            if (accounts != null) {
-
-                mGraphAccountAdapter.setNotifyOnChange(false);
-                mGraphAccountAdapter.clear();
-                mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
-
-                mAccountIds.clear();
-                mAccountIds.add(-1L);
-
-                for (Account account : accounts) {
-                    mGraphAccountAdapter.add(account.getName());
-                    mAccountIds.add(account.getId());
-                }
-                mGraphAccountAdapter.setNotifyOnChange(true);
-                mGraphAccountAdapter.notifyDataSetChanged();
-
-                if (mSelectedPosition != AdapterView.INVALID_POSITION) {
-                    mGraphSpinner.setSelection(mSelectedPosition);
-                }
-            }
 
         } else {
             mGraphLayout.setVisibility(GONE);
@@ -206,6 +222,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         SavedState ss = new SavedState(superState);
         ss.mSelectedPosition = this.mSelectedPosition;
+        ss.mAccountIds = this.mAccountIds;
 
         return ss;
     }
@@ -221,10 +238,12 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         super.onRestoreInstanceState(ss.getSuperState());
 
         this.mSelectedPosition = ss.mSelectedPosition;
+        this.mAccountIds = ss.mAccountIds;
     }
 
     static class SavedState extends BaseSavedState {
         int mSelectedPosition;
+        List<Long> mAccountIds;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -232,13 +251,16 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         private SavedState(Parcel in) {
             super(in);
-            this.mSelectedPosition = in.readInt();
+            mSelectedPosition = in.readInt();
+            mAccountIds = new ArrayList<>();
+            in.readList(mAccountIds, getClass().getClassLoader());
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeInt(this.mSelectedPosition);
+            out.writeInt(mSelectedPosition);
+            out.writeList(mAccountIds);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =

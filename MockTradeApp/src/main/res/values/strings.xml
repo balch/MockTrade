@@ -141,5 +141,7 @@
     <string name="portfolio_view_last_quote">Last Quote: %1$s</string>
     <string name="menu_hide_exclude_accounts">Hide Exclude Accounts</string>
     <string name="portfolio_view_empty_graph_text">Nothing to see here.\nCreate a portfolio and come back during market hours.</string>
+    <string name="portfolio_view_time_title_today">Today</string>
+    <string name="portfolio_view_graph_spinner_totals">Totals</string>
 
 </resources>

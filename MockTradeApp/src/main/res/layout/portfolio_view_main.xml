@@ -58,11 +58,16 @@
                     android:paddingEnd="@dimen/portfolio_view_graph_container_padding"
                     android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
                     <TextView
-                        android:id="@+id/portfolio_view_graph_title"
+                        android:id="@+id/portfolio_view_graph_time_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_gravity="start"
                         android:textColor="@color/portfolio_view_graph_title"
                         android:shadowRadius="3"
                         android:shadowDx=".5"
@@ -70,14 +75,23 @@
                         android:shadowColor="@color/portfolio_view_graph_title_shadow"
                         android:textSize="@dimen/portfolio_view_graph_title_size"/>
 
-                    <com.balch.mocktrade.portfolio.DailyGraphView
-                        android:id="@+id/portfolio_view_daily_graph"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                    <Spinner
+                        android:id="@+id/portfolio_view_graph_spinner"
+                        android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
-                        android:background="@color/portfolio_view_graph_background"/>
+                        android:layout_height="wrap_content"
+                        android:gravity="end" />
+
                 </LinearLayout>
+
+                <com.balch.mocktrade.portfolio.DailyGraphView
+                    android:id="@+id/portfolio_view_daily_graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
+                    android:background="@color/portfolio_view_graph_background"/>
+            </LinearLayout>
 
             </android.support.v7.widget.CardView>
             <android.support.v7.widget.Toolbar

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?android:attr/spinnerItemStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="@color/portfolio_view_graph_title"
+    android:singleLine="true"
+    android:ellipsize="marquee"
+    android:layout_gravity="center"
+    android:textSize="@dimen/portfolio_view_graph_title_size"/>
+

@@ -367,7 +367,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
         mPortfolioAdapter.bind(data);
 
-        mMainPortfolioView.setDailyGraphData(data.getGraphData());
+        mMainPortfolioView.setDailyGraphData(data.getGraphData(), data.getAccounts());
 //        mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
         hideProgress();

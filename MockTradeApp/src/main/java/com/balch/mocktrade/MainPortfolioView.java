@@ -24,14 +24,22 @@ package com.balch.mocktrade;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.IdRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.view.BaseView;
+import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.portfolio.DailyGraphView;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
@@ -42,6 +50,9 @@ import java.util.Date;
 import java.util.List;
 
 public class MainPortfolioView extends LinearLayout implements BaseView {
+
+    // id is required for onSaveInstanceState to be called
+    private static final @IdRes int VIEW_ID = 996969;
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
@@ -54,18 +65,26 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected DailyGraphView mDailyGraphView;
     protected TextView mEmptyGraphView;
     protected LinearLayout mGraphLayout;
-    protected TextView mGraphTitle;
+    protected TextView mGraphTimeTitle;
+    protected Spinner mGraphSpinner;
+
+    protected ArrayAdapter<String> mGraphAccountAdapter;
+
+    protected int mSelectedPosition = 0;
 
     public MainPortfolioView(Context context) {
         super(context);
+        setId(VIEW_ID);
     }
 
     public MainPortfolioView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setId(VIEW_ID);
     }
 
     public MainPortfolioView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setId(VIEW_ID);
     }
 
     @Override
@@ -82,7 +101,25 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
         mEmptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
         mGraphLayout = (LinearLayout) findViewById(R.id.portfolio_view_daily_graph_layout);
-        mGraphTitle = (TextView) findViewById(R.id.portfolio_view_graph_title);
+        mGraphTimeTitle = (TextView) findViewById(R.id.portfolio_view_graph_time_title);
+
+        mGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_graph_spinner);
+
+        mGraphAccountAdapter = new ArrayAdapter<>(getContext(), R.layout.portfolio_view_graph_spinner_text);
+        mGraphAccountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGraphSpinner.setAdapter(mGraphAccountAdapter);
+
+        mGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mSelectedPosition = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mSelectedPosition = 0;
+            }
+        });
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
@@ -119,17 +156,87 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mDailyGraphView.animateGraph();
     }
 
-    public void setDailyGraphData(List<PerformanceItem> performanceItems) {
+    public void setDailyGraphData(List<PerformanceItem> performanceItems, List<Account> accounts) {
         if ((performanceItems != null) && (performanceItems.size() >= 2)) {
 
-            mGraphTitle.setText("Today"); // TODO: fix this
+            Date timestamp =  performanceItems.get(0).getTimestamp();
+            if (DateUtils.isToday(timestamp.getTime())) {
+                mGraphTimeTitle.setText(R.string.portfolio_view_time_title_today);
+            } else {
+                mGraphTimeTitle.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(timestamp));
+            }
             mDailyGraphView.bind(performanceItems);
             mEmptyGraphView.setVisibility(GONE);
             mGraphLayout.setVisibility(VISIBLE);
+
+            mGraphAccountAdapter.setNotifyOnChange(false);
+            mGraphAccountAdapter.clear();
+            mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
+            for (Account account : accounts) {
+                mGraphAccountAdapter.add(account.getName());
+            }
+            mGraphAccountAdapter.setNotifyOnChange(true);
+            mGraphAccountAdapter.notifyDataSetChanged();
+
+            if (mSelectedPosition != AdapterView.INVALID_POSITION) {
+                mGraphSpinner.setSelection(mSelectedPosition);
+            }
 
         } else {
             mGraphLayout.setVisibility(GONE);
             mEmptyGraphView.setVisibility(VISIBLE);
         }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+
+        SavedState ss = new SavedState(superState);
+        ss.mSelectedPosition = this.mSelectedPosition;
+
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if(!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState ss = (SavedState)state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        this.mSelectedPosition = ss.mSelectedPosition;
+    }
+
+    static class SavedState extends BaseSavedState {
+        int mSelectedPosition;
+
+        SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            this.mSelectedPosition = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(this.mSelectedPosition);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
     }
 }

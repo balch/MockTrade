@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 2
-        versionName "1.1.0"
+        versionName "2.0"
     }
     buildTypes {
         release {
@@ -41,7 +41,7 @@ uploadArchives {
         pom.project {
             groupId 'com.balch'
             artifactId 'app-framework'
-            version "1.0.1"
+            version '2.0'
         }
     }
 }

@@ -147,17 +147,19 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
         boolean isChanged = false;
         for (Account account : accounts) {
 
-            PerformanceItem performanceItem =
-                    account.getPerformanceItem(accountToInvestmentMap.get(account.getId()), now);
-            performanceItems.add(performanceItem);
+            List<Investment> investments = accountToInvestmentMap.get(account.getId());
+            if ((investments != null) && (investments.size() > 0)) {
+                PerformanceItem performanceItem = account.getPerformanceItem(investments, now);
+                performanceItems.add(performanceItem);
 
-            if (!isChanged) {
-                PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
-                if ((lastPerformanceItem == null) ||
-                        !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
-                        !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
-                        !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
-                    isChanged = true;
+                if (!isChanged) {
+                    PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
+                    if ((lastPerformanceItem == null) ||
+                            !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
+                            !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
+                            !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
+                        isChanged = true;
+                    }
                 }
             }
         }

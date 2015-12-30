@@ -32,6 +32,7 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.account.strategies.DogsOfTheDow;
+import com.balch.mocktrade.account.strategies.TripleMomentum;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 
@@ -169,7 +170,8 @@ public class Account extends DomainObject implements Serializable {
 
     public enum Strategy implements MetadataUtils.EnumResource {
         NONE(null),
-        DOGS_OF_THE_DOW(DogsOfTheDow.class);
+        DOGS_OF_THE_DOW(DogsOfTheDow.class),
+        TRIPLE_MOMENTUM(TripleMomentum.class);
 
         protected final Class<? extends BaseStrategy> strategyClazz;
 

@@ -47,6 +47,7 @@
     <string-array name="account_strategy_display_values">
         <item>None</item>
         <item>Dogs of the Dow</item>
+        <item>Triple ETF Momentum</item>
     </string-array>
 
     <string name="account_create_title">New Portfolio</string>

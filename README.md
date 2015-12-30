@@ -13,12 +13,13 @@ MockTrade
     * SqlConnection Encapsulation
         * Domain Objects
         * SqlMapper pattern
+        * Create and Upgrade via SQL scripts
 * MockTrade Application
-    * Proving Ground for AppFramework
     * Trading Simulation Business Logic
     * Teach Trading Basics and Strategies 
         * Dogs of the Dow
         * Strategy plugin model
+    * Implements AppFramework
 
 #####&lt;/TL;DR&gt;
 
@@ -44,7 +45,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
     * sqlite encapsulation
     * SqlMapper pattern
     * auto id, create_time, and update_time column management
-    * use reflection to translate java types to sql (and back)
+    * database creation and upgrade via SQL script assets
 * Model/View/Presenter Support
     * Model - Interfaces describing data retrieval and persistence functionality
         * abstracts data contract from data source
@@ -54,7 +55,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
         * caches controls (ViewHolder pattern)
         * provides Listener interfaces to communicate with Presenter
         * facilitates binding to Business/Domain Object patterns
-    * Presenter - BaseAppCompatActiivty classes to facilitate MVP
+    * Presenter - BaseAppCompatActivity classes to facilitate MVP
         * coordinates interactions between the View and Model 
         * error handling framework for exceptions thrown from the Presenter. 
         * provide system services to business logic
@@ -69,13 +70,26 @@ explore some Application Architecture ideas and apply them to the Android platfo
 * Option Chains
 
 ### Screenshots
+
+Main portfolio screen. View multiple portfolios with totals pinned to the bottom
+
 ![Screen Shot 1](./Mocktrade_ss1.png)
+
+Slide screen down to reveal daily performance chart
 
 ![Screen Shot 2](./Mocktrade_ss5.png)
 
+Create a new portfolio. User can create a normal portfolio and
+manage their own assets, or choose a strategy and track the
+performance over time
+
 ![Screen Shot 3](./Mocktrade_ss2.png)
 
+Sell screen showing a Trailing Stop % order type
+
 ![Screen Shot 4](./Mocktrade_ss3.png)
+
+Buy screen with real-time quote and order validation
 
 ![Screen Shot 5](./Mocktrade_ss4.png)
 

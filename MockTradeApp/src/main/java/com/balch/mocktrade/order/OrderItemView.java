@@ -93,7 +93,7 @@ public class OrderItemView extends LinearLayout {
         this.mOrderId.setText(order.getId().toString());
         this.mSymbol.setText(order.getSymbol());
         this.mAction.setText(order.getAction().toString());
-        this.mCreateDate.setText(DateFormat.getDateTimeInstance().format(order.getCreateTime().getDate()));
+        this.mCreateDate.setText(DateFormat.getDateTimeInstance().format(order.getCreateTime()));
         this.mStrategy.setText(order.getStrategy().toString());
         this.mQuantity.setText(order.getQuantity().toString());
 

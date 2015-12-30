@@ -86,7 +86,7 @@ public class DogsOfTheDow extends BaseStrategy {
 
             @Override
             public void onErrorResponse(String error) {
-
+                Log.e(TAG, "Error running financeModel.getQuotes: "+ error);
             }
         });
     }

@@ -85,8 +85,12 @@ public class TradeApplication extends Application implements ModelProvider {
 
         configureModelFactory();
 
-        FinanceModel financeModel = getModelFactory().getModel(FinanceModel.class);
+        ModelFactory modelFactory = getModelFactory();
+        FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
         financeModel.setQuoteServiceAlarm();
+
+        PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+        portfolioModel.scheduleOrderServiceAlarmIfNeeded();
 
     }
 

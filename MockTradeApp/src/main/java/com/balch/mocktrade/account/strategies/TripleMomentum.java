@@ -43,19 +43,18 @@ public class TripleMomentum extends BaseStrategy {
 
     private static final double TRAILING_PERCENTAGE = 2.0;
 
-    protected static final String[] SYMBOLS =
-            {"TQQQ","SQQQ"};
+    protected static final String[] SYMBOLS = {"TQQQ","SQQQ"};
 
     public void initialize(Account account) {
         executeStrategy(Arrays.asList(SYMBOLS), account);
     }
 
-    private void executeStrategy(List<String> symbols, final Account account) {
+    private void executeStrategy(final List<String> symbols, final Account account) {
         this.financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
             @Override
             public void onResponse(Map<String, Quote> response) {
                 for (Quote quote : response.values()) {
-                    double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) SYMBOLS.length;
+                    double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) symbols.size();
 
                     long quantity = (long) (fundsPerOrder / quote.getPrice().getDollars());
                     Order order = new Order();

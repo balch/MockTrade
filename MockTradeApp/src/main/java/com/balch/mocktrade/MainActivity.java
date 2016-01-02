@@ -1,11 +1,9 @@
 package com.balch.mocktrade;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -16,10 +14,8 @@ import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -41,9 +37,11 @@ import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
 import com.balch.mocktrade.order.OrderListActivity;
 import com.balch.mocktrade.portfolio.AccountViewHolder;
+import com.balch.mocktrade.portfolio.GraphDataLoader;
 import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
+import com.balch.mocktrade.portfolio.PortfolioLoader;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.Settings;
@@ -59,11 +57,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
-            implements LoaderManager.LoaderCallbacks<PortfolioData>  {
+public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    protected static final int ACCOUNT_LOADER_ID = 0;
+    protected static final int PORTFOLIO_LOADER_ID = 0;
+    protected static final int GRAPH_LOADER_ID = 1;
 
     protected static final int NEW_ACCOUNT_RESULT = 0;
     protected static final int NEW_ORDER_RESULT = 1;
@@ -72,7 +70,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     protected MainPortfolioView mMainPortfolioView;
 
     protected PortfolioAdapter mPortfolioAdapter;
-    protected QuoteUpdateReceiver mQuoteUpdateReceiver;
 
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
@@ -80,6 +77,72 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
 
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     private Settings mSettings;
+
+    private LoaderManager.LoaderCallbacks<PortfolioData> mPortfolioDataLoaderCallback =
+            new LoaderManager.LoaderCallbacks<PortfolioData>() {
+                @Override
+                public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
+                    return new PortfolioLoader(MainActivity.this, mPortfolioModel, mSettings);
+                }
+
+                @Override
+                public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
+                    PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
+
+                    int accountsWithTotals = 0;
+
+                    Date timestamp = new Date();
+                    for (Account account : data.getAccounts()) {
+                        if (!account.getExcludeFromTotals()) {
+                            List<Investment> investments = data.getInvestments(account.getId());
+                            performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
+
+                            accountsWithTotals++;
+                        }
+                    }
+
+                    mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
+
+                    boolean showTotals = (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) &&
+                            (accountsWithTotals > 1);
+                    mMainPortfolioView.setTotals(showTotals, performanceItem);
+
+                    mPortfolioAdapter.bind(data);
+
+                    mMainPortfolioView.setDailyGraphDataAccounts(data.getAccounts());
+
+                    hideProgress();
+
+                }
+
+                @Override
+                public void onLoaderReset(Loader<PortfolioData> loader) {
+                    mPortfolioAdapter.clear(true);
+                }
+
+            };
+
+    private LoaderManager.LoaderCallbacks<List<PerformanceItem>> mGraphDataLoaderCallback =
+            new LoaderManager.LoaderCallbacks<List<PerformanceItem>>() {
+                @Override
+                public Loader<List<PerformanceItem>> onCreateLoader(int id, Bundle args) {
+                    return new GraphDataLoader(MainActivity.this, mPortfolioModel);
+                }
+
+                @Override
+                public void onLoadFinished(Loader<List<PerformanceItem>> loader, List<PerformanceItem> data) {
+                    mMainPortfolioView.setDailyGraphData(data);
+//                      mMainPortfolioView.setDailyGraphData(generateRandomTestData());
+
+                    hideProgress();
+
+                }
+
+                @Override
+                public void onLoaderReset(Loader<List<PerformanceItem>> loader) {
+                }
+
+            };
 
     @Override
     protected void onCreateBase(Bundle bundle) {
@@ -102,8 +165,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             toolbar.setOverflowIcon(icon);
         }
 
-        mQuoteUpdateReceiver = new QuoteUpdateReceiver();
-
         setupAdapter();
 
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.portfolio_view_app_bar);
@@ -117,6 +178,10 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         } else {
             appBarLayout.setExpanded(false, false);
         }
+
+        LoaderManager loaderManager = getSupportLoaderManager();
+        loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
+        loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
     }
 
     @Override
@@ -124,7 +189,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId) {
-                mMainPortfolioView.setDailyGraphData(mPortfolioModel.getCurrentSnapshot(accountId));
+                GraphDataLoader.update(MainActivity.this, accountId);
             }
         });
         return mMainPortfolioView;
@@ -177,7 +242,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                         R.color.snackbar_background,
                         success ? R.color.success : R.color.failure,
                         android.support.design.R.id.snackbar_text)
-                    .show();
+                        .show();
 
                 handled = true;
                 break;
@@ -186,32 +251,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 mSettings.setHideExcludeAccounts(hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
                 mMainPortfolioView.resetSelectedAccountID();
-                reload(false);
+                updateView(this);
                 handled = true;
                 break;
 
         }
 
         return handled;
-    }
-
-    @Override
-    protected void onStartBase() {
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mQuoteUpdateReceiver, new IntentFilter(QuoteUpdateReceiver.class.getName()));
-    }
-
-    @Override
-    protected void onStopBase() {
-        LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mQuoteUpdateReceiver);
-    }
-
-    @Override
-    protected void onResumeBase() {
-        if (mPortfolioModel != null) {
-            reload(true);
-        }
     }
 
     @Override
@@ -224,7 +270,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                 R.color.snackbar_background,
                 R.color.failure,
                 android.support.design.R.id.snackbar_text)
-            .show();
+                .show();
 
     }
 
@@ -239,7 +285,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             if (sd.canWrite()) {
                 File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
 
-                String backupDBPath = System.currentTimeMillis()+"_"+TradeApplication.DATABASE_NAME;
+                String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
                 File backupDBFile = new File(sd, backupDBPath);
 
                 if (dbFile.exists()) {
@@ -283,7 +329,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
                                     mPortfolioModel.deleteAccount(account);
-                                    reload(true);
+                                    updateView(MainActivity.this);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Deleting account", ex);
                                     Toast.makeText(MainActivity.this, "Error deleting account", Toast.LENGTH_LONG).show();
@@ -321,118 +367,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
     }
 
     /**
-     * Reload update the UI from the data in the database
-     */
-    private void reload(boolean showProgress) {
-        if (showProgress) {
-            showProgress();
-        }
-        LoaderManager loaderManager = getSupportLoaderManager();
-        loaderManager.initLoader(ACCOUNT_LOADER_ID, null, this).forceLoad();
-    }
-
-    /**
      * Refresh launches the quote service which will call the QuoteUpdateReceiver
      * to update the UI once the quotes are fetched
      */
     public void refresh() {
         showProgress();
         startService(QuoteService.getIntent(this));
-    }
-
-    static public void updateView(Context context) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(QuoteUpdateReceiver.class.getName()));
-    }
-
-    @Override
-    public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-        return new PortfolioLoader(this, mPortfolioModel, mSettings, mMainPortfolioView.getSelectedAccountId());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
-        PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
-
-        int accountsWithTotals = 0;
-
-        Date timestamp = new Date();
-        for (Account account : data.getAccounts()) {
-            if (!account.getExcludeFromTotals()) {
-                List<Investment> investments = data.getInvestments(account.getId());
-                performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
-
-                accountsWithTotals++;
-            }
-        }
-
-        mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
-
-        boolean showTotals = (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) &&
-                (accountsWithTotals > 1);
-        mMainPortfolioView.setTotals(showTotals, performanceItem);
-
-        mPortfolioAdapter.bind(data);
-
-        mMainPortfolioView.setDailyGraphDataAccounts(data.getAccounts());
-        mMainPortfolioView.setDailyGraphData(data.getGraphData());
-//        mMainPortfolioView.setDailyGraphData(generateRandomTestData());
-
-        hideProgress();
-
-        // hack to prevent onLoadFinished being called twice
-        // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
-        getSupportLoaderManager().destroyLoader(ACCOUNT_LOADER_ID);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<PortfolioData> loader) {
-        mPortfolioAdapter.clear(true);
-    }
-
-    protected static class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
-        protected final PortfolioModel mPortfolioModel;
-        protected final Settings mSettings;
-        protected final long mSelectedAccountId;
-
-        public PortfolioLoader(Context context, PortfolioModel model, Settings settings,
-                               long selectedAccountId) {
-            super(context);
-            mPortfolioModel = model;
-            mSettings = settings;
-            mSelectedAccountId = selectedAccountId;
-        }
-
-        @Override
-        public PortfolioData loadInBackground() {
-            PortfolioData portfolioData = new PortfolioData();
-
-            List<Account> accounts = mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts());
-
-            portfolioData.addAccounts(accounts);
-            portfolioData.addInvestments(mPortfolioModel.getAllInvestments());
-            portfolioData.setLastSyncTime(new Date(mSettings.getLastSyncTime()));
-            portfolioData.setLastQuoteTime(mPortfolioModel.getLastQuoteTime());
-
-            portfolioData.addGraphData(mPortfolioModel.getCurrentSnapshot(mSelectedAccountId));
-
-            List<Order> openOrders = mPortfolioModel.getOpenOrders();
-            for (Order o : openOrders) {
-                portfolioData.addToOpenOrderCount(o.getAccount().getId());
-            }
-
-            // populate investment account object
-            // hopefully one day investment.account will be set in the model
-            for (Account a : portfolioData.getAccounts()) {
-                List<Investment> investments = portfolioData.getInvestments(a.getId());
-                if (investments != null) {
-                    for (Investment i : investments) {
-                        i.setAccount(a);
-                    }
-                }
-            }
-            return portfolioData;
-        }
     }
 
     protected void showNewAccountActivity() {
@@ -478,13 +418,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
                     // create a new Account instance to make sure the account is initialized correctly
                     mPortfolioModel.createAccount(new Account(account.getName(), account.getDescription(),
                             account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals()));
-                    reload(true);
+                    PortfolioLoader.update(MainActivity.this);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
                 if (order != null) {
                     mPortfolioModel.createOrder(order);
-                    reload(true);
+                    PortfolioLoader.update(MainActivity.this);
 
                     mPortfolioModel.processOrders(this,
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
@@ -505,17 +445,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
             mMenuProgressBar.setVisible(false);
             mMenuRefreshButton.setVisible(true);
         }
-    }
-
-    public class QuoteUpdateReceiver extends BroadcastReceiver {
-        private QuoteUpdateReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            reload(false);
-        }
-
     }
 
     private List<PerformanceItem> generateRandomTestData() {
@@ -543,6 +472,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView>
         }
 
         return performanceItems;
+    }
+
+    static public void updateView(Context context) {
+        PortfolioLoader.update(context);
+        GraphDataLoader.update(context);
     }
 
 }

@@ -35,7 +35,6 @@ public class PortfolioData {
     protected List<Account> mAccounts;
     protected Map<Long, List<Investment>> mAccountToInvestmentMap;
     protected Map<Long, Integer> mAccountToOpenOrderCountMap;
-    protected List<PerformanceItem> mGraphData;
     protected Date mLastSyncTime;
     protected Date mLastQuoteTime;
 
@@ -43,7 +42,6 @@ public class PortfolioData {
         mAccounts = new ArrayList<>();
         mAccountToInvestmentMap = new HashMap<>();
         mAccountToOpenOrderCountMap = new HashMap<>();
-        mGraphData = new ArrayList<>();
     }
 
     public List<Account> getAccounts() {
@@ -105,20 +103,6 @@ public class PortfolioData {
 
     public void setLastQuoteTime(Date lastQuoteTime) {
         mLastQuoteTime = lastQuoteTime;
-    }
-
-    public List<PerformanceItem> getGraphData() {
-        return mGraphData;
-    }
-
-    public void addGraphData(List<PerformanceItem> graphData) {
-        if (graphData != null) {
-            mGraphData.addAll(graphData);
-        }
-    }
-
-    public void clearGraphData() {
-        mGraphData.clear();
     }
 
 }

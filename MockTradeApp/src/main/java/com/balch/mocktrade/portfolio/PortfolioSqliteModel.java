@@ -75,7 +75,7 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
 
     @Override
     public Account getAccount(long accountID) {
-        return null;
+        return accounteModel.getAccount(accountID);
     }
 
     @Override

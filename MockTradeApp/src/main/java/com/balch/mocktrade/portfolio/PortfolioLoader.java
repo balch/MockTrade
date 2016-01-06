@@ -94,7 +94,7 @@ public class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
             mUpdateReceiver = new UpdateReceiver();
 
             LocalBroadcastManager.getInstance(getContext())
-                    .registerReceiver(mUpdateReceiver, new IntentFilter(UpdateReceiver.class.getName()));
+                    .registerReceiver(mUpdateReceiver, new IntentFilter(PortfolioUpdateBroadcaster.ACTION));
         }
 
         if (takeContentChanged() || mPortfolioData == null) {
@@ -143,11 +143,6 @@ public class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
         super.onCanceled(data);
 
     }
-
-    static public void update(Context context) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(UpdateReceiver.class.getName()));
-    }
-
 
     private class UpdateReceiver extends BroadcastReceiver {
         private UpdateReceiver() {

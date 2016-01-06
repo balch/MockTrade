@@ -12,8 +12,6 @@ import java.util.List;
 public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
     private static final String TAG = GraphDataLoader.class.getSimpleName();
 
-    private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
-
     private  final PortfolioModel mPortfolioModel;
 
     private long mSelectedAccountId = -1;
@@ -61,7 +59,7 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
             mUpdateReceiver = new UpdateReceiver();
 
             LocalBroadcastManager.getInstance(getContext())
-                    .registerReceiver(mUpdateReceiver, new IntentFilter(UpdateReceiver.class.getName()));
+                    .registerReceiver(mUpdateReceiver, new IntentFilter(PortfolioUpdateBroadcaster.ACTION));
         }
 
         if (takeContentChanged() || mGraphData == null) {
@@ -104,16 +102,11 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
         }
     }
 
-    static public void update(Context context) {
-        update(context, null);
-    }
 
-    static public void update(Context context, Long accountId) {
-        Intent intent = new Intent(UpdateReceiver.class.getName());
-        if (accountId != null) {
-            intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
-        }
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    public void setSelectedAccountId(long accountID) {
+        mSelectedAccountId = accountID;
+        onContentChanged();
+
     }
 
     private class UpdateReceiver extends BroadcastReceiver {
@@ -122,16 +115,9 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            if (intent.hasExtra(EXTRA_ACCOUNT_ID)) {
-                mSelectedAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1);
-            }
             onContentChanged();
         }
-
     }
-
-
 }
 
 

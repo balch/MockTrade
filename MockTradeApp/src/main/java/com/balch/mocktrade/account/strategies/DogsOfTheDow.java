@@ -26,11 +26,11 @@ import android.util.Log;
 
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
+import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -80,7 +80,7 @@ public class DogsOfTheDow extends BaseStrategy {
                         }
                     }
 
-                    MainActivity.updateView(context);
+                    PortfolioUpdateBroadcaster.broadcast(context);
                 }
             }
 

@@ -1,7 +1,6 @@
 package com.balch.mocktrade;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -77,6 +76,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     private Settings mSettings;
+
+    private GraphDataLoader mGraphDataLoader;
+    private PortfolioLoader mPortfolioLoader;
 
     private LoaderManager.LoaderCallbacks<PortfolioData> mPortfolioDataLoaderCallback =
             new LoaderManager.LoaderCallbacks<PortfolioData>() {
@@ -180,8 +182,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         }
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
-        loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
+        mPortfolioLoader = (PortfolioLoader)loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
+        mGraphDataLoader = (GraphDataLoader)loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
     }
 
     @Override
@@ -189,7 +191,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId) {
-                GraphDataLoader.update(MainActivity.this, accountId);
+                mGraphDataLoader.setSelectedAccountId(accountId);
             }
         });
         return mMainPortfolioView;
@@ -251,7 +253,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 mSettings.setHideExcludeAccounts(hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
                 mMainPortfolioView.resetSelectedAccountID();
-                updateView(this);
+                updateView();
                 handled = true;
                 break;
 
@@ -259,6 +261,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
         return handled;
     }
+
 
     @Override
     protected void onHandleException(String logMsg, String displayMsg, Exception ex) {
@@ -329,7 +332,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
                                     mPortfolioModel.deleteAccount(account);
-                                    updateView(MainActivity.this);
+                                    updateView();
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Deleting account", ex);
                                     Toast.makeText(MainActivity.this, "Error deleting account", Toast.LENGTH_LONG).show();
@@ -418,13 +421,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                     // create a new Account instance to make sure the account is initialized correctly
                     mPortfolioModel.createAccount(new Account(account.getName(), account.getDescription(),
                             account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals()));
-                    PortfolioLoader.update(MainActivity.this);
+                    mPortfolioLoader.onContentChanged();
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
                 if (order != null) {
                     mPortfolioModel.createOrder(order);
-                    PortfolioLoader.update(MainActivity.this);
+                    mPortfolioLoader.onContentChanged();
 
                     mPortfolioModel.processOrders(this,
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
@@ -474,9 +477,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         return performanceItems;
     }
 
-    static public void updateView(Context context) {
-        PortfolioLoader.update(context);
-        GraphDataLoader.update(context);
+    private void updateView() {
+        mGraphDataLoader.onContentChanged();
+        mPortfolioLoader.onContentChanged();
     }
 
 }

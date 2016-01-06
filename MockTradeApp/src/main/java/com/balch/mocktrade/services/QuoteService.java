@@ -31,7 +31,6 @@ import android.util.Log;
 
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
-import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -39,6 +38,7 @@ import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 import com.balch.mocktrade.settings.Settings;
 
 import java.util.ArrayList;
@@ -119,7 +119,7 @@ public class QuoteService extends IntentService {
 
                             mSettings.setLastSyncTime(System.currentTimeMillis());
                         } finally {
-                            MainActivity.updateView(QuoteService.this);
+                            PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
                             releaseWakeLock();
                         }
                     }
@@ -128,13 +128,14 @@ public class QuoteService extends IntentService {
                     public void onErrorResponse(String error) {
                         // failed to return quotes
                         // Error has been logged
-                        MainActivity.updateView(QuoteService.this);
+                        PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
+
                         releaseWakeLock();
                     }
                 });
             } else {
                 completeWakefulIntentOnExit = true;
-                MainActivity.updateView(QuoteService.this);
+                PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
             }
 
             // if the market is closed reset alarm to next market open time

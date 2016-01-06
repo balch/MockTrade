@@ -25,11 +25,11 @@ package com.balch.mocktrade.account.strategies;
 import android.util.Log;
 
 import com.balch.android.app.framework.model.RequestListener;
-import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
+import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +83,8 @@ public class TripleMomentum extends BaseStrategy {
                     }
                 }
 
-                MainActivity.updateView(context);
+                PortfolioUpdateBroadcaster.broadcast(context);
+
             }
 
             @Override

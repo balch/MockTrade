@@ -33,8 +33,6 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
     @Override
     public void deliverResult(List<PerformanceItem> data) {
         if (isReset()) {
-            // The Loader has been reset; ignore the result and invalidate the data.
-            releaseResources(data);
             return;
         }
 
@@ -49,10 +47,6 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
             super.deliverResult(data);
         }
 
-        // Invalidate the old data as we don't need it any more.
-        if (oldData != null && oldData != data) {
-            releaseResources(oldData);
-        }
     }
 
     @Override
@@ -99,7 +93,6 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
 
         // At this point we can release the resources associated with 'mData'.
         if (mGraphData != null) {
-            releaseResources(mGraphData);
             mGraphData = null;
         }
 
@@ -109,22 +102,6 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
                     .unregisterReceiver(mUpdateReceiver);
             mUpdateReceiver = null;
         }
-    }
-
-    @Override
-    public void onCanceled(List<PerformanceItem> data) {
-        // Attempt to cancel the current asynchronous load.
-        super.onCanceled(data);
-
-        // The load has been canceled, so we should release the resources
-        // associated with 'data'.
-        releaseResources(data);
-    }
-
-    private void releaseResources(List<PerformanceItem> data) {
-        // For a simple List, there is nothing to do. For something like a Cursor, we
-        // would close it in this method. All resources associated with the Loader
-        // should be released here.
     }
 
     static public void update(Context context) {

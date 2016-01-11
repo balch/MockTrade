@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -353,6 +354,16 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             public void createNewAccount() {
                 showNewAccountActivity();
             }
+
+            @Override
+            public void createNewDogsAccount() {
+                String name = getResources().getString(R.string.quickstart_account_name);
+                String desc = getResources().getString(R.string.quickstart_account_desc);
+
+                Account newAccount = new Account(name, desc,
+                        new Money(100000.0), Account.Strategy.DOGS_OF_THE_DOW, false);
+                new CreateAccountTask().execute(newAccount);
+            }
         });
 
         mPortfolioAdapter.setAccountItemViewListener(new AccountViewHolder.AccountItemViewListener() {
@@ -418,10 +429,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             if (requestCode == NEW_ACCOUNT_RESULT) {
                 Account account = EditActivity.getResult(data);
                 if (account != null) {
-                    // create a new Account instance to make sure the account is initialized correctly
-                    mPortfolioModel.createAccount(new Account(account.getName(), account.getDescription(),
-                            account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals()));
-                    mPortfolioLoader.onContentChanged();
+                    Account newAccount = new Account(account.getName(), account.getDescription(),
+                            account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals());
+                    new CreateAccountTask().execute(newAccount);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
@@ -481,6 +491,29 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         mGraphDataLoader.onContentChanged();
         mPortfolioLoader.onContentChanged();
     }
+
+    private class CreateAccountTask extends AsyncTask<Account, Void, Void> {
+        protected Void doInBackground(Account... accounts) {
+            int count = accounts.length;
+            for (int i = 0; i < count; i++) {
+                mPortfolioModel.createAccount(accounts[i]);
+                if (isCancelled()) {
+                    break;
+                }
+            }
+            return null;
+        }
+
+        protected void onPreExecute() {
+            showProgress();
+        }
+
+        protected void onPostExecute(Void v) {
+            hideProgress();
+            mPortfolioLoader.onContentChanged();
+        }
+    }
+
 
 }
 

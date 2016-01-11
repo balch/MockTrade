@@ -46,6 +46,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         boolean onLongClickAccount(Account account);
         boolean onLongClickInvestment(Investment investment);
         void createNewAccount();
+        void createNewDogsAccount();
     }
 
     protected AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
@@ -185,6 +186,17 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         public void onClick(View v) {
                             if (listener != null) {
                                 listener.createNewAccount();
+                            }
+
+                        }
+                    });
+
+            itemView.findViewById(R.id.portfolio_view_holder_empty_dogs)
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (listener != null) {
+                                listener.createNewDogsAccount();
                             }
 
                         }

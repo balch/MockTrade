@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Date;
@@ -362,7 +363,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
                 Account newAccount = new Account(name, desc,
                         new Money(100000.0), Account.Strategy.DOGS_OF_THE_DOW, false);
-                new CreateAccountTask().execute(newAccount);
+                new CreateAccountTask(MainActivity.this).execute(newAccount);
             }
         });
 
@@ -431,7 +432,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 if (account != null) {
                     Account newAccount = new Account(account.getName(), account.getDescription(),
                             account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals());
-                    new CreateAccountTask().execute(newAccount);
+                    new CreateAccountTask(this).execute(newAccount);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
@@ -492,7 +493,18 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         mPortfolioLoader.onContentChanged();
     }
 
-    private class CreateAccountTask extends AsyncTask<Account, Void, Void> {
+    private static class CreateAccountTask extends AsyncTask<Account, Void, Void> {
+        private final WeakReference<MainActivity> mWeakActivity;
+        private final PortfolioModel mPortfolioModel;
+
+        private CreateAccountTask(MainActivity activity) {
+            this.mWeakActivity = new WeakReference<>(activity);
+
+            // the models are application scope so it is OK to hold a ref to it
+            mPortfolioModel = activity.mPortfolioModel;
+        }
+
+
         protected Void doInBackground(Account... accounts) {
             int count = accounts.length;
             for (int i = 0; i < count; i++) {
@@ -505,12 +517,20 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         }
 
         protected void onPreExecute() {
-            showProgress();
+            MainActivity activity = mWeakActivity.get();
+            if (activity != null) {
+                activity.showProgress();
+            }
         }
 
         protected void onPostExecute(Void v) {
-            hideProgress();
-            mPortfolioLoader.onContentChanged();
+            MainActivity activity = mWeakActivity.get();
+            if (activity != null) {
+                if (!activity.isFinishing()) {
+                    activity.hideProgress();
+                    activity.mPortfolioLoader.onContentChanged();
+                }
+            }
         }
     }
 

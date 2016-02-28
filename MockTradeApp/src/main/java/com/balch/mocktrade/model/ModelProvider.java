@@ -24,7 +24,7 @@ package com.balch.mocktrade.model;
 
 import android.content.Context;
 
-import com.android.volley.RequestQueue;
+import com.android.volley.Request;
 import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.settings.Settings;
@@ -38,6 +38,8 @@ public interface ModelProvider {
 
     SqlConnection getSqlConnection();
 
-    RequestQueue getRequestQueue();
+    <T> Request<T> addRequest(Request<T> request);
+
+    <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy);
 
 }

@@ -25,7 +25,7 @@ package com.balch.mocktrade.model;
 
 import android.content.Context;
 
-import com.android.volley.RequestQueue;
+import com.android.volley.Request;
 import com.balch.android.app.framework.model.ModelInitializer;
 import com.balch.mocktrade.settings.Settings;
 
@@ -62,8 +62,12 @@ public abstract class YQLModel implements ModelInitializer<ModelProvider> {
         return GOOGLE_BASE_URL +  URLEncoder.encode(symbols, "UTF-8");
     }
 
-    public RequestQueue getRequestQueue() {
-        return mModelProvider.getRequestQueue();
+    public <T> Request<T> addRequest(Request<T> request) {
+        return mModelProvider.addRequest(request);
+    }
+
+    public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
+        return mModelProvider.addRequest(request, customRetryPolicy);
     }
 
     public Context getContext() {

@@ -231,7 +231,7 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
                     }
             );
 
-            this.getRequestQueue().add(request);
+            this.addRequest(request);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -289,7 +289,7 @@ public class FinanceYQLModel extends YQLModel implements FinanceModel {
                 }
             });
 
-            this.getRequestQueue().add(jsObjRequest);
+            this.addRequest(jsObjRequest);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

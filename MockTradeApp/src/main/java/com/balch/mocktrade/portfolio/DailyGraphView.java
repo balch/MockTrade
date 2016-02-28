@@ -52,7 +52,7 @@ public class DailyGraphView extends View {
     private static final int GRAPH_PADDING_VERTICAL = 30;
     private static final int GRAPH_PADDING_HORIZONTAL = 30;
 
-    private static final int[] LINEAR_GRADIENT_COLORS = new int[] {
+    private static final int[] LINEAR_GRADIENT_COLORS_STROKE = new int[] {
             Color.argb(255, 0, 255, 0),
             Color.argb(255, 0, 156, 0),
             Color.argb(255, 156, 156, 156),
@@ -60,16 +60,33 @@ public class DailyGraphView extends View {
             Color.argb(255, 255, 0, 0)
     };
 
-    private static final float[] LINEAR_GRADIENT_POSITIONS = new float[] {
-            0f, .475f, .5f, .525f, 1
+    private static final float[] LINEAR_GRADIENT_POSITIONS_STROKE = new float[] {
+            0f, .475f, .5f, .525f, 1f
+    };
+
+    private static final int[] LINEAR_GRADIENT_COLORS_FILL = new int[] {
+            Color.argb(92, 0, 92, 0),
+            Color.argb(128, 0, 156, 0),
+            Color.argb(128, 0, 255, 0),
+            Color.argb(0, 0, 0, 0),
+            Color.argb(128, 255, 0, 0),
+            Color.argb(128, 156, 0, 0),
+            Color.argb(92, 92, 0, 0)
+    };
+
+    private static final float[] LINEAR_GRADIENT_POSITIONS_FILL = new float[] {
+            0f, .25f, .499f, .5f, .501f,  .75f, 1f
     };
 
     private static final int EXAMINER_WIDTH = 5;
 
-    private Paint mPathPaint;
+    private Paint mPathPaintStroke;
+    private Paint mPathPaintFill;
     private Paint mMarketTimesPaint;
-    private Path mPath;
-    private float mPathLength;
+    private Path mPathStroke;
+    private Path mPathFill;
+    private float mPathLengthStroke;
+    private float mPathLengthFill;
     private Paint mExaminerPaint;
     private RectF mExaminerRect;
     private Paint mExaminerTimePaint;
@@ -126,7 +143,8 @@ public class DailyGraphView extends View {
                     mWidth - GRAPH_PADDING_HORIZONTAL, centerY, mMarketTimesPaint);
         }
 
-        canvas.drawPath(mPath, mPathPaint);
+        canvas.drawPath(mPathStroke, mPathPaintStroke);
+        canvas.drawPath(mPathFill, mPathPaintFill);
 
         if (mExaminerRect != null) {
             canvas.drawRect(mExaminerRect, mExaminerPaint);
@@ -171,20 +189,30 @@ public class DailyGraphView extends View {
         mExaminerValuePaint.setStyle(Paint.Style.FILL);
         mExaminerValuePaint.setTextSize(34);
 
-        mPathPaint = new Paint();
-        mPathPaint.setAntiAlias(true);
-        mPathPaint.setStyle(Paint.Style.STROKE);
-        mPathPaint.setColor(Color.WHITE);
-        mPathPaint.setStrokeWidth(4);
-        mPathPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPathPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPathPaint.setShadowLayer(7, 0f, 0f, Color.LTGRAY);
+        mPathPaintStroke = new Paint();
+        mPathPaintStroke.setAntiAlias(true);
+        mPathPaintStroke.setStyle(Paint.Style.STROKE);
+        mPathPaintStroke.setColor(Color.WHITE);
+        mPathPaintStroke.setStrokeWidth(4);
+        mPathPaintStroke.setStrokeCap(Paint.Cap.ROUND);
+        mPathPaintStroke.setStrokeJoin(Paint.Join.ROUND);
+        mPathPaintStroke.setShadowLayer(7, 0f, 0f, Color.LTGRAY);
+
+        mPathPaintFill = new Paint();
+        mPathPaintFill.setAntiAlias(true);
+        mPathPaintFill.setStyle(Paint.Style.FILL);
+        mPathPaintFill.setColor(Color.WHITE);
+        mPathPaintFill.setStrokeWidth(4);
+        mPathPaintFill.setStrokeCap(Paint.Cap.ROUND);
+        mPathPaintFill.setStrokeJoin(Paint.Join.ROUND);
+        mPathPaintFill.setShadowLayer(7, 0f, 0f, Color.LTGRAY);
 
         if (!isInEditMode() && Build.VERSION.SDK_INT >= 11) {
             setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
 
-        mPath = new Path();
+        mPathStroke = new Path();
+        mPathFill = new Path();
     }
 
     @Override
@@ -198,7 +226,8 @@ public class DailyGraphView extends View {
     }
 
     private void calculatePath() {
-        mPath.rewind();
+        mPathStroke.rewind();
+        mPathFill.rewind();
 
         if ((mPerformanceItems != null) && (mPerformanceItems.size() >= 2)) {
             calculateScale();
@@ -215,24 +244,45 @@ public class DailyGraphView extends View {
                 points.add(new PointF(xScaleValue, yScaleValue));
             }
 
-            mPath.moveTo(points.get(0).x, points.get(0).y);
+            float centerY = scaleY(00.0f);
+
+            mPathFill.moveTo(points.get(0).x, centerY);
+            mPathFill.lineTo(points.get(0).x, points.get(0).y);
+
+            mPathStroke.moveTo(points.get(0).x, points.get(0).y);
+
             for (int x = 1; x < points.size() - 1; x++) {
-                mPath.quadTo(points.get(x).x, points.get(x).y, points.get(x + 1).x, points.get(x + 1).y);
+                mPathStroke.quadTo(points.get(x).x, points.get(x).y, points.get(x + 1).x, points.get(x + 1).y);
+                mPathFill.quadTo(points.get(x).x, points.get(x).y, points.get(x + 1).x, points.get(x + 1).y);
             }
 
             int lastPos = points.size() - 1;
-            mPath.lineTo(points.get(lastPos).x, points.get(lastPos).y);
+            mPathStroke.lineTo(points.get(lastPos).x, points.get(lastPos).y);
+            mPathFill.lineTo(points.get(lastPos).x, points.get(lastPos).y);
 
-            PathMeasure measure = new PathMeasure(mPath, false);
-            mPathLength = measure.getLength();
+
+            mPathFill.lineTo(points.get(lastPos).x, centerY);
+
+            PathMeasure measure = new PathMeasure(mPathStroke, false);
+            mPathLengthStroke = measure.getLength();
 
             Shader shader = new LinearGradient(0, GRAPH_PADDING_VERTICAL,
                     0, mHeight - GRAPH_PADDING_VERTICAL,
-                    LINEAR_GRADIENT_COLORS,
-                    LINEAR_GRADIENT_POSITIONS,
+                    LINEAR_GRADIENT_COLORS_STROKE,
+                    LINEAR_GRADIENT_POSITIONS_STROKE,
                     Shader.TileMode.CLAMP);
 
-            mPathPaint.setShader(shader);
+            mPathPaintStroke.setShader(shader);
+
+            measure = new PathMeasure(mPathFill, true);
+            mPathLengthFill = measure.getLength();
+
+            shader = new LinearGradient(0, GRAPH_PADDING_VERTICAL,
+                    0, mHeight - GRAPH_PADDING_VERTICAL,
+                    LINEAR_GRADIENT_COLORS_FILL,
+                    LINEAR_GRADIENT_POSITIONS_FILL,
+                    Shader.TileMode.CLAMP);
+            mPathPaintFill.setShader(shader);
         }
     }
 
@@ -301,8 +351,9 @@ public class DailyGraphView extends View {
                 Float percentage = (Float) animation.getAnimatedValue();
 
                 // change the path effect to determine how much of path to render
-                float visibleLength = mPathLength * percentage;
-                mPathPaint.setPathEffect(new DashPathEffect(new float[]{visibleLength, mPathLength - visibleLength}, 0));
+                float visibleLength = mPathLengthStroke * percentage;
+                mPathPaintStroke.setPathEffect(new DashPathEffect(new float[]{visibleLength, mPathLengthStroke - visibleLength}, 0));
+
                 invalidate();
             }
         });

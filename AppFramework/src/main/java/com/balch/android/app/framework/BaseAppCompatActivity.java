@@ -93,6 +93,7 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         try {
             super.onCreate(savedInstanceState);
             V view = this.createView();
+            view.setId(View.generateViewId());
             view.initializeLayout();
 
             this.setContentView(view);

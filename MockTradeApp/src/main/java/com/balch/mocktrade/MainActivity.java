@@ -158,29 +158,33 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle("");
+            setSupportActionBar(toolbar);
 
-        // tint the overflow icon
-        ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
-        Drawable icon = toolbar.getOverflowIcon();
-        if (icon != null) {
-            DrawableCompat.setTintList(icon, colorSelector);
-            toolbar.setOverflowIcon(icon);
+            // tint the overflow icon
+            ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
+            Drawable icon = toolbar.getOverflowIcon();
+            if (icon != null) {
+                DrawableCompat.setTintList(icon, colorSelector);
+                toolbar.setOverflowIcon(icon);
+            }
         }
 
         setupAdapter();
 
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.portfolio_view_app_bar);
-        if (bundle == null) {
-            mUIHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    appBarLayout.setExpanded(false);
-                }
-            }, 500);
-        } else {
-            appBarLayout.setExpanded(false, false);
+        if (appBarLayout != null) {
+            if (bundle == null) {
+                mUIHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        appBarLayout.setExpanded(false);
+                    }
+                }, 500);
+            } else {
+                appBarLayout.setExpanded(false, false);
+            }
         }
 
         LoaderManager loaderManager = getSupportLoaderManager();
@@ -506,9 +510,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
 
         protected Void doInBackground(Account... accounts) {
-            int count = accounts.length;
-            for (int i = 0; i < count; i++) {
-                mPortfolioModel.createAccount(accounts[i]);
+            for (Account account : accounts) {
+                mPortfolioModel.createAccount(account);
                 if (isCancelled()) {
                     break;
                 }

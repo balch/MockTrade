@@ -30,6 +30,8 @@ import android.support.v7.widget.Toolbar;
 import com.balch.android.app.framework.BaseAppCompatActivity;
 import com.balch.android.app.framework.R;
 
+import java.util.ArrayList;
+
 public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
@@ -39,7 +41,11 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected static final String EXTRA_CANCEL_BUTTON_RESID = "cancelButtonResId";
     protected static final String EXTRA_RESULT = "EditActivityResult";
 
+    protected static final String STATE_COLUMN_VIEW_IDS = "col_view_ids";
+
     protected EditView view;
+    protected ArrayList<Integer> columnViewIDs = new ArrayList<>();
+
     protected ExternalController validator;
     protected DomainObject item;
     protected boolean isNew;
@@ -80,9 +86,16 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
             }
         });
 
-        this.view.bind(this.item, this.isNew, this.validator,
-                this.okButtonResId, this.cancelButtonResId);
+        if (savedInstanceState != null) {
+            this.columnViewIDs = savedInstanceState.getIntegerArrayList(STATE_COLUMN_VIEW_IDS);
+        }
 
+        this.view.bind(this.item, this.isNew, this.validator, this.okButtonResId, this.cancelButtonResId, this.columnViewIDs);
+    }
+
+    @Override
+    protected void onSaveInstanceStateBase(Bundle outState) {
+        outState.putIntegerArrayList(STATE_COLUMN_VIEW_IDS, this.columnViewIDs);
     }
 
     @Override

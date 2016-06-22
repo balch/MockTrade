@@ -85,9 +85,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     public void initializeLayout() {
         inflate(getContext(), R.layout.portfolio_view_main, this);
 
-        // id required for onSaveInstanceState to fire
-        setId(View.generateViewId());
-
         mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
         mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
 

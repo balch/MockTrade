@@ -100,7 +100,7 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     }
 
     public void bind(DomainObject domainObject, boolean isNew, ExternalController controller,
-                     int okButtonResId, int cancelButtonResId) {
+                     int okButtonResId, int cancelButtonResId, List<Integer> columnViewIDs) {
         this.mDomainObject = domainObject;
         this.mExternalController = controller;
         this.mColumnDescriptorList = MetadataUtils.getColumnDescriptors(mDomainObject, isNew);
@@ -109,6 +109,7 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
         this.mOkButton.setText((okButtonResId != 0) ? okButtonResId : isNew ? R.string.edit_view_ok_button_new : R.string.edit_view_ok_button_edit);
 
         this.mControlMap.clear();
+        int cnt = 0;
         for (ColumnDescriptor descriptor : this.mColumnDescriptorList) {
             MetadataUtils.FrameworkType frameworkType = MetadataUtils.getFrameworkTypeByField(descriptor.getField());
 
@@ -116,6 +117,12 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             if (view == null) {
                 view = new UnsupportedEditLayout(this.getContext());
             }
+
+            if (cnt >= columnViewIDs.size()) {
+                columnViewIDs.add(View.generateViewId());
+            }
+            view.setId(columnViewIDs.get(cnt));
+            cnt++;
 
             if (view instanceof EditLayout) {
 
@@ -264,4 +271,5 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     public void setEditViewListener(EditViewListener editViewListener) {
         this.mEditViewListener = editViewListener;
     }
+
 }

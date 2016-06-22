@@ -43,7 +43,11 @@ import com.balch.android.app.framework.view.BaseView;
 public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
     private static final String TAG = BaseAppCompatActivity.class.getSimpleName();
 
+    private static final String STATE_VIEW_ID = TAG + "_state_view_id";
+
     private String mClassName;
+
+    private int viewId = -1;
 
     abstract protected V createView();
 
@@ -93,7 +97,14 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         try {
             super.onCreate(savedInstanceState);
             V view = this.createView();
-            view.setId(View.generateViewId());
+
+            if (savedInstanceState != null) {
+                viewId = savedInstanceState.getInt(STATE_VIEW_ID, -1);
+            }
+            if (viewId == -1) {
+                viewId = View.generateViewId();
+            }
+            view.setId(viewId);
             view.initializeLayout();
 
             this.setContentView(view);
@@ -137,6 +148,8 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         Log.d(TAG, this.mClassName + " onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
+
+            outState.putInt(STATE_VIEW_ID, viewId);
             onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);

@@ -179,8 +179,7 @@ public class MetadataUtils {
         return descriptors;
     }
 
-    static public View getEditView(ColumnDescriptor columnDescriptor,
-                                   FrameworkType frameworkType, Context context) {
+    static public View getEditView(ColumnDescriptor columnDescriptor, FrameworkType frameworkType, Context context) {
         View view = null;
         Class<? extends ViewGroup> editViewClazz = frameworkType.editViewClazz;
         if (columnDescriptor.getCustomControl() != null) {
@@ -190,7 +189,6 @@ public class MetadataUtils {
         if (editViewClazz != null) {
             try {
                 view =  editViewClazz.getConstructor(Context.class).newInstance(context);
-                view.setId(View.generateViewId());
             } catch (Exception e) {
                 Log.e(TAG, "Error getting EditView from Framework Tyoe", e);
             }

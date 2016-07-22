@@ -41,25 +41,25 @@ import java.util.TimeZone;
 public class QuoteGoogleFinance implements Quote {
     static private final String TAG = QuoteGoogleFinance.class.getSimpleName();
 
-    protected Map<String, String> mData = new HashMap<>();
+    private Map<String, String> quoteData = new HashMap<>();
 
-    protected final static String LastTradePriceOnly="l_cur";
-    protected final static String Symbol="t";
-    protected final static String LastTradeTime="lt_dts"; // 2014-09-04T10:32:44Z  in EST
+    private final static String LAST_TRADE_PRICE_ONLY ="l_fix";
+    private final static String SYMBOL ="t";
+    private final static String LAST_TRADE_TIME ="lt_dts"; // 2014-09-04T10:32:44Z  in EST
 
     @Override
     public Money getPrice() {
-        return new Money(this.mData.get(LastTradePriceOnly));
+        return new Money(this.quoteData.get(LAST_TRADE_PRICE_ONLY));
     }
 
     @Override
     public void setPrice(Money price) {
-        this.mData.put(LastTradePriceOnly, String.valueOf(price.getDollars()));
+        this.quoteData.put(LAST_TRADE_PRICE_ONLY, String.valueOf(price.getDollars()));
     }
 
     @Override
     public String getSymbol() {
-        return this.mData.get(Symbol);
+        return this.quoteData.get(SYMBOL);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class QuoteGoogleFinance implements Quote {
         Calendar ny_cal = Calendar.getInstance(ny_tz);
         int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET))/60000;
 
-        String dateStr = this.mData.get(LastTradeTime);
+        String dateStr = this.quoteData.get(LAST_TRADE_TIME);
         dateStr = dateStr.replace("Z", String.format("%s%02d:%02d",(offset_mins>=0)?"+":"-", Math.abs(offset_mins/60), Math.abs(offset_mins%60)));
         try {
             return ISO8601DateTime.toDate(dateStr);
@@ -104,7 +104,7 @@ public class QuoteGoogleFinance implements Quote {
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if (!jsonObject.isNull(key)) {
-                quote.mData.put(key, jsonObject.getString(key));
+                quote.quoteData.put(key, jsonObject.getString(key));
             }
         }
 

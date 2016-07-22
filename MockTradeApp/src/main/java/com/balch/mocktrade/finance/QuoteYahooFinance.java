@@ -43,101 +43,48 @@ import java.util.TimeZone;
 public class QuoteYahooFinance implements Quote {
     static private final String TAG = QuoteYahooFinance.class.getSimpleName();
 
-    protected Map<String, String> mData = new HashMap<>();
+    private Map<String, String> quoteData = new HashMap<>();
 
-    protected final static String Ask="Ask";
-    protected final static String AverageDailyVolume="AverageDailyVolume";
-    protected final static String Bid="Bid";
-    protected final static String AskRealtime="AskRealtime";
-    protected final static String BidRealtime="BidRealtime";
-    protected final static String BookValue="BookValue";
-    protected final static String Change_PercentChange="Change_PercentChange";
-    protected final static String Change="Change";
-    protected final static String Currency="Currency";
-    protected final static String AfterHoursChangeRealtime="AfterHoursChangeRealtime";
-    protected final static String DividendShare="DividendShare";
-    protected final static String LastTradeDate="LastTradeDate";
-    protected final static String EarningsShare="EarningsShare";
-    protected final static String EPSEstimateCurrentYear="EPSEstimateCurrentYear";
-    protected final static String EPSEstimateNextYear="EPSEstimateNextYear";
-    protected final static String EPSEstimateNextQuarter="EPSEstimateNextQuarter";
-    protected final static String DaysLow="DaysLow";
-    protected final static String DaysHigh="DaysHigh";
-    protected final static String YearLow="YearLow";
-    protected final static String YearHigh="YearHigh";
-    protected final static String MarketCapitalization="MarketCapitalization";
-    protected final static String EBITDA="EBITDA";
-    protected final static String ChangeFromYearLow="ChangeFromYearLow";
-    protected final static String PercentChangeFromYearLow="PercentChangeFromYearLow";
-    protected final static String ChangePercentRealtime="ChangePercentRealtime";
-    protected final static String ChangeFromYearHigh="ChangeFromYearHigh";
-    protected final static String PercebtChangeFromYearHigh="PercebtChangeFromYearHigh";
-    protected final static String LastTradeWithTime="LastTradeWithTime";
-    protected final static String LastTradePriceOnly="LastTradePriceOnly";
-    protected final static String DaysRange="DaysRange";
-    protected final static String DaysRangeRealtime="DaysRangeRealtime";
-    protected final static String FiftydayMovingAverage="FiftydayMovingAverage";
-    protected final static String TwoHundreddayMovingAverage="TwoHundreddayMovingAverage";
-    protected final static String ChangeFromTwoHundreddayMovingAverage="ChangeFromTwoHundreddayMovingAverage";
-    protected final static String PercentChangeFromTwoHundreddayMovingAverage="PercentChangeFromTwoHundreddayMovingAverage";
-    protected final static String ChangeFromFiftydayMovingAverage="ChangeFromFiftydayMovingAverage";
-    protected final static String PercentChangeFromFiftydayMovingAverage="PercentChangeFromFiftydayMovingAverage";
-    protected final static String Name="Name";
-    protected final static String Open="Open";
-    protected final static String PreviousClose="PreviousClose";
-    protected final static String ChangeinPercent="ChangeinPercent";
-    protected final static String PriceSales="PriceSales";
-    protected final static String PriceBook="PriceBook";
-    protected final static String ExDividendDate="ExDividendDate";
-    protected final static String PERatio="PERatio";
-    protected final static String DividendPayDate="DividendPayDate";
-    protected final static String PEGRatio="PEGRatio";
-    protected final static String PriceEPSEstimateCurrentYear="PriceEPSEstimateCurrentYear";
-    protected final static String PriceEPSEstimateNextYear="PriceEPSEstimateNextYear";
-    protected final static String Symbol="Symbol";
-    protected final static String ShortRatio="ShortRatio";
-    protected final static String LastTradeTime="LastTradeTime";
-    protected final static String TickerTrend="TickerTrend";
-    protected final static String OneyrTargetPrice="OneyrTargetPrice";
-    protected final static String Volume="Volume";
-    protected final static String YearRange="YearRange";
-    protected final static String DaysValueChange="DaysValueChange";
-    protected final static String DaysValueChangeRealtime="DaysValueChangeRealtime";
-    protected final static String StockExchange="StockExchange";
-    protected final static String DividendYield="DividendYield";
-    protected final static String PercentChange="PercentChange";
-    protected final static String ErrorIndicationreturnedforsymbolchangedinvalid="ErrorIndicationreturnedforsymbolchangedinvalid";
+    private final static String DIVIDEND_SHARE="DividendShare";
+    private final static String LAST_TRADE_DATE="LastTradeDate";
+    private final static String LAST_TRADE_PRICE_ONLY="LastTradePriceOnly";
+    private final static String NAME="Name";
+    private final static String PREVIOUS_CLOSE="PreviousClose";
+    private final static String SYMBOL="Symbol";
+    private final static String LAST_TRADE_TIME="LastTradeTime";
+    private final static String STOCK_EXCHANGE="StockExchange";
+    private final static String ERROR_SYMBOL_INVALID="ErrorIndicationreturnedforsymbolchangedinvalid";
 
     @Override
     public Money getPrice() {
-        return new Money(mData.get(LastTradePriceOnly));
+        return new Money(quoteData.get(LAST_TRADE_PRICE_ONLY));
     }
 
     @Override
     public void setPrice(Money price) {
-        mData.put(LastTradePriceOnly, String.valueOf(price.getDollars()));
+        quoteData.put(LAST_TRADE_PRICE_ONLY, String.valueOf(price.getDollars()));
     }
 
     @Override
     public String getSymbol() {
-        return mData.get(Symbol);
+        return quoteData.get(SYMBOL);
     }
 
     @Override
     public String getName() {
-        return mData.get(Name);
+        return quoteData.get(NAME);
     }
 
     @Override
     public String getExchange() {
-        return mData.get(StockExchange);
+        return quoteData.get(STOCK_EXCHANGE);
     }
 
     @Override
     public Date getLastTradeTime() {
         DateFormat df = new SimpleDateFormat("M/d/yy h:mma", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        String dateStr = mData.get(LastTradeDate) + " " + mData.get(LastTradeTime).toUpperCase();
+        String dateStr = quoteData.get(LAST_TRADE_DATE) + " " + quoteData.get(LAST_TRADE_TIME).toUpperCase();
         try {
             return df.parse(dateStr);
         } catch (ParseException e) {
@@ -153,14 +100,14 @@ public class QuoteYahooFinance implements Quote {
 
         String dateStr = df.format(time);
         String[] parts = dateStr.split(" ");
-        mData.put(LastTradeDate, parts[0]);
-        mData.put(LastTradeTime, parts[1]);
+        quoteData.put(LAST_TRADE_DATE, parts[0]);
+        quoteData.put(LAST_TRADE_TIME, parts[1]);
 
     }
 
     @Override
     public Money getPreviousClose() {
-        return new Money(mData.get(PreviousClose));
+        return new Money(quoteData.get(PREVIOUS_CLOSE));
     }
 
     public static QuoteYahooFinance fromJSONObject(JSONObject jsonObject) throws JSONException {
@@ -169,11 +116,11 @@ public class QuoteYahooFinance implements Quote {
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if (!jsonObject.isNull(key)) {
-                quote.mData.put(key, jsonObject.getString(key));
+                quote.quoteData.put(key, jsonObject.getString(key));
             }
         }
 
-        String error = quote.mData.get(QuoteYahooFinance.ErrorIndicationreturnedforsymbolchangedinvalid);
+        String error = quote.quoteData.get(QuoteYahooFinance.ERROR_SYMBOL_INVALID);
         if (!TextUtils.isEmpty(error)) {
             throw new JSONException(error);
         }
@@ -194,7 +141,7 @@ public class QuoteYahooFinance implements Quote {
 
     @Override
     public Money getDividendPerShare() {
-        return new Money(mData.get(DividendShare));
+        return new Money(quoteData.get(DIVIDEND_SHARE));
     }
 
 }

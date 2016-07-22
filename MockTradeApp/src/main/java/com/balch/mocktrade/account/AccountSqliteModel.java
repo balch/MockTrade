@@ -33,6 +33,7 @@ import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +87,7 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
 
             db.setTransactionSuccessful();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             db.endTransaction();

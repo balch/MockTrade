@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
+import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.utils.TextFormatUtils;
 
 

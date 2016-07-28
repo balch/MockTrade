@@ -22,11 +22,15 @@
         app:showAsAction="never"
         android:title="@string/menu_new_portfolio" />
 
-
     <item
         android:id="@+id/menu_backup_db"
         app:showAsAction="never"
         android:title="@string/menu_backup_db" />
+
+    <item
+        android:id="@+id/menu_restore_db"
+        app:showAsAction="never"
+        android:title="@string/menu_restore_db" />
 
     <item
         android:id="@+id/menu_hide_exclude_accounts"

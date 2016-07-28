@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
 import java.util.Date;

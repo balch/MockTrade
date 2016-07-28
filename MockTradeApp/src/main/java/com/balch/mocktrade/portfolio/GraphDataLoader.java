@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.balch.mocktrade.shared.PerformanceItem;
+
 import java.util.List;
 
 public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {

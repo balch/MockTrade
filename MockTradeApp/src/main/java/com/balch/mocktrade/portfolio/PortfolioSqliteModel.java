@@ -39,10 +39,10 @@ import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -190,30 +190,12 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
 
     @Override
     public List<PerformanceItem> getCurrentSnapshot() {
-        return getCurrentSnapshot(-1);
+        return snapshotTotalsModel.getCurrentSnapshot();
     }
 
     @Override
     public List<PerformanceItem> getCurrentSnapshot(long accountId) {
-        List<PerformanceItem> snapshot = null;
-
-        long latestTimestamp = snapshotTotalsModel.getLatestGraphSnapshotTime();
-        if (latestTimestamp > 0) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(latestTimestamp);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-
-            long startTime = cal.getTimeInMillis();
-
-            cal.add(Calendar.DAY_OF_YEAR, 1);
-            long endTime = cal.getTimeInMillis();
-
-            snapshot = snapshotTotalsModel.getSnapshots(accountId, startTime, endTime);
-        }
-        return snapshot;
+        return snapshotTotalsModel.getCurrentSnapshot(accountId);
     }
 
     @Override

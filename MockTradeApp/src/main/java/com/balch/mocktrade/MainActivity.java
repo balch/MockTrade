@@ -1,8 +1,10 @@
 package com.balch.mocktrade;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -13,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -38,7 +41,6 @@ import com.balch.mocktrade.order.OrderEditController;
 import com.balch.mocktrade.order.OrderListActivity;
 import com.balch.mocktrade.portfolio.AccountViewHolder;
 import com.balch.mocktrade.portfolio.GraphDataLoader;
-import com.balch.mocktrade.portfolio.PerformanceItem;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioLoader;
@@ -46,14 +48,18 @@ import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -66,6 +72,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
     protected static final int NEW_ACCOUNT_RESULT = 0;
     protected static final int NEW_ORDER_RESULT = 1;
+
+    protected static final int PERMS_REQUEST_BACKUP = 0;
+    protected static final int PERMS_REQUEST_RESTORE = 1;
 
     protected PortfolioModel mPortfolioModel;
     protected MainPortfolioView mMainPortfolioView;
@@ -243,15 +252,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 handled = true;
                 break;
             case R.id.menu_backup_db:
-                boolean success = backupDatabaseToSDCard();
-                String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
+                backupDatabaseToSDCard();
 
-                getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
-                        R.color.snackbar_background,
-                        success ? R.color.success : R.color.failure,
-                        android.support.design.R.id.snackbar_text)
-                        .show();
-
+                handled = true;
+                break;
+            case R.id.menu_restore_db:
+                restoreLatestDatabase();
                 handled = true;
                 break;
             case R.id.menu_hide_exclude_accounts:
@@ -283,47 +289,162 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
     }
 
-    private boolean backupDatabaseToSDCard() {
+    private void backupDatabaseToSDCard() {
 
-        boolean success = false;
-        FileChannel src = null;
-        FileChannel dst = null;
-        try {
-            File sd = Environment.getExternalStorageDirectory();
+        if (isStoragePermissionsGranted(PERMS_REQUEST_BACKUP)) {
+            boolean success = false;
 
-            if (sd.canWrite()) {
-                File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
+            FileChannel src = null;
+            FileChannel dst = null;
+            try {
+                File sd = Environment.getExternalStorageDirectory();
 
-                String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
-                File backupDBFile = new File(sd, backupDBPath);
+                if (sd.canWrite()) {
+                    File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
 
-                if (dbFile.exists()) {
-                    src = new FileInputStream(dbFile).getChannel();
-                    dst = new FileOutputStream(backupDBFile).getChannel();
-                    dst.transferFrom(src, 0, src.size());
+                    String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
+                    File backupDBFile = new File(sd, backupDBPath);
 
-                    success = true;
+                    if (dbFile.exists()) {
+                        src = new FileInputStream(dbFile).getChannel();
+                        dst = new FileOutputStream(backupDBFile).getChannel();
+                        dst.transferFrom(src, 0, src.size());
+
+                        success = true;
+                    }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Error backing up to Database", e);
+            } finally {
+                if (src != null) {
+                    try {
+                        src.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+
+                if (dst != null)
+                    try {
+                        dst.close();
+                    } catch (IOException ignored) {
+                    }
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Error backing up to Database", e);
-        } finally {
-            if (src != null) {
-                try {
-                    src.close();
-                } catch (IOException ignored) {
-                }
-            }
 
-            if (dst != null)
-                try {
-                    dst.close();
-                } catch (IOException ignored) {
-                }
+            String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
+
+            getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
+                    R.color.snackbar_background,
+                    success ? R.color.success : R.color.failure,
+                    android.support.design.R.id.snackbar_text)
+                    .show();
+
         }
-
-        return success;
     }
+
+    private void restoreLatestDatabase() {
+
+        if (isStoragePermissionsGranted(PERMS_REQUEST_RESTORE)) {
+
+            boolean success = false;
+
+            FileChannel src = null;
+            FileChannel dst = null;
+            try {
+                File sd = Environment.getExternalStorageDirectory();
+
+                if (sd.canWrite()) {
+                    File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
+
+                    File[] backups = sd.listFiles(new FilenameFilter() {
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith("_" + TradeApplication.DATABASE_NAME);
+                        }
+                    });
+
+                    if (backups != null && backups.length > 1) {
+                        Arrays.sort(backups, new Comparator<File>() {
+                            @Override
+                            public int compare(File object1, File object2) {
+                                return object1.getName().compareTo(object2.getName());
+                            }
+                        });
+                    }
+
+                    if (backups != null) {
+                        src = new FileInputStream(backups[backups.length - 1]).getChannel();
+                        dst = new FileOutputStream(dbFile).getChannel();
+                        dst.transferFrom(src, 0, src.size());
+
+                        success = true;
+
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error restoring Database", e);
+            } finally {
+                if (src != null) {
+                    try {
+                        src.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+
+                if (dst != null)
+                    try {
+                        dst.close();
+                    } catch (IOException ignored) {
+                    }
+            }
+
+            String msg = getResources().getString(success ? R.string.menu_restore_db_success : R.string.menu_restore_db_fail);
+
+            getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
+                    R.color.snackbar_background,
+                    success ? R.color.success : R.color.failure,
+                    android.support.design.R.id.snackbar_text)
+                    .show();
+        }
+    }
+
+    private boolean isStoragePermissionsGranted(int requestCode) {
+        boolean hasPerms = true;
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
+
+            hasPerms = false;
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                    requestCode);
+        }
+        return hasPerms;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMS_REQUEST_BACKUP: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    backupDatabaseToSDCard();
+                } else {
+                    Log.w(TAG, "User Refused Read Storage");
+                }
+                break;
+            }
+            case PERMS_REQUEST_RESTORE: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    restoreLatestDatabase();
+                } else {
+                    Log.w(TAG, "User Refused Read Storage");
+                }
+                break;
+            }
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
+    }
+
+
 
     protected void setupAdapter() {
         mPortfolioAdapter = new PortfolioAdapter(this);

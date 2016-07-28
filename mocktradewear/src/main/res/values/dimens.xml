@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Author: Balch
+  ~ Created: 7/26/16 6:34 AM
+  ~
+  ~ This file is part of MockTrade.
+  ~
+  ~ MockTrade is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MockTrade is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2016
+  ~
+  -->
+
+<resources>
+    <dimen name="digital_text_size">40dp</dimen>
+    <dimen name="digital_text_size_round">45dp</dimen>
+    <dimen name="digital_x_offset">15dp</dimen>
+    <dimen name="digital_x_offset_round">25dp</dimen>
+    <dimen name="digital_y_offset">90dp</dimen>
+
+
+    <dimen name="day_circle_outer_width">6dp</dimen>
+    <dimen name="day_circle_inner_width">4dp</dimen>
+
+</resources>

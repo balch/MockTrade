@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -86,7 +87,6 @@ public class DailyGraphView extends View {
     private Path mPathStroke;
     private Path mPathFill;
     private float mPathLengthStroke;
-    private float mPathLengthFill;
     private Paint mExaminerPaint;
     private RectF mExaminerRect;
     private Paint mExaminerTimePaint;
@@ -260,7 +260,6 @@ public class DailyGraphView extends View {
             mPathStroke.lineTo(points.get(lastPos).x, points.get(lastPos).y);
             mPathFill.lineTo(points.get(lastPos).x, points.get(lastPos).y);
 
-
             mPathFill.lineTo(points.get(lastPos).x, centerY);
 
             PathMeasure measure = new PathMeasure(mPathStroke, false);
@@ -273,9 +272,6 @@ public class DailyGraphView extends View {
                     Shader.TileMode.CLAMP);
 
             mPathPaintStroke.setShader(shader);
-
-            measure = new PathMeasure(mPathFill, true);
-            mPathLengthFill = measure.getLength();
 
             shader = new LinearGradient(0, GRAPH_PADDING_VERTICAL,
                     0, mHeight - GRAPH_PADDING_VERTICAL,

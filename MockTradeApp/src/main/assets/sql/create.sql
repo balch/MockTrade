@@ -27,6 +27,9 @@ CREATE TABLE investment (
 );
 
 CREATE INDEX investment_account_idx ON investment(account_id);
+CREATE INDEX investment_last_trade_time_idx ON investment(last_trade_time DESC);
+CREATE INDEX investment_query_idx ON investment(account_id, symbol);
+
 
 CREATE TABLE [order] (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,5 +74,5 @@ CREATE TABLE snapshot_totals (
 );
 
 
-CREATE INDEX snapshot_totals_snapshot_time_idx ON [snapshot_totals](snapshot_time);
 CREATE INDEX snapshot_totals_account_idx ON [snapshot_totals](account_id);
+CREATE INDEX snapshot_totals_query_idx ON [snapshot_totals](account_id, snapshot_time);

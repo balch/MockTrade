@@ -138,9 +138,11 @@
     <string name="portfolio_view_intro_header">Get Started</string>
     <string name="portfolio_view_create_portfolio">Create Portfolio</string>
     <string name="menu_backup_db">Backup Database</string>
-
     <string name="menu_backup_db_success">Backup Successful</string>
     <string name="menu_backup_db_fail">Backup Failed</string>
+    <string name="menu_restore_db">Restore Database</string>
+    <string name="menu_restore_db_success">Restore Successful. Restart App to see change.</string>
+    <string name="menu_restore_db_fail">Restore Failed</string>
     <string name="portfolio_view_last_sync">Last Sync: %1$s</string>
     <string name="portfolio_view_last_quote">Last Quote: %1$s</string>
     <string name="menu_hide_exclude_accounts">Hide Exclude Accounts</string>

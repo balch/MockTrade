@@ -33,6 +33,7 @@ import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteModel;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_ACCOUNT_ID, performanceItem.getAccountId());
-        values.put(COLUMN_SNAPSHOT_TIME, performanceItem.mTimestamp.getTime());
+        values.put(COLUMN_SNAPSHOT_TIME, performanceItem.getTimestamp().getTime());
         values.put(COLUMN_COST_BASIS, performanceItem.getCostBasis().getMicroCents());
         values.put(COLUMN_TOTAL_VALUE, performanceItem.getValue().getMicroCents());
         values.put(COLUMN_TODAY_CHANGE, performanceItem.getTodayChange().getMicroCents());
@@ -226,4 +227,31 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
 
         return db.delete(TABLE_NAME, COLUMN_SNAPSHOT_TIME +"<=?", new String[] {String.valueOf(timestamp)});
     }
+
+    public List<PerformanceItem> getCurrentSnapshot() {
+        return getCurrentSnapshot(-1);
+    }
+
+    public List<PerformanceItem> getCurrentSnapshot(long accountId) {
+        List<PerformanceItem> snapshot = null;
+
+        long latestTimestamp = getLatestGraphSnapshotTime();
+        if (latestTimestamp > 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(latestTimestamp);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            long startTime = cal.getTimeInMillis();
+
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+            long endTime = cal.getTimeInMillis();
+
+            snapshot = getSnapshots(accountId, startTime, endTime);
+        }
+        return snapshot;
+    }
+
 }

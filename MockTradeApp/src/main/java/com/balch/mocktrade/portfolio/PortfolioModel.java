@@ -31,6 +31,7 @@ import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.Date;
 import java.util.List;

@@ -1,2 +1,2 @@
-include ':AppFramework'
+include ':AppFramework', ':MockTradeWear', ':MockTradeShared'
 include ':MockTradeApp'

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.balch.mocktrade"
@@ -20,6 +20,7 @@ android {
             keyPassword "android"
         }
     }
+
     buildTypes {
         debug {
             // sign debug build with a common key to facilitate develop from multiple
@@ -35,12 +36,17 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':AppFramework')
+    compile project(path: ':MockTradeShared')
+
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile "com.android.support:support-v4:23.4.0"
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.android.support:cardview-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
+    compile 'com.google.android.gms:play-services-wearable:9.2.1'
+
+    wearApp project(':MockTradeWear')
 
     testCompile 'com.android.support.test:runner:0.2'
     testCompile 'com.android.support.test:rules:0.2'

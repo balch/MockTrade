@@ -34,7 +34,7 @@ import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.account.strategies.DogsOfTheDow;
 import com.balch.mocktrade.account.strategies.TripleMomentum;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.portfolio.PerformanceItem;
+import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.io.Serializable;
 import java.util.Date;

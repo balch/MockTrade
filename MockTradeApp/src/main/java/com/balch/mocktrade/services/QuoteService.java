@@ -118,6 +118,9 @@ public class QuoteService extends IntentService {
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
 
                             mSettings.setLastSyncTime(System.currentTimeMillis());
+
+                            startService(WearSyncService.getIntent(getApplicationContext()));
+
                         } finally {
                             PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
                             releaseWakeLock();

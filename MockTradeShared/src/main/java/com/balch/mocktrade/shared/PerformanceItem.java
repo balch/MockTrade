@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 7/28/16 8:23 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,17 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2016
+ *
  */
 
-package com.balch.mocktrade.portfolio;
+package com.balch.mocktrade.shared;
 
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
+import com.google.android.gms.wearable.DataMap;
 
 import java.util.Date;
 
-public class PerformanceItem extends DomainObject{
+public class PerformanceItem extends DomainObject {
+
+    private static final String DATA_ACCOUNT_ID = "accountId";
+    private static final String DATA_TIMESTAMP = "timestamp";
+    private static final String DATA_COST_BASIS = "costBasis";
+    private static final String DATA_VALUE = "value";
+    private static final String DATA_TODAY_CHANGE = "todayChange";
+
     protected long mAccountId;
     protected Date mTimestamp;
     protected Money mCostBasis;
@@ -44,6 +53,22 @@ public class PerformanceItem extends DomainObject{
         this.mCostBasis = costBasis;
         this.mValue = value;
         this.mTodayChange = todayChange;
+    }
+
+    public PerformanceItem(DataMap map) {
+        this(map.getLong(DATA_ACCOUNT_ID), new Date(map.getLong(DATA_TIMESTAMP)),
+                new Money(map.getLong(DATA_COST_BASIS)), new Money(map.getLong(DATA_VALUE)),
+                new Money(map.getLong(DATA_TODAY_CHANGE)));
+    }
+
+    public DataMap toDataMap() {
+        DataMap map = new DataMap();
+        map.putLong(DATA_ACCOUNT_ID, mAccountId);
+        map.putLong(DATA_TIMESTAMP, mTimestamp.getTime());
+        map.putLong(DATA_COST_BASIS, mCostBasis.getMicroCents());
+        map.putLong(DATA_VALUE, mValue.getMicroCents());
+        map.putLong(DATA_TODAY_CHANGE, mTodayChange.getMicroCents());
+        return map;
     }
 
     public Money getCostBasis() {

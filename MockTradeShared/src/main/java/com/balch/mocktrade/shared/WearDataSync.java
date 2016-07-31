@@ -25,7 +25,9 @@ package com.balch.mocktrade.shared;
 
 public class WearDataSync {
     public static final String PATH_SNAPSHOT_SYNC = "/snapshot/day";
-
     public static final String DATA_SNAPSHOT_DAILY = "snapshot_daily";
+
+    public static final String PATH_HIGHLIGHTS_SYNC = "/highlights";
+    public static final String DATA_HIGHLIGHTS = "highlights";
 
 }

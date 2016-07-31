@@ -24,7 +24,6 @@
 
 <resources>
     <color name="background">#000000</color>
-    <color name="background2">#000088</color>
     <color name="digital_text">#ffffff</color>
 
     <color name="day_circle_inner_color">#000088</color>
@@ -33,5 +32,11 @@
     <color name="day_circle_tick_color">#FFFFFF</color>
 
     <color name="market_inner_color">#88FFFFFF</color>
+
+    <color name="highlight_text_desc_color">#FF00FF</color>
+    <color name="highlight_text_symbol_color">#00CC00</color>
+
+    <color name="data_color_pos">#00FF00</color>
+    <color name="data_color_neg">#FF0000</color>
 
 </resources>

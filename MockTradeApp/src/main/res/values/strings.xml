@@ -151,4 +151,11 @@
     <string name="portfolio_view_graph_spinner_totals">Totals</string>
     <string name="portfolio_view_create_dogs">Dogs of the Dow QuickStart</string>
 
+    <string name="highlight_total_account">Account Total</string>
+    <string name="highlight_total_overall">Portfolio Total</string>
+    <string name="highlight_best_day">Today\'s Best</string>
+    <string name="highlight_worst_day">Today\'s Worst</string>
+    <string name="highlight_best_total">Portfolio Best</string>
+    <string name="highlight_worst_total">Portfolio Worst</string>
+
 </resources>

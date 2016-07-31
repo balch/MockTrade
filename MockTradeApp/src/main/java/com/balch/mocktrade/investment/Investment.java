@@ -150,6 +150,29 @@ public class Investment extends DomainObject {
         return lastTradeTime;
     }
 
+    public Money getTodayChange() {
+        return Money.subtract(getValue(), getPrevDayValue());
+    }
+
+    public Money getTotalChange() {
+        return Money.subtract(getValue(), this.costBasis);
+    }
+
+    public float getTotalChangePercent() {
+        float percent = (this.costBasis.getMicroCents() != 0) ?
+                Money.subtract(this.getValue(), this.costBasis).getMicroCents() / (float) this.costBasis.getMicroCents() :
+                1.0f;
+
+        return percent * 100.0f;
+    }
+
+    public float getTodayChangePercent() {
+        Money delta = Money.subtract(getPrice(), getPrevDayClose());
+        return (getPrevDayClose().getMicroCents() != 0) ?
+                delta.getMicroCents() * 100 / (float) getPrevDayClose().getMicroCents() :
+                100.0f;
+    }
+
     public void aggregateOrder(Order order, Money price) {
         // note: this work with sell orders!!!
         this.costBasis.add(order.getCost(price));

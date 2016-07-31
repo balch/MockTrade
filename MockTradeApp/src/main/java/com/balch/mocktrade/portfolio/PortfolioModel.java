@@ -49,6 +49,8 @@ public interface PortfolioModel extends BaseModel {
 
     List<Investment> getAllInvestments();
 
+    List<Investment> getInvestments(Long accountId);
+
     void createOrder(Order order);
 
     List<Order> getOpenOrders();

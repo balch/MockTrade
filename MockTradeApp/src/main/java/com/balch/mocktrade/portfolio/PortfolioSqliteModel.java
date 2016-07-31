@@ -94,6 +94,11 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
     }
 
     @Override
+    public List<Investment> getInvestments(Long accountId) {
+        return investmentModel.getInvestments(accountId);
+    }
+
+    @Override
     public void createOrder(Order order) {
         orderModel.createOrder(order);
     }

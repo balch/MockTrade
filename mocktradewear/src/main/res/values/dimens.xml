@@ -29,6 +29,10 @@
     <dimen name="digital_x_offset_round">25dp</dimen>
     <dimen name="digital_y_offset">90dp</dimen>
 
+    <dimen name="highlight_desc_size">20dp</dimen>
+    <dimen name="highlight_symbol_size">18dp</dimen>
+    <dimen name="highlight_data_size">14dp</dimen>
+    <dimen name="highlight_y_offset">120dp</dimen>
 
     <dimen name="day_circle_outer_width">6dp</dimen>
     <dimen name="day_circle_inner_width">4dp</dimen>

@@ -84,11 +84,8 @@ public class InvestmentViewHolder extends RecyclerView.ViewHolder {
         mValue.setText(investment.getValue().getFormatted());
 
         Money delta = Money.subtract(investment.getPrice(), investment.getPrevDayClose());
-        float percent = (investment.getPrice().getMicroCents() != 0) ?
-                delta.getMicroCents() / (float) investment.getPrevDayClose().getMicroCents() :
-                1.0f;
 
-        mPerformance.setText(TextFormatUtils.getShortChangePercentText(delta.getDollars(), percent*100));
+        mPerformance.setText(TextFormatUtils.getShortChangePercentText(delta.getDollars(), investment.getTodayChangePercent()));
 
         Money deltaValue = Money.subtract(investment.getValue(), investment.getPrevDayValue());
         mValueChange.setText(TextFormatUtils.getShortChangeText(deltaValue.getDollars()));

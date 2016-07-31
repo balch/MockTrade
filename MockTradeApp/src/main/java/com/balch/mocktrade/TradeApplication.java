@@ -41,6 +41,7 @@ import com.balch.mocktrade.order.OrderModel;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
+import com.balch.mocktrade.services.WearSyncService;
 import com.balch.mocktrade.settings.Settings;
 
 public class TradeApplication extends Application implements ModelProvider {
@@ -97,6 +98,8 @@ public class TradeApplication extends Application implements ModelProvider {
 
         PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
         portfolioModel.scheduleOrderServiceAlarmIfNeeded();
+
+        startService(WearSyncService.getIntent(this));
 
     }
 

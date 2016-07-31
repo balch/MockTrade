@@ -62,7 +62,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         super(modelProvider);
     }
 
-    protected List<Investment> getInvestments(Long accountId) {
+    public List<Investment> getInvestments(Long accountId) {
         try {
             String where = null;
             String [] whereArgs = null;

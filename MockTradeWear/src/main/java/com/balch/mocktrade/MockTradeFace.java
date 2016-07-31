@@ -47,6 +47,8 @@ import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.shared.WearDataSync;
 import com.google.android.gms.common.ConnectionResult;
@@ -136,7 +138,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 calcPerformanceGradient();
             }
         };
-        private int mTapCount;
 
         private Rect mTextSizeRect = new Rect();
         private float mYOffset;
@@ -151,7 +152,17 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private float mMarketDurationDegrees;
 
         private List<PerformanceItem> mPerformanceItems;
-        private float mPerfomanceDurationDegrees;
+        private float mPerformanceDurationDegrees;
+
+        private List<HighlightItem> mHighlightItems;
+        private int mHighlightItemPosition = 0;
+        private Paint mHighlightDescTextPaint;
+        private Paint mHighlightSymbolTextPaint;
+        private Paint mHighlightDataTextPaint;
+        private float mHighlightYOffset;
+
+        private int mColorPositive;
+        private int mColorNegative;
 
         private boolean mLowBitAmbient;
 
@@ -169,7 +180,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
-                    .setAcceptsTapEvents(false)
+                    .setAcceptsTapEvents(true)
                     .setStatusBarGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP)
                     .build());
             Resources resources = MockTradeFace.this.getResources();
@@ -184,11 +195,35 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mInnerColor = ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_inner_color);
 
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+            mHighlightYOffset = resources.getDimension(R.dimen.highlight_y_offset);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.background));
 
-            mTextPaint = createTextPaint(ContextCompat.getColor(MockTradeFace.this, R.color.digital_text));
+            mTextPaint = new Paint();
+            mTextPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.digital_text));
+            mTextPaint.setTypeface(NORMAL_TYPEFACE);
+            mTextPaint.setAntiAlias(true);
+
+            mHighlightDescTextPaint = new Paint();
+            mHighlightDescTextPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.highlight_text_desc_color));
+            mHighlightDescTextPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.highlight_desc_size));
+            mHighlightDescTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            mHighlightDescTextPaint.setAntiAlias(true);
+
+            mHighlightSymbolTextPaint = new Paint();
+            mHighlightSymbolTextPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.highlight_text_symbol_color));
+            mHighlightSymbolTextPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.highlight_symbol_size));
+            mHighlightSymbolTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            mHighlightSymbolTextPaint.setAntiAlias(true);
+
+            mHighlightDataTextPaint = new Paint();
+            mHighlightDataTextPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.highlight_data_size));
+            mHighlightDataTextPaint.setTypeface(Typeface.DEFAULT);
+            mHighlightDataTextPaint.setAntiAlias(true);
+
+            mColorPositive = ContextCompat.getColor(MockTradeFace.this, R.color.data_color_pos);
+            mColorNegative = ContextCompat.getColor(MockTradeFace.this, R.color.data_color_neg);
 
             mDayCirclePaint = new Paint();
             mDayCirclePaint.setStrokeCap(Paint.Cap.ROUND);
@@ -225,14 +260,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
         public void onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             super.onDestroy();
-        }
-
-        private Paint createTextPaint(int textColor) {
-            Paint paint = new Paint();
-            paint.setColor(textColor);
-            paint.setTypeface(NORMAL_TYPEFACE);
-            paint.setAntiAlias(true);
-            return paint;
         }
 
         @Override
@@ -359,7 +386,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 if (lastDegrees < mMarketOpenDegrees) {
                     lastDegrees += 360;
                 }
-                mPerfomanceDurationDegrees = lastDegrees - mMarketOpenDegrees;
+                mPerformanceDurationDegrees = lastDegrees - mMarketOpenDegrees;
             }
             mMarketDayRingPaint.setShader(shader);
         }
@@ -388,7 +415,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     mCurrentTimeDayPaint.setAntiAlias(!inAmbientMode);
                     mMarketTimePaint.setAntiAlias(!inAmbientMode);
                     mMarketDayRingPaint.setAntiAlias(!inAmbientMode);
-
+                    mHighlightDescTextPaint.setAntiAlias(!inAmbientMode);
+                    mHighlightSymbolTextPaint.setAntiAlias(!inAmbientMode);
+                    mHighlightDataTextPaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -398,10 +427,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
             updateTimer();
         }
 
-        /**
-         * Captures tap event (and tap type) and toggles the background color if the user finishes
-         * a tap.
-         */
         @Override
         public void onTapCommand(int tapType, int x, int y, long eventTime) {
             switch (tapType) {
@@ -412,14 +437,12 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     // The user has started a different gesture or otherwise cancelled the tap.
                     break;
                 case TAP_TYPE_TAP:
-                    // The user has completed the tap gesture.
-                    mTapCount++;
-                    mBackgroundPaint.setColor(ContextCompat.getColor(MockTradeFace.this,
-                            mTapCount % 2 == 0 ?
-                            R.color.background : R.color.background2));
+                    if (mHighlightItems != null) {
+                        mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
+                        invalidate();
+                    }
                     break;
             }
-            invalidate();
         }
 
         @Override
@@ -454,7 +477,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mMarketDurationDegrees,false, mMarketTimePaint);
 
             if (mPerformanceItems != null) {
-                canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mPerfomanceDurationDegrees, false, mMarketDayRingPaint);
+                canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mPerformanceDurationDegrees, false, mMarketDayRingPaint);
             }
 
             canvas.restore();
@@ -471,6 +494,77 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
             float x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
             canvas.drawText(text, x, mYOffset, mTextPaint);
+
+            if ((mHighlightItems != null) && (mHighlightItems.size() > 0)) {
+                HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+
+                text = (item.getHighlightType() != HighlightItem.HighlightType.TOTAL_ACCOUNT) ?
+                        item.getDescription() : item.getSymbol();
+                mHighlightDescTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
+                x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
+                canvas.drawText(text, x, mHighlightYOffset, mHighlightDescTextPaint);
+
+                float y = getYOffset(mHighlightYOffset, mTextSizeRect);
+
+                if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL) ||
+                    (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT)) {
+                    drawAccountHighlightItem(item, centerX, y,  canvas);
+                } else {
+                    drawSymbolHighlightItem(item, centerX, y,  canvas);
+                }
+            }
+        }
+
+        private float getYOffset(float startValue, Rect textSizeRect) {
+            return startValue + textSizeRect.height() + 5f;
+        }
+
+        private void drawSymbolHighlightItem(HighlightItem item, float centerX, float y,  Canvas canvas) {
+            String text = item.getSymbol();
+
+            mHighlightSymbolTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
+            float x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
+            canvas.drawText(text, x, y, mHighlightSymbolTextPaint);
+
+            y = getYOffset(y, mTextSizeRect);
+
+            boolean isDayChange = item.isDayChangeType();
+
+            Money value = isDayChange ? item.getTodayChange() : item.getTotalChange();
+            String percent = String.format("%.2f", isDayChange ? item.getTodayChangePercent() : item.getTotalChangePercent());
+            text = value.getFormatted(isDayChange ? 2 : 0) + " (" + percent + "%)";
+
+            mHighlightDataTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
+            x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
+            mHighlightDataTextPaint.setColor((value.getMicroCents() < 0) ? mColorNegative : mColorPositive);
+            canvas.drawText(text, x, y, mHighlightDataTextPaint);
+        }
+
+
+        private void drawAccountHighlightItem(HighlightItem item, float centerX, float y,  Canvas canvas) {
+            String text = item.getValue().getFormatted(0);
+            mHighlightDataTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
+            float x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
+            mHighlightDataTextPaint.setColor(Color.WHITE);
+            canvas.drawText(text, x, y, mHighlightDataTextPaint);
+
+            y = getYOffset(y, mTextSizeRect);
+
+            Money value = item.getTodayChange();
+            int percent = -1;
+            if (value.getMicroCents() == 0) {
+                value = item.getTotalChange();
+                percent = (int) item.getTotalChangePercent();
+            }
+
+            text = value.getFormatted(0);
+            if (percent != -1) {
+                text +=   " (" + percent + "%)";
+            }
+            mHighlightDataTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
+            x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
+            mHighlightDataTextPaint.setColor((value.getMicroCents() < 0) ? mColorNegative : mColorPositive);
+            canvas.drawText(text, x, y, mHighlightDataTextPaint);
         }
 
         private void drawTimeTick(Calendar time, float centerX, float centerY, Canvas canvas, Paint paint) {
@@ -570,6 +664,21 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
                 calcPerformanceGradient();
             }
+
+            if (dataItem.getUri().getPath().equals(WearDataSync.PATH_HIGHLIGHTS_SYNC)) {
+                ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS);
+
+                if (dataMapList != null) {
+                    mHighlightItems = new ArrayList<>(dataMapList.size());
+
+                    for (DataMap data : dataMapList) {
+                        mHighlightItems.add(new HighlightItem(data));
+                    }
+                } else {
+                    mHighlightItems = null;
+                }
+                mHighlightItemPosition = 0;
+            }
         }
 
         private Calendar getMarketOpenTime() {
@@ -628,6 +737,5 @@ public class MockTradeFace extends CanvasWatchFaceService {
         public void onConnectionFailed(ConnectionResult result) {
             Log.e(TAG, "onConnectionFailed: " + result);
         }
-
     }
 }

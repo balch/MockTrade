@@ -2,7 +2,7 @@ MockTrade
 ===============================
 
 
-#####&lt;TL;DR&gt;
+##### &lt;TL;DR&gt;
 
 * Open Source Android Trading Simulator
 * AppFramework Library
@@ -20,8 +20,15 @@ MockTrade
         * Dogs of the Dow
         * Strategy plugin model
     * Implements AppFramework
+* Watch Face Wear Application
+    * 24hr Ring showing when Markets are open
+        * Color coded to indicate portfolio performance
+    * Portfolio Highlights Synced From Mobile App
+        * Portfolio Totals/Best & Worst Day and Total Performers
+        * Uses Wearable Data Layer API
+    * Library Module for classes shared between Mobile and Wear Apps
 
-#####&lt;/TL;DR&gt;
+##### &lt;/TL;DR&gt;
 
 ### MockTrade Application
 Lets get this out of the way, this app is very much a WIP and still has 
@@ -92,6 +99,12 @@ Sell screen showing a Trailing Stop % order type
 Buy screen with real-time quote and order validation
 
 ![Screen Shot 5](./Mocktrade_ss4.png)
+
+WatchFaces
+
+![Screen Shot 6](./preview_digital.png)
+ ![Screen Shot 7](./preview_digital_circular.png)
+ ![Screen Shot 8](./preview_digital_circular_chin.png)
 
 ### Attributions
 * Awesome icon site: http://www.iconarchive.com/

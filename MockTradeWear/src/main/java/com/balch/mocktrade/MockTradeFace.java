@@ -82,15 +82,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
-    private static final float TIME_TICK_STROKE_WIDTH = 2f;
+    private static final float TIME_TICK_STROKE_WIDTH = 3f;
     private static final int SHADOW_RADIUS = 6;
+    private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 128;
 
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
 
-    /**
-     * Handler message id for updating the time periodically in interactive mode.
-     */
     private static final int MSG_UPDATE_TIME = 0;
 
     @Override
@@ -371,7 +369,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     int color = Color.rgb(156, 156, 156);
                     long todayChange = item.getTodayChange().getMicroCents();
                     if (todayChange != 0) {
-                        int colorComponent = (int) Math.min(255, 155 + 100 * (Math.abs(todayChange) / extents));
+                        int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * (Math.abs(todayChange) / extents));
                         color = (todayChange < 0) ? Color.rgb(colorComponent, 0, 0) : Color.rgb(0, colorComponent, 0);
                     }
 
@@ -476,8 +474,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             canvas.save();
             canvas.rotate(-90, centerX, centerY);
-            canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mMarketDurationDegrees,false, mMarketTimePaint);
 
+            // only draw default arc if the performance arc is not complete
+            if (mMarketDurationDegrees != mPerformanceDurationDegrees) {
+                canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mMarketDurationDegrees, false, mMarketTimePaint);
+            }
+
+            // draw performance arc
             if (mPerformanceItems != null) {
                 canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mPerformanceDurationDegrees, false, mMarketDayRingPaint);
             }
@@ -572,8 +575,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private void drawTimeTick(Calendar time, float centerX, float centerY, Canvas canvas, Paint paint) {
             float hours = time.get(Calendar.HOUR_OF_DAY) + time.get(Calendar.MINUTE) / 60.0f + time.get(Calendar.SECOND) / 3600.0f;
 
-            float innerTickRadius = centerX - 10 - mChinSize;
-            float outerTickRadius = centerX - 1 - mChinSize;
+            float innerTickRadius = centerX - 13 - mChinSize;
+            float outerTickRadius = centerX - 2 - mChinSize;
             float tickRot = (float) (hours * Math.PI * 2 / 24);
             float innerX = (float) Math.sin(tickRot) * innerTickRadius;
             float innerY = (float) -Math.cos(tickRot) * innerTickRadius;

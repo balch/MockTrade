@@ -88,6 +88,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
+    private static final long MARKET_OFFSET_MILLIS = TimeUnit.MINUTES.toMillis(15);
 
     private static final int MSG_UPDATE_TIME = 0;
 
@@ -191,9 +192,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mOuterColor = ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_outer_color);
             mInnerColor = ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_inner_color);
 
-            mOuterColor = ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_outer_color);
-            mInnerColor = ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_inner_color);
-
+            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mHighlightYOffset = resources.getDimension(R.dimen.highlight_y_offset);
 
@@ -229,6 +228,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mDayCirclePaint.setStrokeCap(Paint.Cap.ROUND);
             mDayCirclePaint.setStyle(Paint.Style.STROKE);
             mDayCirclePaint.setAntiAlias(true);
+            mDayCirclePaint.setDither(false);
 
             mCurrentTimeDayPaint = new Paint();
             mCurrentTimeDayPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_tick_color));
@@ -236,6 +236,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mCurrentTimeDayPaint.setAntiAlias(true);
             mCurrentTimeDayPaint.setStyle(Paint.Style.STROKE);
             mCurrentTimeDayPaint.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
+            mCurrentTimeDayPaint.setDither(false);
 
             mMarketTimePaint = new Paint();
             mMarketTimePaint.setStrokeCap(Paint.Cap.ROUND);
@@ -243,12 +244,14 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mMarketTimePaint.setAntiAlias(true);
             mMarketTimePaint.setStrokeWidth(mInnerWidth);
             mMarketTimePaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.market_inner_color));
+            mMarketTimePaint.setDither(false);
 
             mMarketDayRingPaint = new Paint();
             mMarketDayRingPaint.setStrokeCap(Paint.Cap.ROUND);
             mMarketDayRingPaint.setStyle(Paint.Style.STROKE);
             mMarketDayRingPaint.setAntiAlias(true);
             mMarketDayRingPaint.setStrokeWidth(mInnerWidth);
+            mMarketDayRingPaint.setDither(false);
 
             mTime = GregorianCalendar.getInstance();
 
@@ -360,8 +363,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 Calendar cal = Calendar.getInstance();
 
                 int size = mPerformanceItems.size();
-                int[] colors = new int[size];
-                float[] positions = new float[size];
+                int[] colors = new int[size+2];
+                float[] positions = new float[size+2];
                 float lastDegrees = 0;
                 for (int x = 0; x < size; x++) {
                     PerformanceItem item = mPerformanceItems.get(x);
@@ -373,14 +376,19 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         color = (todayChange < 0) ? Color.rgb(colorComponent, 0, 0) : Color.rgb(0, colorComponent, 0);
                     }
 
-                    colors[x] = color;
+                    colors[x+1] = color;
 
                     cal.setTimeInMillis(item.getTimestamp().getTime());
 
                     lastDegrees = getDegrees(cal);
-                    positions[x] = lastDegrees / 360.0f;
-
+                    positions[x+1] = lastDegrees / 360.0f;
                 }
+
+                // make sure arrays start at 0 and end at 1
+                colors[0] = colors[1];
+                positions[0] = 0f;
+                colors[size+1] = colors[size];
+                positions[size+1] = 1f;
                 shader = new SweepGradient(frame.centerX(), frame.centerY(), colors, positions);
 
                 if (lastDegrees < mMarketOpenDegrees) {
@@ -476,7 +484,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             canvas.rotate(-90, centerX, centerY);
 
             // only draw default arc if the performance arc is not complete
-            if (mMarketDurationDegrees != mPerformanceDurationDegrees) {
+            if (mMarketDurationDegrees > mPerformanceDurationDegrees) {
                 canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mMarketDurationDegrees, false, mMarketTimePaint);
             }
 
@@ -649,8 +657,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     mPerformanceItems = new ArrayList<>(dataMapList.size());
 
                     // filter out any values that are outside of market open and close times
-                    long marketOpen = getMarketOpenTime().getTimeInMillis() % MILLIS_PER_DAY;
-                    long marketClose = getMarketCloseTime().getTimeInMillis() % MILLIS_PER_DAY;
+                    long marketOpen = (getMarketOpenTime().getTimeInMillis() % MILLIS_PER_DAY) - MARKET_OFFSET_MILLIS;
+                    long marketClose = (getMarketCloseTime().getTimeInMillis() % MILLIS_PER_DAY) + MARKET_OFFSET_MILLIS;
 
                     for (DataMap data : dataMapList) {
                         PerformanceItem item = new PerformanceItem(data);

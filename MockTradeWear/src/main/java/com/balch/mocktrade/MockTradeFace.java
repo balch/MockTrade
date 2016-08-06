@@ -359,7 +359,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             Shader shader = null;
             if ((mPerformanceItems != null) && mPerformanceItems.size() > 0) {
-                float extents = (.01f * mPerformanceItems.get(0).getValue().getMicroCents());
+                float extents = .01f * mPerformanceItems.get(0).getValue().getMicroCents() / 2.0f;
 
                 Calendar cal = Calendar.getInstance();
 
@@ -376,7 +376,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     if (todayChange != 0) {
                         float colorPercent = (Math.abs(todayChange) / extents);
                         int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
-                        int secondaryColorComponent = (int) Math.max(0, OFF_PERFORMANCE_COLOR_COMPONENT - (255 - OFF_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
+                        int secondaryColorComponent = (int) Math.max(0, OFF_PERFORMANCE_COLOR_COMPONENT - (255 - OFF_PERFORMANCE_COLOR_COMPONENT) * colorPercent * 1.5f);
                         color = (todayChange < 0) ? Color.rgb(colorComponent, secondaryColorComponent, secondaryColorComponent) : Color.rgb(secondaryColorComponent, colorComponent, secondaryColorComponent);
                     }
 

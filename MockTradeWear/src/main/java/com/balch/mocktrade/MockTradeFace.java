@@ -228,7 +228,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mDayCirclePaint.setStrokeCap(Paint.Cap.ROUND);
             mDayCirclePaint.setStyle(Paint.Style.STROKE);
             mDayCirclePaint.setAntiAlias(true);
-            mDayCirclePaint.setDither(false);
+            mDayCirclePaint.setStrokeJoin(Paint.Join.MITER);
 
             mCurrentTimeDayPaint = new Paint();
             mCurrentTimeDayPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.day_circle_tick_color));
@@ -236,7 +236,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mCurrentTimeDayPaint.setAntiAlias(true);
             mCurrentTimeDayPaint.setStyle(Paint.Style.STROKE);
             mCurrentTimeDayPaint.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
-            mCurrentTimeDayPaint.setDither(false);
+            mCurrentTimeDayPaint.setStrokeJoin(Paint.Join.BEVEL);
 
             mMarketTimePaint = new Paint();
             mMarketTimePaint.setStrokeCap(Paint.Cap.ROUND);
@@ -244,14 +244,14 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mMarketTimePaint.setAntiAlias(true);
             mMarketTimePaint.setStrokeWidth(mInnerWidth);
             mMarketTimePaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.market_inner_color));
-            mMarketTimePaint.setDither(false);
+            mMarketTimePaint.setStrokeJoin(Paint.Join.BEVEL);
 
             mMarketDayRingPaint = new Paint();
             mMarketDayRingPaint.setStrokeCap(Paint.Cap.ROUND);
             mMarketDayRingPaint.setStyle(Paint.Style.STROKE);
             mMarketDayRingPaint.setAntiAlias(true);
             mMarketDayRingPaint.setStrokeWidth(mInnerWidth);
-            mMarketDayRingPaint.setDither(false);
+            mMarketDayRingPaint.setStrokeJoin(Paint.Join.BEVEL);
 
             mTime = GregorianCalendar.getInstance();
 

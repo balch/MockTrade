@@ -84,7 +84,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
     private static final float TIME_TICK_STROKE_WIDTH = 3f;
     private static final int SHADOW_RADIUS = 6;
-    private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 128;
+    private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 156;
+    private static final int OFF_PERFORMANCE_COLOR_COMPONENT = 128;
 
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
@@ -371,9 +372,12 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
                     int color = Color.rgb(156, 156, 156);
                     long todayChange = item.getTodayChange().getMicroCents();
+//                    todayChange = (long)(-extents + (extents * 2*x/size));
                     if (todayChange != 0) {
-                        int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * (Math.abs(todayChange) / extents));
-                        color = (todayChange < 0) ? Color.rgb(colorComponent, 0, 0) : Color.rgb(0, colorComponent, 0);
+                        float colorPercent = (Math.abs(todayChange) / extents);
+                        int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
+                        int secondaryColorComponent = (int) Math.max(0, OFF_PERFORMANCE_COLOR_COMPONENT - (255 - OFF_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
+                        color = (todayChange < 0) ? Color.rgb(colorComponent, secondaryColorComponent, secondaryColorComponent) : Color.rgb(secondaryColorComponent, colorComponent, secondaryColorComponent);
                     }
 
                     colors[x+1] = color;

@@ -62,6 +62,7 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
@@ -451,6 +452,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 case TAP_TYPE_TAP:
                     if (mHighlightItems != null) {
                         mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
+                        setAccountIdDataItem();
                         invalidate();
                     }
                     break;
@@ -645,6 +647,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     }
 
                     dataItems.release();
+                    invalidate();
                 }
             });
         }
@@ -654,7 +657,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
             DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
             DataMap dataMap = dataMapItem.getDataMap();
 
-            if (dataItem.getUri().getPath().equals(WearDataSync.PATH_SNAPSHOT_SYNC)) {
+            String uriPath = dataItem.getUri().getPath();
+            if (uriPath.equals(WearDataSync.PATH_SNAPSHOT_SYNC)) {
                 ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_SNAPSHOT_DAILY);
 
                 if (dataMapList != null) {
@@ -680,9 +684,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 }
 
                 calcPerformanceGradient();
-            }
-
-            if (dataItem.getUri().getPath().equals(WearDataSync.PATH_HIGHLIGHTS_SYNC)) {
+            } else if (uriPath.equals(WearDataSync.PATH_HIGHLIGHTS_SYNC)) {
                 ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS);
 
                 if (dataMapList != null) {
@@ -694,8 +696,21 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 } else {
                     mHighlightItems = null;
                 }
-                mHighlightItemPosition = 0;
             }
+        }
+
+        private void setAccountIdDataItem() {
+            HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+
+            long accountId = -1;
+            if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
+                accountId = item.getAccountId();
+            }
+
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID);
+            putDataMapRequest.getDataMap().putLong(WearDataSync.DATA_WATCH_FACE_ACCOUNT_ID, accountId);
+            putDataMapRequest.setUrgent();
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
         }
 
         private Calendar getMarketOpenTime() {
@@ -736,6 +751,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 DataItem dataItem = dataEvent.getDataItem();
                 updateFromDataMap(dataItem);
             }
+            invalidate();
         }
 
         @Override

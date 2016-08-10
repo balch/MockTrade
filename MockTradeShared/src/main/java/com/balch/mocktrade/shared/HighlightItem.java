@@ -45,6 +45,7 @@ public class HighlightItem extends DomainObject {
     private static final String DATA_VALUE = "value";
     private static final String DATA_TODAY_CHANGE = "todayChange";
     private static final String DATA_TODAY_CHANGE_PERCENT = "todayChangePercent";
+    private static final String DATA_ACCOUNT_ID = "accountId";
 
     protected HighlightType mHighlightType;
     protected String mDescription;
@@ -53,10 +54,11 @@ public class HighlightItem extends DomainObject {
     protected Money mValue;
     protected Money mTodayChange;
     protected float mTodayChangePercent;
+    protected long mAccountId;
 
     public HighlightItem(HighlightType highlightType, String description,
                          String symbol, Money costBasis, Money value, Money todayChange,
-                        float todayChangePercent) {
+                        float todayChangePercent, long accountId) {
         this.mHighlightType = highlightType;
         this.mDescription = description;
         this.mSymbol = symbol;
@@ -64,13 +66,15 @@ public class HighlightItem extends DomainObject {
         this.mValue = value;
         this.mTodayChange = todayChange;
         this.mTodayChangePercent = todayChangePercent;
+        this.mAccountId = accountId;
     }
 
     public HighlightItem(DataMap map) {
         this(HighlightType.valueOf(map.getString(DATA_TYPE )),
                 map.getString(DATA_DESC), map.getString(DATA_SYMBOL),
                 new Money(map.getLong(DATA_COST_BASIS)), new Money(map.getLong(DATA_VALUE)),
-                new Money(map.getLong(DATA_TODAY_CHANGE)), map.getFloat(DATA_TODAY_CHANGE_PERCENT));
+                new Money(map.getLong(DATA_TODAY_CHANGE)), map.getFloat(DATA_TODAY_CHANGE_PERCENT),
+                map.getLong(DATA_ACCOUNT_ID, -1));
     }
 
     public DataMap toDataMap() {
@@ -82,6 +86,7 @@ public class HighlightItem extends DomainObject {
         map.putLong(DATA_VALUE, mValue.getMicroCents());
         map.putLong(DATA_TODAY_CHANGE, mTodayChange.getMicroCents());
         map.putFloat(DATA_TODAY_CHANGE_PERCENT, mTodayChangePercent);
+        map.putLong(DATA_ACCOUNT_ID, mAccountId);
         return map;
     }
 
@@ -128,5 +133,9 @@ public class HighlightItem extends DomainObject {
 
     public String getSymbol() {
         return mSymbol;
+    }
+
+    public long getAccountId() {
+        return mAccountId;
     }
 }

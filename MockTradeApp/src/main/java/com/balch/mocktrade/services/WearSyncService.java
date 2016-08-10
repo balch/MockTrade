@@ -44,7 +44,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
@@ -58,8 +61,24 @@ public class WearSyncService extends IntentService implements
         GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = WearSyncService.class.getSimpleName();
 
+    private static final String EXTRA_SEND_PERF_ITEMS = "extra_send_perf_items";
+    private static final String EXTRA_SEND_HIGHLIGHTS = "extra_send_highlights";
+    private static final String EXTRA_BROADCAST_ACCOUNT_ID = "extra_broadcast_account_id";
+
     private static final long CONNECTION_TIME_OUT_MS = 1000;
     private GoogleApiClient mGoogleApiClient;
+
+    public static Intent getIntent(Context context, boolean sendPerformanceItems, boolean sendHighlights, boolean broadcastAccountId) {
+        Intent intent = new Intent(context, WearSyncService.class);
+        intent.putExtra(EXTRA_SEND_PERF_ITEMS, sendPerformanceItems);
+        intent.putExtra(EXTRA_SEND_HIGHLIGHTS, sendHighlights);
+        intent.putExtra(EXTRA_BROADCAST_ACCOUNT_ID, broadcastAccountId);
+        return intent;
+    }
+
+    public static Intent getIntent(Context context) {
+        return getIntent(context, true, true, false);
+    }
 
     public WearSyncService() {
         super(WearSyncService.class.getName());
@@ -82,15 +101,27 @@ public class WearSyncService extends IntentService implements
         if (mGoogleApiClient.isConnected()) {
 
             try {
+
+                boolean sendPerformanceItems = intent.getBooleanExtra(EXTRA_SEND_PERF_ITEMS, true);
+                boolean sendHighlights = intent.getBooleanExtra(EXTRA_SEND_HIGHLIGHTS, true);
+                boolean broadcastAccountID = intent.getBooleanExtra(EXTRA_BROADCAST_ACCOUNT_ID, false);
                 Log.i(TAG, "WearSyncService onHandleIntent");
 
                 ModelProvider modelProvider = (ModelProvider) this.getApplication();
                 ModelFactory modelFactory = modelProvider.getModelFactory();
                 PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
 
-                List<PerformanceItem> performanceItems = portfolioModel.getCurrentSnapshot();
+                DataItemBuffer dataItems = Wearable.DataApi.getDataItems(mGoogleApiClient).await();
+                long accountId = getAccountIdFromDataBuffer(dataItems);
 
-                if (performanceItems != null) {
+                dataItems.release();
+                List<PerformanceItem> performanceItems = portfolioModel.getCurrentSnapshot(accountId);
+
+                if (broadcastAccountID) {
+                    AccountUpdateBroadcaster.broadcast(getApplicationContext(), accountId);
+                }
+
+                if (sendPerformanceItems && (performanceItems != null)) {
                     ArrayList<DataMap> dataMapList = new ArrayList<>(performanceItems.size());
                     for (PerformanceItem item : performanceItems) {
                         dataMapList.add(item.toDataMap());
@@ -103,104 +134,111 @@ public class WearSyncService extends IntentService implements
                     pendingResult.await();
                 }
 
-                List<Account> accounts = portfolioModel.getAccounts(!modelProvider.getSettings().getHideExcludeAccounts());
-                if ((accounts != null) && (accounts.size() > 0)) {
+                if (sendHighlights) {
+                    boolean allAccounts = !modelProvider.getSettings().getHideExcludeAccounts();
+                    List<Account> accounts = portfolioModel.getAccounts(allAccounts);
+                    if ((accounts != null) && (accounts.size() > 0)) {
 
-                    PerformanceItem totalsPerformanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
+                        PerformanceItem totalsPerformanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
 
-                    ArrayList<DataMap> accountsDataMapList = new ArrayList<>();
+                        ArrayList<DataMap> accountsDataMapList = new ArrayList<>();
 
-                    Investment bestTotalPerformer = null;
-                    Investment worstTotalPerformer = null;
-                    Investment bestDayPerformer = null;
-                    Investment worstDayPerformer = null;
+                        Investment bestTotalPerformer = null;
+                        Investment worstTotalPerformer = null;
+                        Investment bestDayPerformer = null;
+                        Investment worstDayPerformer = null;
 
-                    Resources resources = getResources();
-                    Date timestamp = new Date();
-                    for (Account account : accounts) {
-                        PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
-                        List<Investment> investments = portfolioModel.getInvestments(account.getId());
+                        Resources resources = getResources();
+                        Date timestamp = new Date();
+                        for (Account account : accounts) {
+                            PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
+                            List<Investment> investments = portfolioModel.getInvestments(account.getId());
 
-                        for (Investment investment : investments) {
-                            if (bestDayPerformer != null) {
-                                if (investment.getTodayChangePercent() > bestDayPerformer.getTodayChangePercent()) {
-                                    bestDayPerformer = investment;
+                            if (allAccounts || !account.getExcludeFromTotals()) {
+                                for (Investment investment : investments) {
+                                    if (bestDayPerformer != null) {
+                                        if (investment.getTodayChangePercent() > bestDayPerformer.getTodayChangePercent()) {
+                                            bestDayPerformer = investment;
+                                        }
+                                    } else {
+                                        bestDayPerformer = investment;
+                                    }
+
+                                    if (worstDayPerformer != null) {
+                                        if (investment.getTodayChangePercent() < worstDayPerformer.getTodayChangePercent()) {
+                                            worstDayPerformer = investment;
+                                        }
+                                    } else {
+                                        worstDayPerformer = investment;
+                                    }
+
+                                    if (bestTotalPerformer != null) {
+                                        if (investment.getTotalChangePercent() > bestTotalPerformer.getTotalChangePercent()) {
+                                            bestTotalPerformer = investment;
+                                        }
+                                    } else {
+                                        bestTotalPerformer = investment;
+                                    }
+
+                                    if (worstTotalPerformer != null) {
+                                        if (investment.getTotalChangePercent() < worstTotalPerformer.getTotalChangePercent()) {
+                                            worstTotalPerformer = investment;
+                                        }
+                                    } else {
+                                        worstTotalPerformer = investment;
+                                    }
+
                                 }
-                            } else {
-                                bestDayPerformer = investment;
                             }
+                            performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
 
-                            if (worstDayPerformer != null) {
-                                if (investment.getTodayChangePercent() < worstDayPerformer.getTodayChangePercent()) {
-                                    worstDayPerformer = investment;
-                                }
-                            } else {
-                                worstDayPerformer = investment;
+                            HighlightItem item = new HighlightItem(HighlightItem.HighlightType.TOTAL_ACCOUNT,
+                                    resources.getString(R.string.highlight_total_account), account.getName(),
+                                    performanceItem.getCostBasis(), performanceItem.getValue(),
+                                    performanceItem.getTodayChange(), performanceItem.getTotalChangePercent(),
+                                    account.getId());
+                            accountsDataMapList.add(item.toDataMap());
+
+                            if (!account.getExcludeFromTotals()) {
+                                totalsPerformanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
                             }
-
-                            if (bestTotalPerformer != null) {
-                                if (investment.getTotalChangePercent() > bestTotalPerformer.getTotalChangePercent()) {
-                                    bestTotalPerformer = investment;
-                                }
-                            } else {
-                                bestTotalPerformer = investment;
-                            }
-
-                            if (worstTotalPerformer != null) {
-                                if (investment.getTotalChangePercent() < worstTotalPerformer.getTotalChangePercent()) {
-                                    worstTotalPerformer = investment;
-                                }
-                            } else {
-                                worstTotalPerformer = investment;
-                            }
-
                         }
-                        performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
 
-                        HighlightItem item = new HighlightItem(HighlightItem.HighlightType.TOTAL_ACCOUNT,
-                                resources.getString(R.string.highlight_total_account), account.getName(),
-                                performanceItem.getCostBasis(), performanceItem.getValue(),
-                                performanceItem.getTodayChange(), performanceItem.getTotalChangePercent());
-                        accountsDataMapList.add(item.toDataMap());
+                        ArrayList<DataMap> dataMapList = new ArrayList<>();
+                        HighlightItem item = new HighlightItem(HighlightItem.HighlightType.TOTAL_OVERALL,
+                                resources.getString(R.string.highlight_total_overall), "",
+                                totalsPerformanceItem.getCostBasis(), totalsPerformanceItem.getValue(),
+                                totalsPerformanceItem.getTodayChange(), -1, -1);
+                        dataMapList.add(item.toDataMap());
+                        dataMapList.addAll(accountsDataMapList);
 
-                        if (!account.getExcludeFromTotals()) {
-                            totalsPerformanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
+                        if (bestTotalPerformer != null) {
+                            dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_BEST_TOTAL,
+                                    resources.getString(R.string.highlight_best_total), bestTotalPerformer));
                         }
+
+                        if (bestDayPerformer != null) {
+                            dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_BEST_DAY,
+                                    resources.getString(R.string.highlight_best_day), bestDayPerformer));
+                        }
+
+                        if (worstTotalPerformer != null) {
+                            dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_WORST_TOTAL,
+                                    resources.getString(R.string.highlight_worst_total), worstTotalPerformer));
+                        }
+
+                        if (worstDayPerformer != null) {
+                            dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_WORST_DAY,
+                                    resources.getString(R.string.highlight_worst_day), worstDayPerformer));
+                        }
+
+                        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_HIGHLIGHTS_SYNC);
+                        putDataMapRequest.setUrgent();
+                        putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS, dataMapList);
+                        PendingResult<DataApi.DataItemResult> pendingResult =
+                                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+                        pendingResult.await();
                     }
-
-                    ArrayList<DataMap> dataMapList = new ArrayList<>();
-                    HighlightItem item = new HighlightItem(HighlightItem.HighlightType.TOTAL_OVERALL,
-                            resources.getString(R.string.highlight_total_overall), "",
-                            totalsPerformanceItem.getCostBasis(), totalsPerformanceItem.getValue(),
-                            totalsPerformanceItem.getTodayChange(), -1);
-                    dataMapList.add(item.toDataMap());
-                    dataMapList.addAll(accountsDataMapList);
-
-                    if (bestTotalPerformer != null) {
-                        dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_BEST_TOTAL,
-                                resources.getString(R.string.highlight_best_total), bestTotalPerformer));
-                    }
-
-                    if (bestDayPerformer != null) {
-                        dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_BEST_DAY,
-                                resources.getString(R.string.highlight_best_day), bestDayPerformer));
-                    }
-
-                    if (worstTotalPerformer != null) {
-                        dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_WORST_TOTAL,
-                                resources.getString(R.string.highlight_worst_total), worstTotalPerformer));
-                    }
-
-                    if (worstDayPerformer != null) {
-                        dataMapList.add(getDataMapFromInvestment(HighlightItem.HighlightType.PERFORMER_WORST_DAY,
-                                resources.getString(R.string.highlight_worst_day), worstDayPerformer));
-                    }
-
-                    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_HIGHLIGHTS_SYNC);
-                    putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS, dataMapList);
-                    PendingResult<DataApi.DataItemResult> pendingResult =
-                            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
-                    pendingResult.await();
                 }
 
             } catch (Exception ex) {
@@ -214,11 +252,37 @@ public class WearSyncService extends IntentService implements
 
     }
 
+    static long getAccountIdFromDataBuffer(DataItemBuffer dataItems) {
+        long accountId = -1;
+        for (int x = 0; x < dataItems.getCount(); x++) {
+            DataItem dataItem = dataItems.get(x);
+
+            if (dataItem.getUri().getPath().equals(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID)) {
+                accountId = getAccountIdFromDataBuffer(dataItem);
+            }
+        }
+
+        return accountId;
+    }
+
+    static long getAccountIdFromDataBuffer(DataItem dataItem) {
+        long accountId = -1;
+        if (dataItem.getUri().getPath().equals(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID)) {
+            DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
+            DataMap dataMap = dataMapItem.getDataMap();
+            accountId = dataMap.getLong(WearDataSync.DATA_WATCH_FACE_ACCOUNT_ID, -1);
+        }
+
+        return accountId;
+    }
+
+
     private DataMap getDataMapFromInvestment(HighlightItem.HighlightType highlightType,
                              String description, Investment investment) {
+        long accountId = (investment.getAccount() != null) ? investment.getAccount().getId() : -1;
         HighlightItem item = new HighlightItem(highlightType, description,
                 investment.getSymbol(), investment.getCostBasis(), investment.getValue(),
-                investment.getTodayChange(), investment.getTodayChangePercent());
+                investment.getTodayChange(), investment.getTodayChangePercent(), accountId);
         return item.toDataMap();
     }
 
@@ -233,9 +297,5 @@ public class WearSyncService extends IntentService implements
     @Override
     public void onConnectionFailed(ConnectionResult result) {
          Log.e(TAG, "onConnectionFailed: "+result.toString());
-    }
-
-    public static Intent getIntent(Context context) {
-        return new Intent(context, WearSyncService.class);
     }
 }

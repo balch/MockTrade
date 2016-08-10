@@ -2,8 +2,11 @@ package com.balch.mocktrade;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -19,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -45,6 +49,7 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioLoader;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.services.AccountUpdateBroadcaster;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
@@ -90,6 +95,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
     private GraphDataLoader mGraphDataLoader;
     private PortfolioLoader mPortfolioLoader;
+
+    private AccountUpdateReceiver mAccountUpdateReceiver;
 
     private LoaderManager.LoaderCallbacks<PortfolioData> mPortfolioDataLoaderCallback =
             new LoaderManager.LoaderCallbacks<PortfolioData>() {
@@ -210,6 +217,24 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             }
         });
         return mMainPortfolioView;
+    }
+
+    @Override
+    protected void onStartBase() {
+        if (mAccountUpdateReceiver == null) {
+            mAccountUpdateReceiver = new AccountUpdateReceiver();
+
+            LocalBroadcastManager.getInstance(this)
+                    .registerReceiver(mAccountUpdateReceiver, new IntentFilter(AccountUpdateBroadcaster.ACTION));
+        }
+    }
+
+    @Override
+    protected void onStopBase() {
+        if (mAccountUpdateReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mAccountUpdateReceiver);
+            mAccountUpdateReceiver = null;
+        }
     }
 
     @Override
@@ -657,5 +682,19 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             }
         }
     }
+
+    private class AccountUpdateReceiver extends BroadcastReceiver {
+        private AccountUpdateReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long accountId = AccountUpdateBroadcaster.getAccountId(intent);
+            mGraphDataLoader.setSelectedAccountId(accountId);
+            mGraphDataLoader.forceLoad();
+            mMainPortfolioView.setAccountSpinner(accountId);
+        }
+    }
+
 }
 

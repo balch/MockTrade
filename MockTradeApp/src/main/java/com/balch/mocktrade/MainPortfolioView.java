@@ -193,6 +193,11 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     }
 
+    public void setAccountSpinner(long accountID) {
+        mSelectedPosition = mAccountIds.contains(accountID) ? mAccountIds.indexOf(accountID) : 0;
+        mGraphSpinner.setSelection(mSelectedPosition);
+    }
+
     public void setDailyGraphData(List<PerformanceItem> performanceItems) {
         if ((performanceItems != null) && (performanceItems.size() >= 2)) {
 

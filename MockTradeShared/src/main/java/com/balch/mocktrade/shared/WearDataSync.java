@@ -30,4 +30,7 @@ public class WearDataSync {
     public static final String PATH_HIGHLIGHTS_SYNC = "/highlights";
     public static final String DATA_HIGHLIGHTS = "highlights";
 
+    public static final String PATH_WATCH_FACE_ACCOUNT_ID = "/watchface";
+    public static final String DATA_WATCH_FACE_ACCOUNT_ID = "account_id";
+
 }

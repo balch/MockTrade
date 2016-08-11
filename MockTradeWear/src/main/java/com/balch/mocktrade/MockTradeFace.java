@@ -397,7 +397,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 shader = new SweepGradient(frame.centerX(), frame.centerY(), colors, positions);
 
                 if (lastDegrees < mMarketOpenDegrees) {
-                    lastDegrees += 360;
+                    lastDegrees = mMarketOpenDegrees +.01f;
                 }
                 mPerformanceDurationDegrees = lastDegrees - mMarketOpenDegrees;
             }

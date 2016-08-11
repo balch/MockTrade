@@ -252,7 +252,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mMarketDayRingPaint.setStrokeCap(Paint.Cap.ROUND);
             mMarketDayRingPaint.setStyle(Paint.Style.STROKE);
             mMarketDayRingPaint.setAntiAlias(true);
-            mMarketDayRingPaint.setStrokeWidth(mInnerWidth);
+            mMarketDayRingPaint.setStrokeWidth(mOuterWidth);
             mMarketDayRingPaint.setStrokeJoin(Paint.Join.BEVEL);
 
             mTime = GregorianCalendar.getInstance();

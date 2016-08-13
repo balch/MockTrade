@@ -108,7 +108,6 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
     public void setSelectedAccountId(long accountID) {
         mSelectedAccountId = accountID;
         onContentChanged();
-
     }
 
     private class UpdateReceiver extends BroadcastReceiver {

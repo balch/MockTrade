@@ -96,13 +96,17 @@ public class QuoteService extends IntentService {
                     @Override
                     public void onResponse(Map<String, Quote> quoteMap) {
                         try {
+                            boolean newHasQuotes = false;
                             for (Investment i : investments) {
                                 try {
                                     Quote quote = quoteMap.get(i.getSymbol());
                                     if (quote != null) {
-                                        i.setPrevDayClose(quote.getPreviousClose());
-                                        i.setPrice(quote.getPrice(), quote.getLastTradeTime());
-                                        portfolioModel.updateInvestment(i);
+                                        if (quote.getLastTradeTime().after(i.getLastTradeTime())) {
+                                            newHasQuotes = true;
+                                            i.setPrevDayClose(quote.getPreviousClose());
+                                            i.setPrice(quote.getPrice(), quote.getLastTradeTime());
+                                            portfolioModel.updateInvestment(i);
+                                        }
                                     }
                                 } catch (Exception ex) {
                                     Log.e(TAG, "updateInvestment exception", ex);
@@ -114,7 +118,9 @@ public class QuoteService extends IntentService {
                                 portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
                             }
 
-                            portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
+                            if (newHasQuotes) {
+                                portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
+                            }
 
                             processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
 

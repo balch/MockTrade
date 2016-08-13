@@ -81,19 +81,12 @@ import java.util.concurrent.TimeUnit;
 public class MockTradeFace extends CanvasWatchFaceService {
     private static final String TAG = MockTradeFace.class.getSimpleName();
 
-    private static final Typeface NORMAL_TYPEFACE =
-            Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-
     private Typeface mTimeFont;
 
     private static final float TIME_TICK_STROKE_WIDTH = 3f;
     private static final float SHADOW_RADIUS = 6;
     private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 156;
     private static final int OFF_PERFORMANCE_COLOR_COMPONENT = 128;
-
-    private static final float TIME_SHADOW_RADIUS = 4;
-    private static final float TIME_SHADOW_OFFSET_X = 2;
-    private static final float TIME_SHADOW_OFFSET_Y = 2;
 
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
@@ -159,6 +152,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private RectF mMarketArcRect = new RectF();
         private float mMarketOpenDegrees;
         private float mMarketDurationDegrees;
+        private boolean mZoomMarketArc; // if two, outer circle is 12HR
 
         private List<PerformanceItem> mPerformanceItems;
         private float mPerformanceDurationDegrees;
@@ -373,34 +367,28 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 Calendar cal = Calendar.getInstance();
 
                 int size = mPerformanceItems.size();
-                int[] colors = new int[size+2];
-                float[] positions = new float[size+2];
-                float lastDegrees = 0;
+                int[] colors = new int[size];
+                float[] positions = new float[size];
+
+                cal.setTimeInMillis(mPerformanceItems.get(0).getTimestamp().getTime());
+                float startDegrees = getDegrees(cal);
+
                 for (int x = 0; x < size; x++) {
                     PerformanceItem item = mPerformanceItems.get(x);
 
                     long todayChange = item.getTodayChange().getMicroCents();
 //                    todayChange = (long)(-extents + (extents * 2*x/size));
 
-                    colors[x+1] = getPerformanceColor(todayChange, extent);
+                    colors[x] = getPerformanceColor(todayChange, extent);
 
                     cal.setTimeInMillis(item.getTimestamp().getTime());
-
-                    lastDegrees = getDegrees(cal);
-                    positions[x+1] = lastDegrees / 360.0f;
+                    positions[x] = (getDegrees(cal)- startDegrees) / 360.0f;
                 }
 
-                // make sure arrays start at 0 and end at 1
-                colors[0] = colors[1];
-                positions[0] = 0f;
-                colors[size+1] = colors[size];
-                positions[size+1] = 1f;
                 shader = new SweepGradient(frame.centerX(), frame.centerY(), colors, positions);
 
-                if (lastDegrees < mMarketOpenDegrees) {
-                    lastDegrees = mMarketOpenDegrees +.01f;
-                }
-                mPerformanceDurationDegrees = lastDegrees - mMarketOpenDegrees;
+                cal.setTimeInMillis(mPerformanceItems.get(size-1).getTimestamp().getTime());
+                mPerformanceDurationDegrees = getDegrees(cal) - mMarketOpenDegrees;
             }
             mMarketDayRingPaint.setShader(shader);
         }
@@ -460,19 +448,46 @@ public class MockTradeFace extends CanvasWatchFaceService {
         public void onTapCommand(int tapType, int x, int y, long eventTime) {
             switch (tapType) {
                 case TAP_TYPE_TOUCH:
-                    // The user has started touching the screen.
                     break;
                 case TAP_TYPE_TOUCH_CANCEL:
-                    // The user has started a different gesture or otherwise cancelled the tap.
                     break;
                 case TAP_TYPE_TAP:
-                    if (mHighlightItems != null) {
+                    if (marketTimeHitTest(x, y)) {
+                        mZoomMarketArc = !mZoomMarketArc;
+                        calcMarketTimes();
+                        calcPerformanceGradient();
+                    } else {
                         mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
                         setAccountIdDataItem();
-                        invalidate();
                     }
+                    invalidate();
                     break;
             }
+        }
+
+        private boolean marketTimeHitTest(int x, int y) {
+            float circleRadius = mMarketArcRect.height() /2.0f;
+
+            float centerX = mMarketArcRect.centerX();
+            float centerY = mMarketArcRect.centerY();
+
+            boolean isHit = false;
+
+            //calculate the distance of the touch point from the center of your circle
+            double dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+            if (Math.abs(dist - circleRadius) <= mOuterWidth*2) {
+                double angle = (Math.atan2(y - centerY, x - centerX) * 57.2958) + 90.0f;
+                if (angle < 0 ){
+                    angle += 360.0;
+                } else if (angle >= 360.0) {
+                    angle -= 360.0;
+                }
+
+                isHit = (angle >= mMarketOpenDegrees) && (angle <= mMarketOpenDegrees+mMarketDurationDegrees);
+            }
+
+            return isHit;
         }
 
         @Override
@@ -503,16 +518,16 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mTime.setTimeInMillis(System.currentTimeMillis());
 
             canvas.save();
-            canvas.rotate(-90, centerX, centerY);
+            canvas.rotate(mMarketOpenDegrees-90, centerX, centerY);
 
             // only draw default arc if the performance arc is not complete
             if (mMarketDurationDegrees > mPerformanceDurationDegrees) {
-                canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mMarketDurationDegrees, false, mMarketTimePaint);
+                canvas.drawArc(mMarketArcRect, 0, mMarketDurationDegrees, false, mMarketTimePaint);
             }
 
             // draw performance arc
             if (mPerformanceItems != null) {
-                canvas.drawArc(mMarketArcRect, mMarketOpenDegrees, mPerformanceDurationDegrees, false, mMarketDayRingPaint);
+                canvas.drawArc(mMarketArcRect, 0, mPerformanceDurationDegrees, false, mMarketDayRingPaint);
             }
 
             canvas.restore();
@@ -607,7 +622,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             float innerTickRadius = centerX - 13 - mChinSize;
             float outerTickRadius = centerX - 2 - mChinSize;
-            float tickRot = (float) (hours * Math.PI * 2 / 24);
+            float tickRot = (float) (hours * Math.PI * 2 / getRingIncrements());
             float innerX = (float) Math.sin(tickRot) * innerTickRadius;
             float innerY = (float) -Math.cos(tickRot) * innerTickRadius;
             float outerX = (float) Math.sin(tickRot) * outerTickRadius;
@@ -616,9 +631,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     centerX + outerX, centerY + outerY, paint);
         }
 
+        private int getRingIncrements() {
+            return mZoomMarketArc ? 12 : 24;
+        }
+
         private float getDegrees(Calendar time) {
             float hours = time.get(Calendar.HOUR_OF_DAY) + time.get(Calendar.MINUTE) / 60.0f + time.get(Calendar.SECOND) / 3600.0f;
-            return hours / 24.0f * 360;
+            return hours / getRingIncrements() * 360.0f;
         }
 
         /**
@@ -711,7 +730,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         mHighlightItems.add(item);
 
                         if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
-                            setTimeShadow(item);
+                            setTimeTextPaint(item);
                         }
                     }
                 } else {
@@ -720,29 +739,26 @@ public class MockTradeFace extends CanvasWatchFaceService {
             }
         }
 
-        private void setTimeShadow(HighlightItem item) {
-            Money value = item.getTodayChange();
-            if (value.getMicroCents() == 0) {
-                value = item.getTotalChange();
+        private void setTimeTextPaint(HighlightItem item) {
+
+            if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) ||
+                    (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
+                Money value = item.getTodayChange();
+                if (value.getMicroCents() == 0) {
+                    value = item.getTotalChange();
+                }
+
+                int color = getPerformanceColor(value.getMicroCents(), getPerformanceExtent(item.getValue().getMicroCents()));
+                mTextPaint.setColorFilter(new LightingColorFilter(color, Color.argb(28, 128, 126, 128)));
+            } else {
+                mTextPaint.setColorFilter(null);
             }
-
-            int color = getPerformanceColor(value.getMicroCents(), getPerformanceExtent(item.getValue().getMicroCents()));
-
-            mTextPaint.setColorFilter(new LightingColorFilter(color, Color.argb(28, 128, 126, 128)));
-
-//            mTextPaint.setShadowLayer(TIME_SHADOW_RADIUS, TIME_SHADOW_OFFSET_X, TIME_SHADOW_OFFSET_Y, color);
         }
 
         private void setAccountIdDataItem() {
             HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
 
-            if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) ||
-                (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
-                setTimeShadow(item);
-            } else {
-                mTextPaint.clearShadowLayer();
-                mTextPaint.setColorFilter(null);
-            }
+            setTimeTextPaint(item);
 
             long accountId = -1;
             if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {

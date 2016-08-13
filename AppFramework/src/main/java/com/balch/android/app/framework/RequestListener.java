@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 8/13/16 5:45 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,10 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2016
+ *
  */
 
-package com.balch.android.app.framework.model;
+package com.balch.android.app.framework;
 
 public interface RequestListener<T> {
     void onResponse(T response);

@@ -22,11 +22,9 @@
 
 package com.balch.mocktrade.order;
 
-import com.balch.android.app.framework.model.BaseModel;
-
 import java.util.List;
 
-public interface OrderModel extends BaseModel {
+public interface OrderModel {
     List<Order> getOpenOrders(Long accountId);
     void cancelOrder(Order order) throws OrderCancelException;
 }

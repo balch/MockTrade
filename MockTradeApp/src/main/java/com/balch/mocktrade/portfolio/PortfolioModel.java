@@ -24,7 +24,6 @@ package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
 
-import com.balch.android.app.framework.model.BaseModel;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
@@ -37,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface PortfolioModel extends BaseModel {
+public interface PortfolioModel {
 
     List<Account> getAccounts(boolean allAccounts);
 

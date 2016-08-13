@@ -31,7 +31,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.RequestListener;
+import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;

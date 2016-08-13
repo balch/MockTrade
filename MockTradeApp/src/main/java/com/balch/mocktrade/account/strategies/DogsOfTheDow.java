@@ -24,21 +24,21 @@ package com.balch.mocktrade.account.strategies;
 
 import android.util.Log;
 
-import com.balch.android.app.framework.model.RequestListener;
-import com.balch.android.app.framework.types.Money;
+import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class DogsOfTheDow extends BaseStrategy {
     private static final String TAG = DogsOfTheDow.class.getSimpleName();
@@ -52,18 +52,22 @@ public class DogsOfTheDow extends BaseStrategy {
         this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS), new RequestListener<Map<String, Quote>>() {
             @Override
             public void onResponse(Map<String, Quote> response) {
-                SortedMap<Money, Quote> sortedQuoteMap = new TreeMap<>();
-                for (Quote quote : response.values()) {
-                    sortedQuoteMap.put(quote.getDividendPerShare(), quote);
-                }
+                List<Quote> sortedQuotes = new ArrayList<>(response.values() ) ;
+                Collections.sort(sortedQuotes, new Comparator<Quote>() {
+                    @Override
+                    public int compare(Quote lhs, Quote rhs) {
+                        // reverse sort
+                        return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
+                    }
+                });
 
-                if (sortedQuoteMap.size() > 0) {
-                    Object[] sortedQuotes = sortedQuoteMap.values().toArray();
-                    int numberOfStocks = Math.min(sortedQuotes.length, 10);
+                if (sortedQuotes.size() > 0) {
+                    int size = sortedQuotes.size();
+                    int numberOfStocks = Math.min(size, 10);
                     double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) numberOfStocks;
 
-                    for (int x = sortedQuotes.length - numberOfStocks; x < sortedQuotes.length; x++) {
-                        Quote quote = (Quote) sortedQuotes[x];
+                    for (int x = 0; x < numberOfStocks; x++) {
+                        Quote quote = sortedQuotes.get(x);
                         Order order = new Order();
                         order.setAccount(account);
                         order.setSymbol(quote.getSymbol());

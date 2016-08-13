@@ -41,7 +41,7 @@ import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.widget.ControlMapper;
 import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.model.RequestListener;
+import com.balch.android.app.framework.RequestListener;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;

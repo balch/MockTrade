@@ -28,7 +28,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.balch.android.app.framework.model.RequestListener;
+import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.ModelProvider;
 
 import org.json.JSONArray;
@@ -76,65 +76,7 @@ public class GoogleFinanceModel implements FinanceModel {
     }
 
     @Override
-    public void getQuotes(final List<String> symbols, final RequestListener<Map<String, Quote>> listener)  {
-
-        final Map<String, Quote> googleQuotes = new HashMap<>();
-
-        this.getGoogleRealTimeQuotes(symbols, new RequestListener<Map<String, Quote>>() {
-            @Override
-            public void onResponse(Map<String, Quote> response) {
-                listener.onResponse(response);
-            }
-
-            @Override
-            public void onErrorResponse(String error) {
-                listener.onErrorResponse(error);
-            }
-        });
-    }
-
-
-    @Override
-    public boolean isMarketOpen() {
-        return mFinanceManager.isMarketOpen();
-    }
-
-    @Override
-    public Date nextMarketOpen() {
-        return mFinanceManager.nextMarketOpen();
-    }
-
-    @Override
-    public boolean isInPollTime() {
-        return mFinanceManager.isInPollTime();
-    }
-
-    @Override
-    public void setQuoteServiceAlarm() {
-        mFinanceManager.setQuoteServiceAlarm();
-    }
-
-    protected String getDelimitedSymbols(List<String> symbols) {
-        StringBuilder builder = new StringBuilder();
-        Set<String> symbolSet = new HashSet<>();
-        boolean isFirst = true;
-        for (String s : symbols) {
-            if (symbolSet.contains(s)) {
-                continue;
-            }
-
-            symbolSet.add(s);
-            if (!isFirst) {
-                builder.append(",");
-            }
-            builder.append(s.toUpperCase());
-
-            isFirst = false;
-        }
-        return builder.toString();
-    }
-
-    protected void getGoogleRealTimeQuotes(final List<String> symbols, final RequestListener<Map<String, Quote>> listener) {
+    public void getQuotes(final List<String> symbols, final RequestListener<Map<String, Quote>> listener) {
         String symbolString = this.getDelimitedSymbols(symbols);
 
         try {
@@ -182,4 +124,43 @@ public class GoogleFinanceModel implements FinanceModel {
         }
     }
 
+    @Override
+    public boolean isMarketOpen() {
+        return mFinanceManager.isMarketOpen();
+    }
+
+    @Override
+    public Date nextMarketOpen() {
+        return mFinanceManager.nextMarketOpen();
+    }
+
+    @Override
+    public boolean isInPollTime() {
+        return mFinanceManager.isInPollTime();
+    }
+
+    @Override
+    public void setQuoteServiceAlarm() {
+        mFinanceManager.setQuoteServiceAlarm();
+    }
+
+    protected String getDelimitedSymbols(List<String> symbols) {
+        StringBuilder builder = new StringBuilder();
+        Set<String> symbolSet = new HashSet<>();
+        boolean isFirst = true;
+        for (String s : symbols) {
+            if (symbolSet.contains(s)) {
+                continue;
+            }
+
+            symbolSet.add(s);
+            if (!isFirst) {
+                builder.append(",");
+            }
+            builder.append(s.toUpperCase());
+
+            isFirst = false;
+        }
+        return builder.toString();
+    }
 }

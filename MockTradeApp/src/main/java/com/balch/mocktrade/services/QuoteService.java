@@ -29,7 +29,7 @@ import android.os.PowerManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.RequestListener;
+import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;

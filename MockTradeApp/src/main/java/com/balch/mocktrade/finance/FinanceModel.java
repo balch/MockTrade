@@ -22,14 +22,13 @@
 
 package com.balch.mocktrade.finance;
 
-import com.balch.android.app.framework.model.BaseModel;
-import com.balch.android.app.framework.model.RequestListener;
+import com.balch.android.app.framework.RequestListener;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface FinanceModel extends BaseModel {
+public interface FinanceModel  {
 
     void getQuotes(List<String> symbols, RequestListener<Map<String, Quote>> listener);
 

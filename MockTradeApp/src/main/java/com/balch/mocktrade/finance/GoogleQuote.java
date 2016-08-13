@@ -22,71 +22,69 @@
 
 package com.balch.mocktrade.finance;
 
-import android.text.TextUtils;
 import android.util.Log;
 
+import com.balch.android.app.framework.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class QuoteYahooFinance implements Quote {
-    static private final String TAG = QuoteYahooFinance.class.getSimpleName();
+public class GoogleQuote implements Quote {
+    static private final String TAG = GoogleQuote.class.getSimpleName();
 
     private Map<String, String> quoteData = new HashMap<>();
 
-    private final static String DIVIDEND_SHARE="DividendShare";
-    private final static String LAST_TRADE_DATE="LastTradeDate";
-    private final static String LAST_TRADE_PRICE_ONLY="LastTradePriceOnly";
-    private final static String NAME="Name";
-    private final static String PREVIOUS_CLOSE="PreviousClose";
-    private final static String SYMBOL="Symbol";
-    private final static String LAST_TRADE_TIME="LastTradeTime";
-    private final static String STOCK_EXCHANGE="StockExchange";
-    private final static String ERROR_SYMBOL_INVALID="ErrorIndicationreturnedforsymbolchangedinvalid";
+    private final static String LAST_CLOSE_PRICE ="pcls_fix";
+    private final static String LAST_TRADE_PRICE_ONLY ="l_fix";
+    private final static String SYMBOL ="t";
+    private final static String LAST_TRADE_TIME ="lt_dts"; // 2014-09-04T10:32:44Z  in EST
+    private final static String NAME ="name";
+    private final static String EXCHANGE ="e";
 
     @Override
     public Money getPrice() {
-        return new Money(quoteData.get(LAST_TRADE_PRICE_ONLY));
+        return new Money(this.quoteData.get(LAST_TRADE_PRICE_ONLY));
     }
 
     @Override
     public void setPrice(Money price) {
-        quoteData.put(LAST_TRADE_PRICE_ONLY, String.valueOf(price.getDollars()));
+        this.quoteData.put(LAST_TRADE_PRICE_ONLY, String.valueOf(price.getDollars()));
     }
 
     @Override
     public String getSymbol() {
-        return quoteData.get(SYMBOL);
+        return this.quoteData.get(SYMBOL);
     }
 
     @Override
     public String getName() {
-        return quoteData.get(NAME);
+        return this.quoteData.get(NAME);
     }
 
     @Override
     public String getExchange() {
-        return quoteData.get(STOCK_EXCHANGE);
+        return this.quoteData.get(EXCHANGE);
     }
 
     @Override
     public Date getLastTradeTime() {
-        DateFormat df = new SimpleDateFormat("M/d/yy h:mma", Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        String dateStr = quoteData.get(LAST_TRADE_DATE) + " " + quoteData.get(LAST_TRADE_TIME).toUpperCase();
+        TimeZone ny_tz = TimeZone.getTimeZone("America/New_York");
+        Calendar ny_cal = Calendar.getInstance(ny_tz);
+        int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET))/60000;
+
+        String dateStr = this.quoteData.get(LAST_TRADE_TIME);
+        dateStr = dateStr.replace("Z", String.format("%s%02d:%02d",(offset_mins>=0)?"+":"-", Math.abs(offset_mins/60), Math.abs(offset_mins%60)));
         try {
-            return df.parse(dateStr);
+            return ISO8601DateTime.toDate(dateStr);
         } catch (ParseException e) {
             Log.e(TAG, "Error parsing date:" + dateStr, e);
             throw new RuntimeException(e);
@@ -95,34 +93,22 @@ public class QuoteYahooFinance implements Quote {
 
     @Override
     public void setLastTradeTime(Date time) {
-        DateFormat df = new SimpleDateFormat("M/d/yy h:mma", Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-
-        String dateStr = df.format(time);
-        String[] parts = dateStr.split(" ");
-        quoteData.put(LAST_TRADE_DATE, parts[0]);
-        quoteData.put(LAST_TRADE_TIME, parts[1]);
-
+        this.quoteData.put(LAST_TRADE_TIME, ISO8601DateTime.toISO8601(time));
     }
 
     @Override
     public Money getPreviousClose() {
-        return new Money(quoteData.get(PREVIOUS_CLOSE));
+        return new Money(this.quoteData.get(LAST_CLOSE_PRICE));
     }
 
-    public static QuoteYahooFinance fromJSONObject(JSONObject jsonObject) throws JSONException {
-        QuoteYahooFinance quote = new QuoteYahooFinance();
+    public static GoogleQuote fromJSONObject(JSONObject jsonObject) throws JSONException {
+        GoogleQuote quote = new GoogleQuote();
         Iterator iter = jsonObject.keys();
         while (iter.hasNext()) {
             String key = (String)iter.next();
             if (!jsonObject.isNull(key)) {
                 quote.quoteData.put(key, jsonObject.getString(key));
             }
-        }
-
-        String error = quote.quoteData.get(QuoteYahooFinance.ERROR_SYMBOL_INVALID);
-        if (!TextUtils.isEmpty(error)) {
-            throw new JSONException(error);
         }
 
         return quote;
@@ -136,12 +122,12 @@ public class QuoteYahooFinance implements Quote {
 
     @Override
     public int getDelaySeconds() {
-        return 15 * 60;
+        return 0;
     }
 
     @Override
     public Money getDividendPerShare() {
-        return new Money(quoteData.get(DIVIDEND_SHARE));
+        throw new UnsupportedOperationException();
     }
 
 }

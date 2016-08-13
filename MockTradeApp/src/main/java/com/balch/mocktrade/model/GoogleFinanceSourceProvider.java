@@ -24,17 +24,17 @@ package com.balch.mocktrade.model;
 
 import com.balch.android.app.framework.model.ModelSourceProvider;
 
-public class YQLSourceProvider extends ModelSourceProvider<YQLModel> {
+public class GoogleFinanceSourceProvider extends ModelSourceProvider<GoogleFinanceModel> {
 
     protected final ModelProvider mModelProvider;
 
-    public YQLSourceProvider(ModelProvider modelProvider) {
-        super(YQLModel.class);
+    public GoogleFinanceSourceProvider(ModelProvider modelProvider) {
+        super(GoogleFinanceModel.class);
         this.mModelProvider = modelProvider;
     }
 
     @Override
-    public void initialize(YQLModel model) {
+    public void initialize(GoogleFinanceModel model) {
         model.initialize(this.mModelProvider);
     }
 

@@ -32,30 +32,21 @@ import com.balch.mocktrade.settings.Settings;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public abstract class YQLModel implements ModelInitializer<ModelProvider> {
-    protected final static String YQL_BASE_URL = "https://query.yahooapis.com/v1/public/yql";
-    protected final static String YQL_ENV = "store://datatables.org/alltableswithkeys";
-
-    protected final static String GOOGLE_BASE_URL = "http://finance.google.com/finance/info?client=ig&q=";
+public abstract class GoogleFinanceModel implements ModelInitializer<ModelProvider> {
+    protected final static String GOOGLE_BASE_URL = "http://www.google.com/finance/info?infotype=infoquoteall&q=";
 
     protected ModelProvider mModelProvider;
 
-    public YQLModel() {
+    public GoogleFinanceModel() {
     }
 
-    protected YQLModel(ModelProvider modelProvider) {
+    protected GoogleFinanceModel(ModelProvider modelProvider) {
         initialize(modelProvider);
     }
 
     @Override
     public void initialize(ModelProvider modelProvider) {
         this.mModelProvider = modelProvider;
-    }
-
-    protected String getYQLQueryUrl(String query) throws UnsupportedEncodingException {
-        return String.format("%s?q=%s&env=%s&format=json", YQL_BASE_URL,
-                URLEncoder.encode(query, "UTF-8"),
-                URLEncoder.encode(YQL_ENV, "UTF-8"));
     }
 
     protected String getGoogleQueryUrl(String symbols) throws UnsupportedEncodingException  {

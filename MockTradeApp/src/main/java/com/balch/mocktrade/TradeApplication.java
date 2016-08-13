@@ -33,10 +33,10 @@ import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.view.VolleyBackground;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.FinanceYQLModel;
+import com.balch.mocktrade.finance.FinanceQuoteModel;
 import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.model.SqliteSourceProvider;
-import com.balch.mocktrade.model.YQLSourceProvider;
+import com.balch.mocktrade.model.GoogleFinanceSourceProvider;
 import com.balch.mocktrade.order.OrderModel;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;
@@ -61,7 +61,7 @@ public class TradeApplication extends Application implements ModelProvider {
     private Settings mSettings;
 
     private SqliteSourceProvider mSqliteScheme;
-    private YQLSourceProvider mYqlScheme;
+    private GoogleFinanceSourceProvider mGoogleFinanceScheme;
     private ModelFactory mModelFactory;
 
     @Override
@@ -117,19 +117,19 @@ public class TradeApplication extends Application implements ModelProvider {
         return mSqliteScheme;
     }
 
-    public YQLSourceProvider getYqlScheme() {
-        return mYqlScheme;
+    public GoogleFinanceSourceProvider getYqlScheme() {
+        return mGoogleFinanceScheme;
     }
 
     private void configureModelFactory() {
         mModelFactory = new ModelFactory();
 
         mSqliteScheme = new SqliteSourceProvider(this);
-        mYqlScheme = new YQLSourceProvider(this);
+        mGoogleFinanceScheme = new GoogleFinanceSourceProvider(this);
 
         mModelFactory.registerModel(PortfolioModel.class, PortfolioSqliteModel.class, mSqliteScheme, true);
         mModelFactory.registerModel(OrderModel.class, OrderSqliteModel.class, mSqliteScheme, true);
-        mModelFactory.registerModel(FinanceModel.class, FinanceYQLModel.class, mYqlScheme, true);
+        mModelFactory.registerModel(FinanceModel.class, FinanceQuoteModel.class, mGoogleFinanceScheme, true);
     }
 
     @Override

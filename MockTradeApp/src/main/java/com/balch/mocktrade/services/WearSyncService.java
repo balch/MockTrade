@@ -30,13 +30,13 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.shared.WearDataSync;
@@ -108,8 +108,7 @@ public class WearSyncService extends IntentService implements
                 Log.i(TAG, "WearSyncService onHandleIntent");
 
                 ModelProvider modelProvider = (ModelProvider) this.getApplication();
-                ModelFactory modelFactory = modelProvider.getModelFactory();
-                PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+                PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
 
                 DataItemBuffer dataItems = Wearable.DataApi.getDataItems(mGoogleApiClient).await();
                 long accountId = getAccountIdFromDataBuffer(dataItems);

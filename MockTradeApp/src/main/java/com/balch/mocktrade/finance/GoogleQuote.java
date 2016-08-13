@@ -49,6 +49,7 @@ public class GoogleQuote implements Quote {
     private final static String LAST_TRADE_TIME ="lt_dts"; // 2014-09-04T10:32:44Z  in EST
     private final static String NAME ="name";
     private final static String EXCHANGE ="e";
+    private final static String DIVIDEND_PER_SHARE ="div";
 
     @Override
     public Money getPrice() {
@@ -101,20 +102,6 @@ public class GoogleQuote implements Quote {
         return new Money(this.quoteData.get(LAST_CLOSE_PRICE));
     }
 
-    public static GoogleQuote fromJSONObject(JSONObject jsonObject) throws JSONException {
-        GoogleQuote quote = new GoogleQuote();
-        Iterator iter = jsonObject.keys();
-        while (iter.hasNext()) {
-            String key = (String)iter.next();
-            if (!jsonObject.isNull(key)) {
-                quote.quoteData.put(key, jsonObject.getString(key));
-            }
-        }
-
-        return quote;
-
-    }
-
     @Override
     public boolean isDelayed() {
         return  (getDelaySeconds() > 0);
@@ -127,7 +114,20 @@ public class GoogleQuote implements Quote {
 
     @Override
     public Money getDividendPerShare() {
-        throw new UnsupportedOperationException();
+        return new Money(this.quoteData.get(DIVIDEND_PER_SHARE));
+    }
+
+    public static GoogleQuote fromJSONObject(JSONObject jsonObject) throws JSONException {
+        GoogleQuote quote = new GoogleQuote();
+        Iterator iter = jsonObject.keys();
+        while (iter.hasNext()) {
+            String key = (String)iter.next();
+            if (!jsonObject.isNull(key)) {
+                quote.quoteData.put(key, jsonObject.getString(key));
+            }
+        }
+
+        return quote;
     }
 
 }

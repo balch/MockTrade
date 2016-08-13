@@ -32,11 +32,11 @@ import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.widget.ControlMap;
 import com.balch.android.app.framework.domain.widget.EditLayout;
 import com.balch.android.app.framework.domain.widget.EnumEditLayout;
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.model.ModelProvider;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,8 +79,8 @@ public class OrderEditController implements ExternalController<Order> {
 
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
 
-        ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
-        FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
+        ModelProvider modelProvider = ((ModelProvider)context.getApplicationContext());
+        FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
 
         QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);

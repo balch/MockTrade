@@ -26,14 +26,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.balch.android.app.framework.sql.SqlConnection;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.investment.InvestmentSqliteModel;
-import com.balch.mocktrade.model.ModelProvider;
-import com.balch.mocktrade.model.SqliteModel;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
@@ -47,45 +47,42 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel {
+public class PortfolioSqliteModel implements PortfolioModel {
 
-    protected AccountSqliteModel accounteModel;
-    protected InvestmentSqliteModel investmentModel;
-    protected OrderSqliteModel orderModel;
-    protected FinanceModel financeModel;
-    protected SnapshotTotalsSqliteModel snapshotTotalsModel;
+    private final AccountSqliteModel accountModel;
+    private final InvestmentSqliteModel investmentModel;
+    private final OrderSqliteModel orderModel;
+    private final FinanceModel financeModel;
+    private final SnapshotTotalsSqliteModel snapshotTotalsModel;
+    private final SqlConnection sqlConnection;
 
-    @Override
-    public void initialize(ModelProvider modelProvider) {
-        super.initialize(modelProvider);
-        this.accounteModel = new AccountSqliteModel(modelProvider);
+    public PortfolioSqliteModel(ModelProvider modelProvider) {
+        this.sqlConnection = modelProvider.getSqlConnection();
+        this.accountModel = new AccountSqliteModel(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);
         this.orderModel = new OrderSqliteModel(modelProvider);
         this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(modelProvider);
-
-        // this mPortfolioModel is more generic then the sqlite models above and is
-        // registered with the mPortfolioModel factory
-        this.financeModel = this.getModelFactory().getModel(FinanceModel.class);
+        this.financeModel = new GoogleFinanceModel(modelProvider);
     }
 
     @Override
     public List<Account> getAccounts(boolean allAccounts) {
-        return accounteModel.getAccounts(allAccounts);
+        return accountModel.getAccounts(allAccounts);
     }
 
     @Override
     public Account getAccount(long accountID) {
-        return accounteModel.getAccount(accountID);
+        return accountModel.getAccount(accountID);
     }
 
     @Override
     public void createAccount(Account account) {
-        accounteModel.createAccount(account);
+        accountModel.createAccount(account);
     }
 
     @Override
     public void deleteAccount(Account account) {
-        accounteModel.deleteAccount(account);
+        accountModel.deleteAccount(account);
     }
 
     @Override
@@ -171,7 +168,6 @@ public class PortfolioSqliteModel extends SqliteModel implements PortfolioModel 
 
         // if there is any change all accounts have to be inserted with this timestamp
         if (isChanged) {
-            SqlConnection sqlConnection = getSqlConnection();
             SQLiteDatabase db = sqlConnection.getWritableDatabase();
             db.beginTransaction();
             try {

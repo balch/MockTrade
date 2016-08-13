@@ -31,8 +31,7 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.model.ModelProvider;
-import com.balch.mocktrade.model.SqliteModel;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.io.Serializable;
@@ -42,8 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class SnapshotTotalsSqliteModel extends SqliteModel
-        implements SqlMapper<PerformanceItem>, Serializable {
+public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem>, Serializable {
     public static final String TAG = SnapshotTotalsSqliteModel.class.getSimpleName();
 
     public static final String TABLE_NAME = "snapshot_totals";
@@ -86,8 +84,10 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
             COLUMN_SNAPSHOT_TIME + " >= ? AND " +
             COLUMN_SNAPSHOT_TIME + " < ?";
 
+    private final SqlConnection mSqlConnection;
+
     public SnapshotTotalsSqliteModel(ModelProvider modelProvider) {
-        super(modelProvider);
+        mSqlConnection = modelProvider.getSqlConnection();
     }
 
     @Override
@@ -124,7 +124,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         PerformanceItem performanceItem = null;
         try {
             List<PerformanceItem> performanceItems =
-                    getSqlConnection().query(this, PerformanceItem.class, where, whereArgs,
+                    mSqlConnection.query(this, PerformanceItem.class, where, whereArgs,
                             COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
             if ((performanceItems != null) && (performanceItems.size() > 0)) {
                 performanceItem = performanceItems.get(0);
@@ -153,7 +153,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
         List<PerformanceItem> performanceItems;
         try {
             performanceItems =
-                    getSqlConnection().query(this, PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                    mSqlConnection.query(this, PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
                             whereArgs, COLUMN_SNAPSHOT_TIME + " ASC");
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots(accountId)", e);
@@ -170,13 +170,12 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
                 String.valueOf(endTimeExclusive)
         };
 
-        SqlConnection sqlConnection = getSqlConnection();
         Cursor cursor = null;
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = sqlConnection.getReadableDatabase().rawQuery(SQL_ACCOUNTS_INCLUDED_TOTALS, whereArgs);
-            sqlConnection.processCursor(this, cursor, PerformanceItem.class, performanceItems);
+            cursor = mSqlConnection.getReadableDatabase().rawQuery(SQL_ACCOUNTS_INCLUDED_TOTALS, whereArgs);
+            mSqlConnection.processCursor(this, cursor, PerformanceItem.class, performanceItems);
 
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots()", e);
@@ -196,12 +195,11 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
      */
     public long getLatestGraphSnapshotTime() {
 
-        SqlConnection sqlConnection = getSqlConnection();
         Cursor cursor = null;
         long latestTimestamp = 0;
         try {
 
-            cursor = sqlConnection.getReadableDatabase().rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
+            cursor = mSqlConnection.getReadableDatabase().rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
             if (cursor.moveToNext()) {
                 latestTimestamp = cursor.getLong(0);
             }
@@ -219,7 +217,7 @@ public class SnapshotTotalsSqliteModel extends SqliteModel
     }
 
     public int purgeSnapshotTable(int days) {
-        SQLiteDatabase db = getSqlConnection().getWritableDatabase();
+        SQLiteDatabase db = mSqlConnection.getWritableDatabase();
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -days);

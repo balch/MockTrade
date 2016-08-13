@@ -27,15 +27,14 @@ import android.database.Cursor;
 
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.model.ModelProvider;
-import com.balch.mocktrade.model.SqliteModel;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Investment> {
+public class InvestmentSqliteModel implements SqlMapper<Investment> {
 
     public static final String TAG = Investment.class.getSimpleName();
 
@@ -58,8 +57,10 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
     public static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
              COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
 
+    private final ModelProvider mModelProvider;
+
     public InvestmentSqliteModel(ModelProvider modelProvider) {
-        super(modelProvider);
+        this.mModelProvider = modelProvider;
     }
 
     public List<Investment> getInvestments(Long accountId) {
@@ -70,7 +71,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
                 where = COLUMN_ACCOUNT_ID + " = ?";
                 whereArgs = new String[]{accountId.toString()};
             }
-            return this.getSqlConnection().query(this, Investment.class, where, whereArgs, COLUMN_SYMBOL + " COLLATE NOCASE");
+            return mModelProvider.getSqlConnection().query(this, Investment.class, where, whereArgs, COLUMN_SYMBOL + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -83,7 +84,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
     public Investment getInvestmentBySymbol(String symbol, Long accountId) {
         try {
             String [] whereArgs = new String[]{symbol, accountId.toString()};
-            List<Investment> investments = this.getSqlConnection().query(this, Investment.class,
+            List<Investment> investments = mModelProvider.getSqlConnection().query(this, Investment.class,
                     SQL_WHERE_BY_ACCOUNT_AND_SYMBOL, whereArgs, null);
 
             return (investments.size() == 1) ? investments.get(0) : null;
@@ -95,7 +96,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
 
     public boolean updateInvestment(Investment investment) {
         try {
-            return this.getSqlConnection().update(this, investment);
+            return mModelProvider.getSqlConnection().update(this, investment);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -144,7 +145,7 @@ public class InvestmentSqliteModel extends SqliteModel implements SqlMapper<Inve
         Date date = null;
         Cursor cursor = null;
         try {
-            cursor = getSqlConnection().getReadableDatabase().rawQuery(SQL_LAST_TRADE_TIME, null);
+            cursor = mModelProvider.getSqlConnection().getReadableDatabase().rawQuery(SQL_LAST_TRADE_TIME, null);
             if (cursor.moveToNext()) {
                 date = new Date(cursor.getLong(0));
             }

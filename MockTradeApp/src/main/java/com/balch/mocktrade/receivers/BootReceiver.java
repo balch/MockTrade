@@ -27,10 +27,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.ModelFactory;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.model.ModelProvider;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = BootReceiver.class.getSimpleName();
@@ -39,11 +40,11 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "BootReceiver onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            ModelFactory modelFactory = ((ModelProvider)context.getApplicationContext()).getModelFactory();
-            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
+            ModelProvider modelProvider = ((ModelProvider)context.getApplicationContext());
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             financeModel.setQuoteServiceAlarm();
 
-            PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+            PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             portfolioModel.scheduleOrderServiceAlarmIfNeeded();
         }
     }

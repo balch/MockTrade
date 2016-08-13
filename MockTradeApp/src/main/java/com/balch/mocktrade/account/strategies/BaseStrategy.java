@@ -24,12 +24,14 @@ package com.balch.mocktrade.account.strategies;
 
 import android.content.Context;
 
-import com.balch.android.app.framework.model.ModelFactory;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 
 import java.util.List;
 import java.util.Map;
@@ -41,10 +43,10 @@ public abstract class BaseStrategy {
 
     public abstract void initialize(Account account);
 
-    private void init(Context context, ModelFactory modelFactory) {
-        this.financeModel = modelFactory.getModel(FinanceModel.class);
-        this.portfolioModel = modelFactory.getModel(PortfolioModel.class);
-        this.context = context;
+    private void init( ModelProvider modelProvider) {
+        this.financeModel = new GoogleFinanceModel(modelProvider);
+        this.portfolioModel = new PortfolioSqliteModel(modelProvider);
+        this.context = modelProvider.getContext();
     }
 
     // NOTE: No Guarantees!!! This could be called more than once a day or not called at all
@@ -60,9 +62,9 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-                                              Context context, ModelFactory modelFactory) throws IllegalAccessException, InstantiationException {
+              ModelProvider modelProvider) throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
-        baseStrategy.init(context, modelFactory);
+        baseStrategy.init(modelProvider);
 
         return baseStrategy;
     }

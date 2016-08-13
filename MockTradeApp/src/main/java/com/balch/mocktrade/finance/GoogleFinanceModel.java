@@ -29,12 +29,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.balch.android.app.framework.model.RequestListener;
-import com.balch.mocktrade.model.GoogleFinanceModel;
-import com.balch.mocktrade.model.ModelProvider;
+import com.balch.mocktrade.ModelProvider;
 
 import org.json.JSONArray;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,18 +43,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FinanceQuoteModel extends GoogleFinanceModel implements FinanceModel {
-    static private final String TAG = FinanceQuoteModel.class.getSimpleName();
+public class GoogleFinanceModel implements FinanceModel {
+    private static final String TAG = GoogleFinanceModel.class.getSimpleName();
 
-    protected FinanceManager mFinanceManager;
+    private final static String GOOGLE_BASE_URL = "http://www.google.com/finance/info?infotype=infoquoteall&q=";
 
-    public FinanceQuoteModel() {
+    private final ModelProvider mModelProvider;
+    private final FinanceManager mFinanceManager;
+
+    public GoogleFinanceModel(ModelProvider mModelProvider) {
+        this.mModelProvider = mModelProvider;
+        this.mFinanceManager = new FinanceManager(mModelProvider.getContext(), mModelProvider.getSettings());
     }
 
-    @Override
-    public void initialize(ModelProvider modelProvider) {
-        super.initialize(modelProvider);
-        this.mFinanceManager = new FinanceManager(this.getContext(), this.geSettings());
+    protected String getGoogleQueryUrl(String symbols) throws UnsupportedEncodingException  {
+        return GOOGLE_BASE_URL +  URLEncoder.encode(symbols, "UTF-8");
     }
 
     @Override
@@ -173,7 +176,7 @@ public class FinanceQuoteModel extends GoogleFinanceModel implements FinanceMode
                     }
             );
 
-            this.addRequest(request);
+            mModelProvider.addRequest(request);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

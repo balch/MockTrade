@@ -41,13 +41,13 @@ import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.widget.ControlMapper;
 import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
-import com.balch.mocktrade.model.ModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,9 +103,8 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
         this.mDescription = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
         this.mPrice = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
 
-        ModelFactory modelFactory;
-        modelFactory = ((ModelProvider)this.getContext().getApplicationContext()).getModelFactory();
-        this.mFinanceModel = modelFactory.getModel(FinanceModel.class);
+        ModelProvider modelProvider = (ModelProvider)this.getContext().getApplicationContext();
+        this.mFinanceModel = new GoogleFinanceModel(modelProvider);
 
         this.mValue.setHint(R.string.order_symbol_hint);
     }

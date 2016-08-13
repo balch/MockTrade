@@ -190,7 +190,7 @@ public class MetadataUtils {
             try {
                 view =  editViewClazz.getConstructor(Context.class).newInstance(context);
             } catch (Exception e) {
-                Log.e(TAG, "Error getting EditView from Framework Tyoe", e);
+                Log.e(TAG, "Error getting EditView from Framework Type", e);
             }
         }
         return view;

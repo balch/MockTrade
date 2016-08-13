@@ -36,9 +36,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
-import com.balch.android.app.framework.model.ModelFactory;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.model.ModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +73,8 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-        mOrderModel = modelFactory.getModel(OrderModel.class);
+        ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+        mOrderModel = new OrderSqliteModel(modelProvider);
 
         this.mOrderListView.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override

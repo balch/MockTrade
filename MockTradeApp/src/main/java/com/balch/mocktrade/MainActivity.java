@@ -34,12 +34,10 @@ import android.widget.Toast;
 
 import com.balch.android.app.framework.BaseAppCompatActivity;
 import com.balch.android.app.framework.domain.EditActivity;
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountEditController;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
 import com.balch.mocktrade.order.OrderListActivity;
@@ -49,6 +47,7 @@ import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioLoader;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.AccountUpdateBroadcaster;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.Settings;
@@ -170,8 +169,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         ModelProvider modelProvider = ((ModelProvider) this.getApplication());
 
         mSettings = modelProvider.getSettings();
-        ModelFactory modelFactory = modelProvider.getModelFactory();
-        mPortfolioModel = modelFactory.getModel(PortfolioModel.class);
+        mPortfolioModel = new PortfolioSqliteModel(modelProvider);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         if (toolbar != null) {

@@ -7,7 +7,6 @@ MockTrade
 * Open Source Android Trading Simulator
 * AppFramework Library
     * BaseAppCompatActivity with built in MVP
-        * ModelFactory!!!!
         * Error Handling
     * Annotation Driven List/Create/Edit Layouts
     * SqlConnection Encapsulation
@@ -56,8 +55,7 @@ explore some Application Architecture ideas and apply them to the Android platfo
 * Model/View/Presenter Support
     * Model - Interfaces describing data retrieval and persistence functionality
         * abstracts data contract from data source
-        * provides flexible ModelFactory pattern allowing application to define multiple 
-        model implementations that are managed by the framework. 
+        model implementations that are managed by the framework.
     * View - Extends Android ViewGroup classes
         * caches controls (ViewHolder pattern)
         * provides Listener interfaces to communicate with Presenter

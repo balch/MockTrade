@@ -31,16 +31,17 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
 import com.balch.mocktrade.MainActivity;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
-import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 
 import java.util.ArrayList;
@@ -60,9 +61,9 @@ public class OrderService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
 
         try {
-            ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
-            final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+            ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
+            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Order> orders = portfolioModel.getOpenOrders();
 
             if (orders.size() > 0) {

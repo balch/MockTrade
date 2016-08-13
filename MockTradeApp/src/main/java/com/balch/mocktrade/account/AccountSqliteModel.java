@@ -29,15 +29,14 @@ import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
-import com.balch.mocktrade.model.ModelProvider;
-import com.balch.mocktrade.model.SqliteModel;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account> {
+public class AccountSqliteModel implements SqlMapper<Account> {
     private static final String TAG = AccountSqliteModel.class.getSimpleName();
 
     public static final String TABLE_NAME = "account";
@@ -49,8 +48,10 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
     public static final String COLUMN_AVAILABLE_FUNDS = "available_funds";
     public static final String COLUMN_EXCLUDE_FROM_TOTALS = "exclude_from_totals";
 
+    private final ModelProvider mModelProvider;
+
     public AccountSqliteModel(ModelProvider modelProvider) {
-        super(modelProvider);
+        mModelProvider = modelProvider;
     }
 
     public List<Account> getAccounts(boolean allAccounts) {
@@ -61,7 +62,7 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
                 where = COLUMN_EXCLUDE_FROM_TOTALS + "=?";
                 args = new String[]{"0"};
             }
-            return getSqlConnection().query(this, Account.class, where, args, COLUMN_NAME + " COLLATE NOCASE");
+            return mModelProvider.getSqlConnection().query(this, Account.class, where, args, COLUMN_NAME + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +70,7 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
 
     public Account getAccount(long accountId) {
         try {
-            List<Account> accounts = getSqlConnection().query(this, Account.class, SqlMapper.COLUMN_ID+"=?", new String[]{String.valueOf(accountId)}, null);
+            List<Account> accounts = mModelProvider.getSqlConnection().query(this, Account.class, SqlMapper.COLUMN_ID+"=?", new String[]{String.valueOf(accountId)}, null);
             return (accounts.size() == 1) ? accounts.get(0) : null;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -77,13 +78,13 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
     }
 
     public void createAccount(Account account) {
-        SQLiteDatabase db = getSqlConnection().getWritableDatabase();
+        SQLiteDatabase db = mModelProvider.getSqlConnection().getWritableDatabase();
         db.beginTransaction();
         try {
-            this.getSqlConnection().insert(this, account, db);
+            mModelProvider.getSqlConnection().insert(this, account, db);
 
             Transaction transaction = new Transaction(account, account.initialBalance, Transaction.TransactionType.DEPOSIT, "Initial Deposit");
-            getSqlConnection().insert(transaction, transaction, db);
+            mModelProvider.getSqlConnection().insert(transaction, transaction, db);
 
             db.setTransactionSuccessful();
 
@@ -97,7 +98,7 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
         Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
         if (strategyClazz != null) {
             try {
-                BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, this.getContext(), this.getModelFactory());
+                BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, mModelProvider);
                 strategy.initialize(account);
             } catch (Exception e) {
                 Log.e(TAG, "Error initializing the strategy", e);
@@ -107,7 +108,7 @@ public class AccountSqliteModel extends SqliteModel implements SqlMapper<Account
 
     public void deleteAccount(Account account) {
         try {
-            this.getSqlConnection().delete(this, account);
+            mModelProvider.getSqlConnection().delete(this, account);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/6/14 10:10 AM
+ * Created: 8/12/16 8:00 PM
  *
  * This file is part of MockTrade.
  *
@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2016
+ *
  */
 
-package com.balch.mocktrade.model;
+package com.balch.mocktrade;
 
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.settings.Settings;
 
@@ -33,8 +33,6 @@ public interface ModelProvider {
     Context getContext();
 
     Settings getSettings();
-
-    ModelFactory getModelFactory();
 
     SqlConnection getSqlConnection();
 

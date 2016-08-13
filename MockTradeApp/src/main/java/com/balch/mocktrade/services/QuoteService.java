@@ -29,15 +29,16 @@ import android.os.PowerManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.balch.android.app.framework.model.ModelFactory;
 import com.balch.android.app.framework.model.RequestListener;
+import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.model.ModelProvider;
 import com.balch.mocktrade.portfolio.PortfolioModel;
+import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 import com.balch.mocktrade.settings.Settings;
 
@@ -67,9 +68,9 @@ public class QuoteService extends IntentService {
             Log.i(TAG, "QuoteService onHandleIntent");
 
             // get the investment list from the db
-            ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-            FinanceModel financeModel = modelFactory.getModel(FinanceModel.class);
-            final PortfolioModel portfolioModel = modelFactory.getModel(PortfolioModel.class);
+            ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
+            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Investment> investments = portfolioModel.getAllInvestments();
             mSettings = ((ModelProvider)this.getApplication()).getSettings();
 
@@ -167,8 +168,8 @@ public class QuoteService extends IntentService {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
             if (strategyClazz != null) {
                 try {
-                    ModelFactory modelFactory = ((ModelProvider)this.getApplication()).getModelFactory();
-                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, this, modelFactory);
+                    ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, modelProvider);
                     if (doDailyUpdate) {
                         strategy.dailyUpdate(account, accountIdToInvestmentMap.get(account.getId()), quoteMap);
                     }

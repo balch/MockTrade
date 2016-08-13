@@ -30,6 +30,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -83,10 +84,16 @@ public class MockTradeFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
+    private Typeface mTimeFont;
+
     private static final float TIME_TICK_STROKE_WIDTH = 3f;
-    private static final int SHADOW_RADIUS = 6;
+    private static final float SHADOW_RADIUS = 6;
     private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 156;
     private static final int OFF_PERFORMANCE_COLOR_COMPONENT = 128;
+
+    private static final float TIME_SHADOW_RADIUS = 4;
+    private static final float TIME_SHADOW_OFFSET_X = 2;
+    private static final float TIME_SHADOW_OFFSET_Y = 2;
 
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
@@ -96,6 +103,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
     @Override
     public Engine onCreateEngine() {
+        mTimeFont = Typeface.createFromAsset(this.getAssets(), "fonts/lovelyweekend.ttf");
         return new Engine();
     }
 
@@ -203,7 +211,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             mTextPaint = new Paint();
             mTextPaint.setColor(ContextCompat.getColor(MockTradeFace.this, R.color.digital_text));
-            mTextPaint.setTypeface(NORMAL_TYPEFACE);
+            mTextPaint.setTypeface(mTimeFont);
             mTextPaint.setAntiAlias(true);
 
             mHighlightDescTextPaint = new Paint();
@@ -360,7 +368,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             Shader shader = null;
             if ((mPerformanceItems != null) && mPerformanceItems.size() > 0) {
-                float extents = .01f * mPerformanceItems.get(0).getValue().getMicroCents() / 2.0f;
+                float extent = getPerformanceExtent(mPerformanceItems.get(0).getValue().getMicroCents());
 
                 Calendar cal = Calendar.getInstance();
 
@@ -371,17 +379,10 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 for (int x = 0; x < size; x++) {
                     PerformanceItem item = mPerformanceItems.get(x);
 
-                    int color = Color.rgb(156, 156, 156);
                     long todayChange = item.getTodayChange().getMicroCents();
 //                    todayChange = (long)(-extents + (extents * 2*x/size));
-                    if (todayChange != 0) {
-                        float colorPercent = (Math.abs(todayChange) / extents);
-                        int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
-                        int secondaryColorComponent = (int) Math.max(0, OFF_PERFORMANCE_COLOR_COMPONENT - (255 - OFF_PERFORMANCE_COLOR_COMPONENT) * colorPercent * 1.5f);
-                        color = (todayChange < 0) ? Color.rgb(colorComponent, secondaryColorComponent, secondaryColorComponent) : Color.rgb(secondaryColorComponent, colorComponent, secondaryColorComponent);
-                    }
 
-                    colors[x+1] = color;
+                    colors[x+1] = getPerformanceColor(todayChange, extent);
 
                     cal.setTimeInMillis(item.getTimestamp().getTime());
 
@@ -404,6 +405,21 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mMarketDayRingPaint.setShader(shader);
         }
 
+        private float getPerformanceExtent(long value) {
+            return .01f * value / 2.0f;
+        }
+
+        private int getPerformanceColor(long value, float extent) {
+            int color = Color.rgb(156, 156, 156);
+            if (value != 0) {
+                float colorPercent = (Math.abs(value) / extent);
+                int colorComponent = (int) Math.min(255, BASE_PERFORMANCE_COLOR_COMPONENT + (255 - BASE_PERFORMANCE_COLOR_COMPONENT) * colorPercent);
+                int secondaryColorComponent = (int) Math.max(0, OFF_PERFORMANCE_COLOR_COMPONENT - (255 - OFF_PERFORMANCE_COLOR_COMPONENT) * colorPercent * 1.5f);
+                color = (value < 0) ? Color.rgb(colorComponent, secondaryColorComponent, secondaryColorComponent) : Color.rgb(secondaryColorComponent, colorComponent, secondaryColorComponent);
+            }
+
+            return color;
+        }
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
@@ -691,7 +707,12 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     mHighlightItems = new ArrayList<>(dataMapList.size());
 
                     for (DataMap data : dataMapList) {
-                        mHighlightItems.add(new HighlightItem(data));
+                        HighlightItem item = new HighlightItem(data);
+                        mHighlightItems.add(item);
+
+                        if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
+                            setTimeShadow(item);
+                        }
                     }
                 } else {
                     mHighlightItems = null;
@@ -699,8 +720,29 @@ public class MockTradeFace extends CanvasWatchFaceService {
             }
         }
 
+        private void setTimeShadow(HighlightItem item) {
+            Money value = item.getTodayChange();
+            if (value.getMicroCents() == 0) {
+                value = item.getTotalChange();
+            }
+
+            int color = getPerformanceColor(value.getMicroCents(), getPerformanceExtent(item.getValue().getMicroCents()));
+
+            mTextPaint.setColorFilter(new LightingColorFilter(color, Color.argb(28, 128, 126, 128)));
+
+//            mTextPaint.setShadowLayer(TIME_SHADOW_RADIUS, TIME_SHADOW_OFFSET_X, TIME_SHADOW_OFFSET_Y, color);
+        }
+
         private void setAccountIdDataItem() {
             HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+
+            if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) ||
+                (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
+                setTimeShadow(item);
+            } else {
+                mTextPaint.clearShadowLayer();
+                mTextPaint.setColorFilter(null);
+            }
 
             long accountId = -1;
             if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {

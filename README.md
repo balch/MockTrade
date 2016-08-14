@@ -112,6 +112,7 @@ Changes to watchface reflect in application
 ![Wear Spec](./ss_watch_spec.png)
 
 Tapping on performance ring zooms to 12hr view
+
 ![Wear Spec](./ss_watch_spec_12.png)
 
 

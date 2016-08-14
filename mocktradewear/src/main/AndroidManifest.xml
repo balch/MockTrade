@@ -40,7 +40,7 @@
             <meta-data android:name="com.google.android.wearable.watchface.preview"
                 android:resource="@drawable/preview_digital" />
             <meta-data android:name="com.google.android.wearable.watchface.preview_circular"
-                android:resource="@drawable/preview_digital_circular" />
+                android:resource="@drawable/preview_digital" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />

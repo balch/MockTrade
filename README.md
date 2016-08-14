@@ -106,8 +106,12 @@ WatchFaces
 ![App Dogs](./ss_app_dogs.png)
 ![Wear Dogs](./ss_watch_dogs.png)
 
+Changes to watchface reflect in application
+
 ![App Spec](./ss_app_spec.png)
 ![Wear Spec](./ss_watch_spec.png)
+
+Tapping on performance ring zooms to 12hr view
 ![Wear Spec](./ss_watch_spec_12.png)
 
 

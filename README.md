@@ -20,7 +20,7 @@ MockTrade
         * Strategy plugin model
     * Implements AppFramework
 * Watch Face Wear Application
-    * 24hr Ring showing when Markets are open
+    * 12/24hr Ring showing when Markets are open
         * Color coded to indicate portfolio performance
     * Portfolio Highlights Synced From Mobile App
         * Portfolio Totals/Best & Worst Day and Total Performers
@@ -78,31 +78,38 @@ explore some Application Architecture ideas and apply them to the Android platfo
 
 Main portfolio screen. View multiple portfolios with totals pinned to the bottom
 
-![Screen Shot 1](./Mocktrade_ss1.png)
+![Portait](./ss_app_portrait.png)
+
+![Landscape](./ss_app_landscape.png)
 
 Slide screen down to reveal daily performance chart
 
-![Screen Shot 2](./Mocktrade_ss5.png)
+![App Totals](./ss_app_totals.png)
+![Wear Totals](./ss_watch_totals.png)
 
 Create a new portfolio. User can create a normal portfolio and
 manage their own assets, or choose a strategy and track the
 performance over time
 
-![Screen Shot 3](./Mocktrade_ss2.png)
+![Create Account](./ss_app_dogs_create.png)
 
 Sell screen showing a Trailing Stop % order type
 
-![Screen Shot 4](./Mocktrade_ss3.png)
+![Sell TSLA](./ss_app_sell_tsla.png)
 
 Buy screen with real-time quote and order validation
 
-![Screen Shot 5](./Mocktrade_ss4.png)
+![Buy WMT](ss_app_buy_wmt.png)
 
 WatchFaces
 
-![Screen Shot 6](./preview_digital.png)
- ![Screen Shot 7](./preview_digital_circular.png)
- ![Screen Shot 8](./preview_digital_circular_chin.png)
+![App Dogs](./ss_app_dogs.png)
+![Wear Dogs](./ss_watch_dogs.png)
+
+![App Spec](./ss_app_spec.png)
+![Wear Spec](./ss_watch_spec.png)
+![Wear Spec](./ss_watch_spec_12.png)
+
 
 ### Attributions
 * Awesome icon site: http://www.iconarchive.com/

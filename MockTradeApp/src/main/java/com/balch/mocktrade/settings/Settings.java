@@ -36,7 +36,7 @@ public class Settings {
     public enum Key {
         PREF_HIDE_EXCLUDE_ACCOUNTS,
         PREF_DEMO_MODE,
-        PREF_TWENTY_FOUR_HOUR_DISPLAY,
+        PREF_TWENTY_FOUR_HOUR_DISPLAY, // reference in watch app by name()
     }
 
     private static final String PREF_LAST_SYNC_TIME = "pref_last_sync_time";

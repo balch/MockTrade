@@ -51,6 +51,7 @@ import android.view.WindowInsets;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
+import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -168,6 +169,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private int mColorNegative;
 
         private boolean mLowBitAmbient;
+        private boolean mShowTwentyFourHourTime;
 
         GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(MockTradeFace.this)
                 .addConnectionCallbacks(this)
@@ -534,12 +536,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             drawTimeTick(mTime, centerX, centerY, canvas, mCurrentTimeDayPaint);
 
-            int hour = mTime.get(Calendar.HOUR);
-            if (hour == 0) {
+            int hour = mTime.get(mShowTwentyFourHourTime ? Calendar.HOUR_OF_DAY : Calendar.HOUR);
+            if (!mShowTwentyFourHourTime && (hour == 0)) {
                 hour = 12;
             }
 
-            String text =  String.format("%d:%02d", hour, mTime.get(Calendar.MINUTE)) ;
+            String formatText = mShowTwentyFourHourTime ? "%02d:%02d" : "%d:%02d";
+            String text =  String.format(formatText, hour, mTime.get(Calendar.MINUTE)) ;
 
             mTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
             float x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
@@ -736,7 +739,18 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 } else {
                     mHighlightItems = null;
                 }
+            } else if (uriPath.equals(WearDataSync.PATH_WATCH_CONFIG_SYNC)) {
+                ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS);
+                if (dataMapList != null) {
+                    for (DataMap dm : dataMapList) {
+                        WatchConfigItem item = new WatchConfigItem(dm);
+                        if (item.getKey().equals("PREF_TWENTY_FOUR_HOUR_DISPLAY")) {
+                            mShowTwentyFourHourTime = item.isEnabled();
+                        }
+                    }
+                }
             }
+
         }
 
         private void setTimeTextPaint(HighlightItem item) {

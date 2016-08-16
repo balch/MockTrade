@@ -187,9 +187,6 @@ public class MockTradeWatchConfigActivity extends Activity implements
     @Override // WearableListView.OnScrollListener
     public void onCentralPositionChanged(int centralPosition) {}
 
-    private void updateConfigDataItem(final WatchConfigItem configItem) {
-    }
-
     private static class ConfigItemAdapter extends WearableListView.Adapter {
         public interface ConfigItemAdapterListener {
             void onConfigItemChanged(WatchConfigItem item);

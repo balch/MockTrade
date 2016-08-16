@@ -684,6 +684,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         updateFromDataMap(dataItems.get(x));
                     }
 
+                    if ((mHighlightItems != null) && !mHighlightItems.isEmpty()) {
+                        setTimeTextPaint(mHighlightItems.get(mHighlightItemPosition));
+                    }
                     dataItems.release();
                     invalidate();
                 }

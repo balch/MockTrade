@@ -88,6 +88,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
     private MenuItem mMenuHideExcludeAccounts;
+    private MenuItem mMenuDemoMode;
 
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     private Settings mSettings;
@@ -111,8 +112,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                     int accountsWithTotals = 0;
 
                     Date timestamp = new Date();
+                    boolean demoMode = mSettings.getConfigItem(Settings.Key.PREF_DEMO_MODE);
                     for (Account account : data.getAccounts()) {
-                        if (!account.getExcludeFromTotals()) {
+                        if (demoMode || !account.getExcludeFromTotals()) {
                             List<Investment> investments = data.getInvestments(account.getId());
                             performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
 
@@ -237,11 +239,13 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
         getMenuInflater().inflate(R.menu.main_menu, menu);
         mMenuProgressBar = menu.findItem(R.id.menu_progress_bar);
         mMenuRefreshButton = menu.findItem(R.id.menu_refresh);
         mMenuHideExcludeAccounts = menu.findItem(R.id.menu_hide_exclude_accounts);
-        mMenuHideExcludeAccounts.setChecked(mSettings.getHideExcludeAccounts());
+        mMenuDemoMode = menu.findItem(R.id.menu_demo_mode);
 
         // tint all the menu item icons
         ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
@@ -254,6 +258,15 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             }
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        mMenuHideExcludeAccounts.setChecked(mSettings.getConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
+        mMenuDemoMode.setChecked(mSettings.getConfigItem(Settings.Key.PREF_DEMO_MODE));
         return true;
     }
 
@@ -285,9 +298,16 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 break;
             case R.id.menu_hide_exclude_accounts:
                 boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
-                mSettings.setHideExcludeAccounts(hideExcludeAccounts);
+                mSettings.setConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
                 mMainPortfolioView.resetSelectedAccountID();
+                updateView();
+                handled = true;
+                break;
+            case R.id.menu_demo_mode:
+                boolean demoMode = !mMenuDemoMode.isChecked();
+                mSettings.setConfigItem(Settings.Key.PREF_DEMO_MODE, demoMode);
+                mMenuDemoMode.setChecked(demoMode);
                 updateView();
                 handled = true;
                 break;

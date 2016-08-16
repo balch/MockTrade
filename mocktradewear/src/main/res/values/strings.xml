@@ -22,6 +22,8 @@
   -->
 
 <resources>
-    <string name="app_name">MockTradeWear</string>
+    <string name="app_name">MockTrade</string>
     <string name="face_name">MockTrade</string>
+    <string name="watch_config_title">Config MockTrade</string>
+
 </resources>

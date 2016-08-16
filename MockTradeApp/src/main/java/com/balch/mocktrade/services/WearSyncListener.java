@@ -28,11 +28,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.settings.Settings;
+import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -42,10 +46,13 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     private static final String TAG = WearSyncListener.class.getSimpleName();
 
     private GoogleApiClient mGoogleApiClient;
+    private ModelProvider modelProvider;
 
     @Override
     public void onCreate() {
         Log.d(TAG, "WearSyncListener: onCreate");
+        modelProvider = (ModelProvider) this.getApplication();
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -60,11 +67,20 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
 
         Log.d(TAG, "WearSyncListener: onDataChanged");
         for  (int x = 0; x < dataItems.getCount(); x++) {
-            DataItem dataItem = dataItems.get(x).getDataItem();
-            String uriPath = dataItem.getUri().getPath();
-            if (uriPath.equals(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID)) {
-                startService(WearSyncService.getIntent(getApplicationContext(), true, false, true));
+            DataEvent dataEvent = dataItems.get(x);
+            if (dataEvent.getType() != DataEvent.TYPE_CHANGED) {
+                continue;
             }
+
+            String uriPath = dataEvent.getDataItem().getUri().getPath();
+            if (uriPath.equals(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID)) {
+                startService(WearSyncService.getIntent(getApplicationContext(), true, false, false, true));
+            } else if (uriPath.equals(WearDataSync.PATH_WATCH_CONFIG_SET)) {
+                DataMapItem dataMapItem = DataMapItem.fromDataItem(dataEvent.getDataItem());
+                WatchConfigItem configItem = new WatchConfigItem(dataMapItem.getDataMap().getDataMap(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEM));
+                modelProvider.getSettings().setConfigItem(Settings.Key.valueOf(configItem.getKey()), configItem.isEnabled());
+            }
+
         }
     }
 
@@ -72,7 +88,6 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "WearSyncListener: onConnected");
         Wearable.DataApi.addListener(mGoogleApiClient, this);
-        startService(WearSyncService.getIntent(getApplicationContext(), true, false, true));
     }
 
     @Override

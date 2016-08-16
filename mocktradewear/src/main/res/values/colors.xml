@@ -39,4 +39,8 @@
     <color name="data_color_pos">#00FF00</color>
     <color name="data_color_neg">#FF0000</color>
 
+    <color name="config_watch_item_label_color">#FFFFFF</color>
+    <color name="config_watch_item_background_color">#000000</color>
+
+
 </resources>

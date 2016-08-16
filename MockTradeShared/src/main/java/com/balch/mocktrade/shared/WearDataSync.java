@@ -33,4 +33,10 @@ public class WearDataSync {
     public static final String PATH_WATCH_FACE_ACCOUNT_ID = "/watchface";
     public static final String DATA_WATCH_FACE_ACCOUNT_ID = "account_id";
 
+    public static final String PATH_WATCH_CONFIG_SYNC = "/config/watch";
+    public static final String DATA_WATCH_CONFIG_DATA_ITEMS = "config_data_items";
+
+    public static final String PATH_WATCH_CONFIG_SET = "/config/watch/set";
+    public static final String DATA_WATCH_CONFIG_DATA_ITEM = "config_data_item";
+
 }

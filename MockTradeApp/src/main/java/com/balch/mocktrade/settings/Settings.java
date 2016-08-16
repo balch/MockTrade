@@ -27,13 +27,20 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.services.WearSyncService;
 
 import java.util.TimeZone;
 
 public class Settings {
 
-    private static final String PREF_HIDE_EXCLUDE_ACCOUNTS = "pref_hide_exclude_accounts";
+    public enum Key {
+        PREF_HIDE_EXCLUDE_ACCOUNTS,
+        PREF_DEMO_MODE,
+        PREF_TWENTY_FOUR_HOUR_DISPLAY,
+    }
+
     private static final String PREF_LAST_SYNC_TIME = "pref_last_sync_time";
+
 
     protected Application mContext;
 
@@ -74,15 +81,17 @@ public class Settings {
         return TimeZone.getTimeZone("America/Los_Angeles");
     }
 
-    public boolean getHideExcludeAccounts() {
-        return getSharedPrefs().getBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, false);
+    public boolean getConfigItem(Key key) {
+        return getSharedPrefs().getBoolean(key.name(), false);
     }
 
-    public void setHideExcludeAccounts(boolean hideExcludeAccounts) {
+    public void setConfigItem(Key key, boolean value) {
         getSharedPrefs()
                 .edit()
-                .putBoolean(PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts)
+                .putBoolean(key.name(), value)
                 .apply();
+        mContext.startService(WearSyncService.getIntent(mContext, true, true, true, false));
+
     }
 
     public long getLastSyncTime() {

@@ -86,7 +86,7 @@ public class TradeApplication extends Application implements ModelProvider {
         PortfolioModel portfolioModel = new PortfolioSqliteModel(this);
         portfolioModel.scheduleOrderServiceAlarmIfNeeded();
 
-        startService(WearSyncService.getIntent(this));
+        startService(WearSyncService.getIntent(this, true, true, true, false));
 
     }
 

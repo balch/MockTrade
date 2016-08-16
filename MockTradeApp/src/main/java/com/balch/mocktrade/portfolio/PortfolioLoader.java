@@ -37,7 +37,7 @@ public class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
     public PortfolioData loadInBackground() {
         PortfolioData portfolioData = new PortfolioData();
 
-        List<Account> accounts = mPortfolioModel.getAccounts(!mSettings.getHideExcludeAccounts());
+        List<Account> accounts = mPortfolioModel.getAccounts(!mSettings.getConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
 
         portfolioData.addAccounts(accounts);
         portfolioData.addInvestments(mPortfolioModel.getAllInvestments());

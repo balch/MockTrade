@@ -37,8 +37,10 @@ import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
+import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,22 +64,25 @@ public class WearSyncService extends IntentService implements
     private static final String TAG = WearSyncService.class.getSimpleName();
 
     private static final String EXTRA_SEND_PERF_ITEMS = "extra_send_perf_items";
+    private static final String EXTRA_SEND_CONFIG_ITEMS = "extra_send_config_items";
     private static final String EXTRA_SEND_HIGHLIGHTS = "extra_send_highlights";
     private static final String EXTRA_BROADCAST_ACCOUNT_ID = "extra_broadcast_account_id";
 
     private static final long CONNECTION_TIME_OUT_MS = 1000;
     private GoogleApiClient mGoogleApiClient;
 
-    public static Intent getIntent(Context context, boolean sendPerformanceItems, boolean sendHighlights, boolean broadcastAccountId) {
+    public static Intent getIntent(Context context, boolean sendPerformanceItems, boolean sendHighlights,
+                                   boolean sendConfigItems, boolean broadcastAccountId) {
         Intent intent = new Intent(context, WearSyncService.class);
         intent.putExtra(EXTRA_SEND_PERF_ITEMS, sendPerformanceItems);
         intent.putExtra(EXTRA_SEND_HIGHLIGHTS, sendHighlights);
+        intent.putExtra(EXTRA_SEND_CONFIG_ITEMS, sendConfigItems);
         intent.putExtra(EXTRA_BROADCAST_ACCOUNT_ID, broadcastAccountId);
         return intent;
     }
 
     public static Intent getIntent(Context context) {
-        return getIntent(context, true, true, false);
+        return getIntent(context, true, true, false, false);
     }
 
     public WearSyncService() {
@@ -104,6 +109,7 @@ public class WearSyncService extends IntentService implements
 
                 boolean sendPerformanceItems = intent.getBooleanExtra(EXTRA_SEND_PERF_ITEMS, true);
                 boolean sendHighlights = intent.getBooleanExtra(EXTRA_SEND_HIGHLIGHTS, true);
+                boolean sendConfigItems = intent.getBooleanExtra(EXTRA_SEND_CONFIG_ITEMS, false);
                 boolean broadcastAccountID = intent.getBooleanExtra(EXTRA_BROADCAST_ACCOUNT_ID, false);
                 Log.i(TAG, "WearSyncService onHandleIntent");
 
@@ -120,6 +126,14 @@ public class WearSyncService extends IntentService implements
                     AccountUpdateBroadcaster.broadcast(getApplicationContext(), accountId);
                 }
 
+                if (sendConfigItems) {
+                    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_WATCH_CONFIG_SYNC);
+                    putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS, getConfigDataMap(modelProvider.getSettings() ));
+                    putDataMapRequest.setUrgent();
+                    PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+                    pendingResult.await();
+                }
+
                 if (sendPerformanceItems && (performanceItems != null)) {
                     ArrayList<DataMap> dataMapList = new ArrayList<>(performanceItems.size());
                     for (PerformanceItem item : performanceItems) {
@@ -134,7 +148,8 @@ public class WearSyncService extends IntentService implements
                 }
 
                 if (sendHighlights) {
-                    boolean allAccounts = !modelProvider.getSettings().getHideExcludeAccounts();
+                    boolean allAccounts = !modelProvider.getSettings().getConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS);
+                    boolean demoMode = modelProvider.getSettings().getConfigItem(Settings.Key.PREF_DEMO_MODE);
                     List<Account> accounts = portfolioModel.getAccounts(allAccounts);
                     if ((accounts != null) && (accounts.size() > 0)) {
 
@@ -198,7 +213,7 @@ public class WearSyncService extends IntentService implements
                                     account.getId());
                             accountsDataMapList.add(item.toDataMap());
 
-                            if (!account.getExcludeFromTotals()) {
+                            if (demoMode || !account.getExcludeFromTotals()) {
                                 totalsPerformanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
                             }
                         }
@@ -283,6 +298,20 @@ public class WearSyncService extends IntentService implements
                 investment.getSymbol(), investment.getCostBasis(), investment.getValue(),
                 investment.getTodayChange(), investment.getTodayChangePercent(), accountId);
         return item.toDataMap();
+    }
+
+    private ArrayList<DataMap> getConfigDataMap(Settings settings) {
+        Resources resources = getResources();
+        ArrayList<DataMap> dataMaps = new ArrayList<>();
+        dataMaps.add(newConfigItem(Settings.Key.PREF_TWENTY_FOUR_HOUR_DISPLAY, resources.getString(R.string.watch_config_item_twenty_four_hour_time), settings).toDataMap());
+        dataMaps.add(newConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, resources.getString(R.string.watch_config_item_hide_exclude_account), settings).toDataMap());
+        dataMaps.add(newConfigItem(Settings.Key.PREF_DEMO_MODE, resources.getString(R.string.watch_config_item_obfuscate_total), settings).toDataMap());
+
+        return dataMaps;
+    }
+
+    private WatchConfigItem newConfigItem(Settings.Key key, String description, Settings settings) {
+        return new WatchConfigItem(key.name(), description, settings.getConfigItem(key));
     }
 
     @Override

@@ -131,7 +131,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private Paint mCurrentTimeDayPaint;
         private Paint mMarketTimePaint;
         private Paint mMarketDayRingPaint;
-        private boolean mAmbient;
         private Calendar mTime;
         private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -426,23 +425,27 @@ public class MockTradeFace extends CanvasWatchFaceService {
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
-            if (mAmbient != inAmbientMode) {
-                mAmbient = inAmbientMode;
-                if (mLowBitAmbient) {
-                    mTextPaint.setAntiAlias(!inAmbientMode);
-                    mDayCirclePaint.setAntiAlias(!inAmbientMode);
-                    mCurrentTimeDayPaint.setAntiAlias(!inAmbientMode);
-                    mMarketTimePaint.setAntiAlias(!inAmbientMode);
-                    mMarketDayRingPaint.setAntiAlias(!inAmbientMode);
-                    mHighlightDescTextPaint.setAntiAlias(!inAmbientMode);
-                    mHighlightSymbolTextPaint.setAntiAlias(!inAmbientMode);
-                    mHighlightDataTextPaint.setAntiAlias(!inAmbientMode);
-                }
-                invalidate();
+            if (mLowBitAmbient) {
+                mTextPaint.setAntiAlias(!inAmbientMode);
+                mDayCirclePaint.setAntiAlias(!inAmbientMode);
+                mCurrentTimeDayPaint.setAntiAlias(!inAmbientMode);
+                mMarketTimePaint.setAntiAlias(!inAmbientMode);
+                mMarketDayRingPaint.setAntiAlias(!inAmbientMode);
+                mHighlightDescTextPaint.setAntiAlias(!inAmbientMode);
+                mHighlightSymbolTextPaint.setAntiAlias(!inAmbientMode);
+                mHighlightDataTextPaint.setAntiAlias(!inAmbientMode);
             }
 
-            // Whether the timer should be running depends on whether we're visible (as well as
-            // whether we're in ambient mode), so we may need to start or stop the timer.
+            if (inAmbientMode) {
+                mTextPaint.setColorFilter(null);
+            } else {
+                if ((mHighlightItems != null) && !mHighlightItems.isEmpty()) {
+                    HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+                    setTimeTextPaint(item);
+                }
+            }
+
+            invalidate();
             updateTimer();
         }
 
@@ -520,7 +523,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             mTime.setTimeInMillis(System.currentTimeMillis());
 
             canvas.save();
-            canvas.rotate(mMarketOpenDegrees-90, centerX, centerY);
+            canvas.rotate(mMarketOpenDegrees - 90, centerX, centerY);
 
             // only draw default arc if the performance arc is not complete
             if (mMarketDurationDegrees > mPerformanceDurationDegrees) {
@@ -548,7 +551,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             float x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
             canvas.drawText(text, x, mYOffset, mTextPaint);
 
-            if ((mHighlightItems != null) && (mHighlightItems.size() > 0)) {
+            if ((mHighlightItems != null) && !mHighlightItems.isEmpty()) {
                 HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
 
                 text = (item.getHighlightType() != HighlightItem.HighlightType.TOTAL_ACCOUNT) ?

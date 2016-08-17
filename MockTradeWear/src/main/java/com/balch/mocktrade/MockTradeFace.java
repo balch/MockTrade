@@ -23,6 +23,7 @@
 
 package com.balch.mocktrade;
 
+import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +48,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.shared.HighlightItem;
@@ -94,6 +96,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
     private static final long MARKET_OFFSET_MILLIS = TimeUnit.MINUTES.toMillis(15);
 
     private static final int MSG_UPDATE_TIME = 0;
+
+    private static final int ANIMATION_DURATION_MS = 500;
+
 
     @Override
     public Engine onCreateEngine() {
@@ -441,7 +446,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             } else {
                 if ((mHighlightItems != null) && !mHighlightItems.isEmpty()) {
                     HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
-                    setTimeTextPaint(item);
+                    setTimeTextPaint(item, true);
                 }
             }
 
@@ -463,7 +468,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         calcPerformanceGradient();
                     } else {
                         mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
-                        setAccountIdDataItem();
+                        HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+                        setTimeTextPaint(item, false);
+                        setAccountIdDataItem(item);
                     }
                     invalidate();
                     break;
@@ -688,7 +695,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     }
 
                     if ((mHighlightItems != null) && !mHighlightItems.isEmpty()) {
-                        setTimeTextPaint(mHighlightItems.get(mHighlightItemPosition));
+                        setTimeTextPaint(mHighlightItems.get(mHighlightItemPosition), false);
                     }
                     dataItems.release();
                     invalidate();
@@ -739,7 +746,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         mHighlightItems.add(item);
 
                         if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
-                            setTimeTextPaint(item);
+                            setTimeTextPaint(item, false);
                         }
                     }
                 } else {
@@ -759,27 +766,43 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
         }
 
-        private void setTimeTextPaint(HighlightItem item) {
+        private void setTimeTextPaint(HighlightItem item, boolean animate) {
 
             if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) ||
-                    (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
-                Money value = item.getTodayChange();
-                if (value.getMicroCents() == 0) {
-                    value = item.getTotalChange();
-                }
+                (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
 
-                int color = getPerformanceColor(value.getMicroCents(), getPerformanceExtent(item.getValue().getMicroCents()));
-                mTextPaint.setColorFilter(new LightingColorFilter(color, Color.argb(28, 128, 126, 128)));
+                final float extent = getPerformanceExtent(item.getValue().getMicroCents());
+                final long value = (item.getTodayChange().getMicroCents() != 0) ?
+                        item.getTodayChange().getMicroCents() :
+                        item.getTotalChange().getMicroCents();
+
+                if (animate) {
+                    ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+                    animator.setDuration(ANIMATION_DURATION_MS);
+                    animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            float animationPercent = (float) animation.getAnimatedValue();
+                            setPerformancePaint((long) (value * animationPercent), extent);
+                        }
+                    });
+                    animator.start();
+                } else {
+                    setPerformancePaint(value, extent);
+                }
             } else {
                 mTextPaint.setColorFilter(null);
             }
         }
 
-        private void setAccountIdDataItem() {
-            HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+        private void setPerformancePaint(long value, float extent) {
+            int color = getPerformanceColor(value , extent);
+            mTextPaint.setColorFilter(new LightingColorFilter(color, Color.argb(28, 128, 126, 128)));
+            invalidate();
+        }
 
-            setTimeTextPaint(item);
-
+        private void setAccountIdDataItem(HighlightItem item) {
             long accountId = -1;
             if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
                 accountId = item.getAccountId();

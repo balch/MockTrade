@@ -36,7 +36,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -63,6 +64,16 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     }
 
     @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        String uriPath = messageEvent.getPath();
+        if (uriPath.equals(WearDataSync.MSG_WATCH_CONFIG_SET)) {
+            byte[] rawData = messageEvent.getData();
+            WatchConfigItem configItem = new WatchConfigItem(DataMap.fromByteArray(rawData));
+            modelProvider.getSettings().setConfigItem(Settings.Key.valueOf(configItem.getKey()), configItem.isEnabled());
+        }
+    }
+
+    @Override
     public void onDataChanged(DataEventBuffer dataItems) {
 
         Log.d(TAG, "WearSyncListener: onDataChanged");
@@ -75,12 +86,7 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
             String uriPath = dataEvent.getDataItem().getUri().getPath();
             if (uriPath.equals(WearDataSync.PATH_WATCH_FACE_ACCOUNT_ID)) {
                 startService(WearSyncService.getIntent(getApplicationContext(), true, false, false, true));
-            } else if (uriPath.equals(WearDataSync.PATH_WATCH_CONFIG_SET)) {
-                DataMapItem dataMapItem = DataMapItem.fromDataItem(dataEvent.getDataItem());
-                WatchConfigItem configItem = new WatchConfigItem(dataMapItem.getDataMap().getDataMap(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEM));
-                modelProvider.getSettings().setConfigItem(Settings.Key.valueOf(configItem.getKey()), configItem.isEnabled());
             }
-
         }
     }
 
@@ -88,12 +94,14 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "WearSyncListener: onConnected");
         Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.d(TAG, "WearSyncListener: onConnectionSuspended");
         Wearable.DataApi.removeListener(mGoogleApiClient, this);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
     }
 
     @Override

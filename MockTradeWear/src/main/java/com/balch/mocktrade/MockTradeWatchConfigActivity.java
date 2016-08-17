@@ -47,7 +47,9 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
     private GoogleApiClient mGoogleApiClient;
     private TextView mHeader;
     private ConfigItemAdapter mConfigItemAdapter;
+    private Node mCompanionNode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,10 +96,23 @@ public class MockTradeWatchConfigActivity extends Activity implements
         mConfigItemAdapter = new ConfigItemAdapter(new ConfigItemAdapter.ConfigItemAdapterListener() {
             @Override
             public void onConfigItemChanged(WatchConfigItem item) {
-                PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_WATCH_CONFIG_SET);
-                putDataMapRequest.getDataMap().putDataMap(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEM, item.toDataMap());
-                putDataMapRequest.setUrgent();
-                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+                if (mCompanionNode != null && mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
+
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, mCompanionNode.getId(),
+                            WearDataSync.MSG_WATCH_CONFIG_SET, item.toDataMap().toByteArray()).setResultCallback(
+
+                            new ResultCallback<MessageApi.SendMessageResult>() {
+                                @Override
+                                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+
+                                    if (!sendMessageResult.getStatus().isSuccess()) {
+                                        Log.e("TAG", "Failed to send message with status code: "
+                                                + sendMessageResult.getStatus().getStatusCode());
+                                    }
+                                }
+                            }
+                    );
+                }
             }
         });
         listView.setAdapter(mConfigItemAdapter);
@@ -149,6 +165,29 @@ public class MockTradeWatchConfigActivity extends Activity implements
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(TAG, "onConnected: " + connectionHint);
+
+        mCompanionNode = null;
+        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+            @Override
+            public void onResult(NodeApi.GetConnectedNodesResult nodesResult) {
+                List<Node> nodes = nodesResult.getNodes();
+                if (!nodes.isEmpty()) {
+                    for (Node node : nodes) {
+                        if (node.isNearby()) {
+                            mCompanionNode = node;
+                            break;
+                        }
+
+                        if (mCompanionNode == null) {
+                            mCompanionNode = nodes.get(0);
+                        }
+                    }
+                }
+
+                mCompanionNode = !nodes.isEmpty() ? nodes.get(0) : null;
+            }
+        });
+
         PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(mGoogleApiClient);
         results.setResultCallback(new ResultCallback<DataItemBuffer>() {
             @Override

@@ -112,7 +112,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                     int accountsWithTotals = 0;
 
                     Date timestamp = new Date();
-                    boolean demoMode = mSettings.getConfigItem(Settings.Key.PREF_DEMO_MODE);
+                    boolean demoMode = mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE);
                     for (Account account : data.getAccounts()) {
                         if (demoMode || !account.getExcludeFromTotals()) {
                             List<Investment> investments = data.getInvestments(account.getId());
@@ -265,8 +265,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        mMenuHideExcludeAccounts.setChecked(mSettings.getConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
-        mMenuDemoMode.setChecked(mSettings.getConfigItem(Settings.Key.PREF_DEMO_MODE));
+        mMenuHideExcludeAccounts.setChecked(mSettings.getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
+        mMenuDemoMode.setChecked(mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE));
         return true;
     }
 
@@ -298,7 +298,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 break;
             case R.id.menu_hide_exclude_accounts:
                 boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
-                mSettings.setConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
+                mSettings.setBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
                 mMainPortfolioView.resetSelectedAccountID();
                 updateView();
@@ -306,7 +306,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 break;
             case R.id.menu_demo_mode:
                 boolean demoMode = !mMenuDemoMode.isChecked();
-                mSettings.setConfigItem(Settings.Key.PREF_DEMO_MODE, demoMode);
+                mSettings.setBoolean(Settings.Key.PREF_DEMO_MODE, demoMode);
                 mMenuDemoMode.setChecked(demoMode);
                 updateView();
                 handled = true;

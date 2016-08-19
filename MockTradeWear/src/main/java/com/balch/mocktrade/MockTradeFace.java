@@ -757,7 +757,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 if (dataMapList != null) {
                     for (DataMap dm : dataMapList) {
                         WatchConfigItem item = new WatchConfigItem(dm);
-                        if (item.getKey().equals("PREF_TWENTY_FOUR_HOUR_DISPLAY")) {
+                        if (item.getKey().equals("pref_twenty_four_hour_display")) {
                             mShowTwentyFourHourTime = item.isEnabled();
                         }
                     }

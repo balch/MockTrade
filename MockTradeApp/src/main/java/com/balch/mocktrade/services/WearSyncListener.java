@@ -69,7 +69,7 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
         if (uriPath.equals(WearDataSync.MSG_WATCH_CONFIG_SET)) {
             byte[] rawData = messageEvent.getData();
             WatchConfigItem configItem = new WatchConfigItem(DataMap.fromByteArray(rawData));
-            modelProvider.getSettings().setConfigItem(Settings.Key.valueOf(configItem.getKey()), configItem.isEnabled());
+            modelProvider.getSettings().setBoolean(Settings.Key.fromKey(configItem.getKey()), configItem.isEnabled());
         }
     }
 

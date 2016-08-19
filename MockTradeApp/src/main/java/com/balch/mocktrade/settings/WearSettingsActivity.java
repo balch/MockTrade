@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 8/19/16 11:42 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,13 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2016
+ *
  */
 
 package com.balch.mocktrade.settings;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -32,18 +31,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
-import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
+import com.balch.mocktrade.services.WearSyncService;
 
-public class SettingsActivity extends AppCompatActivity
+public class WearSettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-
-    public static Intent newIntent(Context context) {
-        return new Intent(context, SettingsActivity.class);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,17 +52,12 @@ public class SettingsActivity extends AppCompatActivity
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        getFragmentManager().beginTransaction().replace(R.id.settings_view_content_frame, new SettingsPreferenceFragment()).commit();
+        getFragmentManager().beginTransaction().replace(R.id.settings_view_content_frame, new WearSettingsPreferenceFragment()).commit();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Settings.Key settingKey = Settings.Key.fromKey(key);
-        if (settingKey == Settings.Key.PREF_POLL_INTERVAL) {
-            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
-            financeModel.setQuoteServiceAlarm();
-        }
+        startService(WearSyncService.getIntent(this, true, true, true, false));
     }
 
     @Override
@@ -85,11 +72,11 @@ public class SettingsActivity extends AppCompatActivity
         super.onPause();
     }
 
-    public static class SettingsPreferenceFragment extends PreferenceFragment {
+    public static class WearSettingsPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.settings_pref_screen);
+            addPreferencesFromResource(R.xml.wear_settings_pref_screen);
         }
     }
 }

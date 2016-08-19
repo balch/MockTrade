@@ -148,8 +148,8 @@ public class WearSyncService extends IntentService implements
                 }
 
                 if (sendHighlights) {
-                    boolean allAccounts = !modelProvider.getSettings().getConfigItem(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS);
-                    boolean demoMode = modelProvider.getSettings().getConfigItem(Settings.Key.PREF_DEMO_MODE);
+                    boolean allAccounts = !modelProvider.getSettings().getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS);
+                    boolean demoMode = modelProvider.getSettings().getBoolean(Settings.Key.PREF_DEMO_MODE);
                     List<Account> accounts = portfolioModel.getAccounts(allAccounts);
                     if ((accounts != null) && (accounts.size() > 0)) {
 
@@ -311,7 +311,7 @@ public class WearSyncService extends IntentService implements
     }
 
     private WatchConfigItem newConfigItem(Settings.Key key, String description, Settings settings) {
-        return new WatchConfigItem(key.name(), description, settings.getConfigItem(key));
+        return new WatchConfigItem(key.key(), description, settings.getBoolean(key));
     }
 
     @Override

@@ -5,21 +5,21 @@
     xmlns:trades="http://schemas.android.com/apk/res-auto">
 
     <com.balch.android.app.framework.preference.LocalTimePickerPreference
-        android:key="@string/market_open_time"
+        android:key="market_open_time"
         android:title="@string/settings_market_open_time_title"
         android:summary="@string/settings_market_open_time_summary"
         trades:valueTimeZone="America/Los_Angeles"
         android:defaultValue="6:30"/>
 
     <com.balch.android.app.framework.preference.LocalTimePickerPreference
-        android:key="@string/market_close_time"
+        android:key="market_close_time"
         android:title="@string/settings_market_close_time_title"
         android:summary="@string/settings_market_close_time_summary"
         trades:valueTimeZone="America/Los_Angeles"
         android:defaultValue="13:00"/>
 
     <ListPreference
-        android:key="@string/poll_interval"
+        android:key="poll_interval"
         android:title="@string/settings_poll_interval_title"
         android:summary="@string/settings_poll_interval_summary"
         android:entries="@array/settings_poll_interval_display_values"
@@ -27,7 +27,7 @@
         android:defaultValue="300"/>
 
     <ListPreference
-        android:key="@string/poll_interval_order"
+        android:key="poll_interval_order"
         android:title="@string/settings_poll_interval_order_title"
         android:summary="@string/settings_poll_interval_order_summary"
         android:entries="@array/settings_poll_interval_order_display_values"

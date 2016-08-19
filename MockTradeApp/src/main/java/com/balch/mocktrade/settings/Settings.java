@@ -34,13 +34,42 @@ import java.util.TimeZone;
 public class Settings {
 
     public enum Key {
-        PREF_HIDE_EXCLUDE_ACCOUNTS,
-        PREF_DEMO_MODE,
-        PREF_TWENTY_FOUR_HOUR_DISPLAY, // reference in watch app by name()
+        PREF_HIDE_EXCLUDE_ACCOUNTS("pref_hide_exclude_accounts", true),
+        PREF_DEMO_MODE("pref_demo_mode", true),
+        PREF_TWENTY_FOUR_HOUR_DISPLAY("pref_twenty_four_hour_display", true),
+        PREF_MARKET_OPEN_TIME("market_open_time", false),
+        PREF_MARKET_CLOSE_TIME("market_close_time", false),
+        PREF_POLL_INTERVAL("poll_interval", false),
+        PREF_POLL_INTERVAL_ORDER("poll_interval_order", false),
+        PREF_LAST_SYNC_TIME("pref_last_sync_time", false);
+
+        private final String prefKey;
+        private final boolean refreshWatch;
+        Key(String value, boolean refreshWatch) {
+            this.prefKey = value;
+            this.refreshWatch = refreshWatch;
+        }
+
+        public String key() {
+            return prefKey;
+        }
+
+        public boolean isRefreshWatch() {
+            return refreshWatch;
+        }
+
+        public static Key fromKey(String value) {
+            Key key = null;
+            for (Key k : Key.values()) {
+                if (k.prefKey.equals(value)) {
+                    key = k;
+                    break;
+                }
+            }
+
+            return key;
+        }
     }
-
-    private static final String PREF_LAST_SYNC_TIME = "pref_last_sync_time";
-
 
     protected Application mContext;
 
@@ -53,55 +82,54 @@ public class Settings {
         return PreferenceManager.getDefaultSharedPreferences(this.mContext);
     }
 
-    protected String getPrefKey(int resID) {
-        return this.mContext.getResources().getString(resID);
-    }
-
     // Polls start time is in HH:mm format in PST
     public String geMarketOpenTime() {
-        return getSharedPrefs().getString(getPrefKey(R.string.market_open_time), "6:30");
+        return getSharedPrefs().getString(Key.PREF_MARKET_OPEN_TIME.key(), "6:30");
     }
 
     // Polls end time is in HH:mm format in PST
     public String geMarketCloseTime() {
-        return getSharedPrefs().getString(getPrefKey(R.string.market_close_time), "13:00");
+        return getSharedPrefs().getString(Key.PREF_MARKET_CLOSE_TIME.key(), "13:00");
     }
 
     // poll interval specified in seconds
     public int getPollInterval() {
-        return Integer.parseInt(getSharedPrefs().getString(getPrefKey(R.string.poll_interval), "300"));
+        return Integer.parseInt(getSharedPrefs().getString(Key.PREF_POLL_INTERVAL.key(), "300"));
     }
 
     // poll interval specified in seconds for processing open orders
     public int getPollOrderInterval() {
-        return Integer.parseInt(getSharedPrefs().getString(getPrefKey(R.string.poll_interval_order), "30"));
+        return Integer.parseInt(getSharedPrefs().getString(Key.PREF_POLL_INTERVAL_ORDER.key(), "30"));
     }
 
     public TimeZone getSavedSettingsTimeZone() {
         return TimeZone.getTimeZone("America/Los_Angeles");
     }
 
-    public boolean getConfigItem(Key key) {
-        return getSharedPrefs().getBoolean(key.name(), false);
+    public boolean getBoolean(Key key) {
+        return getSharedPrefs().getBoolean(key.key(), false);
     }
 
-    public void setConfigItem(Key key, boolean value) {
+    public void setBoolean(Key key, boolean value) {
         getSharedPrefs()
                 .edit()
-                .putBoolean(key.name(), value)
+                .putBoolean(key.key(), value)
                 .apply();
-        mContext.startService(WearSyncService.getIntent(mContext, true, true, true, false));
+
+        if (key.isRefreshWatch()) {
+            mContext.startService(WearSyncService.getIntent(mContext, true, true, true, false));
+        }
 
     }
 
     public long getLastSyncTime() {
-        return getSharedPrefs().getLong(PREF_LAST_SYNC_TIME, 0);
+        return getSharedPrefs().getLong(Key.PREF_LAST_SYNC_TIME.key(), 0);
     }
 
     public void setLastSyncTime(long syncTime) {
         getSharedPrefs()
                 .edit()
-                .putLong(PREF_LAST_SYNC_TIME, syncTime)
+                .putLong(Key.PREF_LAST_SYNC_TIME.key(), syncTime)
                 .apply();
     }
 

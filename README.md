@@ -85,9 +85,7 @@ Main portfolio screen. View multiple portfolios with totals pinned to the bottom
 Slide screen down to reveal daily performance chart
 
 ![App Totals](./ss_app_totals.png)
-
 ![Wear Totals](./ss_watch_totals.png)
-![Wear Totals Graph](./ss_watch_totals_graph.png)
 
 Create a new portfolio. User can create a normal portfolio and
 manage their own assets, or choose a strategy and track the
@@ -111,9 +109,11 @@ WatchFaces
 Changes to watchface reflect in application
 
 ![App Spec](./ss_app_spec.png)
-![Wear Spec](./ss_watch_spec.png)
 
-Tapping on performance ring zooms to 12hr view
+![Wear Spec](./ss_watch_spec.png)
+![Wear Spec Graph](./ss_watch_spec_graph.png)
+
+12hr view
 
 ![Wear Spec](./ss_watch_spec_12.png)
 

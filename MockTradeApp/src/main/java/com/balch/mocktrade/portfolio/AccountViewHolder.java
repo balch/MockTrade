@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.utils.TextFormatUtils;
 
@@ -44,19 +45,22 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
         void onShowOpenOrdersClicked(Account account);
     }
 
-    protected AccountItemViewListener mAccountItemViewListener;
-    protected TextView mName;
-    protected TextView mCurrentBalance;
-    protected Button mOpenOrders;
-    protected TextView mDayPerformance;
-    protected TextView mTotalPerformance;
-    protected LinearLayout mValueLayout;
-    protected Button mTradeButton;
+    protected final AccountItemViewListener mAccountItemViewListener;
+    protected final TextView mName;
+    protected final TextView mCurrentBalance;
+    protected final Button mOpenOrders;
+    protected final TextView mDayPerformance;
+    protected final TextView mTotalPerformance;
+    protected final LinearLayout mValueLayout;
+    protected final Button mTradeButton;
+    protected final Settings mSettings;
     protected Account mAccount;
 
-    public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener) {
+
+    public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener, Settings settings) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_account, parent, false));
         mAccountItemViewListener = listener;
+        mSettings = settings;
 
         mName = (TextView) itemView.findViewById(R.id.account_item_name);
         mCurrentBalance = (TextView) itemView.findViewById(R.id.account_item_current_balance);
@@ -65,7 +69,6 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
         mTradeButton = (Button) itemView.findViewById(R.id.account_item_trade_button);
         mOpenOrders = (Button) itemView.findViewById(R.id.account_item_open_order_button);
         mValueLayout = (LinearLayout) itemView.findViewById(R.id.account_item_value_layout);
-
     }
 
     public void bind(Account account, PerformanceItem performanceItem, int openOrderCount) {
@@ -74,7 +77,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
 
         mCurrentBalance.setText(performanceItem.getValue().getFormatted());
 
-        int flags = (account.getExcludeFromTotals()) ?
+        int flags = (account.getExcludeFromTotals() && !mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE)) ?
                 mName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG :
                 mName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG;
         mCurrentBalance.setPaintFlags(flags);

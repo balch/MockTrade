@@ -60,7 +60,7 @@ class OrderManager {
     public OrderManager(Context context, FinanceModel financeModel, Settings settings,
                         OrderManagerListener listener) {
         this.mSettings = settings;
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
         this.mFinanceModel = financeModel;
         this.mOrderManagerListener = listener;
     }

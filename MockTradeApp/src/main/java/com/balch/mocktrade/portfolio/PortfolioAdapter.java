@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
@@ -52,14 +53,17 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     protected AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
 
-    protected Context mContext;
+    protected final Context mContext;
+    protected final Settings mSettings;
+
     protected PortfolioAdapterListener mPortfolioAdapterListener;
     protected PortfolioData mPortfolioData = new PortfolioData();
 
     protected List<Object> mDataList;
 
-    public PortfolioAdapter(Context context) {
-        mContext = context;
+    public PortfolioAdapter(Context context, Settings settings) {
+        mContext = context.getApplicationContext();
+        mSettings = settings;
     }
 
     public void bind(PortfolioData portfolioData) {
@@ -113,7 +117,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ACCOUNT_HEADER:
-                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener);
+                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener, mSettings);
                 break;
             case VIEW_TYPE_PORTFOLIO_ITEM:
                 viewHolder = new InvestmentViewHolder(parent);

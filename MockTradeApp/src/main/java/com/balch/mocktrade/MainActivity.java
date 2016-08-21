@@ -487,10 +487,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         }
     }
 
-
-
     protected void setupAdapter() {
-        mPortfolioAdapter = new PortfolioAdapter(this);
+        mPortfolioAdapter = new PortfolioAdapter(this, mSettings);
         mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {

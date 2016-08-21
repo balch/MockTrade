@@ -127,7 +127,7 @@ class FinanceManager {
             startTime = new Date();
         }
 
-        alarmManager.setInexactRepeating(AlarmManager.RTC,
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 startTime.getTime(),
                 this.mSettings.getPollInterval() * 1000,
                 pendingIntent);

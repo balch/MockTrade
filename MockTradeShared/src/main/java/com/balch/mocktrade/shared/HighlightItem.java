@@ -168,6 +168,11 @@ public class HighlightItem extends DomainObject implements Parcelable {
                 (mHighlightType == HighlightType.PERFORMER_WORST_DAY));
     }
 
+    public boolean isTotalType() {
+        return ((mHighlightType == HighlightType.TOTAL_ACCOUNT) ||
+                (mHighlightType == HighlightType.TOTAL_OVERALL));
+    }
+
     public HighlightType getHighlightType() {
         return mHighlightType;
     }

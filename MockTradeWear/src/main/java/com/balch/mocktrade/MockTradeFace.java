@@ -388,13 +388,24 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     colors[x] = getPerformanceColor(todayChange, extent);
 
                     cal.setTimeInMillis(item.getTimestamp().getTime());
-                    positions[x] = (getDegrees(cal)- startDegrees) / 360.0f;
+                    float calDegrees = getDegrees(cal);
+                    if (calDegrees < startDegrees) {
+                        calDegrees += 360;
+                    }
+
+                    positions[x] = (calDegrees - startDegrees) / 360.0f;
                 }
 
                 shader = new SweepGradient(frame.centerX(), frame.centerY(), colors, positions);
 
                 cal.setTimeInMillis(mPerformanceItems.get(size-1).getTimestamp().getTime());
-                mPerformanceDurationDegrees = getDegrees(cal) - mMarketOpenDegrees;
+
+                float calDegrees = getDegrees(cal);
+                if (calDegrees < mMarketOpenDegrees) {
+                    calDegrees += 360;
+                }
+
+                mPerformanceDurationDegrees = calDegrees - mMarketOpenDegrees;
             }
             mMarketDayRingPaint.setShader(shader);
         }
@@ -462,14 +473,16 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 case TAP_TYPE_TOUCH_CANCEL:
                     break;
                 case TAP_TYPE_TAP:
-                    if (marketTimeHitTest(x, y, false)) {
+                    if (timeTickHitTest(x, y)) {
                         mZoomMarketArc = !mZoomMarketArc;
                         calcMarketTimes();
                         calcPerformanceGradient();
                     } else if (marketTimeHitTest(x, y, true)) {
                         HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
-                        startActivity(GraphActivity.newIntent(getApplicationContext(), item, mPerformanceItems));
-                    } else {
+                        if (item.isTotalType()) {
+                            startActivity(GraphActivity.newIntent(getApplicationContext(), item, mPerformanceItems));
+                        }
+                    } else if (!marketTimeHitTest(x, y, false)) {  // did not click in time ring
                         mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
                         HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
                         setTimeTextPaint(item, false);
@@ -503,6 +516,33 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 if (!inPerformanceArea) {
                     isHit = !isHit;
                 }
+            }
+
+            return isHit;
+        }
+
+        private boolean timeTickHitTest(int x, int y) {
+            float circleRadius = mMarketArcRect.height() /2.0f;
+
+            float centerX = mMarketArcRect.centerX();
+            float centerY = mMarketArcRect.centerY();
+
+            boolean isHit = false;
+
+            //calculate the distance of the touch point from the center of your circle
+            double dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+            if (Math.abs(dist - circleRadius) <= mOuterWidth*2) {
+                double angle = (Math.atan2(y - centerY, x - centerX) * 57.2958) + 90.0f;
+                if (angle < 0 ){
+                    angle += 360.0;
+                } else if (angle >= 360.0) {
+                    angle -= 360.0;
+                }
+
+
+                float nowTick = getDegrees(mTime);
+                isHit = ((angle >= nowTick-5) && (angle <= nowTick+5));
             }
 
             return isHit;
@@ -575,8 +615,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
                 float y = getYOffset(mHighlightYOffset, mTextSizeRect);
 
-                if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL) ||
-                    (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT)) {
+                if (item.isTotalType()) {
                     drawAccountHighlightItem(item, centerX, y,  canvas);
                 } else {
                     drawSymbolHighlightItem(item, centerX, y,  canvas);
@@ -637,7 +676,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
         }
 
         private void drawTimeTick(Calendar time, float centerX, float centerY, Canvas canvas, Paint paint) {
-            float hours = time.get(Calendar.HOUR_OF_DAY) + time.get(Calendar.MINUTE) / 60.0f + time.get(Calendar.SECOND) / 3600.0f;
+            float hours = getHours(time);
 
             float innerTickRadius = centerX - 13 - mChinSize;
             float outerTickRadius = centerX - 2 - mChinSize;
@@ -650,13 +689,17 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     centerX + outerX, centerY + outerY, paint);
         }
 
+        private float getHours(Calendar time) {
+            return time.get(Calendar.HOUR_OF_DAY) + time.get(Calendar.MINUTE) / 60.0f + time.get(Calendar.SECOND) / 3600.0f;
+        }
+
         private int getRingIncrements() {
             return mZoomMarketArc ? 12 : 24;
         }
 
         private float getDegrees(Calendar time) {
             float hours = time.get(Calendar.HOUR_OF_DAY) + time.get(Calendar.MINUTE) / 60.0f + time.get(Calendar.SECOND) / 3600.0f;
-            return hours / getRingIncrements() * 360.0f;
+            return (hours / getRingIncrements() * 360.0f) % 360;
         }
 
         /**
@@ -769,14 +812,11 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     }
                 }
             }
-
         }
 
         private void setTimeTextPaint(HighlightItem item, boolean animate) {
 
-            if ((item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) ||
-                (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_OVERALL)) {
-
+            if (item.isTotalType()) {
                 final float extent = getPerformanceExtent(item.getValue().getMicroCents());
                 final long value = (item.getTodayChange().getMicroCents() != 0) ?
                         item.getTodayChange().getMicroCents() :

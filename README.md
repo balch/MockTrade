@@ -20,7 +20,7 @@ MockTrade
         * Strategy plugin model
     * Implements AppFramework
 * Watch Face Wear Application
-    * 12/24hr Ring showing when Markets are open
+    * 24hr Ring showing when Markets are open
         * Color coded to indicate portfolio performance
     * Portfolio Highlights Synced From Mobile App
         * Portfolio Totals/Best & Worst Day and Total Performers
@@ -85,7 +85,9 @@ Main portfolio screen. View multiple portfolios with totals pinned to the bottom
 Slide screen down to reveal daily performance chart
 
 ![App Totals](./ss_app_totals.png)
+
 ![Wear Totals](./ss_watch_totals.png)
+![Wear Totals Graph](./ss_watch_totals_graph.png)
 
 Create a new portfolio. User can create a normal portfolio and
 manage their own assets, or choose a strategy and track the

@@ -248,9 +248,13 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                     post(new Runnable() {
                         @Override
                         public void run() {
-                            setInvestmentData(response.getName(), response.getPrice());
-                            mValue.setError(null);
+                            if (response != null) {
+                                setInvestmentData(response.getName(), response.getPrice());
+                            } else {
+                                setInvestmentData("", null);
+                            }
 
+                            mValue.setError(null);
                             callListenerOnChanged(false);
                         }
                     });

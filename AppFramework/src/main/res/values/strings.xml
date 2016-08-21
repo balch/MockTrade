@@ -8,6 +8,7 @@
     <string name="control_percent_hint">Enter percent here</string>
 
     <string name="error_empty_string">Cannot be empty</string>
+    <string name="error_invalid_symbol">Invalid Symbol</string>
 
     <string name="edit_view_ok_button_edit">Save</string>
     <string name="edit_view_ok_button_new">Create</string>

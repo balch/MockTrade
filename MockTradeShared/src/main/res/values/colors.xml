@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Author: Balch
-  ~ Created: 7/26/16 6:34 AM
+  ~ Created: 8/21/16 7:30 AM
   ~
   ~ This file is part of MockTrade.
   ~
@@ -22,11 +23,9 @@
   -->
 
 <resources>
-    <string name="app_name">MockTrade</string>
-    <string name="face_name">MockTrade</string>
-    <string name="watch_config_title">Config MockTrade</string>
-    <string name="title_activity_graph">GraphActivity</string>
-    <string name="hello_round">Hello Round World!</string>
-    <string name="hello_square">Hello Square World!</string>
+    <color name="graph_background">#2200CC00</color>
+
+    <color name="portfolio_view_graph_title">#FF0000FF</color>
+    <color name="portfolio_view_graph_title_shadow">#FF000066</color>
 
 </resources>

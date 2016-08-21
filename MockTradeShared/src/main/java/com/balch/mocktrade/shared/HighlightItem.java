@@ -23,11 +23,14 @@
 
 package com.balch.mocktrade.shared;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.google.android.gms.wearable.DataMap;
 
-public class HighlightItem extends DomainObject {
+public class HighlightItem extends DomainObject implements Parcelable {
 
     public enum HighlightType {
         TOTAL_OVERALL,
@@ -76,6 +79,48 @@ public class HighlightItem extends DomainObject {
                 new Money(map.getLong(DATA_TODAY_CHANGE)), map.getFloat(DATA_TODAY_CHANGE_PERCENT),
                 map.getLong(DATA_ACCOUNT_ID, -1));
     }
+
+    protected HighlightItem(Parcel in) {
+        super(in);
+        mHighlightType = HighlightType.valueOf(in.readString());
+        mDescription = in.readString();
+        mSymbol = in.readString();
+        mCostBasis = in.readParcelable(Money.class.getClassLoader());
+        mValue = in.readParcelable(Money.class.getClassLoader());
+        mTodayChange  = in.readParcelable(Money.class.getClassLoader());
+        mTodayChangePercent = in.readFloat();
+        mAccountId = in.readLong();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(mHighlightType.name());
+        dest.writeString(mDescription);
+        dest.writeString(mSymbol);
+        dest.writeParcelable(mCostBasis, flags);
+        dest.writeParcelable(mValue, flags);
+        dest.writeParcelable(mTodayChange, flags);
+        dest.writeFloat(mTodayChangePercent);
+        dest.writeLong(mAccountId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<HighlightItem> CREATOR = new Creator<HighlightItem>() {
+        @Override
+        public HighlightItem createFromParcel(Parcel in) {
+            return new HighlightItem(in);
+        }
+
+        @Override
+        public HighlightItem[] newArray(int size) {
+            return new HighlightItem[size];
+        }
+    };
 
     public DataMap toDataMap() {
         DataMap map = new DataMap();

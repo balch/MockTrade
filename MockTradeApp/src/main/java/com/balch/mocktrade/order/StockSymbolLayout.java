@@ -250,11 +250,12 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                         public void run() {
                             if (response != null) {
                                 setInvestmentData(response.getName(), response.getPrice());
+                                mValue.setError(null);
                             } else {
                                 setInvestmentData("", null);
+                                mValue.setError(getResources().getString(R.string.error_invalid_symbol));
                             }
 
-                            mValue.setError(null);
                             callListenerOnChanged(false);
                         }
                     });
@@ -268,9 +269,13 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                             setInvestmentData("", null);
 
                             String display = error;
-                            int pos = display.indexOf('.');
-                            if (pos != -1) {
-                                display = display.substring(0, pos + 1);
+                            if (display != null) {
+                                int pos = display.indexOf('.');
+                                if (pos != -1) {
+                                    display = display.substring(0, pos + 1);
+                                }
+                            } else {
+                                display = getResources().getString(R.string.error_invalid_symbol);
                             }
                             mValue.setError(display);
                             callListenerOnChanged(true);

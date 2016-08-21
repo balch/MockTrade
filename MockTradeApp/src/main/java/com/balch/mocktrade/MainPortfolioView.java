@@ -38,7 +38,7 @@ import android.widget.TextView;
 
 import com.balch.android.app.framework.view.BaseView;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.portfolio.DailyGraphView;
+import com.balch.mocktrade.shared.widget.DailyGraphView;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.SummaryTotalsView;
 import com.balch.mocktrade.shared.PerformanceItem;

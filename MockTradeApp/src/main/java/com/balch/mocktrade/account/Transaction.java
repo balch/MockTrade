@@ -25,15 +25,16 @@ package com.balch.mocktrade.account;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 
-import java.io.Serializable;
 import java.util.Map;
 
-public class Transaction extends DomainObject implements SqlMapper<Transaction>,  Serializable {
+public class Transaction extends DomainObject implements SqlMapper<Transaction>, Parcelable {
     public static final String TABLE_NAME = "[transaction]";
 
     public static final String COLUMN_ACCOUNT_ID = "account_id";
@@ -55,6 +56,40 @@ public class Transaction extends DomainObject implements SqlMapper<Transaction>,
         this.mTransactionType = type;
         this.mNotes = notes;
     }
+
+    protected Transaction(Parcel in) {
+        super(in);
+        mAccount = in.readParcelable(Account.class.getClassLoader());
+        mAmount  = in.readParcelable(Money.class.getClassLoader());
+        mTransactionType =  TransactionType.valueOf(in.readString());
+        mNotes = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(mAccount, flags);
+        dest.writeParcelable(mAmount, flags);
+        dest.writeString(mTransactionType.name());
+        dest.writeString(mNotes);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
+        @Override
+        public Transaction createFromParcel(Parcel in) {
+            return new Transaction(in);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
 
     @Override
     public String getTableName() {

@@ -22,18 +22,19 @@
 
 package com.balch.mocktrade.order;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.annotations.ColumnEdit;
 import com.balch.android.app.framework.domain.annotations.ColumnNew;
-import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 
-import java.io.Serializable;
-
-public class Order  extends DomainObject implements Serializable {
+public class Order extends DomainObject implements Parcelable {
 
     public static final String FLD_LIMIT_PRICE = "limitPrice";
     public static final String FLD_STOP_PRICE = "stopPrice";
@@ -91,6 +92,54 @@ public class Order  extends DomainObject implements Serializable {
         this.stopPercent = 0.0;
         this.highestPrice = new Money(0);
     }
+
+    protected Order(Parcel in) {
+        super(in);
+        account = in.readParcelable(Account.class.getClassLoader());
+        symbol = in.readString();
+        status = (OrderStatus)in.readSerializable();
+        action = (OrderAction) in.readSerializable();
+        strategy = (OrderStrategy) in.readSerializable();
+        duration = (OrderDuration) in.readSerializable();
+        limitPrice = in.readParcelable(Money.class.getClassLoader());
+        stopPrice = in.readParcelable(Money.class.getClassLoader());
+        stopPercent = (Double)in.readSerializable();
+        quantity = (Long)in.readSerializable();
+        highestPrice = in.readParcelable(Money.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(account, flags);
+        dest.writeString(symbol);
+        dest.writeSerializable(status);
+        dest.writeSerializable(action);
+        dest.writeSerializable(strategy);
+        dest.writeSerializable(duration);
+        dest.writeParcelable(limitPrice, flags);
+        dest.writeParcelable(stopPrice, flags);
+        dest.writeSerializable(stopPercent);
+        dest.writeSerializable(quantity);
+        dest.writeParcelable(highestPrice, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Order> CREATOR = new Creator<Order>() {
+        @Override
+        public Order createFromParcel(Parcel in) {
+            return new Order(in);
+        }
+
+        @Override
+        public Order[] newArray(int size) {
+            return new Order[size];
+        }
+    };
 
     public Account getAccount() {
         return account;

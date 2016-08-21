@@ -23,6 +23,9 @@
 package com.balch.mocktrade.account;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.domain.EditState;
@@ -36,11 +39,10 @@ import com.balch.mocktrade.account.strategies.TripleMomentum;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.shared.PerformanceItem;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Account extends DomainObject implements Serializable {
+public class Account extends DomainObject implements Parcelable {
 
     public static final String FLD_STRATEGY = "strategy";
     public static final String FLD_NAME = "name";
@@ -85,6 +87,44 @@ public class Account extends DomainObject implements Serializable {
         this.excludeFromTotals = excludeFromTotals;
     }
 
+
+    protected Account(Parcel in) {
+        super(in);
+        name = in.readString();
+        description = in.readString();
+        initialBalance = in.readParcelable(Money.class.getClassLoader());
+        strategy = Strategy.valueOf(in.readString());
+        availableFunds = in.readParcelable(Money.class.getClassLoader());
+        excludeFromTotals = (Boolean) in.readSerializable();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeParcelable(initialBalance, flags);
+        dest.writeString(strategy.name());
+        dest.writeParcelable(availableFunds, flags);
+        dest.writeSerializable(excludeFromTotals);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Account> CREATOR = new Creator<Account>() {
+        @Override
+        public Account createFromParcel(Parcel in) {
+            return new Account(in);
+        }
+
+        @Override
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+    };
 
     public void aggregate(Account account) {
         this.initialBalance.add(account.initialBalance);

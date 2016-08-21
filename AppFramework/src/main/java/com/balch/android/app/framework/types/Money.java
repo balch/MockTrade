@@ -23,18 +23,19 @@
 package com.balch.android.app.framework.types;
 
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.Currency;
 import java.util.Locale;
 
-public class Money implements Cloneable, Serializable, Comparable<Money> {
+public class Money implements Cloneable, Parcelable, Comparable<Money> {
     private static final String TAG = Money.class.getSimpleName();
 
     protected static final int DOLLAR_TO_MICRO_CENT = 10000;
@@ -58,6 +59,34 @@ public class Money implements Cloneable, Serializable, Comparable<Money> {
     public Money(String dollars) {
         this.setDollars(dollars);
     }
+
+    protected Money(Parcel in) {
+        microCents = in.readLong();
+        currency = Currency.getInstance(in.readString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(microCents);
+        dest.writeString(currency.getCurrencyCode());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Money> CREATOR = new Creator<Money>() {
+        @Override
+        public Money createFromParcel(Parcel in) {
+            return new Money(in);
+        }
+
+        @Override
+        public Money[] newArray(int size) {
+            return new Money[size];
+        }
+    };
 
     public long getMicroCents() {
         return microCents;

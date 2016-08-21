@@ -159,7 +159,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private float mMarketDurationDegrees;
         private boolean mZoomMarketArc; // if two, outer circle is 12HR
 
-        private List<PerformanceItem> mPerformanceItems;
+        private ArrayList<PerformanceItem> mPerformanceItems;
         private float mPerformanceDurationDegrees;
 
         private List<HighlightItem> mHighlightItems;
@@ -462,10 +462,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 case TAP_TYPE_TOUCH_CANCEL:
                     break;
                 case TAP_TYPE_TAP:
-                    if (marketTimeHitTest(x, y)) {
+                    if (marketTimeHitTest(x, y, false)) {
                         mZoomMarketArc = !mZoomMarketArc;
                         calcMarketTimes();
                         calcPerformanceGradient();
+                    } else if (marketTimeHitTest(x, y, true)) {
+                        HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+                        startActivity(GraphActivity.newIntent(getApplicationContext(), item, mPerformanceItems));
                     } else {
                         mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
                         HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
@@ -477,7 +480,7 @@ public class MockTradeFace extends CanvasWatchFaceService {
             }
         }
 
-        private boolean marketTimeHitTest(int x, int y) {
+        private boolean marketTimeHitTest(int x, int y, boolean inPerformanceArea) {
             float circleRadius = mMarketArcRect.height() /2.0f;
 
             float centerX = mMarketArcRect.centerX();
@@ -496,7 +499,10 @@ public class MockTradeFace extends CanvasWatchFaceService {
                     angle -= 360.0;
                 }
 
-                isHit = (angle >= mMarketOpenDegrees) && (angle <= mMarketOpenDegrees+mMarketDurationDegrees);
+                isHit = ((angle >= mMarketOpenDegrees) && (angle <= mMarketOpenDegrees+mMarketDurationDegrees));
+                if (!inPerformanceArea) {
+                    isHit = !isHit;
+                }
             }
 
             return isHit;

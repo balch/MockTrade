@@ -23,13 +23,16 @@
 
 package com.balch.mocktrade.shared;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.google.android.gms.wearable.DataMap;
 
 import java.util.Date;
 
-public class PerformanceItem extends DomainObject {
+public class PerformanceItem extends DomainObject implements Parcelable {
 
     private static final String DATA_ACCOUNT_ID = "accountId";
     private static final String DATA_TIMESTAMP = "timestamp";
@@ -60,6 +63,42 @@ public class PerformanceItem extends DomainObject {
                 new Money(map.getLong(DATA_COST_BASIS)), new Money(map.getLong(DATA_VALUE)),
                 new Money(map.getLong(DATA_TODAY_CHANGE)));
     }
+
+    protected PerformanceItem(Parcel in) {
+        super(in);
+        mAccountId = in.readLong();
+        mTimestamp = (Date)in.readSerializable();
+        mCostBasis = in.readParcelable(Money.class.getClassLoader());
+        mValue = in.readParcelable(Money.class.getClassLoader());
+        mTodayChange = in.readParcelable(Money.class.getClassLoader());
+}
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeLong(mAccountId);
+        dest.writeSerializable(mTimestamp);
+        dest.writeParcelable(mCostBasis, flags);
+        dest.writeParcelable(mValue, flags);
+        dest.writeParcelable(mTodayChange, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<PerformanceItem> CREATOR = new Creator<PerformanceItem>() {
+        @Override
+        public PerformanceItem createFromParcel(Parcel in) {
+            return new PerformanceItem(in);
+        }
+
+        @Override
+        public PerformanceItem[] newArray(int size) {
+            return new PerformanceItem[size];
+        }
+    };
 
     public DataMap toDataMap() {
         DataMap map = new DataMap();

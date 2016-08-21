@@ -1,7 +1,31 @@
-package com.balch.mocktrade.portfolio;
+/*
+ * Author: Balch
+ * Created: 8/21/16 7:27 AM
+ *
+ * This file is part of MockTrade.
+ *
+ * MockTrade is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MockTrade is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2016
+ *
+ */
+
+package com.balch.mocktrade.shared.widget;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -24,6 +48,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.shared.PerformanceItem;
+import com.balch.mocktrade.shared.R;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -51,7 +76,6 @@ public class DailyGraphView extends View {
     private static final int ANIMATION_DURATION_MS = 700;
 
     private static final int GRAPH_PADDING_VERTICAL = 30;
-    private static final int GRAPH_PADDING_HORIZONTAL = 30;
 
     private static final int[] LINEAR_GRADIENT_COLORS_STROKE = new int[] {
             Color.argb(255, 0, 255, 0),
@@ -96,7 +120,6 @@ public class DailyGraphView extends View {
     private String mExaminerValue;
     private Rect mExaminerValueTextBounds = new Rect();
 
-
     private List<PerformanceItem> mPerformanceItems;
 
     private int mWidth;
@@ -110,15 +133,16 @@ public class DailyGraphView extends View {
     private int mMinYIndex = -1;
     private long mMarketStartTime;
     private long mMarketEndTime;
+    private boolean mAllowMove = true;
 
     public DailyGraphView(Context context) {
         super(context);
-        initialize();
+        initialize(null);
     }
 
     public DailyGraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize();
+        initialize(attrs);
     }
 
     @Override
@@ -139,8 +163,7 @@ public class DailyGraphView extends View {
 
         if (mMarketEndTime != 0) {
             float centerY = scaleY(00.0f);
-            canvas.drawLine(GRAPH_PADDING_HORIZONTAL, centerY,
-                    mWidth - GRAPH_PADDING_HORIZONTAL, centerY, mMarketTimesPaint);
+            canvas.drawLine(0, centerY, mWidth, centerY, mMarketTimesPaint);
         }
 
         canvas.drawPath(mPathStroke, mPathPaintStroke);
@@ -160,7 +183,23 @@ public class DailyGraphView extends View {
         }
     }
 
-    private void initialize() {
+    private void initialize(AttributeSet attrs) {
+
+        int examineTextSize = 34;
+        mAllowMove = true;
+        if (attrs != null) {
+            TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                    attrs,
+                    R.styleable.DailyGraphView,
+                    0, 0);
+
+            try {
+                examineTextSize = a.getDimensionPixelSize(R.styleable.DailyGraphView_examineTextSize, 34);
+                mAllowMove = a.getBoolean(R.styleable.DailyGraphView_allowMove, true);
+            } finally {
+                a.recycle();
+            }
+        }
 
         mMarketTimesPaint = new Paint();
         mMarketTimesPaint.setAntiAlias(true);
@@ -181,13 +220,13 @@ public class DailyGraphView extends View {
         mExaminerTimePaint.setAntiAlias(true);
         mExaminerTimePaint.setColor(Color.WHITE);
         mExaminerTimePaint.setStyle(Paint.Style.FILL);
-        mExaminerTimePaint.setTextSize(34);
+        mExaminerTimePaint.setTextSize(examineTextSize);
 
         mExaminerValuePaint = new Paint();
         mExaminerValuePaint.setAntiAlias(true);
         mExaminerValuePaint.setColor(Color.WHITE);
         mExaminerValuePaint.setStyle(Paint.Style.FILL);
-        mExaminerValuePaint.setTextSize(34);
+        mExaminerValuePaint.setTextSize(examineTextSize);
 
         mPathPaintStroke = new Paint();
         mPathPaintStroke.setAntiAlias(true);
@@ -298,7 +337,7 @@ public class DailyGraphView extends View {
                 deltaY = minDeltaY;
             }
 
-            mScaleY =  (float)(mHeight - (2 * GRAPH_PADDING_HORIZONTAL)) / deltaY ;
+            mScaleY =  (float)(mHeight) / deltaY ;
             mOffsetY = mHeight / 2; // 0.0 will be the vertical center
 
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -332,7 +371,7 @@ public class DailyGraphView extends View {
                 endScaleX = lastX;
             }
 
-            mScaleX =  (mWidth - (2 * GRAPH_PADDING_HORIZONTAL)) / (float) (endScaleX - startScaleX);
+            mScaleX =  mWidth / (float) (endScaleX - startScaleX);
             mOffsetX = startScaleX;
 
         }
@@ -401,8 +440,13 @@ public class DailyGraphView extends View {
         float eventX = event.getX();
 
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_MOVE: {
+            case MotionEvent.ACTION_MOVE:
+                if (!mAllowMove) {
+                    break;
+                } // else fallthrow
+
+            case MotionEvent.ACTION_DOWN: {
+
                 long timestamp = (long) (eventX / mScaleX) + mOffsetX;
 
                 if (mExaminerRect == null) {

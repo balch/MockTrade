@@ -34,14 +34,13 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.shared.PerformanceItem;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem>, Serializable {
+public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
     public static final String TAG = SnapshotTotalsSqliteModel.class.getSimpleName();
 
     public static final String TABLE_NAME = "snapshot_totals";

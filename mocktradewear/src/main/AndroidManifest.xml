@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Author: Balch
   ~ Created: 7/26/16 6:34 AM
   ~
@@ -20,8 +19,7 @@
   ~
   ~ Copyright (C) 2016
   ~
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.balch.mocktrade">
 
@@ -30,16 +28,24 @@
     <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <application android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name" android:supportsRtl="true"
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
-        <service android:name=".MockTradeFace" android:label="@string/face_name"
+        <service
+            android:name=".MockTradeFace"
+            android:label="@string/face_name"
             android:permission="android.permission.BIND_WALLPAPER">
-            <meta-data android:name="android.service.wallpaper"
+            <meta-data
+                android:name="android.service.wallpaper"
                 android:resource="@xml/watch_face" />
-            <meta-data android:name="com.google.android.wearable.watchface.preview"
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview"
                 android:resource="@drawable/preview_digital" />
-            <meta-data android:name="com.google.android.wearable.watchface.preview_circular"
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview_circular"
                 android:resource="@drawable/preview_digital" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.companionConfigurationAction"
@@ -47,8 +53,10 @@
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
                 android:value="com.balch.mocktrade.watchface.CONFIG_ACTIVITY" />
+
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
+
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
@@ -57,16 +65,20 @@
             android:name=".MockTradeWatchConfigActivity"
             android:label="@string/watch_config_title">
             <intent-filter>
-                <action android:name=
-                    "com.balch.mocktrade.watchface.CONFIG_ACTIVITY" />
-                <category android:name=
-                    "com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <action android:name="com.balch.mocktrade.watchface.CONFIG_ACTIVITY" />
+
+                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".GraphActivity"
+            android:label="@string/title_activity_graph"></activity>
     </application>
 
 </manifest>

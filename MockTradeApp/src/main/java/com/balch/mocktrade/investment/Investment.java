@@ -22,6 +22,8 @@
 
 package com.balch.mocktrade.investment;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.format.DateUtils;
 
 import com.balch.android.app.framework.MetadataUtils;
@@ -33,7 +35,7 @@ import com.balch.mocktrade.order.Order;
 
 import java.util.Date;
 
-public class Investment extends DomainObject {
+public class Investment extends DomainObject implements Parcelable {
     public static final String TAG = Investment.class.getSimpleName();
 
     protected Account account;
@@ -45,14 +47,14 @@ public class Investment extends DomainObject {
     protected Money price;
     protected Date lastTradeTime;
     protected Money prevDayClose;
-    protected Long quantity;
+    protected long quantity;
 
     public Investment() {
     }
 
     public Investment(Account account, String symbol,
                       InvestmentStatus status, String description, String exchange,
-                      Money costBasis, Money price, Date lastTradeTime, Long quantity) {
+                      Money costBasis, Money price, Date lastTradeTime, long quantity) {
         this.account = account;
         this.symbol = symbol;
         this.status = status;
@@ -64,6 +66,52 @@ public class Investment extends DomainObject {
         this.quantity = quantity;
         this.lastTradeTime = lastTradeTime;
     }
+
+    protected Investment(Parcel in) {
+        super(in);
+        account = in.readParcelable(Account.class.getClassLoader());
+        symbol = in.readString();
+        status = InvestmentStatus.valueOf(in.readString());
+        description = in.readString();
+        exchange = in.readString();
+        costBasis = in.readParcelable(Money.class.getClassLoader());
+        price = in.readParcelable(Money.class.getClassLoader());
+        lastTradeTime = new Date(in.readLong());
+        prevDayClose = in.readParcelable(Money.class.getClassLoader());
+        quantity = in.readLong();
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(account, flags);
+        dest.writeString(symbol);
+        dest.writeString(description);
+        dest.writeString(exchange);
+        dest.writeParcelable(costBasis, flags);
+        dest.writeParcelable(price, flags);
+        dest.writeLong(lastTradeTime.getTime());
+        dest.writeParcelable(prevDayClose, flags);
+        dest.writeLong(quantity);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Investment> CREATOR = new Creator<Investment>() {
+        @Override
+        public Investment createFromParcel(Parcel in) {
+            return new Investment(in);
+        }
+
+        @Override
+        public Investment[] newArray(int size) {
+            return new Investment[size];
+        }
+    };
 
     public Account getAccount() {
         return account;
@@ -122,11 +170,11 @@ public class Investment extends DomainObject {
         this.lastTradeTime = lastTradeTime;
     }
 
-    public Long getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Long quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 

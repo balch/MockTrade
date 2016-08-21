@@ -84,13 +84,13 @@
 
                 </LinearLayout>
 
-                <com.balch.mocktrade.portfolio.DailyGraphView
+                <com.balch.mocktrade.shared.widget.DailyGraphView
                     android:id="@+id/portfolio_view_daily_graph"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
-                    android:background="@color/portfolio_view_graph_background"/>
+                    android:background="@color/graph_background"/>
             </LinearLayout>
 
             </android.support.v7.widget.CardView>

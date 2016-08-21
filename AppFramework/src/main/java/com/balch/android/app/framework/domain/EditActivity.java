@@ -64,7 +64,7 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
         setSupportActionBar(toolbar);
 
         this.validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
-        this.item = (DomainObject) intent.getSerializableExtra(EXTRA_ITEM);
+        this.item = intent.getParcelableExtra(EXTRA_ITEM);
         this.isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
         this.okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
         this.cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
@@ -119,6 +119,6 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
     }
 
     public static <T extends DomainObject> T getResult(Intent intent) {
-        return (T) intent.getSerializableExtra(EXTRA_RESULT);
+        return (T) intent.getParcelableExtra(EXTRA_RESULT);
     }
 }

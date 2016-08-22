@@ -23,10 +23,10 @@
 
 package com.balch.mocktrade;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.wearable.activity.WearableActivity;
 import android.widget.TextView;
 
 import com.balch.mocktrade.shared.HighlightItem;
@@ -36,7 +36,7 @@ import com.balch.mocktrade.shared.widget.DailyGraphView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GraphActivity extends Activity {
+public class GraphActivity extends WearableActivity {
 
     private final static String EXTRA_PERFORMANCE_ITEMS = "extra_performance_items";
     private final static String EXTRA_HIGHLIGHT_ITEM = "extra_highlight_item";
@@ -53,16 +53,26 @@ public class GraphActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.graph_activity);
+
+        setAmbientEnabled();
+
         Intent intent = getIntent();
         List<PerformanceItem> performanceItems = intent.getParcelableArrayListExtra(EXTRA_PERFORMANCE_ITEMS);
         HighlightItem highlightItem = intent.getParcelableExtra(EXTRA_HIGHLIGHT_ITEM);
         DailyGraphView graphView = (DailyGraphView) findViewById(R.id.graph_view);
         graphView.bind(performanceItems);
 
-        TextView title = (TextView) findViewById(R.id.graph_title);
+        TextView titleTextView = (TextView) findViewById(R.id.graph_title);
         String text = (highlightItem.getHighlightType() != HighlightItem.HighlightType.TOTAL_ACCOUNT) ?
                 highlightItem.getDescription() : highlightItem.getSymbol();
 
-        title.setText(text);
+        titleTextView.setText(text);
     }
+
+    @Override
+    public void onEnterAmbient(Bundle ambientDetails) {
+        super.onEnterAmbient(ambientDetails);
+        finish();
+    }
+
 }

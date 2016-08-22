@@ -798,8 +798,13 @@ public class MockTradeFace extends CanvasWatchFaceService {
                             setTimeTextPaint(item, false);
                         }
                     }
+
+                    if (mHighlightItemPosition >= mHighlightItems.size()) {
+                        mHighlightItemPosition = 0;
+                    }
                 } else {
                     mHighlightItems = null;
+                    mHighlightItemPosition = 0;
                 }
             } else if (uriPath.equals(WearDataSync.PATH_WATCH_CONFIG_SYNC)) {
                 ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS);

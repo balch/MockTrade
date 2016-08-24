@@ -36,7 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.view.BaseView;
+import com.balch.android.app.framework.BaseView;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.shared.widget.DailyGraphView;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;

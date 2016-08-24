@@ -30,7 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.balch.android.app.framework.view.BaseView;
+import com.balch.android.app.framework.BaseView;
 import com.balch.mocktrade.R;
 
 import java.util.List;

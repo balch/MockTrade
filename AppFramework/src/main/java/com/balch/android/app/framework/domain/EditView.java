@@ -30,13 +30,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.balch.android.app.framework.MetadataUtils;
 import com.balch.android.app.framework.R;
 import com.balch.android.app.framework.domain.widget.ControlMap;
 import com.balch.android.app.framework.domain.widget.ControlMapper;
 import com.balch.android.app.framework.domain.widget.EditLayout;
 import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
-import com.balch.android.app.framework.view.BaseView;
+import com.balch.android.app.framework.BaseView;
 
 import java.lang.reflect.Field;
 import java.util.List;

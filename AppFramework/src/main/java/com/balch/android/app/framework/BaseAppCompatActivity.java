@@ -32,8 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.view.BaseView;
-
 /**
  * This class enhances the AppCompatActivity functionality by providing View creation abstraction
  * and error handling.

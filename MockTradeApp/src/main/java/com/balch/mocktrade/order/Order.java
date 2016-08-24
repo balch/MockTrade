@@ -25,7 +25,7 @@ package com.balch.mocktrade.order;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.domain.MetadataUtils;
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.domain.EditState;
 import com.balch.android.app.framework.domain.annotations.ColumnEdit;

@@ -26,7 +26,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
 
-import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.domain.MetadataUtils;
 import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;

@@ -30,7 +30,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.android.app.framework.view.VolleyBackground;
+import com.balch.android.app.framework.VolleyBackground;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;

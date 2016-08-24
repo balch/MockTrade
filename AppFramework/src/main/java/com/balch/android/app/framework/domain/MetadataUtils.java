@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 8/23/16 5:08 PM
  *
  * This file is part of MockTrade.
  *
@@ -17,19 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2016
+ *
  */
 
-package com.balch.android.app.framework;
+package com.balch.android.app.framework.domain;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.annotations.ColumnEdit;
 import com.balch.android.app.framework.domain.annotations.ColumnNew;
 import com.balch.android.app.framework.domain.widget.EditLayout;
@@ -39,7 +37,6 @@ import com.balch.android.app.framework.domain.widget.MoneyEditLayout;
 import com.balch.android.app.framework.domain.widget.NumberEditLayout;
 import com.balch.android.app.framework.domain.widget.StringEditLayout;
 import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
-import com.balch.android.app.framework.domain.DomainObject;
 import com.balch.android.app.framework.types.Money;
 
 import java.lang.reflect.Field;

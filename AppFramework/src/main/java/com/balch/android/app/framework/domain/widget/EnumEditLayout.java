@@ -32,7 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.MetadataUtils;
+import com.balch.android.app.framework.domain.MetadataUtils;
 import com.balch.android.app.framework.R;
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.EditState;

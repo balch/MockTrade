@@ -95,7 +95,7 @@ public class Account extends DomainObject implements Parcelable {
         initialBalance = in.readParcelable(Money.class.getClassLoader());
         strategy = Strategy.valueOf(in.readString());
         availableFunds = in.readParcelable(Money.class.getClassLoader());
-        excludeFromTotals = (Boolean) in.readSerializable();
+        excludeFromTotals = (in.readByte() == 1) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Account extends DomainObject implements Parcelable {
         dest.writeParcelable(initialBalance, flags);
         dest.writeString(strategy.name());
         dest.writeParcelable(availableFunds, flags);
-        dest.writeSerializable(excludeFromTotals);
+        dest.writeByte(((excludeFromTotals != null) && excludeFromTotals.equals(Boolean.TRUE)) ? (byte)1 : 0);
     }
 
     @Override

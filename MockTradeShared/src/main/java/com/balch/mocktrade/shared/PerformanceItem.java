@@ -67,7 +67,7 @@ public class PerformanceItem extends DomainObject implements Parcelable {
     protected PerformanceItem(Parcel in) {
         super(in);
         mAccountId = in.readLong();
-        mTimestamp = (Date)in.readSerializable();
+        mTimestamp = readDate(in);
         mCostBasis = in.readParcelable(Money.class.getClassLoader());
         mValue = in.readParcelable(Money.class.getClassLoader());
         mTodayChange = in.readParcelable(Money.class.getClassLoader());
@@ -77,7 +77,7 @@ public class PerformanceItem extends DomainObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeLong(mAccountId);
-        dest.writeSerializable(mTimestamp);
+        writeDate(dest, mTimestamp);
         dest.writeParcelable(mCostBasis, flags);
         dest.writeParcelable(mValue, flags);
         dest.writeParcelable(mTodayChange, flags);

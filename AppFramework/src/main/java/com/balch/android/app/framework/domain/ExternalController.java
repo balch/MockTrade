@@ -23,12 +23,11 @@
 package com.balch.android.app.framework.domain;
 
 import android.content.Context;
+import android.os.Parcelable;
 
 import com.balch.android.app.framework.domain.widget.ControlMap;
 
-import java.io.Serializable;
-
-public interface ExternalController<T extends DomainObject> extends Serializable {
+public interface ExternalController<T extends DomainObject> extends Parcelable {
 
     void onChanged(Context context, ColumnDescriptor descriptor, Object value,
                   ControlMap controlMap) throws ValidatorException;

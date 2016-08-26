@@ -14,16 +14,17 @@ public abstract class DomainObject implements Parcelable {
     }
 
     protected DomainObject(Parcel in) {
-        id = (Long)in.readSerializable();
-        createTime = (Date)in.readSerializable();
-        updateTime = (Date)in.readSerializable();
+        long val = in.readLong();
+        id = (val != -1) ? val : null;
+        createTime = readDate(in);
+        updateTime = readDate(in);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(id);
-        dest.writeSerializable(createTime);
-        dest.writeSerializable(updateTime);
+        dest.writeLong((id != null) ? id : -1);
+        writeDate(dest, createTime);
+        writeDate(dest, updateTime);
     }
 
     @Override
@@ -55,4 +56,13 @@ public abstract class DomainObject implements Parcelable {
         this.updateTime = updateTime;
     }
 
+    protected void writeDate(Parcel parcel, Date date) {
+        long time = (date != null) ? date.getTime() : -1;
+        parcel.writeLong(time);
+    }
+
+    protected Date readDate(Parcel parcel) {
+        long time = parcel.readLong();
+        return (time != -1) ? new Date(time) : null;
+    }
 }

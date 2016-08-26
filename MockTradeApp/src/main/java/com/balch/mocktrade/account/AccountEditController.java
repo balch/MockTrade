@@ -23,6 +23,8 @@
 package com.balch.mocktrade.account;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.balch.android.app.framework.domain.ColumnDescriptor;
 import com.balch.android.app.framework.domain.ExternalController;
@@ -30,7 +32,10 @@ import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.widget.ControlMap;
 import com.balch.android.app.framework.domain.widget.EditLayout;
 
-public class AccountEditController implements ExternalController<Account> {
+public class AccountEditController implements ExternalController<Account>, Parcelable {
+    public AccountEditController() {
+    }
+
     @Override
     public void onChanged(Context context, ColumnDescriptor descriptor, Object value, ControlMap controlMap) throws ValidatorException {
         if (descriptor.getField().getName().equals(Account.FLD_STRATEGY)) {
@@ -50,5 +55,29 @@ public class AccountEditController implements ExternalController<Account> {
     @Override
     public void initialize(Context context, Account account, ControlMap controlMap) {
     }
+
+    protected AccountEditController(Parcel in) {
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<AccountEditController> CREATOR = new Creator<AccountEditController>() {
+        @Override
+        public AccountEditController createFromParcel(Parcel in) {
+            return new AccountEditController(in);
+        }
+
+        @Override
+        public AccountEditController[] newArray(int size) {
+            return new AccountEditController[size];
+        }
+    };
 
 }

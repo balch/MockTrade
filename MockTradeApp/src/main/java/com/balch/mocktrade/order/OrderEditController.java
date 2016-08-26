@@ -23,6 +23,8 @@
 package com.balch.mocktrade.order;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,7 +43,9 @@ import com.balch.mocktrade.finance.GoogleFinanceModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderEditController implements ExternalController<Order> {
+public class OrderEditController implements ExternalController<Order>, Parcelable {
+    public OrderEditController() {
+    }
 
     @Override
     public void onChanged(Context context, ColumnDescriptor descriptor, Object value, ControlMap controlMap) throws ValidatorException {
@@ -150,6 +154,30 @@ public class OrderEditController implements ExternalController<Order> {
 
             ((EnumEditLayout)control).setOptions(enumValues, displayValues, selectionIndex);
         }
-
     }
+
+    protected OrderEditController(Parcel in) {
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<OrderEditController> CREATOR = new Creator<OrderEditController>() {
+        @Override
+        public OrderEditController createFromParcel(Parcel in) {
+            return new OrderEditController(in);
+        }
+
+        @Override
+        public OrderEditController[] newArray(int size) {
+            return new OrderEditController[size];
+        }
+    };
+
 }

@@ -63,7 +63,7 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
         Toolbar toolbar = (Toolbar) findViewById(R.id.edit_view_toolbar);
         setSupportActionBar(toolbar);
 
-        this.validator = (ExternalController) intent.getSerializableExtra(EXTRA_VALIDATOR);
+        this.validator = intent.getParcelableExtra(EXTRA_VALIDATOR);
         this.item = intent.getParcelableExtra(EXTRA_ITEM);
         this.isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
         this.okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);

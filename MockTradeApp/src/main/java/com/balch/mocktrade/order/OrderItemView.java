@@ -25,6 +25,7 @@ package com.balch.mocktrade.order;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -64,6 +65,12 @@ public class OrderItemView extends LinearLayout {
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(HORIZONTAL);
+
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(padding, padding, padding, padding);
+
         inflate(getContext(), R.layout.order_item_view, this);
 
         this.mOrderId = (TextView)findViewById(R.id.order_item_id);

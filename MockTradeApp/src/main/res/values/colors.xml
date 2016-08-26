@@ -11,4 +11,6 @@
     <color name="portfolio_view_status_text">#FF999999</color>
     <color name="portfolio_view_status_background">#FF000000</color>
 
+    <color name="summary_totals_background">#66666666</color>
+
 </resources>

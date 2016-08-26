@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/EditControl"
-    android:orientation="vertical">
+    >
 
     <TextView
         android:id="@+id/unsupported_edit_control_label"
@@ -17,4 +16,4 @@
         android:layout_height="wrap_content">
     </TextView>
 
-</LinearLayout>
+</merge>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/EditControl"
-    android:orientation="vertical">
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
         android:id="@+id/symbol_edit_label"
@@ -38,6 +36,6 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</merge>
 
 

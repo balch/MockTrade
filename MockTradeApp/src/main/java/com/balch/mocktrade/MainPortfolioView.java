@@ -30,6 +30,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -38,10 +39,10 @@ import android.widget.TextView;
 
 import com.balch.android.app.framework.BaseView;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.shared.widget.DailyGraphView;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.SummaryTotalsView;
 import com.balch.mocktrade.shared.PerformanceItem;
+import com.balch.mocktrade.shared.widget.DailyGraphView;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -83,6 +84,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     @Override
     public void initializeLayout() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setOrientation(VERTICAL);
         inflate(getContext(), R.layout.portfolio_view_main, this);
 
         mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);

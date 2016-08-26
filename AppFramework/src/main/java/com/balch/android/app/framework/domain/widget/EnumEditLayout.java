@@ -26,6 +26,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -70,6 +71,11 @@ public class EnumEditLayout extends LinearLayout implements EditLayout {
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(VERTICAL);
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(0, padding, 0, padding);
+
         inflate(getContext(), R.layout.edit_control_enum, this);
         this.label = (TextView) findViewById(R.id.enum_edit_control_label);
         this.value = (Spinner) findViewById(R.id.enum_edit_control_value);

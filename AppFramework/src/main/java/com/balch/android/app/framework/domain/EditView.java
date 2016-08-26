@@ -26,6 +26,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -72,6 +73,9 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
 
     @Override
     public void initializeLayout() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setOrientation(VERTICAL);
+
         inflate(getContext(), R.layout.edit_view, this);
         this.mEditControlLayout = (LinearLayout)findViewById(R.id.edit_layout);
         this.mOkButton = (Button)findViewById(R.id.edit_ok_button);

@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -97,6 +98,12 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(0, padding, 0, padding);
+
+
+        setOrientation(VERTICAL);
         inflate(getContext(), com.balch.mocktrade.R.layout.symbol_edit_control, this);
         this.mLabel = (TextView) findViewById(R.id.symbol_edit_label);
         this.mValue = (EditText) findViewById(R.id.symbol_edit_value);

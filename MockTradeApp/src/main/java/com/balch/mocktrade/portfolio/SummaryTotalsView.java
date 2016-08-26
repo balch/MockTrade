@@ -23,7 +23,10 @@
 package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -54,6 +57,16 @@ public class SummaryTotalsView extends LinearLayout {
     }
 
     protected void initialize() {
+        Resources resources = getResources();
+        ContextCompat.getColor(getContext(), R.color.summary_totals_background);
+
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(HORIZONTAL);
+        setBackgroundColor(ContextCompat.getColor(getContext(), R.color.summary_totals_background));
+
+        int padding = resources.getDimensionPixelSize(R.dimen.summary_total_padding);
+        setPadding(padding, padding, padding, padding);
+
         inflate(getContext(), R.layout.portfolio_view_summary_totals, this);
         mCurrentBalance = (TextView) findViewById(R.id.summary_item_current_balance);
         mDayPerformance = (TextView) findViewById(R.id.summary_item_day_performance);

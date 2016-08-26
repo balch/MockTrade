@@ -18,4 +18,6 @@
     <dimen name="portfolio_view_status_text_size">12sp</dimen>
     <dimen name="portfolio_view_graph_empty_text_size">28sp</dimen>
     <dimen name="portfolio_view_graph_empty_padding">20dp</dimen>
+    <dimen name="summary_total_padding">10dp</dimen>
+
 </resources>

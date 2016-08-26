@@ -55,6 +55,8 @@ public class OrderListView extends LinearLayout implements BaseView {
 
     @Override
     public void initializeLayout() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setOrientation(VERTICAL);
         inflate(getContext(), R.layout.order_list_view, this);
         this.mOrderList = (ListView)findViewById(R.id.order_list);
     }

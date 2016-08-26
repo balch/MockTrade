@@ -24,6 +24,7 @@ package com.balch.android.app.framework.domain.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -53,6 +54,11 @@ public class UnsupportedEditLayout extends LinearLayout implements EditLayout {
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(VERTICAL);
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(0, padding, 0, padding);
+
         inflate(getContext(), R.layout.edit_control_unsupported, this);
         this.label = (TextView)findViewById(R.id.unsupported_edit_control_label);
         this.value = (TextView)findViewById(R.id.unsupported_edit_control_value);

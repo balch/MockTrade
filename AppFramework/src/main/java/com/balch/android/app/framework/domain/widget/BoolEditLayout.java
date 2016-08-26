@@ -25,6 +25,7 @@ package com.balch.android.app.framework.domain.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
@@ -58,6 +59,11 @@ public class BoolEditLayout extends LinearLayout implements EditLayout, View.OnC
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(VERTICAL);
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(0, padding, 0, padding);
+
         inflate(getContext(), R.layout.edit_control_bool, this);
         this.checkBox = (CheckBox) findViewById(R.id.bool_edit_control_value);
 

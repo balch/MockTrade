@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -87,6 +88,11 @@ public class StringEditLayout extends LinearLayout implements EditLayout, TextWa
     }
 
     protected void initialize() {
+        setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setOrientation(VERTICAL);
+        int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
+        setPadding(0, padding, 0, padding);
+
         inflate(getContext(), R.layout.edit_control_string, this);
         this.label = (TextView) findViewById(R.id.string_edit_control_label);
         this.value = (EditText) findViewById(R.id.string_edit_control_value);

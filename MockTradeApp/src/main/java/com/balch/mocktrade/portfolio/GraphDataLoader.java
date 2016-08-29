@@ -17,6 +17,7 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
     private  final PortfolioModel mPortfolioModel;
 
     private long mSelectedAccountId = -1;
+    private int mDaysToReturn = -1;
     protected UpdateReceiver mUpdateReceiver;
     protected List<PerformanceItem> mGraphData;
 
@@ -27,7 +28,10 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
 
     @Override
     public List<PerformanceItem> loadInBackground() {
-        return mPortfolioModel.getCurrentSnapshot(mSelectedAccountId);
+
+        return (mDaysToReturn < 2) ?
+                mPortfolioModel.getCurrentSnapshot(mSelectedAccountId) :
+                mPortfolioModel.getCurrentDailySnapshot(mSelectedAccountId, mDaysToReturn);
     }
 
     @Override
@@ -105,8 +109,9 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
     }
 
 
-    public void setSelectedAccountId(long accountID) {
+    public void setSelectionCriteria(long accountID, int days) {
         mSelectedAccountId = accountID;
+        mDaysToReturn = days;
         onContentChanged();
     }
 

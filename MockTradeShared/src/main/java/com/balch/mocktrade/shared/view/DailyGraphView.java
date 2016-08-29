@@ -21,7 +21,7 @@
  *
  */
 
-package com.balch.mocktrade.shared.widget;
+package com.balch.mocktrade.shared.view;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -34,7 +34,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
-import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -51,10 +50,11 @@ import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.shared.R;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -77,7 +77,7 @@ public class DailyGraphView extends View {
 
     private static final int GRAPH_PADDING_VERTICAL = 30;
 
-    private static final int[] LINEAR_GRADIENT_COLORS_STROKE = new int[] {
+    private static final int[] LINEAR_GRADIENT_COLORS_STROKE = new int[]{
             Color.argb(255, 0, 255, 0),
             Color.argb(255, 0, 156, 0),
             Color.argb(255, 156, 156, 156),
@@ -85,11 +85,11 @@ public class DailyGraphView extends View {
             Color.argb(255, 255, 0, 0)
     };
 
-    private static final float[] LINEAR_GRADIENT_POSITIONS_STROKE = new float[] {
+    private static final float[] LINEAR_GRADIENT_POSITIONS_STROKE = new float[]{
             0f, .475f, .5f, .525f, 1f
     };
 
-    private static final int[] LINEAR_GRADIENT_COLORS_FILL = new int[] {
+    private static final int[] LINEAR_GRADIENT_COLORS_FILL = new int[]{
             Color.argb(92, 0, 92, 0),
             Color.argb(128, 0, 156, 0),
             Color.argb(128, 0, 255, 0),
@@ -99,9 +99,12 @@ public class DailyGraphView extends View {
             Color.argb(92, 92, 0, 0)
     };
 
-    private static final float[] LINEAR_GRADIENT_POSITIONS_FILL = new float[] {
-            0f, .25f, .499f, .5f, .501f,  .75f, 1f
+    private static final float[] LINEAR_GRADIENT_POSITIONS_FILL = new float[]{
+            0f, .25f, .499f, .5f, .501f, .75f, 1f
     };
+
+    private final static DateFormat HOURLY_DATE_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
+    private final static DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat("EEE, MMM dd", Locale.getDefault());
 
     private static final int EXAMINER_WIDTH = 5;
 
@@ -126,14 +129,16 @@ public class DailyGraphView extends View {
     private int mHeight;
     private float mScaleX = 1.0f;
     private float mScaleY = 1.0f;
-    private int mOffsetY;
+    private long mOffsetY;
     private long mOffsetX;
 
-    private int mMaxYIndex = -1;
-    private int mMinYIndex = -1;
+    private long mMaxYValue;
+    private long mMinYValue;
     private long mMarketStartTime;
     private long mMarketEndTime;
     private boolean mAllowMove = true;
+
+    private boolean mHourly = true;
 
     public DailyGraphView(Context context) {
         super(context);
@@ -149,22 +154,22 @@ public class DailyGraphView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mMarketStartTime != 0) {
-            float marketStartX = scaleX(mMarketStartTime);
-            canvas.drawLine(marketStartX, GRAPH_PADDING_VERTICAL,
-                    marketStartX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
+        if (mHourly) {
+            if (mMarketStartTime != 0) {
+                float marketStartX = scaleX(mMarketStartTime);
+                canvas.drawLine(marketStartX, GRAPH_PADDING_VERTICAL,
+                        marketStartX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
+            }
+
+            if (mMarketEndTime != 0) {
+                float marketEndX = scaleX(mMarketEndTime);
+                canvas.drawLine(marketEndX, GRAPH_PADDING_VERTICAL,
+                        marketEndX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
+            }
         }
 
-        if (mMarketEndTime != 0) {
-            float marketEndX = scaleX(mMarketEndTime);
-            canvas.drawLine(marketEndX, GRAPH_PADDING_VERTICAL,
-                    marketEndX, mHeight - GRAPH_PADDING_VERTICAL, mMarketTimesPaint);
-        }
-
-        if (mMarketEndTime != 0) {
-            float centerY = scaleY(00.0f);
-            canvas.drawLine(0, centerY, mWidth, centerY, mMarketTimesPaint);
-        }
+        float centerY = scaleY(getCenterValue());
+        canvas.drawLine(0, centerY, mWidth, centerY, mMarketTimesPaint);
 
         canvas.drawPath(mPathStroke, mPathPaintStroke);
         canvas.drawPath(mPathFill, mPathPaintFill);
@@ -181,6 +186,14 @@ public class DailyGraphView extends View {
                     mExaminerValueTextBounds.height() + 2,
                     mExaminerValuePaint);
         }
+    }
+
+    private long getCenterValue() {
+        long centerPos = 0;
+        if (!mHourly && (mPerformanceItems.size() > 0)) {
+            centerPos = getPerformanceItemValue(mPerformanceItems.get(0)).getMicroCents();
+        }
+        return centerPos;
     }
 
     private void initialize(AttributeSet attrs) {
@@ -256,7 +269,7 @@ public class DailyGraphView extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if ((w != 0) && (h!=0)) {
+        if ((w != 0) && (h != 0)) {
             mWidth = w;
             mHeight = h;
 
@@ -271,35 +284,50 @@ public class DailyGraphView extends View {
         if ((mPerformanceItems != null) && (mPerformanceItems.size() >= 2)) {
             calculateScale();
 
-            List<PointF> points = new ArrayList<>(mPerformanceItems.size());
+            float centerY = scaleY(getCenterValue());
 
-            for (PerformanceItem performanceItem : mPerformanceItems) {
-                float xValue = (float)performanceItem.getTimestamp().getTime();
-                float yValue = (float)getPerformanceItemValue(performanceItem).getMicroCents();
+            int startIndex = mHourly ? 0 : 1;
 
-                float xScaleValue = scaleX(xValue);
-                float yScaleValue = scaleY(yValue);
+            PerformanceItem performanceItem = mPerformanceItems.get(startIndex);
 
-                points.add(new PointF(xScaleValue, yScaleValue));
+            float xScaleValue = scaleX(mHourly ? performanceItem.getTimestamp().getTime() : 0);
+            float yScaleValue = scaleY(getPerformanceItemValue(performanceItem).getMicroCents());
+
+            mPathStroke.moveTo(xScaleValue, yScaleValue);
+
+            mPathFill.moveTo(xScaleValue, centerY);
+            mPathFill.lineTo(xScaleValue, yScaleValue);
+
+            for (int x = startIndex + 1; x < mPerformanceItems.size() - 1; x++) {
+                PerformanceItem nextPerformanceItem = mPerformanceItems.get(x+1);
+                float xScaleValueNext = scaleX(mHourly ? nextPerformanceItem.getTimestamp().getTime() : x);
+                float yScaleValueNext = scaleY(getPerformanceItemValue(nextPerformanceItem).getMicroCents());
+
+                if (mHourly) {
+                    mPathStroke.quadTo(xScaleValue, yScaleValue, xScaleValueNext, yScaleValueNext);
+                    mPathFill.quadTo(xScaleValue, yScaleValue, xScaleValueNext, yScaleValueNext);
+                } else {
+                    mPathStroke.lineTo(xScaleValueNext, yScaleValue);
+                    mPathStroke.lineTo(xScaleValueNext, yScaleValueNext);
+
+                    mPathFill.lineTo(xScaleValueNext, yScaleValue);
+                    mPathFill.lineTo(xScaleValueNext, yScaleValueNext);
+                }
+
+                xScaleValue = xScaleValueNext;
+                yScaleValue = yScaleValueNext;
             }
 
-            float centerY = scaleY(00.0f);
+            int lastPos = mPerformanceItems.size() - 1;
+            performanceItem = mPerformanceItems.get(lastPos);
 
-            mPathFill.moveTo(points.get(0).x, centerY);
-            mPathFill.lineTo(points.get(0).x, points.get(0).y);
+            xScaleValue = scaleX(mHourly ? performanceItem.getTimestamp().getTime() : lastPos);
+            yScaleValue = scaleY(getPerformanceItemValue(performanceItem).getMicroCents());
 
-            mPathStroke.moveTo(points.get(0).x, points.get(0).y);
+            mPathStroke.lineTo(xScaleValue, yScaleValue);
 
-            for (int x = 1; x < points.size() - 1; x++) {
-                mPathStroke.quadTo(points.get(x).x, points.get(x).y, points.get(x + 1).x, points.get(x + 1).y);
-                mPathFill.quadTo(points.get(x).x, points.get(x).y, points.get(x + 1).x, points.get(x + 1).y);
-            }
-
-            int lastPos = points.size() - 1;
-            mPathStroke.lineTo(points.get(lastPos).x, points.get(lastPos).y);
-            mPathFill.lineTo(points.get(lastPos).x, points.get(lastPos).y);
-
-            mPathFill.lineTo(points.get(lastPos).x, centerY);
+            mPathFill.lineTo(xScaleValue, yScaleValue);
+            mPathFill.lineTo(xScaleValue, centerY);
 
             PathMeasure measure = new PathMeasure(mPathStroke, false);
             mPathLengthStroke = measure.getLength();
@@ -323,57 +351,63 @@ public class DailyGraphView extends View {
 
     private void calculateScale() {
 
-        if ( (mWidth != 0) && (mHeight != 0)) {
+        if ((mWidth != 0) && (mHeight != 0)) {
 
-            // set the Y range so 0 is at the center, with room
-            // to accommodate the max gain or loss
-            long absMaxY = Math.abs(getPerformanceItemValue(mPerformanceItems.get(mMaxYIndex)).getMicroCents());
-            long absMinY = Math.abs(getPerformanceItemValue(mPerformanceItems.get(mMinYIndex)).getMicroCents());
+            long initialValue = mPerformanceItems.get(0).getValue().getMicroCents();
+            long centerValue = getCenterValue();
+
+            // set the Y range with room to accommodate the max gain or loss
+            long absMaxY = Math.abs(mMaxYValue - centerValue);
+            long absMinY = Math.abs(mMinYValue - centerValue);
             long deltaY = (absMaxY > absMinY) ? 2 * absMaxY : 2 * absMinY;
 
             // set the min scale to 1% of current value.
-            long minDeltaY = (long) (.01f * mPerformanceItems.get(0).getValue().getMicroCents());
+            long minDeltaY = (long) (.01f * initialValue);
             if (deltaY < minDeltaY) {
                 deltaY = minDeltaY;
             }
 
-            mScaleY =  (float)(mHeight) / deltaY ;
-            mOffsetY = mHeight / 2; // 0.0 will be the vertical center
+            mScaleY = (float) (mHeight) / deltaY;
+            mOffsetY = mHourly ? 0 : initialValue;
 
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
+            if (mHourly) {
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
 
-            // get market start time on same day of first x
-            long firstX = mPerformanceItems.get(0).getTimestamp().getTime();
-            cal.setTimeInMillis(firstX);
-            cal.set(Calendar.HOUR_OF_DAY, 6);
-            cal.set(Calendar.MINUTE, 30);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
+                // get market start time on same day of first x
+                long firstX = mPerformanceItems.get(mHourly ? 0 : 1).getTimestamp().getTime();
+                cal.setTimeInMillis(firstX);
+                cal.set(Calendar.HOUR_OF_DAY, 6);
+                cal.set(Calendar.MINUTE, 30);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
 
-            mMarketStartTime = cal.getTimeInMillis();
+                mMarketStartTime = cal.getTimeInMillis();
 
-            // set the start to 30 mins b4 market close
-            cal.set(Calendar.MINUTE, 0);
-            long startScaleX = cal.getTimeInMillis();
+                // set the start to 30 mins b4 market close
+                cal.set(Calendar.MINUTE, 0);
+                long startScaleX = cal.getTimeInMillis();
 
-            // get the market end tme
-            cal.set(Calendar.HOUR_OF_DAY, 13);
-            cal.set(Calendar.MINUTE, 0);
-            mMarketEndTime = cal.getTimeInMillis();
+                // get the market end tme
+                cal.set(Calendar.HOUR_OF_DAY, 13);
+                cal.set(Calendar.MINUTE, 0);
+                mMarketEndTime = cal.getTimeInMillis();
 
-            // set the end scale to 30 mins after market close
-            cal.set(Calendar.MINUTE, 30);
-            long endScaleX = cal.getTimeInMillis();
+                // set the end scale to 30 mins after market close
+                cal.set(Calendar.MINUTE, 30);
+                long endScaleX = cal.getTimeInMillis();
 
-            // see if there is a sample after the market close and extend the end if so
-            long lastX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
-            if (endScaleX < lastX) {
-                endScaleX = lastX;
+                // see if there is a sample after the market close and extend the end if so
+                long lastX = mPerformanceItems.get(mPerformanceItems.size() - 1).getTimestamp().getTime();
+                if (endScaleX < lastX) {
+                    endScaleX = lastX;
+                }
+
+                mScaleX = mWidth / (float) (endScaleX - startScaleX);
+                mOffsetX = startScaleX;
+            } else {
+                mScaleX = mWidth / (float) (mPerformanceItems.size() - 1);
+                mOffsetX = 0;
             }
-
-            mScaleX =  mWidth / (float) (endScaleX - startScaleX);
-            mOffsetX = startScaleX;
-
         }
     }
 
@@ -395,22 +429,22 @@ public class DailyGraphView extends View {
         va.start();
     }
 
-    public void bind(List<PerformanceItem> performanceItems) {
+    public void bind(List<PerformanceItem> performanceItems, boolean hourly) {
         mPerformanceItems = performanceItems;
+        mHourly = hourly;
 
-        long maxY = Long.MIN_VALUE;
-        long minY = Long.MAX_VALUE;
+        mMaxYValue = Long.MIN_VALUE;
+        mMinYValue = Long.MAX_VALUE;
+
         for (int idx = 0; idx < mPerformanceItems.size(); idx++) {
             PerformanceItem performanceItem = mPerformanceItems.get(idx);
             long y = getPerformanceItemValue(performanceItem).getMicroCents();
-            if (y > maxY) {
-                maxY = y;
-                mMaxYIndex = idx;
+            if (y > mMaxYValue) {
+                mMaxYValue = y;
             }
 
-            if (y < minY) {
-                minY = y;
-                mMinYIndex = idx;
+            if (y < mMinYValue) {
+                mMinYValue = y;
             }
         }
 
@@ -419,18 +453,25 @@ public class DailyGraphView extends View {
     }
 
     private float scaleX(float x) {
-        return  ((x - mOffsetX) * mScaleX);
+        return ((x - mOffsetX) * mScaleX);
     }
 
     private float scaleY(float y) {
-        return  mOffsetY - (y * mScaleY);
+        return mHeight / 2.0f - ((y - mOffsetY) * mScaleY);
     }
 
     /**
      * This function will be used to abstract out which value to graph
      */
     private Money getPerformanceItemValue(PerformanceItem performanceItem) {
-        return performanceItem.getTodayChange();
+        Money money;
+        if (mHourly) {
+            money = performanceItem.getTodayChange();
+        } else {
+            money = performanceItem.getValue();
+        }
+
+        return money;
     }
 
     @Override
@@ -447,7 +488,8 @@ public class DailyGraphView extends View {
 
             case MotionEvent.ACTION_DOWN: {
 
-                long timestamp = (long) (eventX / mScaleX) + mOffsetX;
+                long val = (long) (eventX / mScaleX) + mOffsetX;
+                Date timestamp = mHourly ? new Date(val) : mPerformanceItems.get((int)val).getTimestamp();
 
                 if (mExaminerRect == null) {
                     mExaminerRect = new RectF();
@@ -456,14 +498,13 @@ public class DailyGraphView extends View {
                 mExaminerRect.set(eventX, GRAPH_PADDING_VERTICAL,
                         eventX + EXAMINER_WIDTH, mHeight - GRAPH_PADDING_VERTICAL);
 
-                mExaminerTime = DateFormat.getTimeInstance(DateFormat.SHORT)
-                        .format(new Date(timestamp));
-                mExaminerTimePaint.getTextBounds(mExaminerTime, 0,
-                        mExaminerTime.length(), mExaminerTimeTextBounds);
-
+                mExaminerTime = mHourly ?
+                        HOURLY_DATE_FORMAT.format(timestamp) :
+                        DAILY_DATE_FORMAT.format(timestamp);
+                mExaminerTimePaint.getTextBounds(mExaminerTime, 0, mExaminerTime.length(), mExaminerTimeTextBounds);
 
                 mExaminerValue = "";
-                Money extrapolated = extrapolateValue(timestamp);
+                Money extrapolated = extrapolateValue(timestamp.getTime());
                 if (extrapolated != null) {
                     mExaminerValue = extrapolated.getFormatted();
                     mExaminerValuePaint.setColor((extrapolated.getMicroCents() >= 0) ?
@@ -497,7 +538,7 @@ public class DailyGraphView extends View {
                 PerformanceItem performanceItem = mPerformanceItems.get(x);
 
                 if (timestamp <= performanceItem.getTimestamp().getTime()) {
-                    if ((timestamp == performanceItem.getTimestamp().getTime()) || (x == 0)) {
+                    if (!mHourly || (timestamp == performanceItem.getTimestamp().getTime()) || (x == 0)) {
                         money = getPerformanceItemValue(performanceItem);
                     } else {
 
@@ -510,7 +551,7 @@ public class DailyGraphView extends View {
                         long deltaX = performanceItem.getTimestamp().getTime() -
                                 prevPerformanceItem.getTimestamp().getTime();
 
-                        money = new Money((deltaY *  (timestamp - prevPerformanceItem.getTimestamp().getTime())) / deltaX +
+                        money = new Money((deltaY * (timestamp - prevPerformanceItem.getTimestamp().getTime())) / deltaX +
                                 getPerformanceItemValue(prevPerformanceItem).getMicroCents());
                     }
                     break;

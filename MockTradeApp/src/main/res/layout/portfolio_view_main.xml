@@ -33,19 +33,7 @@
                 app:cardElevation="8dp"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-                <TextView
-                    android:id="@+id/portfolio_view_daily_graph_empty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/portfolio_view_empty_graph_text"
-                    android:textColor="?attr/colorAccent"
-                    android:textSize="@dimen/portfolio_view_graph_empty_text_size"
-                    android:padding="@dimen/portfolio_view_graph_empty_padding"
-                    android:visibility="gone"/>
-
                 <LinearLayout
-                    android:id="@+id/portfolio_view_daily_graph_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingTop="@dimen/portfolio_view_graph_container_padding"
@@ -54,39 +42,48 @@
                     android:paddingEnd="@dimen/portfolio_view_graph_container_padding"
                     android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/portfolio_view_time_graph_spinner"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:textColor="@color/portfolio_view_graph_title"
+                            android:gravity="start" />
+
+                        <Spinner
+                            android:id="@+id/portfolio_view_account_graph_spinner"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:gravity="end" />
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/portfolio_view_graph_time_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:textColor="@color/portfolio_view_graph_title"
-                        android:shadowRadius="3"
-                        android:shadowDx=".5"
-                        android:shadowDy=".5"
-                        android:shadowColor="@color/portfolio_view_graph_title_shadow"
-                        android:textSize="@dimen/portfolio_view_graph_title_size"/>
+                        android:id="@+id/portfolio_view_daily_graph_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/portfolio_view_empty_graph_text"
+                        android:textColor="?attr/colorAccent"
+                        android:textSize="@dimen/portfolio_view_graph_empty_text_size"
+                        android:padding="@dimen/portfolio_view_graph_empty_padding"
+                        android:visibility="gone"/>
 
-                    <Spinner
-                        android:id="@+id/portfolio_view_graph_spinner"
-                        android:layout_width="0dp"
+
+                    <com.balch.mocktrade.shared.view.DailyGraphView
+                        android:id="@+id/portfolio_view_daily_graph"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="end" />
-
-                </LinearLayout>
-
-                <com.balch.mocktrade.shared.widget.DailyGraphView
-                    android:id="@+id/portfolio_view_daily_graph"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
-                    android:background="@color/graph_background"/>
+                        android:layout_marginTop="@dimen/portfolio_view_graph_margin_top"
+                        android:background="@color/graph_background"/>
             </LinearLayout>
 
             </android.support.v7.widget.CardView>

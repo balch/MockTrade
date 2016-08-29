@@ -171,8 +171,10 @@ public class PortfolioSqliteModel implements PortfolioModel {
             SQLiteDatabase db = sqlConnection.getWritableDatabase();
             db.beginTransaction();
             try {
+
+                SnapshotMapper snapshotMapper = new SnapshotMapper(true);
                 for (PerformanceItem performanceItem : performanceItems) {
-                    sqlConnection.insert(snapshotTotalsModel, performanceItem, db);
+                    sqlConnection.insert(snapshotMapper, performanceItem, db);
                 }
                 db.setTransactionSuccessful();
 
@@ -200,8 +202,19 @@ public class PortfolioSqliteModel implements PortfolioModel {
     }
 
     @Override
+    public List<PerformanceItem> getCurrentDailySnapshot(int days) {
+        return snapshotTotalsModel.getCurrentDailySnapshot(days);
+    }
+
+    @Override
+    public List<PerformanceItem> getCurrentDailySnapshot(long accountId, int days) {
+        return snapshotTotalsModel.getCurrentDailySnapshot(accountId, days);
+    }
+
+    @Override
     public OrderResult attemptExecuteOrder(Order order, Quote quote) throws OrderExecutionException {
         return orderModel.attemptExecuteOrder(order, quote);
     }
+
 
 }

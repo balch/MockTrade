@@ -28,22 +28,34 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-public class AccountUpdateBroadcaster {
-    private static final String TAG = AccountUpdateBroadcaster.class.getSimpleName();
+public class PerformanceItemUpdateBroadcaster {
+    private static final String TAG = PerformanceItemUpdateBroadcaster.class.getSimpleName();
 
     private static final String EXTRA_ACCOUNT_ID = "extra_account_id";
+    private static final String EXTRA_DAYS_COUNT = "extra_days_count";
 
-    public static final String ACTION = AccountUpdateBroadcaster.class.getName();
+    public static final String ACTION = PerformanceItemUpdateBroadcaster.class.getName();
 
-    static public void broadcast(Context context, long accountId) {
+    public static class PerformanceItemUpdateData {
+        public final long accountId;
+        public final int  days;
+
+        public PerformanceItemUpdateData(long accountId, int days) {
+            this.accountId = accountId;
+            this.days = days;
+        }
+    }
+
+    static public void broadcast(Context context, long accountId, int days) {
         Log.d(TAG, "broadcast sent:" + ACTION);
         Intent intent = new Intent(ACTION);
         intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
+        intent.putExtra(EXTRA_DAYS_COUNT, days);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    static public long getAccountId(Intent intent) {
-        return intent.getLongExtra(EXTRA_ACCOUNT_ID, -1);
+    static public PerformanceItemUpdateData getData(Intent intent) {
+        return new PerformanceItemUpdateData(intent.getLongExtra(EXTRA_ACCOUNT_ID, -1), intent.getIntExtra(EXTRA_DAYS_COUNT, -1));
     }
 
 }

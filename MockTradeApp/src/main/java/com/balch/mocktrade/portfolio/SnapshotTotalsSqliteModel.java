@@ -23,65 +23,54 @@
 package com.balch.mocktrade.portfolio;
 
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
-import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
+public class SnapshotTotalsSqliteModel {
     public static final String TAG = SnapshotTotalsSqliteModel.class.getSimpleName();
 
-    public static final String TABLE_NAME = "snapshot_totals";
-
-    public static final String COLUMN_ACCOUNT_ID = "account_id";
-    public static final String COLUMN_SNAPSHOT_TIME = "snapshot_time";
-    public static final String COLUMN_TOTAL_VALUE = "total_value";
-    public static final String COLUMN_COST_BASIS = "cost_basis";
-    public static final String COLUMN_TODAY_CHANGE = "today_change";
 
     // create SQL to aggregate accounts we want to see in totals
     private static final String SQL_ACCOUNTS_INCLUDED_TOTALS =
-            "SELECT -1 AS " + COLUMN_ACCOUNT_ID + ", " +
-                    "t1." + COLUMN_ID + "," +
-                    "t1." + COLUMN_CREATE_TIME + "," +
-                    "t1." + COLUMN_UPDATE_TIME + "," +
-                    "t1." + COLUMN_SNAPSHOT_TIME + "," +
-                    " SUM(" + COLUMN_TOTAL_VALUE + ") AS " + COLUMN_TOTAL_VALUE + "," +
-                    " SUM(" + COLUMN_COST_BASIS + ") AS " + COLUMN_COST_BASIS + "," +
-                    " SUM(" + COLUMN_TODAY_CHANGE + ") AS " + COLUMN_TODAY_CHANGE + " " +
-                " FROM " + TABLE_NAME + " AS t1, account AS t2" +
-                " WHERE t1.account_id = t2._id AND t2.exclude_from_totals = 0" +
-                    " AND " + COLUMN_SNAPSHOT_TIME + " >= ?" +
-                    " AND " + COLUMN_SNAPSHOT_TIME + " < ?" +
-                " GROUP BY " + COLUMN_SNAPSHOT_TIME +
-                " ORDER BY " + COLUMN_SNAPSHOT_TIME + " ASC";
+            "SELECT -1 AS " + SnapshotMapper.COLUMN_ACCOUNT_ID + ", " +
+                    "t1." + SqlMapper.COLUMN_ID + " AS " + SqlMapper.COLUMN_ID + "," +
+                    "t1." + SqlMapper.COLUMN_CREATE_TIME + " AS " + SqlMapper.COLUMN_CREATE_TIME + "," +
+                    "t1." + SqlMapper.COLUMN_UPDATE_TIME + " AS " + SqlMapper.COLUMN_UPDATE_TIME + "," +
+                    "t1." + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " AS " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + "," +
+                    " SUM(" + SnapshotMapper.COLUMN_TOTAL_VALUE + ") AS " + SnapshotMapper.COLUMN_TOTAL_VALUE + "," +
+                    " SUM(" + SnapshotMapper.COLUMN_COST_BASIS + ") AS " + SnapshotMapper.COLUMN_COST_BASIS + "," +
+                    " SUM(" + SnapshotMapper.COLUMN_TODAY_CHANGE + ") AS " + SnapshotMapper.COLUMN_TODAY_CHANGE + " " +
+                    " FROM %s AS t1, account AS t2" +
+                    " WHERE t1.account_id = t2._id AND t2.exclude_from_totals = 0" +
+                    " AND " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " >= ?" +
+                    " AND " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " < ?" +
+                    " GROUP BY " + SnapshotMapper.COLUMN_SNAPSHOT_TIME +
+                    " ORDER BY " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " ASC";
 
     private static final String SQL_LATEST_VALID_GRAPH_DATE =
-                "SELECT MAX("+ COLUMN_SNAPSHOT_TIME +") AS "+ COLUMN_SNAPSHOT_TIME +", " +
-                        "DATE("+ COLUMN_SNAPSHOT_TIME +"/1000, 'unixepoch') AS dt, " +
-                        "COUNT(DISTINCT("+ COLUMN_SNAPSHOT_TIME +")) as readings " +
-                " FROM " + TABLE_NAME +
-                " GROUP BY dt " +
-                " HAVING readings >= 3 " +
-                " ORDER BY dt DESC " +
-                " LIMIT 1";
+            "SELECT MAX(" + SnapshotMapper.COLUMN_SNAPSHOT_TIME + ") AS " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + ", " +
+                    "DATE(" + SnapshotMapper.COLUMN_SNAPSHOT_TIME + "/1000, 'unixepoch') AS dt, " +
+                    "COUNT(DISTINCT(" + SnapshotMapper.COLUMN_SNAPSHOT_TIME + ")) as readings " +
+                    " FROM " + SnapshotMapper.TABLE_NAME +
+                    " GROUP BY dt " +
+                    " HAVING readings >= 3 " +
+                    " ORDER BY dt DESC " +
+                    " LIMIT 1";
 
     private static final String SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID =
-            COLUMN_ACCOUNT_ID + "=? AND " +
-            COLUMN_SNAPSHOT_TIME + " >= ? AND " +
-            COLUMN_SNAPSHOT_TIME + " < ?";
+            SnapshotMapper.COLUMN_ACCOUNT_ID + "=? AND " +
+                    SnapshotMapper.COLUMN_SNAPSHOT_TIME + " >= ? AND " +
+                    SnapshotMapper.COLUMN_SNAPSHOT_TIME + " < ?";
 
     private final SqlConnection mSqlConnection;
 
@@ -89,42 +78,15 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
         mSqlConnection = modelProvider.getSqlConnection();
     }
 
-    @Override
-    public String getTableName() {
-        return SnapshotTotalsSqliteModel.TABLE_NAME;
-    }
-
-    @Override
-    public ContentValues getContentValues(PerformanceItem performanceItem) {
-        ContentValues values = new ContentValues();
-
-        values.put(COLUMN_ACCOUNT_ID, performanceItem.getAccountId());
-        values.put(COLUMN_SNAPSHOT_TIME, performanceItem.getTimestamp().getTime());
-        values.put(COLUMN_COST_BASIS, performanceItem.getCostBasis().getMicroCents());
-        values.put(COLUMN_TOTAL_VALUE, performanceItem.getValue().getMicroCents());
-        values.put(COLUMN_TODAY_CHANGE, performanceItem.getTodayChange().getMicroCents());
-
-        return values;
-    }
-
-    @Override
-    public void populate(PerformanceItem performanceItem, Cursor cursor, Map<String, Integer> columnMap) {
-        performanceItem.setAccountId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        performanceItem.setTimestamp(new Date(cursor.getLong(columnMap.get(COLUMN_SNAPSHOT_TIME))));
-        performanceItem.setCostBasis(new Money(cursor.getLong(columnMap.get(COLUMN_COST_BASIS))));
-        performanceItem.setValue(new Money(cursor.getLong(columnMap.get(COLUMN_TOTAL_VALUE))));
-        performanceItem.setTodayChange(new Money(cursor.getLong(columnMap.get(COLUMN_TODAY_CHANGE))));
-    }
-
     public PerformanceItem getLastSnapshot(long accountId) {
-        String where = COLUMN_ACCOUNT_ID + "=?";
+        String where = SnapshotMapper.COLUMN_ACCOUNT_ID + "=?";
         String[] whereArgs = new String[]{String.valueOf(accountId)};
 
         PerformanceItem performanceItem = null;
         try {
             List<PerformanceItem> performanceItems =
-                    mSqlConnection.query(this, PerformanceItem.class, where, whereArgs,
-                            COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
+                    mSqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, where, whereArgs,
+                            SnapshotMapper.COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
             if ((performanceItems != null) && (performanceItems.size() > 0)) {
                 performanceItem = performanceItems.get(0);
             }
@@ -136,14 +98,13 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
         return performanceItem;
     }
 
-    public List<PerformanceItem> getSnapshots(long accountId, long startTime,
-                                              long endTimeExclusive) {
+    public List<PerformanceItem> getSnapshots(long accountId, long startTime, long endTimeExclusive) {
 
         if (accountId < 0) {
             return getSnapshots(startTime, endTimeExclusive);
         }
 
-        String[] whereArgs = new String[] {
+        String[] whereArgs = new String[]{
                 String.valueOf(accountId),
                 String.valueOf(startTime),
                 String.valueOf(endTimeExclusive)
@@ -152,8 +113,33 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
         List<PerformanceItem> performanceItems;
         try {
             performanceItems =
-                    mSqlConnection.query(this, PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
-                            whereArgs, COLUMN_SNAPSHOT_TIME + " ASC");
+                    mSqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                            whereArgs, SnapshotMapper.COLUMN_SNAPSHOT_TIME + " ASC");
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getSnapshots(accountId)", e);
+            throw new RuntimeException(e);
+        }
+
+        return performanceItems;
+    }
+
+    public List<PerformanceItem> getSnapshotsByDay(long accountId, long startTime, long endTimeExclusive) {
+
+        if (accountId < 0) {
+            return getSnapshotsByDay(startTime, endTimeExclusive);
+        }
+
+        String[] whereArgs = new String[]{
+                String.valueOf(accountId),
+                String.valueOf(startTime),
+                String.valueOf(endTimeExclusive)
+        };
+
+        List<PerformanceItem> performanceItems;
+        try {
+            performanceItems =
+                    mSqlConnection.query(new SnapshotMapper(false), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                            whereArgs, SnapshotMapper.COLUMN_SNAPSHOT_TIME + " ASC");
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots(accountId)", e);
             throw new RuntimeException(e);
@@ -164,7 +150,7 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
 
     public List<PerformanceItem> getSnapshots(long startTime, long endTimeExclusive) {
 
-        String[] whereArgs = new String[] {
+        String[] whereArgs = new String[]{
                 String.valueOf(startTime),
                 String.valueOf(endTimeExclusive)
         };
@@ -173,11 +159,39 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = mSqlConnection.getReadableDatabase().rawQuery(SQL_ACCOUNTS_INCLUDED_TOTALS, whereArgs);
-            mSqlConnection.processCursor(this, cursor, PerformanceItem.class, performanceItems);
+            cursor = mSqlConnection.getReadableDatabase().rawQuery(
+                    String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME), whereArgs);
+            mSqlConnection.processCursor(new SnapshotMapper(true), cursor, PerformanceItem.class, performanceItems);
 
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots()", e);
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return performanceItems;
+    }
+
+    public List<PerformanceItem> getSnapshotsByDay(long startTime, long endTimeExclusive) {
+
+        String[] whereArgs = new String[]{
+                String.valueOf(startTime),
+                String.valueOf(endTimeExclusive)
+        };
+
+        Cursor cursor = null;
+        List<PerformanceItem> performanceItems = new ArrayList<>();
+        try {
+
+            cursor = mSqlConnection.getReadableDatabase().rawQuery(
+                    String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME_SNAPSHOT_DAILY), whereArgs);
+            mSqlConnection.processCursor(new SnapshotMapper(false), cursor, PerformanceItem.class, performanceItems);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error in getSnapshotsByDay()", e);
             throw new RuntimeException(e);
         } finally {
             if (cursor != null) {
@@ -222,7 +236,7 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
         cal.add(Calendar.DAY_OF_YEAR, -days);
         long timestamp = cal.getTimeInMillis();
 
-        return db.delete(TABLE_NAME, COLUMN_SNAPSHOT_TIME +"<=?", new String[] {String.valueOf(timestamp)});
+        return db.delete(SnapshotMapper.TABLE_NAME, SnapshotMapper.COLUMN_SNAPSHOT_TIME + "<=?", new String[]{String.valueOf(timestamp)});
     }
 
     public List<PerformanceItem> getCurrentSnapshot() {
@@ -247,6 +261,33 @@ public class SnapshotTotalsSqliteModel implements SqlMapper<PerformanceItem> {
             long endTime = cal.getTimeInMillis();
 
             snapshot = getSnapshots(accountId, startTime, endTime);
+        }
+        return snapshot;
+    }
+
+
+    public List<PerformanceItem> getCurrentDailySnapshot(int days) {
+        return getCurrentDailySnapshot(-1, days);
+    }
+
+    public List<PerformanceItem> getCurrentDailySnapshot(long accountId, int days) {
+        List<PerformanceItem> snapshot = null;
+
+        long latestTimestamp = getLatestGraphSnapshotTime();
+        if (latestTimestamp > 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(latestTimestamp);
+
+            long endTime = cal.getTimeInMillis();
+
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.add(Calendar.DAY_OF_YEAR, -days);
+            long startTime = cal.getTimeInMillis();
+
+            snapshot = getSnapshotsByDay(accountId, startTime, endTime);
         }
         return snapshot;
     }

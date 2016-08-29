@@ -123,7 +123,7 @@ public class WearSyncService extends IntentService implements
                 List<PerformanceItem> performanceItems = portfolioModel.getCurrentSnapshot(accountId);
 
                 if (broadcastAccountID) {
-                    AccountUpdateBroadcaster.broadcast(getApplicationContext(), accountId);
+                    PerformanceItemUpdateBroadcaster.broadcast(getApplicationContext(), accountId, -1);
                 }
 
                 if (sendConfigItems) {

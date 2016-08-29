@@ -73,5 +73,10 @@ public interface PortfolioModel {
     List<PerformanceItem> getCurrentSnapshot();
 
     List<PerformanceItem> getCurrentSnapshot(long accountId);
+
+    List<PerformanceItem> getCurrentDailySnapshot(int days);
+
+    List<PerformanceItem> getCurrentDailySnapshot(long accountId, int days);
+
 }
 

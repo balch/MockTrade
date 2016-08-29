@@ -31,7 +31,7 @@ import android.widget.TextView;
 
 import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
-import com.balch.mocktrade.shared.widget.DailyGraphView;
+import com.balch.mocktrade.shared.view.DailyGraphView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class GraphActivity extends WearableActivity {
         List<PerformanceItem> performanceItems = intent.getParcelableArrayListExtra(EXTRA_PERFORMANCE_ITEMS);
         HighlightItem highlightItem = intent.getParcelableExtra(EXTRA_HIGHLIGHT_ITEM);
         DailyGraphView graphView = (DailyGraphView) findViewById(R.id.graph_view);
-        graphView.bind(performanceItems);
+        graphView.bind(performanceItems, true);
 
         TextView titleTextView = (TextView) findViewById(R.id.graph_title);
         String text = (highlightItem.getHighlightType() != HighlightItem.HighlightType.TOTAL_ACCOUNT) ?

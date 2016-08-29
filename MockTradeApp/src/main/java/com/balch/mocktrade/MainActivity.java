@@ -48,7 +48,7 @@ import com.balch.mocktrade.portfolio.PortfolioData;
 import com.balch.mocktrade.portfolio.PortfolioLoader;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
-import com.balch.mocktrade.services.AccountUpdateBroadcaster;
+import com.balch.mocktrade.services.PerformanceItemUpdateBroadcaster;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
@@ -212,8 +212,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     protected MainPortfolioView createView() {
         mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
-            public void onGraphSelectionChanged(long accountId) {
-                mGraphDataLoader.setSelectedAccountId(accountId);
+            public void onGraphSelectionChanged(long accountId, int daysToReturn) {
+                mGraphDataLoader.setSelectionCriteria(accountId, daysToReturn);
             }
         });
         return mMainPortfolioView;
@@ -225,7 +225,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             mAccountUpdateReceiver = new AccountUpdateReceiver();
 
             LocalBroadcastManager.getInstance(this)
-                    .registerReceiver(mAccountUpdateReceiver, new IntentFilter(AccountUpdateBroadcaster.ACTION));
+                    .registerReceiver(mAccountUpdateReceiver, new IntentFilter(PerformanceItemUpdateBroadcaster.ACTION));
         }
     }
 
@@ -705,10 +705,10 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            long accountId = AccountUpdateBroadcaster.getAccountId(intent);
-            mGraphDataLoader.setSelectedAccountId(accountId);
+            PerformanceItemUpdateBroadcaster.PerformanceItemUpdateData data = PerformanceItemUpdateBroadcaster.getData(intent);
+            mGraphDataLoader.setSelectionCriteria(data.accountId, data.days);
             mGraphDataLoader.forceLoad();
-            mMainPortfolioView.setAccountSpinner(accountId);
+            mMainPortfolioView.setAccountSpinner(data.accountId);
         }
     }
 

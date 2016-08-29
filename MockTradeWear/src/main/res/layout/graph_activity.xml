@@ -51,7 +51,7 @@
             android:textSize="20sp"
             android:textStyle="bold"/>
 
-        <com.balch.mocktrade.shared.widget.DailyGraphView
+        <com.balch.mocktrade.shared.view.DailyGraphView
             android:id="@+id/graph_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"

@@ -759,64 +759,76 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
             String uriPath = dataItem.getUri().getPath();
             if (uriPath.equals(WearDataSync.PATH_SNAPSHOT_SYNC)) {
-                ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_SNAPSHOT_DAILY);
-
-                if (dataMapList != null) {
-                    mPerformanceItems = new ArrayList<>(dataMapList.size());
-
-                    // filter out any values that are outside of market open and close times
-                    long marketOpen = (getMarketOpenTime().getTimeInMillis() % MILLIS_PER_DAY) - MARKET_OFFSET_MILLIS;
-                    long marketClose = (getMarketCloseTime().getTimeInMillis() % MILLIS_PER_DAY) + MARKET_OFFSET_MILLIS;
-
-                    for (DataMap data : dataMapList) {
-                        PerformanceItem item = new PerformanceItem(data);
-                        long ts = item.getTimestamp().getTime() % MILLIS_PER_DAY;
-                        if ((ts >= marketOpen) && (ts <= marketClose)) {
-                            mPerformanceItems.add(item);
-                        }
-                    }
-
-                    if (mPerformanceItems.size() == 0) {
-                        mPerformanceItems = null;
-                    }
-                } else {
-                    mPerformanceItems = null;
-                }
-
-                calcPerformanceGradient();
+                updatePathSnapshotSync(dataMap);
             } else if (uriPath.equals(WearDataSync.PATH_HIGHLIGHTS_SYNC)) {
-                ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS);
-
-                if (dataMapList != null) {
-                    mHighlightItems = new ArrayList<>(dataMapList.size());
-
-                    for (DataMap data : dataMapList) {
-                        HighlightItem item = new HighlightItem(data);
-                        mHighlightItems.add(item);
-
-                        if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
-                            setTimeTextPaint(item, false);
-                        }
-                    }
-
-                    if (mHighlightItemPosition >= mHighlightItems.size()) {
-                        mHighlightItemPosition = 0;
-                    }
-                } else {
-                    mHighlightItems = null;
-                    mHighlightItemPosition = 0;
-                }
+                updatePathHighlightsSync(dataMap);
             } else if (uriPath.equals(WearDataSync.PATH_WATCH_CONFIG_SYNC)) {
-                ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS);
-                if (dataMapList != null) {
-                    for (DataMap dm : dataMapList) {
-                        WatchConfigItem item = new WatchConfigItem(dm);
-                        if (item.getKey().equals("pref_twenty_four_hour_display")) {
-                            mShowTwentyFourHourTime = item.isEnabled();
-                        }
+                updatePathWatchConfigSync(dataMap);
+            }
+        }
+
+        private void updatePathWatchConfigSync(DataMap dataMap) {
+            ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS);
+            if (dataMapList != null) {
+                for (DataMap dm : dataMapList) {
+                    WatchConfigItem item = new WatchConfigItem(dm);
+                    if (item.getKey().equals("pref_twenty_four_hour_display")) {
+                        mShowTwentyFourHourTime = item.isEnabled();
                     }
                 }
             }
+        }
+
+        private void updatePathHighlightsSync(DataMap dataMap) {
+            ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS);
+
+            if (dataMapList != null) {
+                mHighlightItems = new ArrayList<>(dataMapList.size());
+
+                for (DataMap data : dataMapList) {
+                    HighlightItem item = new HighlightItem(data);
+                    mHighlightItems.add(item);
+
+                    if (item.getHighlightType() == HighlightItem.HighlightType.TOTAL_ACCOUNT) {
+                        setTimeTextPaint(item, false);
+                    }
+                }
+
+                if (mHighlightItemPosition >= mHighlightItems.size()) {
+                    mHighlightItemPosition = 0;
+                }
+            } else {
+                mHighlightItems = null;
+                mHighlightItemPosition = 0;
+            }
+        }
+
+        private void updatePathSnapshotSync(DataMap dataMap) {
+            ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_SNAPSHOT_DAILY);
+
+            if (dataMapList != null) {
+                mPerformanceItems = new ArrayList<>(dataMapList.size());
+
+                // filter out any values that are outside of market open and close times
+                long marketOpen = (getMarketOpenTime().getTimeInMillis() % MILLIS_PER_DAY) - MARKET_OFFSET_MILLIS;
+                long marketClose = (getMarketCloseTime().getTimeInMillis() % MILLIS_PER_DAY) + MARKET_OFFSET_MILLIS;
+
+                for (DataMap data : dataMapList) {
+                    PerformanceItem item = new PerformanceItem(data);
+                    long ts = item.getTimestamp().getTime() % MILLIS_PER_DAY;
+                    if ((ts >= marketOpen) && (ts <= marketClose)) {
+                        mPerformanceItems.add(item);
+                    }
+                }
+
+                if (mPerformanceItems.size() == 0) {
+                    mPerformanceItems = null;
+                }
+            } else {
+                mPerformanceItems = null;
+            }
+
+            calcPerformanceGradient();
         }
 
         private void setTimeTextPaint(HighlightItem item, boolean animate) {

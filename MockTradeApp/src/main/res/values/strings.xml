@@ -2,14 +2,6 @@
 <resources>
 
     <string name="app_name">MockTrade</string>
-    <string name="action_settings">Settings</string>
-    <string name="init_database_error_title">Error initialing Database</string>
-    <string name="init_database_error_message">There has been an error initializing the database.
-        This renders the application unusable.  Contact the vendor to report the problem.</string>
-    <string name="nav_money_center">$$$ Center</string>
-    <string name="nav_research">Research</string>
-    <string name="nav_ideas">Ideas</string>
-    <string name="nav_settings">Settings</string>
     <string name="settings_market_open_time_title">Market Open Time</string>
     <string name="settings_market_open_time_summary">Local time the markets open. This is used to determine when the app starts polling.</string>
     <string name="settings_market_close_time_title">Market Close Time</string>
@@ -41,7 +33,6 @@
     <string name="account_description_label">Description</string>
     <string name="account_init_balance_label">Initial Balance</string>
     <string name="account_strategy_label">Strategy</string>
-    <string name="account_current_balance_label">Current Balance</string>
     <string name="account_exclude_from_totals_label">Exclude From Totals</string>
 
     <string-array name="account_strategy_display_values">
@@ -100,10 +91,7 @@
     <string name="order_cancel_dlg_title">Are you sure?</string>
     <string name="order_cancel_dlg_message_format">You are about to cancel Order #:%1$d for \'%2$s\'.  This cannot be undone!!!</string>
 
-    <string name="order_edit_title_edit">Change Order</string>
-    <string name="order_edit_title_new">New Order</string>
     <string name="order_edit_ok_button_new">Execute</string>
-    <string name="order_edit_ok_button_edit">Change</string>
 
     <string name="order_symbol_label">Symbol</string>
     <string name="order_action_label">Action</string>
@@ -113,9 +101,6 @@
     <string name="order_stop_percent_label">Stop Amount(%)</string>
     <string name="order_quantity_label">Quantity</string>
     <string name="order_symbol_hint">ex: GOOG</string>
-
-    <string name="portfolio_heading">Portfolio</string>
-    <string name="portfolio_new_account_button">New</string>
 
     <string name="quantity_edit_control_balance_label">Available Funds:</string>
     <string name="quantity_edit_control_cost_buy_label">Estimated Cost:</string>

@@ -1,13 +1,4 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
-    <dimen name="settings_si_height">65dp</dimen>
-    <dimen name="settings_si_padding">3dp</dimen>
-    <dimen name="spacing_normal">16dp</dimen>
-    <dimen name="image_width">120dp</dimen>
-    <dimen name="image_final_width">32dp</dimen>
     <dimen name="portfolio_view_header_height">240dp</dimen>
     <dimen name="portfolio_view_header_margin">10dp</dimen>
     <dimen name="portfolio_view_graph_container_padding">20dp</dimen>

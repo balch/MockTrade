@@ -39,6 +39,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -154,9 +155,7 @@ public class SqlConnection extends SQLiteOpenHelper {
         if (!TextUtils.isEmpty(extraWhere)) {
             where.append(" ").append(extraWhere);
             if (whereArgs != null) {
-                for (String s : whereArgs) {
-                    whereArgList.add(s);
-                }
+                Collections.addAll(whereArgList, whereArgs);
             }
         }
         int count = db.update(mapper.getTableName(), values, where.toString(),

@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingLeft="10dp"
-    android:paddingRight="10sp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10sp"
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
-    android:background="#66666666">
+    android:background="#66666666"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:layout_width="0dp"

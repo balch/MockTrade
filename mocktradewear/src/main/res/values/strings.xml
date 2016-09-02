@@ -26,7 +26,4 @@
     <string name="face_name">MockTrade</string>
     <string name="watch_config_title">Config MockTrade</string>
     <string name="title_activity_graph">GraphActivity</string>
-    <string name="hello_round">Hello Round World!</string>
-    <string name="hello_square">Hello Square World!</string>
-
 </resources>

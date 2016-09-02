@@ -485,9 +485,18 @@ public class DailyGraphView extends View {
                 } // else fallthrow
 
             case MotionEvent.ACTION_DOWN: {
+                Money money;
+                Date timestamp;
 
-                long val = (long) (eventX / mScaleX) + mOffsetX;
-                Date timestamp = mHourly ? new Date(val) : mPerformanceItems.get((int)val).getTimestamp();
+                long xVal = (long) (eventX / mScaleX) + mOffsetX;
+                if (mHourly) {
+                    timestamp = new Date(xVal);
+                    money = extrapolateValue(timestamp.getTime());
+                } else {
+                    PerformanceItem performanceItem = mPerformanceItems.get((int) xVal + 1);
+                    timestamp = performanceItem.getTimestamp();
+                    money = getPerformanceItemValue(performanceItem);
+                }
 
                 if (mExaminerRect == null) {
                     mExaminerRect = new RectF();
@@ -502,10 +511,9 @@ public class DailyGraphView extends View {
                 mExaminerTimePaint.getTextBounds(mExaminerTime, 0, mExaminerTime.length(), mExaminerTimeTextBounds);
 
                 mExaminerValue = "";
-                Money extrapolated = extrapolateValue(timestamp.getTime());
-                if (extrapolated != null) {
-                    mExaminerValue = extrapolated.getFormatted();
-                    mExaminerValuePaint.setColor((extrapolated.getMicroCents() >= 0) ?
+                if (money != null) {
+                    mExaminerValue = money.getFormatted();
+                    mExaminerValuePaint.setColor((money.getMicroCents() >= 0) ?
                             Color.GREEN : Color.RED);
                 }
                 mExaminerValuePaint.getTextBounds(mExaminerValue, 0,
@@ -536,7 +544,7 @@ public class DailyGraphView extends View {
                 PerformanceItem performanceItem = mPerformanceItems.get(x);
 
                 if (timestamp <= performanceItem.getTimestamp().getTime()) {
-                    if (!mHourly || (timestamp == performanceItem.getTimestamp().getTime()) || (x == 0)) {
+                    if ((timestamp == performanceItem.getTimestamp().getTime()) || (x == 0)) {
                         money = getPerformanceItemValue(performanceItem);
                     } else {
 

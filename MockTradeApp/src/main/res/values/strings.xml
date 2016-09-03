@@ -135,7 +135,7 @@
     <string name="portfolio_view_empty_graph_text">Nothing to see here.\nCreate a portfolio and come back during market hours.</string>
     <string name="portfolio_view_time_title_today">Today</string>
     <string name="portfolio_view_time_title_last_week">Last Week</string>
-    <string name="portfolio_view_time_title_last_month">Last Month</string>
+    <string name="portfolio_view_time_title_last_month">Last 30 Days</string>
     <string name="portfolio_view_time_title_last_90_days">Last 90 Days</string>
     <string name="portfolio_view_graph_spinner_totals">Totals</string>
     <string name="portfolio_view_create_dogs">Dogs of the Dow QuickStart</string>

@@ -277,15 +277,15 @@ public class SnapshotTotalsSqliteModel {
         if (latestTimestamp > 0) {
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(latestTimestamp);
-
-            long endTime = cal.getTimeInMillis();
-
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
             cal.add(Calendar.DAY_OF_YEAR, -days);
             long startTime = cal.getTimeInMillis();
+
+            cal.add(Calendar.DAY_OF_YEAR, days + 1);
+            long endTime = cal.getTimeInMillis();
 
             snapshot = getSnapshotsByDay(accountId, startTime, endTime);
         }

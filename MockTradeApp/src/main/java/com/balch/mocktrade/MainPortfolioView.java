@@ -55,7 +55,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         void onGraphSelectionChanged(long accountId, int daysToReturn);
     }
 
-    private static int [] GRAPH_TIME_VALUES = {-1, 8, 31, 91};
+    private static int [] GRAPH_TIME_VALUES = {-1, 7, 30, 90};
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;

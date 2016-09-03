@@ -493,31 +493,31 @@ public class DailyGraphView extends View {
                     timestamp = new Date(xVal);
                     money = extrapolateValue(timestamp.getTime());
                 } else {
-                    PerformanceItem performanceItem = mPerformanceItems.get((int) xVal + 1);
-                    timestamp = performanceItem.getTimestamp();
-                    money = getPerformanceItemValue(performanceItem);
+                    int index = (int) xVal + 1;
+                    if (index < mPerformanceItems.size()) {
+                        PerformanceItem performanceItem = mPerformanceItems.get(index);
+                        timestamp = performanceItem.getTimestamp();
+                        money = getPerformanceItemValue(performanceItem);
+                    } else {
+                        return true;
+                    }
                 }
 
                 if (mExaminerRect == null) {
                     mExaminerRect = new RectF();
                 }
 
-                mExaminerRect.set(eventX, GRAPH_PADDING_VERTICAL,
-                        eventX + EXAMINER_WIDTH, mHeight - GRAPH_PADDING_VERTICAL);
+                mExaminerRect.set(eventX, GRAPH_PADDING_VERTICAL, eventX + EXAMINER_WIDTH, mHeight - GRAPH_PADDING_VERTICAL);
 
-                mExaminerTime = mHourly ?
-                        HOURLY_DATE_FORMAT.format(timestamp) :
-                        DAILY_DATE_FORMAT.format(timestamp);
+                mExaminerTime = mHourly ? HOURLY_DATE_FORMAT.format(timestamp) : DAILY_DATE_FORMAT.format(timestamp);
                 mExaminerTimePaint.getTextBounds(mExaminerTime, 0, mExaminerTime.length(), mExaminerTimeTextBounds);
 
                 mExaminerValue = "";
                 if (money != null) {
                     mExaminerValue = money.getFormatted();
-                    mExaminerValuePaint.setColor((money.getMicroCents() >= 0) ?
-                            Color.GREEN : Color.RED);
+                    mExaminerValuePaint.setColor((money.getMicroCents() >= 0) ? Color.GREEN : Color.RED);
                 }
-                mExaminerValuePaint.getTextBounds(mExaminerValue, 0,
-                        mExaminerValue.length(), mExaminerValueTextBounds);
+                mExaminerValuePaint.getTextBounds(mExaminerValue, 0, mExaminerValue.length(), mExaminerValueTextBounds);
 
                 handled = true;
                 break;

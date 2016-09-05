@@ -26,13 +26,16 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -55,7 +58,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         void onGraphSelectionChanged(long accountId, int daysToReturn);
     }
 
-    private static int [] GRAPH_TIME_VALUES = {-1, 7, 30, 90};
+    private final static int [] GRAPH_TIME_VALUES = {-1, 7, 30, 90};
+    private final static int GRAPH_TIME_HOURLY_INDEX = 0;
+    private final static DateFormat DATE_FORMAT_SHORT = DateFormat.getDateInstance(DateFormat.SHORT);
 
     protected PortfolioAdapter mPortfolioAdapter;
     protected RecyclerView mPortfolioList;
@@ -71,7 +76,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     protected Spinner mTimeGraphSpinner;
 
     protected ArrayAdapter<String> mGraphAccountAdapter;
-    protected ArrayAdapter<String> mGraphTimeAdapter;
+    protected GraphTimeAdapter mGraphTimeAdapter;
 
     // variables that need to be persisted
     protected List<Long> mAccountIds = new ArrayList<>();
@@ -128,8 +133,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         Resources resources = getResources();
 
-        mGraphTimeAdapter = new ArrayAdapter<>(getContext(), R.layout.portfolio_view_graph_spinner_text);
-        mGraphTimeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGraphTimeAdapter = new GraphTimeAdapter(getContext(), R.layout.portfolio_view_graph_spinner_text, android.R.layout.simple_spinner_dropdown_item);
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_today));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_week));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_month));
@@ -241,15 +245,18 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     public void setDailyGraphData(List<PerformanceItem> performanceItems) {
         if ((performanceItems != null) && (performanceItems.size() >= 2)) {
 
-/*
-            Date timestamp =  performanceItems.get(0).getTimestamp();
-            if (DateUtils.isToday(timestamp.getTime())) {
-                mGraphTimeTitle.setText(R.string.portfolio_view_time_title_today);
-            } else {
-                mGraphTimeTitle.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(timestamp));
+            if (mGraphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX) {
+                Date timestamp = performanceItems.get(performanceItems.size() - 1).getTimestamp();
+                String label = (DateUtils.isToday(timestamp.getTime()) ?
+                        getResources().getString(R.string.portfolio_view_time_title_today) :
+                        DATE_FORMAT_SHORT.format(timestamp));
+
+                if (!mGraphTimeAdapter.getItem(GRAPH_TIME_HOURLY_INDEX).equals(label)) {
+                    mGraphTimeAdapter.set(GRAPH_TIME_HOURLY_INDEX, label);
+                }
             }
-*/
-            mDailyGraphView.bind(performanceItems, (mGraphTimeSelectedPosition == 0));
+
+            mDailyGraphView.bind(performanceItems, (mGraphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX));
             mEmptyGraphView.setVisibility(GONE);
             mDailyGraphView.setVisibility(VISIBLE);
 
@@ -321,5 +328,70 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
                         return new SavedState[size];
                     }
                 };
+    }
+
+    private static class GraphTimeAdapter extends BaseAdapter {
+        private final LayoutInflater mInflater;
+        private final int mResource;
+        private final int mDropDownResource;
+
+        private final List<String> mDataItems = new ArrayList<>();
+
+        private GraphTimeAdapter(Context context, @LayoutRes int resource, @LayoutRes int dropdownResource) {
+            this.mInflater = LayoutInflater.from(context);
+            this.mResource = resource;
+            this.mDropDownResource = dropdownResource;
+        }
+
+        @Override
+        public int getCount() {
+            return mDataItems.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return mDataItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public void add(String item) {
+            mDataItems.add(item);
+        }
+
+        public void set(int position, String text) {
+            mDataItems.set(position, text);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return createViewFromResource(position, convertView, parent, mResource);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return createViewFromResource(position, convertView, parent, mDropDownResource);
+        }
+
+        private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
+            View view;
+            TextView text;
+
+            if (convertView == null) {
+                view = mInflater.inflate(resource, parent, false);
+            } else {
+                view = convertView;
+            }
+
+            text = (TextView) view;
+            text.setText(getItem(position));
+
+            return view;
+        }
+
     }
 }

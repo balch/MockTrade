@@ -90,19 +90,17 @@ public class DailyGraphView extends View {
     };
 
     private static final int[] LINEAR_GRADIENT_COLORS_FILL = new int[]{
-            Color.argb(128, 0, 128, 0),
-            Color.argb(64, 0, 128, 0),
-            Color.argb(48, 0, 128, 0),
-            Color.argb(32, 0, 92, 0),
+            Color.argb(92, 0, 255, 0),
+            Color.argb(92, 0, 156, 0),
+            Color.argb(92, 0, 92, 0),
             Color.argb(0, 0, 0, 0),
-            Color.argb(32, 92, 0, 0),
-            Color.argb(48, 128, 0, 0),
-            Color.argb(64, 128, 0, 0),
-            Color.argb(128, 128, 0, 0)
+            Color.argb(92, 92, 0, 0),
+            Color.argb(92, 156, 0, 0),
+            Color.argb(92, 255, 0, 0)
     };
 
     private static final float[] LINEAR_GRADIENT_POSITIONS_FILL = new float[]{
-            0f, .1f, .20f, .499f, .5f, .501f, .80f, .9f, 1f
+            0f, .25f, .499f, .5f, .501f, .75f, 1f
     };
 
     private final static DateFormat HOURLY_DATE_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -365,7 +363,7 @@ public class DailyGraphView extends View {
                 deltaY = minDeltaY;
             }
 
-            mScaleY = (float) (mHeight) / deltaY;
+            mScaleY = (float) (mHeight-1) / deltaY;
             mOffsetY = mHourly ? 0 : initialValue;
 
             if (mHourly) {

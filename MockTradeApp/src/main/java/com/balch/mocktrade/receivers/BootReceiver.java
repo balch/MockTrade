@@ -27,25 +27,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.balch.mocktrade.ModelProvider;
-import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
-import com.balch.mocktrade.portfolio.PortfolioModel;
-import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
-
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = BootReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "BootReceiver onReceive");
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            ModelProvider modelProvider = ((ModelProvider)context.getApplicationContext());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
-            financeModel.setQuoteServiceAlarm();
+        Log.d(TAG, "BootReceiver onReceive");
 
-            PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
-            portfolioModel.scheduleOrderServiceAlarmIfNeeded();
-        }
+        // no-op
+        // the BootReceiver will cause the TradeApplication.onCreate to fire which
+        // will initialize the alarms
     }
 }

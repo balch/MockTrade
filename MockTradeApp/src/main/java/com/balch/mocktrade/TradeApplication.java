@@ -24,13 +24,14 @@ package com.balch.mocktrade;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.VolleyBackground;
+import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;
@@ -50,9 +51,9 @@ public class TradeApplication extends Application implements ModelProvider {
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
-    private SqlConnection mSqlConnection;
-    private RequestQueue mRequestQueue;
-    private Settings mSettings;
+    private volatile SqlConnection mSqlConnection;
+    private volatile RequestQueue mRequestQueue;
+    private volatile Settings mSettings;
 
     @Override
     public void onCreate() {
@@ -73,23 +74,21 @@ public class TradeApplication extends Application implements ModelProvider {
                     .build());
         }
 
-        mSettings = new Settings(this);
-
-        mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
-                DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
-
-        mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
-
-        FinanceModel financeModel = new GoogleFinanceModel(this);
-        financeModel.setQuoteServiceAlarm();
-
-        PortfolioModel portfolioModel = new PortfolioSqliteModel(this);
-        portfolioModel.scheduleOrderServiceAlarmIfNeeded();
-
         startService(WearSyncService.getIntent(this, true, true, true, false));
 
+        new StartAlarmsTask().execute();
     }
 
+    private class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... urls) {
+            FinanceModel financeModel = new GoogleFinanceModel(TradeApplication.this);
+            financeModel.setQuoteServiceAlarm();
+
+            PortfolioModel portfolioModel = new PortfolioSqliteModel(TradeApplication.this);
+            portfolioModel.scheduleOrderServiceAlarmIfNeeded();
+            return null;
+        }
+    }
 
     @Override
     public Context getContext() {
@@ -98,11 +97,31 @@ public class TradeApplication extends Application implements ModelProvider {
 
     @Override
     public SqlConnection getSqlConnection() {
+
+        // double check lock pattern
+        if (mSqlConnection == null) {
+            synchronized (this) {
+                if (mSqlConnection == null) {
+                    mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
+                            DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
+                }
+            }
+        }
+
         return mSqlConnection;
     }
 
     @Override
     public Settings getSettings() {
+        // double check lock pattern
+        if (mSettings == null) {
+            synchronized (this) {
+                if (mSettings == null) {
+                    mSettings = new Settings(this);
+                }
+            }
+        }
+
         return mSettings;
     }
 
@@ -113,6 +132,15 @@ public class TradeApplication extends Application implements ModelProvider {
 
     @Override
     public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
+        // double check lock pattern
+        if (mRequestQueue == null) {
+            synchronized (this) {
+                if (mRequestQueue == null) {
+                    mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
+                }
+            }
+        }
+
         if (!customRetryPolicy) {
             request.setRetryPolicy(DEFAULT_RETRY_POlICY);
         }

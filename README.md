@@ -78,44 +78,44 @@ explore some Application Architecture ideas and apply them to the Android platfo
 
 Main portfolio screen. View multiple portfolios with totals pinned to the bottom
 
-![Portait](./ss_app_portrait.png)
+![Portait](assets/ss_app_portrait.png)
 
-![Landscape](./ss_app_landscape.png)
+![Landscape](assets/ss_app_landscape.png)
 
 Slide screen down to reveal daily performance chart
 
-![App Totals](./ss_app_totals.png)
-![Wear Totals](./ss_watch_totals.png)
+![App Totals](assets/ss_app_totals.png)
+![Wear Totals](assets/ss_watch_totals.png)
 
 Create a new portfolio. User can create a normal portfolio and
 manage their own assets, or choose a strategy and track the
 performance over time
 
-![Create Account](./ss_app_dogs_create.png)
+![Create Account](assets/ss_app_dogs_create.png)
 
 Sell screen showing a Trailing Stop % order type
 
-![Sell TSLA](./ss_app_sell_tsla.png)
+![Sell TSLA](assets/ss_app_sell_tsla.png)
 
 Buy screen with real-time quote and order validation
 
-![Buy WMT](ss_app_buy_wmt.png)
+![Buy WMT](assets/ss_app_buy_wmt.png)
 
 WatchFaces
 
-![App Dogs](./ss_app_dogs.png)
-![Wear Dogs](./ss_watch_dogs.png)
+![App Dogs](assets/ss_app_dogs.png)
+![Wear Dogs](assets/ss_watch_dogs.png)
 
 Changes to watchface reflect in application
 
-![App Spec](./ss_app_spec.png)
+![App Spec](assets/ss_app_spec.png)
 
-![Wear Spec](./ss_watch_spec.png)
-![Wear Spec Graph](./ss_watch_spec_graph.png)
+![Wear Spec](assets/ss_watch_spec.png)
+![Wear Spec Graph](assets/ss_watch_spec_graph.png)
 
 12hr view
 
-![Wear Spec](./ss_watch_spec_12.png)
+![Wear Spec](assets/ss_watch_spec_12.png)
 
 
 ### Attributions

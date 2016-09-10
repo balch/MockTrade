@@ -83,22 +83,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class MockTradeFace extends CanvasWatchFaceService {
     private static final String TAG = MockTradeFace.class.getSimpleName();
-
-    private Typeface mTimeFont;
-
     private static final float TIME_TICK_STROKE_WIDTH = 3f;
     private static final float SHADOW_RADIUS = 6;
     private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 156;
     private static final int OFF_PERFORMANCE_COLOR_COMPONENT = 128;
-
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
     private static final long MARKET_OFFSET_MILLIS = TimeUnit.MINUTES.toMillis(15);
-
     private static final int MSG_UPDATE_TIME = 0;
-
     private static final int ANIMATION_DURATION_MS = 500;
-
+    private Typeface mTimeFont;
 
     @Override
     public Engine onCreateEngine() {
@@ -130,6 +124,11 @@ public class MockTradeFace extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(MockTradeFace.this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
         private Paint mBackgroundPaint;
         private Paint mTextPaint;
         private Paint mDayCirclePaint;
@@ -137,15 +136,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
         private Paint mMarketTimePaint;
         private Paint mMarketDayRingPaint;
         private Calendar mTime;
-        private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mTime.setTimeZone(TimeZone.getDefault());
-                calcMarketTimes();
-                calcPerformanceGradient();
-            }
-        };
-
         private Rect mTextSizeRect = new Rect();
         private float mYOffset;
         private int mChinSize;
@@ -161,25 +151,24 @@ public class MockTradeFace extends CanvasWatchFaceService {
 
         private ArrayList<PerformanceItem> mPerformanceItems;
         private float mPerformanceDurationDegrees;
-
+        private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mTime.setTimeZone(TimeZone.getDefault());
+                calcMarketTimes();
+                calcPerformanceGradient();
+            }
+        };
         private List<HighlightItem> mHighlightItems;
         private int mHighlightItemPosition = 0;
         private Paint mHighlightDescTextPaint;
         private Paint mHighlightSymbolTextPaint;
         private Paint mHighlightDataTextPaint;
         private float mHighlightYOffset;
-
         private int mColorPositive;
         private int mColorNegative;
-
         private boolean mLowBitAmbient;
         private boolean mShowTwentyFourHourTime;
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(MockTradeFace.this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
 
         @Override
         public void onCreate(SurfaceHolder holder) {

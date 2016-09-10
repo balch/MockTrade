@@ -227,13 +227,8 @@ public class MockTradeWatchConfigActivity extends Activity implements
     public void onCentralPositionChanged(int centralPosition) {}
 
     private static class ConfigItemAdapter extends WearableListView.Adapter {
-        public interface ConfigItemAdapterListener {
-            void onConfigItemChanged(WatchConfigItem item);
-        }
-
-        private List<WatchConfigItem> mConfigItems = new ArrayList<>();
         private final ConfigItemAdapterListener listener;
-
+        private List<WatchConfigItem> mConfigItems = new ArrayList<>();
         public ConfigItemAdapter(ConfigItemAdapterListener listener) {
             this.listener = listener;
         }
@@ -283,6 +278,10 @@ public class MockTradeWatchConfigActivity extends Activity implements
         @Override
         public int getItemCount() {
             return mConfigItems.size();
+        }
+
+        public interface ConfigItemAdapterListener {
+            void onConfigItemChanged(WatchConfigItem item);
         }
     }
 

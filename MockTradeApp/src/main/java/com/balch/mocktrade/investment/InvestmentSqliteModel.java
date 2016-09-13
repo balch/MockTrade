@@ -145,7 +145,7 @@ public class InvestmentSqliteModel implements SqlMapper<Investment> {
         Date date = null;
         Cursor cursor = null;
         try {
-            cursor = mModelProvider.getSqlConnection().getReadableDatabase().rawQuery(SQL_LAST_TRADE_TIME, null);
+            cursor = mModelProvider.getSqlConnection().rawQuery(SQL_LAST_TRADE_TIME, null);
             if (cursor.moveToNext()) {
                 date = new Date(cursor.getLong(0));
             }

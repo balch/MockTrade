@@ -159,7 +159,7 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = mSqlConnection.getReadableDatabase().rawQuery(
+            cursor = mSqlConnection.rawQuery(
                     String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME), whereArgs);
             mSqlConnection.processCursor(new SnapshotMapper(true), cursor, PerformanceItem.class, performanceItems);
 
@@ -186,7 +186,7 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = mSqlConnection.getReadableDatabase().rawQuery(
+            cursor = mSqlConnection.rawQuery(
                     String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME_SNAPSHOT_DAILY), whereArgs);
             mSqlConnection.processCursor(new SnapshotMapper(false), cursor, PerformanceItem.class, performanceItems);
 
@@ -212,7 +212,7 @@ public class SnapshotTotalsSqliteModel {
         long latestTimestamp = 0;
         try {
 
-            cursor = mSqlConnection.getReadableDatabase().rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
+            cursor = mSqlConnection.rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
             if (cursor.moveToNext()) {
                 latestTimestamp = cursor.getLong(0);
             }

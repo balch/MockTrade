@@ -93,6 +93,9 @@ public class SqlConnection extends SQLiteOpenHelper {
                                                        Class<T> clazz, List<T> results)
                     throws IllegalAccessException, InvocationTargetException,
                             InstantiationException, NoSuchMethodException {
+
+        StopWatch sw = StopWatch.newInstance();
+
         Map<String, Integer> columnMap = getColumnMap(cursor);
         Constructor<T> ctor = clazz.getConstructor();
         while (cursor.moveToNext()) {
@@ -111,10 +114,22 @@ public class SqlConnection extends SQLiteOpenHelper {
             mapper.populate(item, cursor, columnMap);
             results.add(item);
         }
+
+        long elapsedMs = sw.stop();
+        Log.d(TAG, String.format("SqlConnection.processCursor on %s took %d ms to return %d rows", mapper.getTableName(), elapsedMs, results.size()));
     }
 
+    public Cursor rawQuery(String sql, String[] selectionArgs) {
+        StopWatch sw = StopWatch.newInstance();
 
-    public long insert(SqlMapper mapper, DomainObject item) throws SQLException {
+        Cursor cursor = getReadableDatabase().rawQuery(sql, selectionArgs);
+        long elapsedMs = sw.stop();
+        Log.d(TAG, String.format("SqlConnection.rawQuery on %d ms: %s",elapsedMs, sql));
+
+        return cursor;
+    }
+
+        public long insert(SqlMapper mapper, DomainObject item) throws SQLException {
         return insert(mapper, item, this.getWritableDatabase());
     }
 

@@ -655,8 +655,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     private void updateView() {
-        mGraphDataLoader.onContentChanged();
-        mPortfolioLoader.onContentChanged();
+        mGraphDataLoader.forceLoad();
+        mPortfolioLoader.forceLoad();
     }
 
     private static class CreateAccountTask extends AsyncTask<Account, Void, Void> {

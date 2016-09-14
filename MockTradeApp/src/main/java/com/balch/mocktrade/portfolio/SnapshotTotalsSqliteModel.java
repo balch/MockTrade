@@ -30,6 +30,7 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
@@ -51,7 +52,8 @@ public class SnapshotTotalsSqliteModel {
                     " SUM(" + SnapshotMapper.COLUMN_COST_BASIS + ") AS " + SnapshotMapper.COLUMN_COST_BASIS + "," +
                     " SUM(" + SnapshotMapper.COLUMN_TODAY_CHANGE + ") AS " + SnapshotMapper.COLUMN_TODAY_CHANGE + " " +
                     " FROM %s AS t1, account AS t2" +
-                    " WHERE t1.account_id = t2._id AND t2.exclude_from_totals = 0" +
+                    " WHERE t1.account_id = t2._id " +
+                    " AND ('1'=? OR t2.exclude_from_totals = 0)" +
                     " AND " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " >= ?" +
                     " AND " + SnapshotMapper.COLUMN_SNAPSHOT_TIME + " < ?" +
                     " GROUP BY " + SnapshotMapper.COLUMN_SNAPSHOT_TIME +
@@ -73,9 +75,11 @@ public class SnapshotTotalsSqliteModel {
                     SnapshotMapper.COLUMN_SNAPSHOT_TIME + " < ?";
 
     private final SqlConnection mSqlConnection;
+    private final Settings mSettings;
 
     public SnapshotTotalsSqliteModel(ModelProvider modelProvider) {
         mSqlConnection = modelProvider.getSqlConnection();
+        mSettings = modelProvider.getSettings();
     }
 
     public PerformanceItem getLastSnapshot(long accountId) {
@@ -151,6 +155,7 @@ public class SnapshotTotalsSqliteModel {
     public List<PerformanceItem> getSnapshots(long startTime, long endTimeExclusive) {
 
         String[] whereArgs = new String[]{
+                getDemoModeWhereValue(),
                 String.valueOf(startTime),
                 String.valueOf(endTimeExclusive)
         };
@@ -178,6 +183,7 @@ public class SnapshotTotalsSqliteModel {
     public List<PerformanceItem> getSnapshotsByDay(long startTime, long endTimeExclusive) {
 
         String[] whereArgs = new String[]{
+                getDemoModeWhereValue(),
                 String.valueOf(startTime),
                 String.valueOf(endTimeExclusive)
         };
@@ -290,6 +296,10 @@ public class SnapshotTotalsSqliteModel {
             snapshot = getSnapshotsByDay(accountId, startTime, endTime);
         }
         return snapshot;
+    }
+
+    private String getDemoModeWhereValue() {
+        return mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE) ? "1"  : "0";
     }
 
 }

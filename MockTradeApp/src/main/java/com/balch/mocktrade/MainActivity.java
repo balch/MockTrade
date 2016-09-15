@@ -202,10 +202,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 appBarLayout.setExpanded(false, false);
             }
         }
-
-        LoaderManager loaderManager = getSupportLoaderManager();
-        mPortfolioLoader = (PortfolioLoader)loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
-        mGraphDataLoader = (GraphDataLoader)loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
     }
 
     @Override
@@ -219,8 +215,21 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         return mMainPortfolioView;
     }
 
+
+    @Override
+    protected void onResumeBase() {
+        // onRestoreInstanceState is called after onStart but before OnResume
+        // creating the loaders in onResume ensure the views are correctly restored
+        if ((mPortfolioLoader == null) || (mGraphDataLoader == null)) {
+            LoaderManager loaderManager = getSupportLoaderManager();
+            mPortfolioLoader = (PortfolioLoader) loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
+            mGraphDataLoader = (GraphDataLoader) loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
+        }
+    }
+
     @Override
     protected void onStartBase() {
+
         if (mAccountUpdateReceiver == null) {
             mAccountUpdateReceiver = new AccountUpdateReceiver();
 

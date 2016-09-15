@@ -274,7 +274,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         SavedState ss = new SavedState(superState);
         ss.mAccountSelectedPosition = this.mAccountSelectedPosition;
         ss.mAccountIds = this.mAccountIds;
-        ss.mTimeSelectedPosition = this.mGraphTimeSelectedPosition;
+        ss.mGraphTimeSelectedPosition = this.mGraphTimeSelectedPosition;
 
         return ss;
     }
@@ -291,12 +291,12 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         this.mAccountSelectedPosition = ss.mAccountSelectedPosition;
         this.mAccountIds = ss.mAccountIds;
-        this.mGraphTimeSelectedPosition = ss.mTimeSelectedPosition;
+        this.mGraphTimeSelectedPosition = ss.mGraphTimeSelectedPosition;
     }
 
     static class SavedState extends BaseSavedState {
         int mAccountSelectedPosition;
-        int mTimeSelectedPosition;
+        int mGraphTimeSelectedPosition;
         List<Long> mAccountIds;
 
         SavedState(Parcelable superState) {
@@ -308,7 +308,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             mAccountSelectedPosition = in.readInt();
             mAccountIds = new ArrayList<>();
             in.readList(mAccountIds, getClass().getClassLoader());
-            mTimeSelectedPosition = in.readInt();
+            mGraphTimeSelectedPosition = in.readInt();
         }
 
         @Override
@@ -316,7 +316,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
             super.writeToParcel(out, flags);
             out.writeInt(mAccountSelectedPosition);
             out.writeList(mAccountIds);
-            out.writeInt(mTimeSelectedPosition);
+            out.writeInt(mGraphTimeSelectedPosition);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =

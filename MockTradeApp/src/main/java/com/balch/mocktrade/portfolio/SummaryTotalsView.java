@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.shared.PerformanceItem;
-import com.balch.mocktrade.utils.TextFormatUtils;
+import com.balch.mocktrade.shared.utils.TextFormatUtils;
 
 
 public class SummaryTotalsView extends LinearLayout {

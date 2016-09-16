@@ -34,7 +34,7 @@ import android.widget.TextView;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.investment.Investment;
-import com.balch.mocktrade.utils.TextFormatUtils;
+import com.balch.mocktrade.shared.utils.TextFormatUtils;
 
 
 public class InvestmentViewHolder extends RecyclerView.ViewHolder {

@@ -55,6 +55,7 @@ import com.balch.mocktrade.shared.HighlightItem;
 import com.balch.mocktrade.shared.PerformanceItem;
 import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
+import com.balch.mocktrade.shared.utils.TextFormatUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -628,8 +629,8 @@ public class MockTradeFace extends CanvasWatchFaceService {
             boolean isDayChange = item.isDayChangeType();
 
             Money value = isDayChange ? item.getTodayChange() : item.getTotalChange();
-            String percent = String.format("%.2f", isDayChange ? item.getTodayChangePercent() : item.getTotalChangePercent());
-            text = value.getFormatted(isDayChange ? 2 : 0) + " (" + percent + "%)";
+            String percent = TextFormatUtils.getPercentString(isDayChange ? item.getTodayChangePercent() : item.getTotalChangePercent());
+            text = TextFormatUtils.getDollarString(value.getDollars()) + " (" + percent + ")";
 
             mHighlightDataTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
             x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;
@@ -654,9 +655,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
                 percent = (int) item.getTotalChangePercent();
             }
 
-            text = value.getFormatted(0);
+            text = TextFormatUtils.getDollarString(value.getDollars());
             if (percent != -1) {
-                text +=   " (" + percent + "%)";
+                text +=  " (" + TextFormatUtils.getPercentString(percent) + ")";
             }
             mHighlightDataTextPaint.getTextBounds(text, 0, text.length(), mTextSizeRect);
             x = centerX - mTextSizeRect.width() / 2f - mTextSizeRect.left;

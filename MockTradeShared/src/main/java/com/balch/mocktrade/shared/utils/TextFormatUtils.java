@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.mocktrade.utils;
+package com.balch.mocktrade.shared.utils;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -29,25 +29,31 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 public class TextFormatUtils {
-    static public Spannable getLongChangePercentText(Context context, double dollars, float percent, int labelId) {
-        String sign = (dollars >= 0) ? "" : "-";
+    private final static NumberFormat MONEY_DECIMAL_FORMAT = new DecimalFormat("'$'#,##0.00");
+    private final static NumberFormat MONEY_INTEGER_FORMAT = new DecimalFormat("'$'#,###");
+    private final static NumberFormat PERCENT_DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private final static NumberFormat PERCENT_INTEGER_FORMAT = new DecimalFormat("#,##0");
+
+    public static Spannable getLongChangePercentText(Context context, double dollars, float percent, int labelId) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 
         String label = context.getResources().getString(labelId);
 
-        String val = String.format("%s: %s$%,.02f (%s%.2f%%)", label, sign, Math.abs(dollars), sign, Math.abs(percent));
+        String val = label + ": " + getDollarString(dollars) + " (" + getPercentString(percent) +")";
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, label.length()+1, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return spanString;
     }
 
-    static public Spannable getShortChangePercentText(double dollars, float percent) {
-        String sign = (dollars >= 0) ? "" : "-";
+    public static Spannable getShortChangePercentText(double dollars, float percent) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 
-        String val = String.format("%s%.2f%%  %s$%,.02f", sign, Math.abs(percent), sign, Math.abs(dollars));
+        String val = getDollarString(dollars) + "  " + getPercentString(percent);
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, 0, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         spanString.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -55,27 +61,34 @@ public class TextFormatUtils {
         return spanString;
     }
 
-    static public Spannable getShortChangeText(Context context, double dollars, int labelId) {
-        String sign = (dollars >= 0) ? "" : "-";
+    public static Spannable getShortChangeText(Context context, double dollars, int labelId) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 
         String label = context.getResources().getString(labelId);
 
-        String val = String.format("%s: %s$%,.02f", label, sign, Math.abs(dollars));
+        String val = label + ": " + getDollarString(dollars);
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, label.length()+1, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return spanString;
     }
 
-    static public Spannable getShortChangeText(double dollars) {
-        String sign = (dollars >= 0) ? "" : "-";
+    public static Spannable getShortChangeText(double dollars) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
-
-        String val = String.format("%s$%,.02f", sign, Math.abs(dollars));
+        String val = getDollarString(dollars);
         SpannableStringBuilder spanString = new SpannableStringBuilder(val);
         spanString.setSpan(spanColor, 0, val.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return spanString;
+    }
+
+    public static String getDollarString(double dollars) {
+        NumberFormat format = Math.abs(dollars) < 10000 ? MONEY_DECIMAL_FORMAT : MONEY_INTEGER_FORMAT;
+        return format.format(dollars);
+    }
+
+    public static String getPercentString(float percent) {
+        NumberFormat format = Math.abs(percent) < 100 ? PERCENT_DECIMAL_FORMAT : PERCENT_INTEGER_FORMAT;
+        return format.format(percent) + "%";
     }
 }

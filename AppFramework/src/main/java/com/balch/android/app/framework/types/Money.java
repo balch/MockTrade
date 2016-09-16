@@ -167,8 +167,8 @@ public class Money implements Cloneable, Parcelable, Comparable<Money> {
         return String.format("%1$.0"+decimalPlaces+"f", dollars);
     }
 
-    public void multiply(long quantitiy) {
-        this.microCents *= quantitiy;
+    public void multiply(long value) {
+        this.microCents *= value;
     }
 
     public void add(Money money) {

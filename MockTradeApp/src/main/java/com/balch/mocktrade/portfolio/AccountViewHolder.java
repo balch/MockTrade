@@ -35,7 +35,7 @@ import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
-import com.balch.mocktrade.utils.TextFormatUtils;
+import com.balch.mocktrade.shared.utils.TextFormatUtils;
 
 
 public class AccountViewHolder extends RecyclerView.ViewHolder {

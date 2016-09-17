@@ -81,7 +81,7 @@
 
         <activity
             android:name=".GraphActivity"
-            android:label="@string/title_activity_graph"></activity>
+            android:label="@string/title_activity_graph"/>
     </application>
 
 </manifest>

@@ -43,6 +43,13 @@ android {
             keyAlias "mocktrade"
             keyPassword "android"
         }
+
+        release {
+            storeFile file(System.getenv("com.balch.mocktrade.storeFile") ?: "../keystore/release_key.jks")
+            storePassword System.getenv("com.balch.mocktrade.storePassword") ?: ""
+            keyAlias System.getenv("com.balch.mocktrade.keyAlias") ?: ""
+            keyPassword System.getenv("com.balch.mocktrade.keyPassword") ?: ""
+        }
     }
 
     buildTypes {
@@ -50,11 +57,14 @@ android {
             // sign debug build with a common key to facilitate develop from multiple
             // computers w/o having to reinstall
             signingConfig signingConfigs.debug
+            applicationIdSuffix ".debug"
         }
 
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
         }
     }
 }

@@ -15,3 +15,11 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep class android.support.v4.app.** { *; }
+-keep interface android.support.v4.app.** { *; }
+-keep class com.android.volley.** { *; }
+-keep interface com.android.volley.** { *; }
+
+-keepattributes *Annotation*
+

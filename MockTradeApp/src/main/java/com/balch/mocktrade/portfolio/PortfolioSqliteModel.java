@@ -140,41 +140,48 @@ public class PortfolioSqliteModel implements PortfolioModel {
     public void createSnapshotTotals(List<Account> accounts,
             Map<Long, List<Investment>> accountToInvestmentMap) {
 
-        Date now = new Date();
-
         // the accounts need to be added as an atomic bundle for the sums to add up
         // this loop will set the isChanged to true if any account has totals that
         // are different from last snapshot
-        List<PerformanceItem> performanceItems = new ArrayList<>(accounts.size());
-        boolean isChanged = false;
+        List<PerformanceItem> newPerformanceItems = new ArrayList<>(accounts.size());
+        List<PerformanceItem> updatePerformanceItems = new ArrayList<>(accounts.size());
         for (Account account : accounts) {
 
             List<Investment> investments = accountToInvestmentMap.get(account.getId());
             if ((investments != null) && (investments.size() > 0)) {
-                PerformanceItem performanceItem = account.getPerformanceItem(investments, now);
-                performanceItems.add(performanceItem);
+                PerformanceItem performanceItem = account.getPerformanceItem(investments);
 
-                if (!isChanged) {
-                    PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
-                    if ((lastPerformanceItem == null) ||
-                            !lastPerformanceItem.getValue().equals(performanceItem.getValue()) ||
-                            !lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
-                            !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange())) {
-                        isChanged = true;
+                PerformanceItem lastPerformanceItem = snapshotTotalsModel.getLastSnapshot(account.getId());
+                if ((lastPerformanceItem != null) &&
+                     lastPerformanceItem.getTimestamp().equals(performanceItem.getTimestamp())) {
+
+                    if (!lastPerformanceItem.getCostBasis().equals(performanceItem.getCostBasis()) ||
+                        !lastPerformanceItem.getTodayChange().equals(performanceItem.getTodayChange()) ||
+                        !lastPerformanceItem.getValue().equals(performanceItem.getValue())) {
+
+                        lastPerformanceItem.setCostBasis(performanceItem.getCostBasis());
+                        lastPerformanceItem.setTodayChange(performanceItem.getTodayChange());
+                        lastPerformanceItem.setValue(performanceItem.getValue());
+
+                        updatePerformanceItems.add(lastPerformanceItem);
                     }
+                } else {
+                    newPerformanceItems.add(performanceItem);
                 }
             }
         }
 
-        // if there is any change all accounts have to be inserted with this timestamp
-        if (isChanged) {
+        if (!updatePerformanceItems.isEmpty() || !newPerformanceItems.isEmpty()) {
             SQLiteDatabase db = sqlConnection.getWritableDatabase();
             db.beginTransaction();
             try {
 
                 SnapshotMapper snapshotMapper = new SnapshotMapper(true);
-                for (PerformanceItem performanceItem : performanceItems) {
+                for (PerformanceItem performanceItem : newPerformanceItems) {
                     sqlConnection.insert(snapshotMapper, performanceItem, db);
+                }
+                for (PerformanceItem performanceItem : updatePerformanceItems) {
+                    sqlConnection.update(snapshotMapper, performanceItem, db);
                 }
                 db.setTransactionSuccessful();
 

@@ -111,12 +111,11 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
                     int accountsWithTotals = 0;
 
-                    Date timestamp = new Date();
                     boolean demoMode = mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE);
                     for (Account account : data.getAccounts()) {
                         if (demoMode || !account.getExcludeFromTotals()) {
                             List<Investment> investments = data.getInvestments(account.getId());
-                            performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
+                            performanceItem.aggregate(account.getPerformanceItem(investments));
 
                             accountsWithTotals++;
                         }

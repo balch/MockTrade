@@ -179,21 +179,26 @@ public class Account extends DomainObject implements Parcelable {
         this.excludeFromTotals = excludeFromTotals;
     }
 
-    public PerformanceItem getPerformanceItem(List<Investment> investments, Date timestamp) {
+    public PerformanceItem getPerformanceItem(List<Investment> investments) {
         Money currentBalance = new Money(this.getAvailableFunds().getMicroCents());
         Money todayChange = new Money(0);
 
+        long timestamp = -1;
         if (investments != null) {
             for (Investment i : investments) {
                 currentBalance.add(i.getValue());
 
+                long lastTradeTime = i.getLastTradeTime().getTime();
+                if (lastTradeTime > timestamp) {
+                    timestamp = lastTradeTime;
+                }
                 if (i.isPriceCurrent()) {
                     todayChange.add(Money.subtract(i.getValue(),i.getPrevDayValue()));
                 }
             }
         }
 
-        return new PerformanceItem(this.getId(), timestamp, this.initialBalance, currentBalance, todayChange);
+        return new PerformanceItem(this.getId(), new Date(timestamp), this.initialBalance, currentBalance, todayChange);
     }
 
     @Override

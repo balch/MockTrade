@@ -468,15 +468,19 @@ public class MockTradeFace extends CanvasWatchFaceService {
                         calcMarketTimes();
                         calcPerformanceGradient();
                     } else if (marketTimeHitTest(x, y, true)) {
-                        HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
-                        if (item.isTotalType()) {
-                            startActivity(GraphActivity.newIntent(getApplicationContext(), item, mPerformanceItems));
+                        if (mHighlightItems != null) {
+                            HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+                            if (item.isTotalType()) {
+                                startActivity(GraphActivity.newIntent(getApplicationContext(), item, mPerformanceItems));
+                            }
                         }
                     } else if (!marketTimeHitTest(x, y, false)) {  // did not click in time ring
-                        mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
-                        HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
-                        setTimeTextPaint(item, false);
-                        setAccountIdDataItem(item);
+                        if (mHighlightItems != null) {
+                            mHighlightItemPosition = ++mHighlightItemPosition % mHighlightItems.size();
+                            HighlightItem item = mHighlightItems.get(mHighlightItemPosition);
+                            setTimeTextPaint(item, false);
+                            setAccountIdDataItem(item);
+                        }
                     }
                     invalidate();
                     break;

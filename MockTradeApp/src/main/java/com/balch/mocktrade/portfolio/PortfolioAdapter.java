@@ -35,6 +35,7 @@ import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -139,7 +140,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             final Account account = (Account) mDataList.get(position);
 
             List<Investment> investments = mPortfolioData.getInvestments(account.getId());
-            PerformanceItem performanceItem = account.getPerformanceItem(investments);
+            PerformanceItem performanceItem = account.getPerformanceItem(investments, new Date());
 
             accountViewHolder.bind(account, performanceItem, mPortfolioData.getOpenOrderCount(account.getId()));
 

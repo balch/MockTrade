@@ -163,6 +163,7 @@ public class WearSyncService extends IntentService implements
                         Investment worstDayPerformer = null;
 
                         Resources resources = getResources();
+                        Date timestamp = new Date();
                         for (Account account : accounts) {
                             PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
                             List<Investment> investments = portfolioModel.getInvestments(account.getId());
@@ -203,7 +204,7 @@ public class WearSyncService extends IntentService implements
 
                                 }
                             }
-                            performanceItem.aggregate(account.getPerformanceItem(investments));
+                            performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
 
                             HighlightItem item = new HighlightItem(HighlightItem.HighlightType.TOTAL_ACCOUNT,
                                     resources.getString(R.string.highlight_total_account), account.getName(),
@@ -213,7 +214,7 @@ public class WearSyncService extends IntentService implements
                             accountsDataMapList.add(item.toDataMap());
 
                             if (demoMode || !account.getExcludeFromTotals()) {
-                                totalsPerformanceItem.aggregate(account.getPerformanceItem(investments));
+                                totalsPerformanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
                             }
                         }
 

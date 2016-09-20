@@ -35,6 +35,7 @@ import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class SnapshotTotalsSqliteModel {
@@ -254,7 +255,7 @@ public class SnapshotTotalsSqliteModel {
 
         long latestTimestamp = getLatestGraphSnapshotTime();
         if (latestTimestamp > 0) {
-            Calendar cal = Calendar.getInstance();
+            Calendar cal = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
             cal.setTimeInMillis(latestTimestamp);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
@@ -263,7 +264,12 @@ public class SnapshotTotalsSqliteModel {
 
             long startTime = cal.getTimeInMillis();
 
-            cal.add(Calendar.DAY_OF_YEAR, 1);
+            String [] parts = mSettings.geMarketCloseTime().split(":");
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(parts[0]));
+            cal.set(Calendar.MINUTE, Integer.parseInt(parts[1]));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.add(Calendar.MINUTE, 15);
             long endTime = cal.getTimeInMillis();
 
             snapshot = getSnapshots(accountId, startTime, endTime);

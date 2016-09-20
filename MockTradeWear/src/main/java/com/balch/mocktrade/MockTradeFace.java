@@ -89,8 +89,6 @@ public class MockTradeFace extends CanvasWatchFaceService {
     private static final int BASE_PERFORMANCE_COLOR_COMPONENT = 156;
     private static final int OFF_PERFORMANCE_COLOR_COMPONENT = 128;
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(15);
-    private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
-    private static final long MARKET_OFFSET_MILLIS = TimeUnit.MINUTES.toMillis(15);
     private static final int MSG_UPDATE_TIME = 0;
     private static final int ANIMATION_DURATION_MS = 500;
     private Typeface mTimeFont;
@@ -803,16 +801,9 @@ public class MockTradeFace extends CanvasWatchFaceService {
             if (dataMapList != null) {
                 mPerformanceItems = new ArrayList<>(dataMapList.size());
 
-                // filter out any values that are outside of market open and close times
-                long marketOpen = (getMarketOpenTime().getTimeInMillis() % MILLIS_PER_DAY) - MARKET_OFFSET_MILLIS;
-                long marketClose = (getMarketCloseTime().getTimeInMillis() % MILLIS_PER_DAY) + MARKET_OFFSET_MILLIS;
-
                 for (DataMap data : dataMapList) {
                     PerformanceItem item = new PerformanceItem(data);
-                    long ts = item.getTimestamp().getTime() % MILLIS_PER_DAY;
-                    if ((ts >= marketOpen) && (ts <= marketClose)) {
-                        mPerformanceItems.add(item);
-                    }
+                    mPerformanceItems.add(item);
                 }
 
                 if (mPerformanceItems.size() == 0) {

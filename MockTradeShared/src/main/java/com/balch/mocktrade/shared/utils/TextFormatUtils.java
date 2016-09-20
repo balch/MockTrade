@@ -38,6 +38,8 @@ public class TextFormatUtils {
     private final static NumberFormat PERCENT_DECIMAL_FORMAT = new DecimalFormat("0.00");
     private final static NumberFormat PERCENT_INTEGER_FORMAT = new DecimalFormat("#,##0");
 
+    private TextFormatUtils() { }
+
     public static Spannable getLongChangePercentText(Context context, double dollars, float percent, int labelId) {
         ForegroundColorSpan spanColor = new ForegroundColorSpan((dollars >= 0)? Color.GREEN:Color.RED);
 

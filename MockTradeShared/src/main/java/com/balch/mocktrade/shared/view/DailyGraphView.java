@@ -294,7 +294,7 @@ public class DailyGraphView extends View {
             mPathFill.moveTo(xScaleValue, centerY);
             mPathFill.lineTo(xScaleValue, yScaleValue);
 
-            for (int x = startIndex + 1; x < mPerformanceItems.size() - 1; x++) {
+            for (int x = startIndex; x < mPerformanceItems.size() - 1; x++) {
                 PerformanceItem nextPerformanceItem = mPerformanceItems.get(x+1);
                 float xScaleValueNext = scaleX(mHourly ? nextPerformanceItem.getTimestamp().getTime() : x);
                 float yScaleValueNext = scaleY(getPerformanceItemValue(nextPerformanceItem).getMicroCents());

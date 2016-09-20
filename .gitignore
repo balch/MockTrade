@@ -7,3 +7,4 @@
 *.iml
 MockTradeApp/*.apk
 keystore/release_key.jks
+/projectFilesBackup

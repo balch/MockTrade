@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.ModelProvider;
@@ -43,7 +44,6 @@ import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
 import com.balch.mocktrade.settings.Settings;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +77,7 @@ public class QuoteService extends IntentService {
             if (investments.size() > 0) {
                 final List<Account> accounts = portfolioModel.getAccounts(true);
 
-                final Map<Long, List<Investment>> accountIdToInvestmentMap = new HashMap<>(accounts.size());
+                final LongSparseArray<List<Investment>> accountIdToInvestmentMap = new LongSparseArray<>(accounts.size());
                 List<String> symbols = new ArrayList<>(investments.size());
                 for (Investment i : investments) {
                     symbols.add(i.getSymbol());
@@ -168,7 +168,7 @@ public class QuoteService extends IntentService {
     }
 
     protected void processAccountStrategies(List<Account> accounts,
-                                            Map<Long, List<Investment>> accountIdToInvestmentMap,
+                                            LongSparseArray<List<Investment>> accountIdToInvestmentMap,
                                             Map<String, Quote> quoteMap, boolean doDailyUpdate) {
         for (Account account : accounts) {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();

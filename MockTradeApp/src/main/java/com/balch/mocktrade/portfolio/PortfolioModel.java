@@ -23,6 +23,7 @@
 package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
+import android.util.LongSparseArray;
 
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
@@ -34,7 +35,6 @@ import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface PortfolioModel {
 
@@ -64,7 +64,7 @@ public interface PortfolioModel {
 
     void scheduleOrderServiceAlarmIfNeeded();
 
-    void createSnapshotTotals(List<Account> accounts, Map<Long, List<Investment>> accountToInvestmentMap);
+    void createSnapshotTotals(List<Account> accounts, LongSparseArray<List<Investment>> accountToInvestmentMap);
 
     int purgeSnapshots(int days);
 

@@ -22,26 +22,26 @@
 
 package com.balch.mocktrade.portfolio;
 
+import android.util.LongSparseArray;
+
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PortfolioData {
     protected List<Account> mAccounts;
-    protected Map<Long, List<Investment>> mAccountToInvestmentMap;
-    protected Map<Long, Integer> mAccountToOpenOrderCountMap;
+    protected LongSparseArray<List<Investment>> mAccountToInvestmentMap;
+    protected LongSparseArray<Integer> mAccountToOpenOrderCountMap;
     protected Date mLastSyncTime;
     protected Date mLastQuoteTime;
 
     public PortfolioData() {
         mAccounts = new ArrayList<>();
-        mAccountToInvestmentMap = new HashMap<>();
-        mAccountToOpenOrderCountMap = new HashMap<>();
+        mAccountToInvestmentMap = new LongSparseArray<>();
+        mAccountToOpenOrderCountMap = new LongSparseArray<>();
     }
 
     public List<Account> getAccounts() {
@@ -85,8 +85,7 @@ public class PortfolioData {
     }
 
     public int getOpenOrderCount(Long accountId) {
-        return this.mAccountToOpenOrderCountMap.containsKey(accountId) ?
-                this.mAccountToOpenOrderCountMap.get(accountId) : 0;
+        return this.mAccountToOpenOrderCountMap.get(accountId, 0);
     }
 
     public Date getLastSyncTime() {

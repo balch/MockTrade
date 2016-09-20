@@ -24,6 +24,7 @@ package com.balch.mocktrade.portfolio;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.LongSparseArray;
 
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.ModelProvider;
@@ -45,7 +46,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class PortfolioSqliteModel implements PortfolioModel {
 
@@ -138,7 +138,7 @@ public class PortfolioSqliteModel implements PortfolioModel {
 
     @Override
     public void createSnapshotTotals(List<Account> accounts,
-            Map<Long, List<Investment>> accountToInvestmentMap) {
+                         LongSparseArray<List<Investment>> accountToInvestmentMap) {
 
         Date now = new Date();
 

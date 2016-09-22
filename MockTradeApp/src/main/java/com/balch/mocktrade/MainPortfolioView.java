@@ -58,7 +58,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         void onGraphSelectionChanged(long accountId, int daysToReturn);
     }
 
-    private final static int [] GRAPH_TIME_VALUES = {-1, 7, 30, 90};
+    private final static int [] GRAPH_TIME_VALUES = {-1, 7, 30, 90, 180, 365};
     private final static int GRAPH_TIME_HOURLY_INDEX = 0;
     private final static DateFormat DATE_FORMAT_SHORT = DateFormat.getDateInstance(DateFormat.SHORT);
 
@@ -138,6 +138,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_week));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_month));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_90_days));
+        mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_180_days));
+        mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_year));
         mTimeGraphSpinner.setAdapter(mGraphTimeAdapter);
 
         mTimeGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

@@ -50,7 +50,7 @@ import java.util.Map;
 public class QuoteService extends IntentService {
     private static final String TAG = QuoteService.class.getSimpleName();
 
-    public static final int SNAPSHOT_DAYS_TO_KEEP = 120;
+    public static final int SNAPSHOT_DAYS_TO_KEEP = 3650;
     public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
 
     private Settings mSettings;

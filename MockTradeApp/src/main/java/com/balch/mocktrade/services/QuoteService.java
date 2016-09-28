@@ -25,12 +25,10 @@ package com.balch.mocktrade.services;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 
-import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
@@ -41,6 +39,7 @@ import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
+import com.balch.mocktrade.receivers.QuoteReceiver;
 import com.balch.mocktrade.settings.Settings;
 
 import java.util.ArrayList;
@@ -51,9 +50,6 @@ public class QuoteService extends IntentService {
     private static final String TAG = QuoteService.class.getSimpleName();
 
     public static final int SNAPSHOT_DAYS_TO_KEEP = 3650;
-    public static final String WAKE_LOCK_TAG = "QuoteServiceWakeLockTag";
-
-    private Settings mSettings;
 
     public QuoteService() {
         super(QuoteService.class.getName());
@@ -62,17 +58,15 @@ public class QuoteService extends IntentService {
     @Override
     protected void onHandleIntent(final Intent intent) {
 
-        boolean completeWakefulIntentOnExit = false;
-
         try {
             Log.i(TAG, "QuoteService onHandleIntent");
 
             // get the investment list from the db
-            ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Investment> investments = portfolioModel.getAllInvestments();
-            mSettings = ((ModelProvider)this.getApplication()).getSettings();
+            Settings settings = ((ModelProvider) this.getApplication()).getSettings();
 
             if (investments.size() > 0) {
                 final List<Account> accounts = portfolioModel.getAccounts(true);
@@ -92,60 +86,40 @@ public class QuoteService extends IntentService {
                 }
 
                 // get quotes over the wire
-                financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
-                    @Override
-                    public void onResponse(Map<String, Quote> quoteMap) {
+                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols);
+                if (quoteMap != null) {
+                    boolean newHasQuotes = false;
+                    for (Investment i : investments) {
                         try {
-                            boolean newHasQuotes = false;
-                            for (Investment i : investments) {
-                                try {
-                                    Quote quote = quoteMap.get(i.getSymbol());
-                                    if (quote != null) {
-                                        if (quote.getLastTradeTime().after(i.getLastTradeTime())) {
-                                            newHasQuotes = true;
-                                            i.setPrevDayClose(quote.getPreviousClose());
-                                            i.setPrice(quote.getPrice(), quote.getLastTradeTime());
-                                            portfolioModel.updateInvestment(i);
-                                        }
-                                    }
-                                } catch (Exception ex) {
-                                    Log.e(TAG, "updateInvestment exception", ex);
+                            Quote quote = quoteMap.get(i.getSymbol());
+                            if (quote != null) {
+                                if (quote.getLastTradeTime().after(i.getLastTradeTime())) {
+                                    newHasQuotes = true;
+                                    i.setPrevDayClose(quote.getPreviousClose());
+                                    i.setPrice(quote.getPrice(), quote.getLastTradeTime());
+                                    portfolioModel.updateInvestment(i);
                                 }
                             }
-
-                            boolean isFirstSyncOfDay = !DateUtils.isToday(mSettings.getLastSyncTime());
-                            if (isFirstSyncOfDay) {
-                                portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
-                            }
-
-                            if (newHasQuotes) {
-                                portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
-                            }
-
-                            processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
-
-                            mSettings.setLastSyncTime(System.currentTimeMillis());
-
-                            startService(WearSyncService.getIntent(getApplicationContext()));
-
-                        } finally {
-                            PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
-                            releaseWakeLock();
+                        } catch (Exception ex) {
+                            Log.e(TAG, "updateInvestment exception", ex);
                         }
                     }
 
-                    @Override
-                    public void onErrorResponse(String error) {
-                        // failed to return quotes
-                        // Error has been logged
-                        PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
-
-                        releaseWakeLock();
+                    boolean isFirstSyncOfDay = !DateUtils.isToday(settings.getLastSyncTime());
+                    if (isFirstSyncOfDay) {
+                        portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
                     }
-                });
-            } else {
-                completeWakefulIntentOnExit = true;
-                PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
+
+                    if (newHasQuotes) {
+                        portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
+                    }
+
+                    processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
+
+                    settings.setLastSyncTime(System.currentTimeMillis());
+
+                    startService(WearSyncService.getIntent(getApplicationContext()));
+                }
             }
 
             // if the market is closed reset alarm to next market open time
@@ -154,12 +128,10 @@ public class QuoteService extends IntentService {
             }
 
         } catch (Exception ex) {
-            completeWakefulIntentOnExit = true;
             Log.e(TAG, "onHandleIntent exception", ex);
         } finally {
-            if (completeWakefulIntentOnExit) {
-                releaseWakeLock();
-            }
+            PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
+            QuoteReceiver.completeWakefulIntent(intent);
         }
     }
 
@@ -187,12 +159,4 @@ public class QuoteService extends IntentService {
         }
     }
 
-    private void releaseWakeLock() {
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                WAKE_LOCK_TAG);
-        if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-    }
 }

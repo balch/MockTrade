@@ -142,8 +142,8 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
 
             for (int x = 0; x < Order.OrderStrategy.values().length; x++) {
                 Order.OrderStrategy s = Order.OrderStrategy.values()[x];
-                if ( ((action == Order.OrderAction.BUY) && s.isBuySuported()) ||
-                     ((action == Order.OrderAction.SELL) && s.isSellSuported())) {
+                if ( ((action == Order.OrderAction.BUY) && s.isBuySupported()) ||
+                     ((action == Order.OrderAction.SELL) && s.isSellSupported())) {
                     if (s == strategy) {
                         selectionIndex = x;
                     }

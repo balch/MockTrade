@@ -22,17 +22,15 @@
 
 package com.balch.mocktrade.finance;
 
-import com.balch.android.app.framework.RequestListener;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface FinanceModel  {
 
-    void getQuotes(List<String> symbols, RequestListener<Map<String, Quote>> listener);
+    Map<String, Quote> getQuotes(List<String> symbols);
 
-    void getQuote(String symbol, RequestListener<Quote> listener);
+    Quote getQuote(String symbol);
 
     boolean isMarketOpen();
 

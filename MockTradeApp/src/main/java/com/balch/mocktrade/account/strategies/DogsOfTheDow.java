@@ -24,7 +24,6 @@ package com.balch.mocktrade.account.strategies;
 
 import android.util.Log;
 
-import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
@@ -43,56 +42,49 @@ import java.util.Map;
 public class DogsOfTheDow extends BaseStrategy {
     private static final String TAG = DogsOfTheDow.class.getSimpleName();
 
-    protected static final String[] DOW_SYMBOLS=
+    private static final String[] DOW_SYMBOLS=
             {"AXP","BA","CAT","CSCO","CVX","DD","XOM","GE","GS","HD",
             "IBM","INTC","JNJ","KO","JPM","MCD","MMM","MRK","MSFT","NKE",
             "PFE","PG","T","TRV","UNH","UTX","VZ","V","WMT","DIS"};
 
     public void initialize(final Account account) {
-        this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS), new RequestListener<Map<String, Quote>>() {
-            @Override
-            public void onResponse(Map<String, Quote> response) {
-                List<Quote> sortedQuotes = new ArrayList<>(response.values() ) ;
-                Collections.sort(sortedQuotes, new Comparator<Quote>() {
-                    @Override
-                    public int compare(Quote lhs, Quote rhs) {
-                        // reverse sort
-                        return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
-                    }
-                });
-
-                if (sortedQuotes.size() > 0) {
-                    int size = sortedQuotes.size();
-                    int numberOfStocks = Math.min(size, 10);
-                    double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) numberOfStocks;
-
-                    for (int x = 0; x < numberOfStocks; x++) {
-                        Quote quote = sortedQuotes.get(x);
-                        Order order = new Order();
-                        order.setAccount(account);
-                        order.setSymbol(quote.getSymbol());
-                        order.setAction(Order.OrderAction.BUY);
-                        order.setStrategy(Order.OrderStrategy.MANUAL);
-                        order.setLimitPrice(quote.getPrice());
-                        order.setQuantity((long) (fundsPerOrder / quote.getPrice().getDollars()));
-
-                        portfolioModel.createOrder(order);
-                        try {
-                            portfolioModel.attemptExecuteOrder(order, quote);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error executing order", e);
-                        }
-                    }
-
-                    PortfolioUpdateBroadcaster.broadcast(context);
+        Map<String, Quote> response = this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS));
+        if (response != null) {
+            List<Quote> sortedQuotes = new ArrayList<>(response.values());
+            Collections.sort(sortedQuotes, new Comparator<Quote>() {
+                @Override
+                public int compare(Quote lhs, Quote rhs) {
+                    // reverse sort
+                    return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
                 }
-            }
+            });
 
-            @Override
-            public void onErrorResponse(String error) {
-                Log.e(TAG, "Error running financeModel.getQuotes: "+ error);
+            if (sortedQuotes.size() > 0) {
+                int size = sortedQuotes.size();
+                int numberOfStocks = Math.min(size, 10);
+                double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) numberOfStocks;
+
+                for (int x = 0; x < numberOfStocks; x++) {
+                    Quote quote = sortedQuotes.get(x);
+                    Order order = new Order();
+                    order.setAccount(account);
+                    order.setSymbol(quote.getSymbol());
+                    order.setAction(Order.OrderAction.BUY);
+                    order.setStrategy(Order.OrderStrategy.MANUAL);
+                    order.setLimitPrice(quote.getPrice());
+                    order.setQuantity((long) (fundsPerOrder / quote.getPrice().getDollars()));
+
+                    portfolioModel.createOrder(order);
+                    try {
+                        portfolioModel.attemptExecuteOrder(order, quote);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error executing order", e);
+                    }
+                }
+
+                PortfolioUpdateBroadcaster.broadcast(context);
             }
-        });
+        }
     }
 
     @Override
@@ -110,7 +102,7 @@ public class DogsOfTheDow extends BaseStrategy {
         }
     }
 
-    protected Account sellAll(Account account, List<Investment> investments,
+    private Account sellAll(Account account, List<Investment> investments,
                            Map<String, Quote> quoteMap) {
         for (Investment i : investments) {
             Quote quote = quoteMap.get(i.getSymbol());

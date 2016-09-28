@@ -36,13 +36,13 @@ import com.balch.mocktrade.account.Account;
 
 public class Order extends DomainObject implements Parcelable {
 
-    public static final String FLD_LIMIT_PRICE = "limitPrice";
-    public static final String FLD_STOP_PRICE = "stopPrice";
-    public static final String FLD_STOP_PERCENT = "stopPercent";
-    public static final String FLD_SYMBOL = "symbol";
-    public static final String FLD_ACTION = "action";
-    public static final String FLD_STRATEGY = "strategy";
-    public static final String FLD_QUANTITY = "quantity";
+    static final String FLD_LIMIT_PRICE = "limitPrice";
+    static final String FLD_STOP_PRICE = "stopPrice";
+    static final String FLD_STOP_PERCENT = "stopPercent";
+    static final String FLD_SYMBOL = "symbol";
+    static final String FLD_ACTION = "action";
+    static final String FLD_STRATEGY = "strategy";
+    static final String FLD_QUANTITY = "quantity";
 
     protected Account account;
 
@@ -283,17 +283,17 @@ public class Order extends DomainObject implements Parcelable {
             return R.array.order_strategy_display_values;
         }
 
-        public boolean isBuySuported() {
+        public boolean isBuySupported() {
             return ((this.supportedActions & FLAG_BUY) != 0);
         }
 
-        public boolean isSellSuported() {
+        public boolean isSellSupported() {
             return ((this.supportedActions & FLAG_SELL) != 0);
         }
 
     }
 
-    public enum OrderDuration implements MetadataUtils.EnumResource {
+    enum OrderDuration implements MetadataUtils.EnumResource {
         GOOD_TIL_CANCELED,
         DAY;
 

@@ -23,6 +23,7 @@
 package com.balch.mocktrade.order;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -42,7 +43,6 @@ import com.balch.android.app.framework.domain.ValidatorException;
 import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.widget.ControlMapper;
 import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.RequestListener;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
@@ -50,6 +50,7 @@ import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -249,51 +250,7 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
 
         if (!hasError) {
-            mFinanceModel.getQuote(symbol, new RequestListener<Quote>() {
-                @Override
-                public void onResponse(final Quote response) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (response != null) {
-                                setInvestmentData(response.getName(), response.getPrice());
-                                mValue.setError(null);
-                            } else {
-                                setInvestmentData("", null);
-                                mValue.setError(getResources().getString(R.string.error_invalid_symbol));
-                            }
-
-                            callListenerOnChanged(false);
-                        }
-                    });
-                }
-
-                @Override
-                public void onErrorResponse(final String error) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setInvestmentData("", null);
-
-                            String display = error;
-                            if (display != null) {
-                                int pos = display.indexOf('.');
-                                if (pos != -1) {
-                                    display = display.substring(0, pos + 1);
-                                }
-                            } else {
-                                display = getResources().getString(R.string.error_invalid_symbol);
-                            }
-                            mValue.setError(display);
-                            callListenerOnChanged(true);
-                            mEditLayoutListener.onError(mDescriptor, symbol, error);
-//                        Toast.makeText(activity, error, Toast.LENGTH_LONG);
-                        }
-                    });
-
-                }
-            });
-
+            new GetQuoteTask(this, mFinanceModel).execute(symbol);
         }
     }
 
@@ -310,4 +267,38 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
     public Money getPrice() {
         return new Money(mPrice.getText().toString());
     }
+
+    private static class GetQuoteTask extends AsyncTask<String, Void, Quote> {
+        private final FinanceModel mFinanceModel;
+        private final WeakReference<StockSymbolLayout> mStockSymbolLayout;
+
+        GetQuoteTask(StockSymbolLayout layout, FinanceModel financeModel) {
+            mStockSymbolLayout = new WeakReference<>(layout);
+            mFinanceModel = financeModel;
+        }
+
+        @Override
+        protected Quote doInBackground(String... symbols) {
+            return mFinanceModel.getQuote(symbols[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Quote quote) {
+            final StockSymbolLayout layout = mStockSymbolLayout.get();
+            if (layout != null) {
+                if (quote != null) {
+                    layout.setInvestmentData(quote.getName(), quote.getPrice());
+                    layout.mValue.setError(null);
+                    layout.callListenerOnChanged(false);
+                } else {
+                    layout.setInvestmentData("", null);
+                    String message = layout.getResources().getString(R.string.error_invalid_symbol);
+                    layout.mValue.setError(message);
+                    layout.callListenerOnChanged(true);
+                }
+            }
+        }
+
+    }
+
 }

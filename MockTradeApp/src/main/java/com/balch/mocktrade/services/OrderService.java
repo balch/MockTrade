@@ -28,10 +28,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
 import android.util.Log;
 
-import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
@@ -43,6 +41,7 @@ import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.portfolio.PortfolioUpdateBroadcaster;
+import com.balch.mocktrade.receivers.OrderReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +49,6 @@ import java.util.Map;
 
 public class OrderService extends IntentService {
     private static final String TAG = OrderService.class.getSimpleName();
-
-    public static final String WAKE_LOCK_TAG = "OrderServiceWakeLockTag";
 
     public OrderService() {
         super(OrderService.class.getName());
@@ -61,7 +58,7 @@ public class OrderService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
 
         try {
-            ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Order> orders = portfolioModel.getOpenOrders();
@@ -72,68 +69,52 @@ public class OrderService extends IntentService {
                     symbols.add(o.getSymbol());
                 }
 
-                financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
-                    @Override
-                    public void onResponse(Map<String, Quote> quoteMap) {
+                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols);
+                boolean updateView = false;
+                boolean reschedule = (quoteMap == null);
+                if (quoteMap != null) {
+                    for (Order o : orders) {
                         try {
-                            boolean updateView = false;
-                            boolean reschedule = false;
-                            for (Order o : orders) {
-                                try {
-                                    Quote quote = quoteMap.get(o.getSymbol());
-                                    OrderResult orderResult = portfolioModel.attemptExecuteOrder(o, quote);
-                                    if (orderResult.isSuccess()) {
+                            Quote quote = quoteMap.get(o.getSymbol());
+                            OrderResult orderResult = portfolioModel.attemptExecuteOrder(o, quote);
+                            if (orderResult.isSuccess()) {
 
-                                        String msg = (o.getAction() == Order.OrderAction.BUY) ?
-                                                getString(R.string.notification_order_buy_success_format,
-                                                        o.getSymbol(), o.getQuantity(),
-                                                        orderResult.getPrice().getFormatted(),
-                                                        orderResult.getCost().getFormatted()) :
-                                                getString(R.string.notification_order_sell_success_format,
-                                                        o.getSymbol(), o.getQuantity(),
-                                                        orderResult.getPrice().getFormatted(),
-                                                        orderResult.getValue().getFormatted(),
-                                                        orderResult.getProfit().getFormatted());
+                                String msg = (o.getAction() == Order.OrderAction.BUY) ?
+                                        getString(R.string.notification_order_buy_success_format,
+                                                o.getSymbol(), o.getQuantity(),
+                                                orderResult.getPrice().getFormatted(),
+                                                orderResult.getCost().getFormatted()) :
+                                        getString(R.string.notification_order_sell_success_format,
+                                                o.getSymbol(), o.getQuantity(),
+                                                orderResult.getPrice().getFormatted(),
+                                                orderResult.getValue().getFormatted(),
+                                                orderResult.getProfit().getFormatted());
 
 
-                                        sendNotification(o, msg);
-                                        updateView = true;
-                                    } else {
-                                        reschedule = true;
-                                    }
-
-                                } catch (Exception ex) {
-                                    Log.e(TAG, "attemptExecuteOrder exception", ex);
-                                    sendNotification(o, String.format(getString(R.string.notification_order_error_format),
-                                            o.getId(), o.getSymbol(), ex.getMessage()));
-                                }
+                                sendNotification(o, msg);
+                                updateView = true;
+                            } else {
+                                reschedule = true;
                             }
 
-                            if (updateView) {
-                                PortfolioUpdateBroadcaster.broadcast(OrderService.this);
-                            }
-
-                            if (reschedule) {
-                                portfolioModel.scheduleOrderServiceAlarm();
-                            }
-
-
-                        } finally {
-                            releaseWakeLock();
+                        } catch (Exception ex) {
+                            Log.e(TAG, "attemptExecuteOrder exception", ex);
+                            sendNotification(o, String.format(getString(R.string.notification_order_error_format),
+                                    o.getId(), o.getSymbol(), ex.getMessage()));
                         }
                     }
+                }
 
-                    @Override
-                    public void onErrorResponse(String error) {
-                        // failed to return quotes
-                        // Error has been logged
-                        releaseWakeLock();
-                    }
-                });
+                if (updateView) {
+                    PortfolioUpdateBroadcaster.broadcast(OrderService.this);
+                }
+
+                if (reschedule) {
+                    portfolioModel.scheduleOrderServiceAlarm();
+                }
             }
-        } catch (Exception ex) {
-            Log.e(TAG, "onHandleIntent exception", ex);
-            releaseWakeLock();
+        } finally {
+            OrderReceiver.completeWakefulIntent(intent);
         }
     }
 
@@ -159,13 +140,4 @@ public class OrderService extends IntentService {
         return new Intent(context, OrderService.class);
     }
 
-    private void releaseWakeLock() {
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                WAKE_LOCK_TAG);
-        if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-
-    }
 }

@@ -30,7 +30,7 @@ import android.os.StrictMode;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.balch.android.app.framework.VolleyBackground;
+import com.android.volley.toolbox.Volley;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
@@ -76,15 +76,21 @@ public class TradeApplication extends Application implements ModelProvider {
 
         startService(WearSyncService.getIntent(this, true, true, true, false));
 
-        new StartAlarmsTask().execute();
+        new StartAlarmsTask(this).execute();
     }
 
-    private class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
+    private static class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
+        private final ModelProvider mModelProvider;
+
+        private StartAlarmsTask(ModelProvider modelProvider) {
+            this.mModelProvider = modelProvider;
+        }
+
         protected Void doInBackground(Void... urls) {
-            FinanceModel financeModel = new GoogleFinanceModel(TradeApplication.this);
+            FinanceModel financeModel = new GoogleFinanceModel(mModelProvider);
             financeModel.setQuoteServiceAlarm();
 
-            PortfolioModel portfolioModel = new PortfolioSqliteModel(TradeApplication.this);
+            PortfolioModel portfolioModel = new PortfolioSqliteModel(mModelProvider);
             portfolioModel.scheduleOrderServiceAlarmIfNeeded();
             return null;
         }
@@ -136,7 +142,7 @@ public class TradeApplication extends Application implements ModelProvider {
         if (mRequestQueue == null) {
             synchronized (this) {
                 if (mRequestQueue == null) {
-                    mRequestQueue = VolleyBackground.newRequestQueue(this, 10);
+                    mRequestQueue = Volley.newRequestQueue(this, 10);
                 }
             }
         }

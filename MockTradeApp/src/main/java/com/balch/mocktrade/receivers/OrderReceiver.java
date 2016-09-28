@@ -22,28 +22,21 @@
 
 package com.balch.mocktrade.receivers;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.balch.mocktrade.services.OrderService;
 
-public class OrderReceiver extends BroadcastReceiver {
+public class OrderReceiver extends WakefulBroadcastReceiver {
     private static final String TAG = OrderReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                OrderService.WAKE_LOCK_TAG);
-        wakeLock.acquire();
-
         Log.i(TAG, "OrderReceiver onReceive");
         Intent service = OrderService.getIntent(context);
-        context.startService(service);
+        startWakefulService(context, service);
     }
 
     public static Intent getIntent(Context context) {

@@ -24,7 +24,6 @@ package com.balch.mocktrade.account.strategies;
 
 import android.util.Log;
 
-import com.balch.android.app.framework.RequestListener;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
@@ -43,55 +42,47 @@ public class TripleMomentum extends BaseStrategy {
 
     private static final double TRAILING_PERCENTAGE = 2.0;
 
-    protected static final String[] SYMBOLS = {"TQQQ","SQQQ"};
+    private static final String[] SYMBOLS = {"TQQQ", "SQQQ"};
 
     public void initialize(Account account) {
         executeStrategy(Arrays.asList(SYMBOLS), account);
     }
 
     private void executeStrategy(final List<String> symbols, final Account account) {
-        this.financeModel.getQuotes(symbols, new RequestListener<Map<String, Quote>>() {
-            @Override
-            public void onResponse(Map<String, Quote> response) {
-                for (Quote quote : response.values()) {
-                    double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) symbols.size();
+        Map<String, Quote> response = this.financeModel.getQuotes(symbols);
+        if (response != null) {
+            for (Quote quote : response.values()) {
+                double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) symbols.size();
 
-                    long quantity = (long) (fundsPerOrder / quote.getPrice().getDollars());
-                    Order order = new Order();
-                    order.setAccount(account);
-                    order.setSymbol(quote.getSymbol());
-                    order.setAction(Order.OrderAction.BUY);
-                    order.setStrategy(Order.OrderStrategy.MANUAL);
-                    order.setLimitPrice(quote.getPrice());
-                    order.setQuantity(quantity);
+                long quantity = (long) (fundsPerOrder / quote.getPrice().getDollars());
+                Order order = new Order();
+                order.setAccount(account);
+                order.setSymbol(quote.getSymbol());
+                order.setAction(Order.OrderAction.BUY);
+                order.setStrategy(Order.OrderStrategy.MANUAL);
+                order.setLimitPrice(quote.getPrice());
+                order.setQuantity(quantity);
 
-                    portfolioModel.createOrder(order);
-                    try {
-                        portfolioModel.attemptExecuteOrder(order, quote);
+                portfolioModel.createOrder(order);
+                try {
+                    portfolioModel.attemptExecuteOrder(order, quote);
 
-                        Order sellOrder = new Order();
-                        sellOrder.setAccount(account);
-                        sellOrder.setSymbol(quote.getSymbol());
-                        sellOrder.setStrategy(Order.OrderStrategy.TRAILING_STOP_PERCENT_CHANGE);
-                        sellOrder.setAction(Order.OrderAction.SELL);
-                        sellOrder.setStopPercent(TRAILING_PERCENTAGE);
-                        sellOrder.setQuantity(quantity);
-                        portfolioModel.createOrder(sellOrder);
+                    Order sellOrder = new Order();
+                    sellOrder.setAccount(account);
+                    sellOrder.setSymbol(quote.getSymbol());
+                    sellOrder.setStrategy(Order.OrderStrategy.TRAILING_STOP_PERCENT_CHANGE);
+                    sellOrder.setAction(Order.OrderAction.SELL);
+                    sellOrder.setStopPercent(TRAILING_PERCENTAGE);
+                    sellOrder.setQuantity(quantity);
+                    portfolioModel.createOrder(sellOrder);
 
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error executing order", e);
-                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error executing order", e);
                 }
-
-                PortfolioUpdateBroadcaster.broadcast(context);
-
             }
 
-            @Override
-            public void onErrorResponse(String error) {
-                Log.e(TAG, "Error running financeModel.getQuotes: "+ error);
-            }
-        });
+            PortfolioUpdateBroadcaster.broadcast(context);
+        }
 
     }
 

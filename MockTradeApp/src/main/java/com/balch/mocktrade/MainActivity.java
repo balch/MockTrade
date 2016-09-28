@@ -679,7 +679,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             mPortfolioModel = activity.mPortfolioModel;
         }
 
-
+        @Override
         protected Void doInBackground(Account... accounts) {
             for (Account account : accounts) {
                 mPortfolioModel.createAccount(account);
@@ -690,20 +690,20 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             return null;
         }
 
+        @Override
         protected void onPreExecute() {
             MainActivity activity = mWeakActivity.get();
-            if (activity != null) {
+            if ((activity != null) && !activity.isFinishing()) {
                 activity.showProgress();
             }
         }
 
+        @Override
         protected void onPostExecute(Void v) {
             MainActivity activity = mWeakActivity.get();
-            if (activity != null) {
-                if (!activity.isFinishing()) {
-                    activity.hideProgress();
-                    activity.mPortfolioLoader.onContentChanged();
-                }
+            if ((activity != null) && !activity.isFinishing()) {
+                activity.hideProgress();
+                activity.mPortfolioLoader.onContentChanged();
             }
         }
     }

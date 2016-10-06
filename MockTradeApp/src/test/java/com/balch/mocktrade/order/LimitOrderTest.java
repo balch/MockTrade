@@ -24,23 +24,21 @@ package com.balch.mocktrade.order;
 
 import android.content.Context;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.finance.QuoteGeneric;
 import com.balch.mocktrade.settings.Settings;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -48,15 +46,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import static org.junit.Assert.assertEquals;
-
 
 @RunWith(Parameterized.class)
 public class LimitOrderTest {
 
-    protected boolean shouldExecute;
-    protected Quote quote;
-    protected Order order;
+    private boolean shouldExecute;
+    private Quote quote;
+    private Order order;
 
 
     public LimitOrderTest(boolean shouldExecute, Order order, Quote quote) {
@@ -65,7 +61,7 @@ public class LimitOrderTest {
         this.order = order;
     }
 
-    protected static Order createOrder(Order.OrderAction action, double limitPrice) {
+    private static Order createOrder(Order.OrderAction action, double limitPrice) {
         Order order = new Order();
         order.setStrategy(Order.OrderStrategy.LIMIT);
         order.setAction(action);
@@ -73,7 +69,7 @@ public class LimitOrderTest {
         return order;
     }
 
-    protected static Quote createQuote(double price) {
+    private static Quote createQuote(double price) {
         Quote quote = new QuoteGeneric();
         quote.setPrice(new Money(price));
         return quote;

@@ -71,14 +71,14 @@ public class Settings {
         }
     }
 
-    protected Application mContext;
+    private Application mContext;
 
     public Settings(Application context) {
         this.mContext = context;
         PreferenceManager.setDefaultValues(this.mContext, R.xml.settings_pref_screen, false);
     }
 
-    protected SharedPreferences getSharedPrefs() {
+    private SharedPreferences getSharedPrefs() {
         return PreferenceManager.getDefaultSharedPreferences(this.mContext);
     }
 

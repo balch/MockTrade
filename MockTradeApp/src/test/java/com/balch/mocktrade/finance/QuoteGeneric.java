@@ -27,20 +27,20 @@ import com.balch.android.app.framework.types.Money;
 import java.util.Date;
 
 public class QuoteGeneric implements Quote {
-    protected String symbol;
-    protected String name;
-    protected String exchange;
-    protected Money price;
-    protected Date lastTradeTime;
-    protected Money previousClose;
-    protected Money dividendPerShare;
+    private String symbol;
+    private String name;
+    private String exchange;
+    private Money price;
+    private Date lastTradeTime;
+    private Money previousClose;
+    private Money dividendPerShare;
 
 
     public QuoteGeneric() {
         this("", "", "", new Money(0), new Date(), new Money(0), new Money(0));
     }
 
-    public QuoteGeneric(String symbol, String name,
+    private QuoteGeneric(String symbol, String name,
                         String exchange, Money price, Date lastTradeTime,
                         Money previousClose, Money dividendPerShare) {
         this.symbol = symbol;
@@ -107,23 +107,4 @@ public class QuoteGeneric implements Quote {
         return this.dividendPerShare;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setExchange(String exchange) {
-        this.exchange = exchange;
-    }
-
-    public void setPreviousClose(Money previousClose) {
-        this.previousClose = previousClose;
-    }
-
-    public void setDividendPerShare(Money dividendPerShare) {
-        this.dividendPerShare = dividendPerShare;
-    }
 }

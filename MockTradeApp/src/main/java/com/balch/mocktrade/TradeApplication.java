@@ -142,7 +142,7 @@ public class TradeApplication extends Application implements ModelProvider {
         if (mRequestQueue == null) {
             synchronized (this) {
                 if (mRequestQueue == null) {
-                    mRequestQueue = Volley.newRequestQueue(this, 10);
+                    mRequestQueue = Volley.newRequestQueue(this);
                 }
             }
         }

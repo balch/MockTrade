@@ -40,13 +40,13 @@ public class PerformanceItemUpdateBroadcaster {
         public final long accountId;
         public final int  days;
 
-        public PerformanceItemUpdateData(long accountId, int days) {
+        PerformanceItemUpdateData(long accountId, int days) {
             this.accountId = accountId;
             this.days = days;
         }
     }
 
-    static public void broadcast(Context context, long accountId, int days) {
+    static void broadcast(Context context, long accountId, int days) {
         Log.d(TAG, "broadcast sent:" + ACTION);
         Intent intent = new Intent(ACTION);
         intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
@@ -54,7 +54,7 @@ public class PerformanceItemUpdateBroadcaster {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    static public PerformanceItemUpdateData getData(Intent intent) {
+    public static PerformanceItemUpdateData getData(Intent intent) {
         return new PerformanceItemUpdateData(intent.getLongExtra(EXTRA_ACCOUNT_ID, -1), intent.getIntExtra(EXTRA_DAYS_COUNT, -1));
     }
 

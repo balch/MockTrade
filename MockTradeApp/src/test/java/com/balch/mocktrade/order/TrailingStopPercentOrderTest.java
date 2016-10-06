@@ -24,22 +24,22 @@ package com.balch.mocktrade.order;
 
 import android.content.Context;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.finance.QuoteGeneric;
 import com.balch.mocktrade.settings.Settings;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -47,22 +47,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 
 @RunWith(Parameterized.class)
 public class TrailingStopPercentOrderTest {
-    enum Outcome {
+    private enum Outcome {
         SUCCESS,
         NO_ORDER,
         UNSUPPORTED,
         HIGHEST_PRICE_CHANGE
     }
 
-    protected Outcome outcome;
-    protected Quote quote;
-    protected Order order;
+    private Outcome outcome;
+    private Quote quote;
+    private Order order;
 
     public TrailingStopPercentOrderTest(Outcome outcome, Order order, Quote quote) {
         this.outcome = outcome;
@@ -70,7 +67,7 @@ public class TrailingStopPercentOrderTest {
         this.order = order;
     }
 
-    protected static Order createOrder(Order.OrderAction action, double stopPercent, double highestPrice) {
+    private static Order createOrder(Order.OrderAction action, double stopPercent, double highestPrice) {
         Order order = new Order();
         order.setStrategy(Order.OrderStrategy.TRAILING_STOP_PERCENT_CHANGE);
         order.setAction(action);
@@ -79,7 +76,7 @@ public class TrailingStopPercentOrderTest {
         return order;
     }
 
-    protected static Quote createQuote(double price) {
+    private static Quote createQuote(double price) {
         Quote quote = new QuoteGeneric();
         quote.setPrice(new Money(price));
         return quote;

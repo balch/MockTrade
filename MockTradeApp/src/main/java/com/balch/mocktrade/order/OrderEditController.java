@@ -89,14 +89,14 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);
         quantityControl.setMarketIsOpen(financeModel.isMarketOpen());
-        quantityControl.setAccountInfo(order.account);
+        quantityControl.setAccountInfo(order.getAccount());
         quantityControl.setEnabled(controlEnabled);
 
         EditLayout control = controlMap.get(Order.FLD_SYMBOL);
         control.setEnabled(controlEnabled);
     }
 
-    protected void showControl(EditLayout control, boolean visible) {
+    private void showControl(EditLayout control, boolean visible) {
         if (control != null) {
             if (control instanceof ViewGroup) {
                 ((ViewGroup) control).setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -104,7 +104,7 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         }
     }
 
-    protected void onChangeStrategy(Order.OrderStrategy strategy, ControlMap controlMap) {
+    private void onChangeStrategy(Order.OrderStrategy strategy, ControlMap controlMap) {
         boolean showLimitPrice = false;
         boolean showStopPrice = false;
         boolean showStopPercent = false;
@@ -130,7 +130,7 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         showControl(controlMap.get(Order.FLD_STOP_PRICE), showStopPrice);
     }
 
-    protected void onChangeAction(Context context, Order.OrderAction action, ControlMap controlMap) {
+    private void onChangeAction(Context context, Order.OrderAction action, ControlMap controlMap) {
         EditLayout control = controlMap.get(Order.FLD_STRATEGY);
         if (control instanceof EnumEditLayout) {
             int selectionIndex = 0;
@@ -156,7 +156,7 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         }
     }
 
-    protected OrderEditController(Parcel in) {
+    private OrderEditController(Parcel in) {
     }
 
     @Override

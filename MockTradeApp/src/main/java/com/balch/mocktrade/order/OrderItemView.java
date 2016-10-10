@@ -40,14 +40,14 @@ public class OrderItemView extends LinearLayout {
         boolean onCancelOrder(Order order);
     }
 
-    protected OrderItemViewListener mOrderItemViewListener;
-    protected TextView mOrderId;
-    protected TextView mSymbol;
-    protected TextView mAction;
-    protected TextView mCreateDate;
-    protected TextView mStrategy;
-    protected TextView mQuantity;
-    protected Order mOrder;
+    private OrderItemViewListener mOrderItemViewListener;
+    private TextView mOrderId;
+    private TextView mSymbol;
+    private TextView mAction;
+    private TextView mCreateDate;
+    private TextView mStrategy;
+    private TextView mQuantity;
+    private Order mOrder;
 
     public OrderItemView(Context context) {
         super(context);

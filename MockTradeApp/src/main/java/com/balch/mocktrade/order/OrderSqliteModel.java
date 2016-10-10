@@ -49,19 +49,19 @@ import java.util.Map;
 public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderManager.OrderManagerListener {
     private static final String TAG = OrderSqliteModel.class.getSimpleName();
 
-    public static final String TABLE_NAME = "[order]";
+    private static final String TABLE_NAME = "[order]";
 
-    public static final String COLUMN_ACCOUNT_ID = "account_id";
-    public static final String COLUMN_SYMBOL = "symbol";
-    public static final String COLUMN_STATUS = "status";
-    public static final String COLUMN_ACTION = "action";
-    public static final String COLUMN_STRATEGY = "strategy";
-    public static final String COLUMN_DURATION = "duration";
-    public static final String COLUMN_LIMIT_PRICE = "limit_price";
-    public static final String COLUMN_STOP_PRICE = "stop_price";
-    public static final String COLUMN_STOP_PERCENT = "stop_percent";
-    public static final String COLUMN_QUANTITY = "quantity";
-    public static final String COLUMN_HIGHEST_PRICE = "highest_price";
+    private static final String COLUMN_ACCOUNT_ID = "account_id";
+    private static final String COLUMN_SYMBOL = "symbol";
+    private static final String COLUMN_STATUS = "status";
+    private static final String COLUMN_ACTION = "action";
+    private static final String COLUMN_STRATEGY = "strategy";
+    private static final String COLUMN_DURATION = "duration";
+    private static final String COLUMN_LIMIT_PRICE = "limit_price";
+    private static final String COLUMN_STOP_PRICE = "stop_price";
+    private static final String COLUMN_STOP_PERCENT = "stop_percent";
+    private static final String COLUMN_QUANTITY = "quantity";
+    private static final String COLUMN_HIGHEST_PRICE = "highest_price";
 
     private final InvestmentSqliteModel mInvestmentModel;
     private final AccountSqliteModel mAccountModel;
@@ -239,17 +239,17 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
     public ContentValues getContentValues(Order order) {
         ContentValues values = new ContentValues();
 
-        values.put(COLUMN_ACCOUNT_ID, order.account.getId());
-        values.put(COLUMN_SYMBOL, order.symbol);
-        values.put(COLUMN_STATUS, order.status.name());
-        values.put(COLUMN_ACTION, order.action.name());
-        values.put(COLUMN_STRATEGY, order.strategy.name());
-        values.put(COLUMN_DURATION, order.duration.name());
-        values.put(COLUMN_LIMIT_PRICE, order.limitPrice.getMicroCents());
-        values.put(COLUMN_STOP_PRICE, order.stopPrice.getMicroCents());
-        values.put(COLUMN_STOP_PERCENT, order.stopPercent);
-        values.put(COLUMN_QUANTITY, order.quantity);
-        values.put(COLUMN_HIGHEST_PRICE, order.highestPrice.getMicroCents());
+        values.put(COLUMN_ACCOUNT_ID, order.getAccount().getId());
+        values.put(COLUMN_SYMBOL, order.getSymbol());
+        values.put(COLUMN_STATUS, order.getStatus().name());
+        values.put(COLUMN_ACTION, order.getAction().name());
+        values.put(COLUMN_STRATEGY, order.getStrategy().name());
+        values.put(COLUMN_DURATION, order.getDuration().name());
+        values.put(COLUMN_LIMIT_PRICE, order.getLimitPrice().getMicroCents());
+        values.put(COLUMN_STOP_PRICE, order.getStopPrice().getMicroCents());
+        values.put(COLUMN_STOP_PERCENT, order.getStopPercent());
+        values.put(COLUMN_QUANTITY, order.getQuantity());
+        values.put(COLUMN_HIGHEST_PRICE, order.getHighestPrice().getMicroCents());
 
         return values;
     }
@@ -257,18 +257,19 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
     @Override
     public void populate(Order order, Cursor cursor, Map<String, Integer> columnMap) {
         order.setId(cursor.getLong(columnMap.get(COLUMN_ID)));
-        order.account = new Account();
-        order.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        order.symbol = cursor.getString(columnMap.get(COLUMN_SYMBOL));
-        order.status = Order.OrderStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS)));
-        order.action = Order.OrderAction.valueOf(cursor.getString(columnMap.get(COLUMN_ACTION)));
-        order.strategy = Order.OrderStrategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY)));
-        order.duration = Order.OrderDuration.valueOf(cursor.getString(columnMap.get(COLUMN_DURATION)));
-        order.limitPrice = new Money(cursor.getLong(columnMap.get(COLUMN_LIMIT_PRICE)));
-        order.stopPrice = new Money(cursor.getLong(columnMap.get(COLUMN_STOP_PRICE)));
-        order.stopPercent = cursor.getDouble(columnMap.get(COLUMN_STOP_PERCENT));
-        order.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
-        order.highestPrice = new Money(cursor.getLong(columnMap.get(COLUMN_HIGHEST_PRICE)));
+        Account account = new Account();
+        account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        order.setAccount(account);
+        order.setSymbol(cursor.getString(columnMap.get(COLUMN_SYMBOL)));
+        order.setStatus(Order.OrderStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS))));
+        order.setAction(Order.OrderAction.valueOf(cursor.getString(columnMap.get(COLUMN_ACTION))));
+        order.setStrategy(Order.OrderStrategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY))));
+        order.setDuration(Order.OrderDuration.valueOf(cursor.getString(columnMap.get(COLUMN_DURATION))));
+        order.setLimitPrice(new Money(cursor.getLong(columnMap.get(COLUMN_LIMIT_PRICE))));
+        order.setStopPrice(new Money(cursor.getLong(columnMap.get(COLUMN_STOP_PRICE))));
+        order.setStopPercent(cursor.getDouble(columnMap.get(COLUMN_STOP_PERCENT)));
+        order.setQuantity(cursor.getLong(columnMap.get(COLUMN_QUANTITY)));
+        order.setHighestPrice(new Money(cursor.getLong(columnMap.get(COLUMN_HIGHEST_PRICE))));
     }
 
 }

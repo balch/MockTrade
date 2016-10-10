@@ -37,9 +37,9 @@ import com.balch.mocktrade.shared.utils.TextFormatUtils;
 
 public class SummaryTotalsView extends LinearLayout {
 
-    protected TextView mCurrentBalance;
-    protected TextView mDayPerformance;
-    protected TextView mTotalPerformance;
+    private TextView mCurrentBalance;
+    private TextView mDayPerformance;
+    private TextView mTotalPerformance;
 
     public SummaryTotalsView(Context context) {
         super(context);

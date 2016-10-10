@@ -39,15 +39,13 @@ import com.balch.mocktrade.shared.utils.TextFormatUtils;
 
 public class InvestmentViewHolder extends RecyclerView.ViewHolder {
 
-    protected TextView mSymbol;
-    protected TextView mDescription;
-    protected TextView mPrice;
-    protected TextView mPerformance;
-    protected TextView mValue;
-    protected TextView mValueChange;
-    protected LinearLayout mValueLayout;
-    protected LinearLayout mPriceLayout;
-    protected Investment mInvestment;
+    private TextView mSymbol;
+    private TextView mDescription;
+    private TextView mPrice;
+    private TextView mPerformance;
+    private TextView mValue;
+    private TextView mValueChange;
+    private Investment mInvestment;
 
     public InvestmentViewHolder(ViewGroup parent) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_investment, parent, false));
@@ -58,12 +56,11 @@ public class InvestmentViewHolder extends RecyclerView.ViewHolder {
 
         mValue = (TextView) itemView.findViewById(R.id.investment_item_value);
         mValueChange = (TextView) itemView.findViewById(R.id.investment_item_value_change);
-        mValueLayout = (LinearLayout) itemView.findViewById(R.id.investment_item_value_layout);
-        mPriceLayout = (LinearLayout) itemView.findViewById(R.id.investment_item_price_layout);
+        LinearLayout valueLayout = (LinearLayout) itemView.findViewById(R.id.investment_item_value_layout);
 
         boolean showValueLayout = (itemView.getResources().getBoolean(R.bool.isTablet) ||
                 (itemView.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE));
-        mValueLayout.setVisibility(showValueLayout ? View.VISIBLE : View.GONE);
+        valueLayout.setVisibility(showValueLayout ? View.VISIBLE : View.GONE);
     }
 
     public void bind(Investment investment) {

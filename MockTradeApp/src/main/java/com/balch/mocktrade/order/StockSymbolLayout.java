@@ -56,23 +56,22 @@ import java.util.List;
 
 public class StockSymbolLayout extends LinearLayout implements EditLayout, TextWatcher {
     private static final String TAG = StockSymbolLayout.class.getSimpleName();
-    protected static final int TEXT_CHANGE_DELAY_MS = 500;
+    private static final int TEXT_CHANGE_DELAY_MS = 500;
 
-    protected TextView mLabel;
-    protected EditText mValue;
-    protected TextView mDescription;
-    protected TextView mPrice;
+    private TextView mLabel;
+    private EditText mValue;
+    private TextView mDescription;
+    private TextView mPrice;
 
-    protected ColumnDescriptor mDescriptor;
-    protected EditLayoutListener mEditLayoutListener;
-    protected ControlMapper mControlMapper;
+    private ColumnDescriptor mDescriptor;
+    private EditLayoutListener mEditLayoutListener;
 
-    protected FinanceModel mFinanceModel;
+    private FinanceModel mFinanceModel;
 
-    protected boolean mAllowEmpty;
+    private boolean mAllowEmpty;
 
-    protected Handler mTextChangeHandler = new Handler(Looper.getMainLooper());
-    protected Runnable mTxtChangeRunnable = new Runnable() {
+    private Handler mTextChangeHandler = new Handler(Looper.getMainLooper());
+    private Runnable mTxtChangeRunnable = new Runnable() {
         @Override
         public void run() {
             try {
@@ -154,7 +153,8 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                 }
             }
         } catch (IllegalAccessException e) {
-            this.mValue.setText("IllegalAccessException getting value");
+            Log.e(TAG, "bind error", e);
+            this.mValue.setText(R.string.get_value_error);
             enabled = false;
         }
         this.mValue.setEnabled(enabled);
@@ -213,7 +213,6 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
     @Override
     public void setControlMapper(ControlMapper controlMapper) {
-        this.mControlMapper = controlMapper;
     }
 
     @Override

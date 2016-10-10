@@ -38,16 +38,16 @@ import java.util.Date;
 public class Investment extends DomainObject implements Parcelable {
     public static final String TAG = Investment.class.getSimpleName();
 
-    protected Account account;
-    protected String symbol;
-    protected InvestmentStatus status;
-    protected String description;
-    protected String exchange;
-    protected Money costBasis;
-    protected Money price;
-    protected Date lastTradeTime;
-    protected Money prevDayClose;
-    protected long quantity;
+    private Account account;
+    private String symbol;
+    private InvestmentStatus status;
+    private String description;
+    private String exchange;
+    private Money costBasis;
+    private Money price;
+    private Date lastTradeTime;
+    private Money prevDayClose;
+    private long quantity;
 
     public Investment() {
     }

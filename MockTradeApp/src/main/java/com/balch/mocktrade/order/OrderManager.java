@@ -52,10 +52,10 @@ class OrderManager {
         boolean updateOrder(Order order) throws IllegalAccessException;
     }
 
-    protected final FinanceModel mFinanceModel;
-    protected final Context mContext;
-    protected final Settings mSettings;
-    protected final OrderManagerListener mOrderManagerListener;
+    private final FinanceModel mFinanceModel;
+    private final Context mContext;
+    private final Settings mSettings;
+    private final OrderManagerListener mOrderManagerListener;
 
     public OrderManager(Context context, FinanceModel financeModel, Settings settings,
                         OrderManagerListener listener) {
@@ -119,16 +119,16 @@ class OrderManager {
         return result;
     }
 
-    protected boolean isQuoteValid(Quote quote)  {
+    boolean isQuoteValid(Quote quote)  {
         Date tradeDate = quote.getLastTradeTime();
         return (mFinanceModel.isMarketOpen() && isToday(tradeDate));
     }
 
-    protected boolean isToday(Date date) {
+    private boolean isToday(Date date) {
         return DateUtils.isToday(date.getTime());
     }
 
-    protected OrderResult executeLimitOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private OrderResult executeLimitOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             int compareQuoteToLimit = quote.getPrice().compareTo(order.getLimitPrice());
@@ -141,7 +141,7 @@ class OrderManager {
         return orderResult;
     }
 
-    protected OrderResult executeTrailingStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private OrderResult executeTrailingStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (order.getAction() == Order.OrderAction.BUY) {
             throw new UnsupportedOperationException("Cannot have a Stop Loss order if the action is BUY");
         }
@@ -191,7 +191,7 @@ class OrderManager {
         return orderResult;
     }
 
-    protected OrderResult executeStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private OrderResult executeStopLossOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (order.getAction() == Order.OrderAction.BUY) {
             throw new UnsupportedOperationException("Cannot have a Stop Loss order if the action is BUY");
         }
@@ -207,7 +207,7 @@ class OrderManager {
         return orderResult;
     }
 
-    protected OrderResult executeMarketOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private OrderResult executeMarketOrder(Order order, Quote quote) throws InvocationTargetException, SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         OrderResult orderResult = new OrderResult(false, null, null, null, 0);
         if (this.isQuoteValid(quote)) {
             orderResult = this.mOrderManagerListener.executeOrder(order, quote, quote.getPrice());

@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -61,12 +62,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -472,7 +471,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMS_REQUEST_BACKUP: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -497,7 +496,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     protected void setupAdapter() {
-        mPortfolioAdapter = new PortfolioAdapter(this, mSettings);
+        mPortfolioAdapter = new PortfolioAdapter(mSettings);
         mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
@@ -636,6 +635,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
         }
     }
 
+/*
     private List<PerformanceItem> generateRandomTestData() {
         List<PerformanceItem> performanceItems = new ArrayList<>();
 
@@ -662,6 +662,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
         return performanceItems;
     }
+*/
 
     private void updateView() {
         mGraphDataLoader.forceLoad();

@@ -83,7 +83,7 @@ public class AccountSqliteModel implements SqlMapper<Account> {
         try {
             mModelProvider.getSqlConnection().insert(this, account, db);
 
-            Transaction transaction = new Transaction(account, account.initialBalance, Transaction.TransactionType.DEPOSIT, "Initial Deposit");
+            Transaction transaction = new Transaction(account, account.getInitialBalance(), Transaction.TransactionType.DEPOSIT, "Initial Deposit");
             mModelProvider.getSqlConnection().insert(transaction, transaction, db);
 
             db.setTransactionSuccessful();
@@ -124,12 +124,12 @@ public class AccountSqliteModel implements SqlMapper<Account> {
     public ContentValues getContentValues(Account account) {
         ContentValues values = new ContentValues();
 
-        values.put(COLUMN_NAME, account.name);
-        values.put(COLUMN_DESCRIPTION, account.description);
-        values.put(COLUMN_INITIAL_BALANCE, account.initialBalance.getMicroCents());
-        values.put(COLUMN_STRATEGY, account.strategy.name());
-        values.put(COLUMN_AVAILABLE_FUNDS, account.availableFunds.getMicroCents());
-        values.put(COLUMN_EXCLUDE_FROM_TOTALS, account.excludeFromTotals ? 1 : 0);
+        values.put(COLUMN_NAME, account.getName());
+        values.put(COLUMN_DESCRIPTION, account.getDescription());
+        values.put(COLUMN_INITIAL_BALANCE, account.getInitialBalance().getMicroCents());
+        values.put(COLUMN_STRATEGY, account.getStrategy().name());
+        values.put(COLUMN_AVAILABLE_FUNDS, account.getAvailableFunds().getMicroCents());
+        values.put(COLUMN_EXCLUDE_FROM_TOTALS, account.getExcludeFromTotals() ? 1 : 0);
 
         return values;
     }
@@ -137,12 +137,12 @@ public class AccountSqliteModel implements SqlMapper<Account> {
     @Override
     public void populate(Account account, Cursor cursor, Map<String, Integer> columnMap) {
         account.setId(cursor.getLong(columnMap.get(COLUMN_ID)));
-        account.name = cursor.getString(columnMap.get(COLUMN_NAME));
-        account.description = cursor.getString(columnMap.get(COLUMN_DESCRIPTION));
-        account.initialBalance = new Money(cursor.getLong(columnMap.get(COLUMN_INITIAL_BALANCE)));
-        account.strategy = Account.Strategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY)));
-        account.availableFunds = new Money(cursor.getLong(columnMap.get(COLUMN_AVAILABLE_FUNDS)));
-        account.excludeFromTotals = cursor.getInt(columnMap.get(COLUMN_EXCLUDE_FROM_TOTALS))==1;
+        account.setName(cursor.getString(columnMap.get(COLUMN_NAME)));
+        account.setDescription(cursor.getString(columnMap.get(COLUMN_DESCRIPTION)));
+        account.setInitialBalance(new Money(cursor.getLong(columnMap.get(COLUMN_INITIAL_BALANCE))));
+        account.setStrategy(Account.Strategy.valueOf(cursor.getString(columnMap.get(COLUMN_STRATEGY))));
+        account.setAvailableFunds(new Money(cursor.getLong(columnMap.get(COLUMN_AVAILABLE_FUNDS))));
+        account.setExcludeFromTotals(cursor.getInt(columnMap.get(COLUMN_EXCLUDE_FROM_TOTALS))==1);
     }
 
 

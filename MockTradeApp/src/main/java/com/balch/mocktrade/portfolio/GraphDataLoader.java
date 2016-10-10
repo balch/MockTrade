@@ -18,8 +18,8 @@ public class GraphDataLoader extends AsyncTaskLoader<List<PerformanceItem>> {
 
     private long mSelectedAccountId = -1;
     private int mDaysToReturn = -1;
-    protected UpdateReceiver mUpdateReceiver;
-    protected List<PerformanceItem> mGraphData;
+    private UpdateReceiver mUpdateReceiver;
+    private List<PerformanceItem> mGraphData;
 
     public GraphDataLoader(Context context, PortfolioModel model) {
         super(context);

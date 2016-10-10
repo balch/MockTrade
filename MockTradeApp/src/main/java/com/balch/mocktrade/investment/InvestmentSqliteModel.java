@@ -36,25 +36,25 @@ import java.util.Map;
 
 public class InvestmentSqliteModel implements SqlMapper<Investment> {
 
-    public static final String TAG = Investment.class.getSimpleName();
+    private static final String TAG = Investment.class.getSimpleName();
 
-    public static final String TABLE_NAME = "investment";
+    private static final String TABLE_NAME = "investment";
 
-    public static final String COLUMN_ACCOUNT_ID = "account_id";
-    public static final String COLUMN_SYMBOL = "symbol";
-    public static final String COLUMN_STATUS = "status";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_EXCHANGE = "exchange";
-    public static final String COLUMN_COST_BASIS = "cost_basis";
-    public static final String COLUMN_PRICE = "price";
-    public static final String COLUMN_LAST_TRADE_TIME = "last_trade_time";
-    public static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
-    public static final String COLUMN_QUANTITY = "quantity";
+    private static final String COLUMN_ACCOUNT_ID = "account_id";
+    private static final String COLUMN_SYMBOL = "symbol";
+    private static final String COLUMN_STATUS = "status";
+    private static final String COLUMN_DESCRIPTION = "description";
+    private static final String COLUMN_EXCHANGE = "exchange";
+    private static final String COLUMN_COST_BASIS = "cost_basis";
+    private static final String COLUMN_PRICE = "price";
+    private static final String COLUMN_LAST_TRADE_TIME = "last_trade_time";
+    private static final String COLUMN_PREV_DAY_CLOSE = "prev_day_close";
+    private static final String COLUMN_QUANTITY = "quantity";
 
-    public static final String SQL_LAST_TRADE_TIME =
+    private static final String SQL_LAST_TRADE_TIME =
             "SELECT MAX(" + COLUMN_LAST_TRADE_TIME + ") FROM "+TABLE_NAME;
 
-    public static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
+    private static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
              COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
 
     private final ModelProvider mModelProvider;
@@ -111,16 +111,16 @@ public class InvestmentSqliteModel implements SqlMapper<Investment> {
     public ContentValues getContentValues(Investment investment) {
         ContentValues values = new ContentValues();
 
-        values.put(COLUMN_ACCOUNT_ID, investment.account.getId());
-        values.put(COLUMN_SYMBOL, investment.symbol);
-        values.put(COLUMN_STATUS, investment.status.name());
-        values.put(COLUMN_DESCRIPTION, investment.description);
-        values.put(COLUMN_EXCHANGE, investment.exchange);
-        values.put(COLUMN_COST_BASIS, investment.costBasis.getMicroCents());
-        values.put(COLUMN_PRICE, investment.price.getMicroCents());
-        values.put(COLUMN_LAST_TRADE_TIME, investment.lastTradeTime.getTime());
-        values.put(COLUMN_PREV_DAY_CLOSE, investment.prevDayClose.getMicroCents());
-        values.put(COLUMN_QUANTITY, investment.quantity);
+        values.put(COLUMN_ACCOUNT_ID, investment.getAccount().getId());
+        values.put(COLUMN_SYMBOL, investment.getSymbol());
+        values.put(COLUMN_STATUS, investment.getStatus().name());
+        values.put(COLUMN_DESCRIPTION, investment.getDescription());
+        values.put(COLUMN_EXCHANGE, investment.getExchange());
+        values.put(COLUMN_COST_BASIS, investment.getCostBasis().getMicroCents());
+        values.put(COLUMN_PRICE, investment.getPrice().getMicroCents());
+        values.put(COLUMN_LAST_TRADE_TIME, investment.getLastTradeTime().getTime());
+        values.put(COLUMN_PREV_DAY_CLOSE, investment.getPrevDayClose().getMicroCents());
+        values.put(COLUMN_QUANTITY, investment.getQuantity());
 
         return values;
     }
@@ -128,17 +128,18 @@ public class InvestmentSqliteModel implements SqlMapper<Investment> {
     @Override
     public void populate(Investment investment, Cursor cursor, Map<String, Integer> columnMap) {
         investment.setId(cursor.getLong(columnMap.get(COLUMN_ID)));
-        investment.account = new Account();
-        investment.account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
-        investment.symbol = cursor.getString(columnMap.get(COLUMN_SYMBOL));
-        investment.status = Investment.InvestmentStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS)));
-        investment.description = cursor.getString(columnMap.get(COLUMN_DESCRIPTION));
-        investment.exchange = cursor.getString(columnMap.get(COLUMN_EXCHANGE));
-        investment.costBasis = new Money(cursor.getLong(columnMap.get(COLUMN_COST_BASIS)));
-        investment.price = new Money(cursor.getLong(columnMap.get(COLUMN_PRICE)));
-        investment.lastTradeTime = new Date(cursor.getLong(columnMap.get(COLUMN_LAST_TRADE_TIME)));
-        investment.prevDayClose = new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE)));
-        investment.quantity = cursor.getLong(columnMap.get(COLUMN_QUANTITY));
+
+        Account account = new Account();
+        account.setId(cursor.getLong(columnMap.get(COLUMN_ACCOUNT_ID)));
+        investment.setAccount(account);
+        investment.setSymbol(cursor.getString(columnMap.get(COLUMN_SYMBOL)));
+        investment.setStatus(Investment.InvestmentStatus.valueOf(cursor.getString(columnMap.get(COLUMN_STATUS))));
+        investment.setDescription(cursor.getString(columnMap.get(COLUMN_DESCRIPTION)));
+        investment.setExchange(cursor.getString(columnMap.get(COLUMN_EXCHANGE)));
+        investment.setCostBasis(new Money(cursor.getLong(columnMap.get(COLUMN_COST_BASIS))));
+        investment.setPrice(new Money(cursor.getLong(columnMap.get(COLUMN_PRICE))), new Date(cursor.getLong(columnMap.get(COLUMN_LAST_TRADE_TIME))));
+        investment.setPrevDayClose(new Money(cursor.getLong(columnMap.get(COLUMN_PREV_DAY_CLOSE))));
+        investment.setQuantity(cursor.getLong(columnMap.get(COLUMN_QUANTITY)));
     }
 
     public Date getLastTradeTime() {

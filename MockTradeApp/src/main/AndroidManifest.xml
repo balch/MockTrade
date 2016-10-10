@@ -30,7 +30,7 @@
 
         <activity
             android:name=".order.OrderListActivity"
-            android:label="@string/order_list_activity_label" >
+            android:label="@string/order_list_activity_label"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

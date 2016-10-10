@@ -42,10 +42,10 @@ public class Transaction extends DomainObject implements SqlMapper<Transaction>,
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_NOTES = "notes";
 
-    protected Account mAccount;
-    protected Money mAmount;
-    protected TransactionType mTransactionType;
-    protected String mNotes;
+    private Account mAccount;
+    private Money mAmount;
+    private TransactionType mTransactionType;
+    private String mNotes;
 
     public Transaction() {
     }

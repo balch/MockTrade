@@ -44,30 +44,30 @@ import java.util.List;
 
 public class Account extends DomainObject implements Parcelable {
 
-    public static final String FLD_STRATEGY = "strategy";
-    public static final String FLD_NAME = "name";
+    static final String FLD_STRATEGY = "strategy";
+    static final String FLD_NAME = "name";
 
     @ColumnEdit(order = 1, labelResId = R.string.account_name_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
     @ColumnNew(order = 1, labelResId = R.string.account_name_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    protected String name;
+    private String name;
 
     @ColumnEdit(order = 2, labelResId = R.string.account_description_label, hints = {"MAX_CHARS=256","DISPLAY_LINES=2"})
     @ColumnNew(order = 2, labelResId = R.string.account_description_label, hints = {"MAX_CHARS=256","DISPLAY_LINES=2"})
-    protected String description;
+    private String description;
 
     @ColumnEdit(order = 3, labelResId = R.string.account_init_balance_label, state = EditState.READONLY, hints = {"NON_NEGATIVE=true","HIDE_CENTS=true"})
     @ColumnNew(order = 3, labelResId = R.string.account_init_balance_label, hints = {"NON_NEGATIVE=true","HIDE_CENTS=true"})
-    protected Money initialBalance;
+    private Money initialBalance;
 
     @ColumnEdit(order = 4, labelResId = R.string.account_strategy_label, state = EditState.READONLY)
     @ColumnNew(order = 4,labelResId = R.string.account_strategy_label)
-    protected Strategy strategy;
+    private Strategy strategy;
 
-    protected Money availableFunds;
+    private Money availableFunds;
 
     @ColumnEdit(order = 5, labelResId = R.string.account_exclude_from_totals_label, state = EditState.READONLY)
     @ColumnNew(order = 5,labelResId = R.string.account_exclude_from_totals_label)
-    protected Boolean excludeFromTotals;
+    private Boolean excludeFromTotals;
 
     public Account() {
         this("", "", new Money(0), Strategy.NONE, false);

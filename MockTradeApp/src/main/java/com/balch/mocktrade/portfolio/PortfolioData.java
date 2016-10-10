@@ -32,11 +32,11 @@ import java.util.Date;
 import java.util.List;
 
 public class PortfolioData {
-    protected List<Account> mAccounts;
-    protected LongSparseArray<List<Investment>> mAccountToInvestmentMap;
-    protected LongSparseArray<Integer> mAccountToOpenOrderCountMap;
-    protected Date mLastSyncTime;
-    protected Date mLastQuoteTime;
+    private List<Account> mAccounts;
+    private LongSparseArray<List<Investment>> mAccountToInvestmentMap;
+    private LongSparseArray<Integer> mAccountToOpenOrderCountMap;
+    private Date mLastSyncTime;
+    private Date mLastQuoteTime;
 
     public PortfolioData() {
         mAccounts = new ArrayList<>();

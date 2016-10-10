@@ -62,28 +62,26 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     private final static int GRAPH_TIME_HOURLY_INDEX = 0;
     private final static DateFormat DATE_FORMAT_SHORT = DateFormat.getDateInstance(DateFormat.SHORT);
 
-    protected PortfolioAdapter mPortfolioAdapter;
-    protected RecyclerView mPortfolioList;
+    private RecyclerView mPortfolioList;
 
-    protected SummaryTotalsView mPortfolioSummary;
+    private SummaryTotalsView mPortfolioSummary;
 
-    protected TextView mLastQuoteTime;
-    protected TextView mLastSyncTime;
+    private TextView mLastQuoteTime;
+    private TextView mLastSyncTime;
 
-    protected DailyGraphView mDailyGraphView;
-    protected TextView mEmptyGraphView;
-    protected Spinner mAccountGraphSpinner;
-    protected Spinner mTimeGraphSpinner;
+    private DailyGraphView mDailyGraphView;
+    private TextView mEmptyGraphView;
+    private Spinner mAccountGraphSpinner;
 
-    protected ArrayAdapter<String> mGraphAccountAdapter;
-    protected GraphTimeAdapter mGraphTimeAdapter;
+    private ArrayAdapter<String> mGraphAccountAdapter;
+    private GraphTimeAdapter mGraphTimeAdapter;
 
     // variables that need to be persisted
-    protected List<Long> mAccountIds = new ArrayList<>();
-    protected int mAccountSelectedPosition = 0;
-    protected int mGraphTimeSelectedPosition = 0;
+    private List<Long> mAccountIds = new ArrayList<>();
+    private int mAccountSelectedPosition = 0;
+    private int mGraphTimeSelectedPosition = 0;
 
-    protected final MainPortfolioViewListener mMainPortfolioViewListener;
+    private final MainPortfolioViewListener mMainPortfolioViewListener;
 
     public MainPortfolioView(Context context, MainPortfolioViewListener mainPortfolioViewListener) {
         super(context);
@@ -108,7 +106,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mEmptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
 
         mAccountGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_account_graph_spinner);
-        mTimeGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_time_graph_spinner);
+        Spinner timeGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_time_graph_spinner);
 
         mGraphAccountAdapter = new ArrayAdapter<>(getContext(), R.layout.portfolio_view_graph_spinner_text);
         mGraphAccountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -140,9 +138,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_90_days));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_180_days));
         mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_year));
-        mTimeGraphSpinner.setAdapter(mGraphTimeAdapter);
+        timeGraphSpinner.setAdapter(mGraphTimeAdapter);
 
-        mTimeGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        timeGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mGraphTimeSelectedPosition != position) {
@@ -183,7 +181,6 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
-        mPortfolioAdapter = portfolioAdapter;
         mPortfolioList.setAdapter(portfolioAdapter);
     }
 

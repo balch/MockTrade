@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class GoogleQuote implements Quote {
@@ -140,7 +141,7 @@ public class GoogleQuote implements Quote {
         Calendar ny_cal = Calendar.getInstance(ny_tz);
         int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET)) / 60000;
 
-        dateStr = dateStr.replace("Z", String.format("%s%02d:%02d", (offset_mins >= 0) ? "+" : "-", Math.abs(offset_mins / 60), Math.abs(offset_mins % 60)));
+        dateStr = dateStr.replace("Z", String.format(Locale.getDefault(), "%s%02d:%02d", (offset_mins >= 0) ? "+" : "-", Math.abs(offset_mins / 60), Math.abs(offset_mins % 60)));
         try {
             return ISO8601DateTime.toDate(dateStr);
         } catch (ParseException e) {

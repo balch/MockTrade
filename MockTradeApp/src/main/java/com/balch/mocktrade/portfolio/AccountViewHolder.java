@@ -45,17 +45,16 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
         void onShowOpenOrdersClicked(Account account);
     }
 
-    protected final AccountItemViewListener mAccountItemViewListener;
-    protected final TextView mName;
-    protected final TextView mCurrentBalance;
-    protected final Button mOpenOrders;
-    protected final TextView mDayPerformance;
-    protected final TextView mTotalPerformance;
-    protected final LinearLayout mValueLayout;
-    protected final Button mTradeButton;
-    protected final Settings mSettings;
-    protected Account mAccount;
-
+    private final AccountItemViewListener mAccountItemViewListener;
+    private final TextView mName;
+    private final TextView mCurrentBalance;
+    private final Button mOpenOrders;
+    private final TextView mDayPerformance;
+    private final TextView mTotalPerformance;
+    private final LinearLayout mValueLayout;
+    private final Button mTradeButton;
+    private final Settings mSettings;
+    private Account mAccount;
 
     public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener, Settings settings) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_account, parent, false));

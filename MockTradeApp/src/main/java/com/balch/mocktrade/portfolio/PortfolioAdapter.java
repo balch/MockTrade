@@ -22,7 +22,6 @@
 
 package com.balch.mocktrade.portfolio;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,18 +50,16 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         void createNewDogsAccount();
     }
 
-    protected AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
+    private AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
 
-    protected final Context mContext;
-    protected final Settings mSettings;
+    private final Settings mSettings;
 
-    protected PortfolioAdapterListener mPortfolioAdapterListener;
-    protected PortfolioData mPortfolioData = new PortfolioData();
+    private PortfolioAdapterListener mPortfolioAdapterListener;
+    private PortfolioData mPortfolioData = new PortfolioData();
 
-    protected List<Object> mDataList;
+    private List<Object> mDataList;
 
-    public PortfolioAdapter(Context context, Settings settings) {
-        mContext = context.getApplicationContext();
+    public PortfolioAdapter(Settings settings) {
         mSettings = settings;
     }
 
@@ -108,7 +105,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return (!isEmpty()) ? mDataList.size() : 1;
     }
 
-    public boolean isEmpty() {
+    private boolean isEmpty() {
         return ((mDataList == null) || (mDataList.size() == 0));
     }
 
@@ -180,9 +177,9 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public static class NewAccountViewHolder extends RecyclerView.ViewHolder {
+    private static class NewAccountViewHolder extends RecyclerView.ViewHolder {
 
-        public NewAccountViewHolder(ViewGroup parent, final PortfolioAdapterListener listener) {
+        NewAccountViewHolder(ViewGroup parent, final PortfolioAdapterListener listener) {
             super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_empty, parent, false));
 
             itemView.findViewById(R.id.portfolio_view_holder_empty_create)

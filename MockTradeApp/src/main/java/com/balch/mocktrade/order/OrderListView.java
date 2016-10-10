@@ -23,6 +23,8 @@
 package com.balch.mocktrade.order;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,9 +39,8 @@ import java.util.List;
 
 public class OrderListView extends LinearLayout implements BaseView {
 
-    protected OrderItemView.OrderItemViewListener mOrderItemViewListener;
-    protected OrderListAdapter mAdapter;
-    protected ListView mOrderList;
+    private OrderItemView.OrderItemViewListener mOrderItemViewListener;
+    private ListView mOrderList;
 
     public OrderListView(Context context) {
         super(context);
@@ -66,18 +67,17 @@ public class OrderListView extends LinearLayout implements BaseView {
     }
 
     public void bind(List<Order> orders) {
-        this.mAdapter = new OrderListAdapter(this.getContext(), orders);
-        this.mOrderList.setAdapter(mAdapter);
+        this.mOrderList.setAdapter(new OrderListAdapter(this.getContext(), orders));
     }
 
     private class OrderListAdapter extends  ArrayAdapter<Order> {
 
-        public OrderListAdapter(Context context, List<Order> orders) {
+        OrderListAdapter(Context context, List<Order> orders) {
             super(context, 0, orders);
         }
 
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
+        public @NonNull View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             OrderItemView view = (OrderItemView) convertView;
             if (view == null) {
                 view = new OrderItemView(this.getContext());

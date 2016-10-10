@@ -152,5 +152,6 @@
     <string name="watch_config_item_twenty_four_hour_time">Show 24hr Time</string>
     <string name="watch_config_item_hide_exclude_account">Hide Exclude Accounts</string>
     <string name="watch_config_item_obfuscate_total">Demo Mode</string>
+    <string name="get_value_error">Error getting value</string>
 
 </resources>

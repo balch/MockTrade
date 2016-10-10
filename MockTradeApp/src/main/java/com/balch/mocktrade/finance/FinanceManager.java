@@ -42,8 +42,8 @@ import java.util.GregorianCalendar;
  */
 class FinanceManager {
 
-    protected final Settings mSettings;
-    protected final Context mContext;
+    private final Settings mSettings;
+    private final Context mContext;
 
     public FinanceManager(Context context, Settings settings) {
         this.mContext = context.getApplicationContext();
@@ -65,7 +65,7 @@ class FinanceManager {
      *           0 - market is open
      *           1 - after market close
      */
-    protected int marketOpenCompareValue(boolean usePoll) {
+    private int marketOpenCompareValue(boolean usePoll) {
         int val = 0; // assume open
         Calendar now = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
         if ((now.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
@@ -94,7 +94,7 @@ class FinanceManager {
         return this.nextMarketOpen(true);
     }
 
-    protected Date nextMarketOpen(boolean usePoll) {
+    private Date nextMarketOpen(boolean usePoll) {
         Date nextOpen;
 
         int comapreVal = marketOpenCompareValue(usePoll);
@@ -133,23 +133,23 @@ class FinanceManager {
                 pendingIntent);
     }
 
-    protected Calendar getPollStartTime() {
+    private Calendar getPollStartTime() {
         return getCalendarFromTime(mSettings.geMarketOpenTime(), -15);
     }
 
-    protected Calendar getMarketOpenTime() {
+    private Calendar getMarketOpenTime() {
         return getCalendarFromTime(mSettings.geMarketOpenTime(), 0);
     }
 
-    protected Calendar getPollEndTime() {
+    private Calendar getPollEndTime() {
         return getCalendarFromTime(mSettings.geMarketCloseTime(), 15);
     }
 
-    protected Calendar getMarketCloseTime() {
+    private Calendar getMarketCloseTime() {
         return getCalendarFromTime(mSettings.geMarketCloseTime(), 0);
     }
 
-    protected Calendar getCalendarFromTime(String time, int offsetMinutes) {
+    private Calendar getCalendarFromTime(String time, int offsetMinutes) {
         Calendar cal = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
         String [] parts = time.split(":");
         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(parts[0]));

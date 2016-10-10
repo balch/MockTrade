@@ -46,23 +46,23 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
         implements LoaderManager.LoaderCallbacks<List<Order>>{
     private static final String TAG = OrderListActivity.class.getSimpleName();
 
-    protected static final int ORDER_LOADER_ID = 0;
+    private static final int ORDER_LOADER_ID = 0;
     private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
 
-    protected OrderModel mOrderModel;
-    protected OrderListView mOrderListView;
-    protected Long mAccountId;
+    private OrderModel mOrderModel;
+    private OrderListView mOrderListView;
+    private Long mAccountId;
 
     public static Intent newIntent(Context context, long accountId) {
         Intent intent = new Intent(context, OrderListActivity.class);
-        intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
-
         intent.putExtra(EXTRA_ACCOUNT_ID, accountId);
         return intent;
     }
 
     @Override
     protected void onCreateBase(Bundle bundle) {
+
+        this.mAccountId = getIntent().getLongExtra(EXTRA_ACCOUNT_ID, 0);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.order_list_view_toolbar);
         setSupportActionBar(toolbar);
@@ -143,12 +143,12 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
         this.mOrderListView.bind(new ArrayList<Order>());
     }
 
-    protected static class OrderLoader extends AsyncTaskLoader<List<Order>> {
-        protected OrderModel model;
-        protected Long accountId;
+    private static class OrderLoader extends AsyncTaskLoader<List<Order>> {
+        private OrderModel model;
+        private Long accountId;
 
 
-        public OrderLoader(Context context, Long accountId, OrderModel model) {
+        OrderLoader(Context context, Long accountId, OrderModel model) {
             super(context);
             this.accountId = accountId;
             this.model = model;

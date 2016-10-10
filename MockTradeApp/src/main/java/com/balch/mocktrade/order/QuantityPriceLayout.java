@@ -55,22 +55,21 @@ import java.util.List;
 
 public class QuantityPriceLayout extends LinearLayout implements EditLayout, TextWatcher {
     private static final String TAG = QuantityPriceLayout.class.getSimpleName();
-    protected static final int TEXT_CHANGE_DELAY_MS = 500;
+    private static final int TEXT_CHANGE_DELAY_MS = 500;
 
-    protected TextView mLabel;
-    protected EditText mValue;
-    protected TextView mAvailableFunds;
-    protected LinearLayout mAvailableFundsLayout;
-    protected TextView mCost;
-    protected TextView mCostLabel;
-    protected TextView mMarketClosedWarning;
+    private TextView mLabel;
+    private EditText mValue;
+    private TextView mAvailableFunds;
+    private LinearLayout mAvailableFundsLayout;
+    private TextView mCost;
+    private TextView mCostLabel;
+    private TextView mMarketClosedWarning;
 
-    protected ColumnDescriptor mDescriptor;
-    protected EditLayoutListener mEditLayoutListener;
-    protected ControlMapper mControlMapper;
+    private ColumnDescriptor mDescriptor;
+    private EditLayoutListener mEditLayoutListener;
 
-    protected Handler mTextChangeHandler = new Handler(Looper.getMainLooper());
-    protected Runnable mTxtChangeRunnable = new Runnable() {
+    private Handler mTextChangeHandler = new Handler(Looper.getMainLooper());
+    private Runnable mTxtChangeRunnable = new Runnable() {
         @Override
         public void run() {
             try {
@@ -151,7 +150,8 @@ public class QuantityPriceLayout extends LinearLayout implements EditLayout, Tex
                 }
             }
         } catch (IllegalAccessException e) {
-            this.mValue.setText("IllegalAccessException getting value");
+            Log.e(TAG, "bind error", e);
+            this.mValue.setText(R.string.get_value_error);
             enabled = false;
         }
         this.mValue.setEnabled(enabled);
@@ -210,7 +210,6 @@ public class QuantityPriceLayout extends LinearLayout implements EditLayout, Tex
 
     @Override
     public void setControlMapper(ControlMapper controlMapper) {
-        this.mControlMapper = controlMapper;
     }
 
     @Override

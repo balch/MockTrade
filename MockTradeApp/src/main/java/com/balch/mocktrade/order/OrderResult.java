@@ -25,11 +25,11 @@ package com.balch.mocktrade.order;
 import com.balch.android.app.framework.types.Money;
 
 public class OrderResult {
-    protected final boolean mSuccess;
-    protected final Money price;
-    protected final Money mCost;
-    protected final Money mProfit;
-    protected final long mConfirmationId;
+    private final boolean mSuccess;
+    private final Money price;
+    private final Money mCost;
+    private final Money mProfit;
+    private final long mConfirmationId;
 
     public OrderResult(boolean success, Money price, Money cost, Money profit, long confirmationId) {
         this.mSuccess = success;

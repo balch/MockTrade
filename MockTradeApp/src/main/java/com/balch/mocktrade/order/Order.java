@@ -44,41 +44,41 @@ public class Order extends DomainObject implements Parcelable {
     static final String FLD_STRATEGY = "strategy";
     static final String FLD_QUANTITY = "quantity";
 
-    protected Account account;
+    private Account account;
 
     @ColumnEdit(order = 1, state = EditState.READONLY, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
     @ColumnNew(order = 1, customControl = StockSymbolLayout.class, labelResId = R.string.order_symbol_label, hints = {"MAX_CHARS=32","NOT_EMPTY=true"})
-    protected String symbol;
+    private String symbol;
 
-    protected OrderStatus status;
+    private OrderStatus status;
 
     @ColumnEdit(order = 2, state = EditState.READONLY, labelResId = R.string.order_action_label)
     @ColumnNew(order = 2, state = EditState.READONLY, labelResId = R.string.order_action_label)
-    protected OrderAction action;
+    private OrderAction action;
 
     @ColumnEdit(order = 3, state = EditState.READONLY, labelResId = R.string.order_strategy_label)
     @ColumnNew(order = 3, labelResId = R.string.order_strategy_label)
-    protected OrderStrategy strategy;
+    private OrderStrategy strategy;
 
-    protected OrderDuration duration;
+    private OrderDuration duration;
 
     @ColumnEdit(order = 4, labelResId = R.string.order_limit_price_label)
     @ColumnNew(order = 4, labelResId = R.string.order_limit_price_label, hints = {"INIT_EMPTY=true"})
-    protected Money limitPrice;
+    private Money limitPrice;
 
     @ColumnEdit(order = 5, labelResId = R.string.order_stop_price_label)
     @ColumnNew(order = 5, labelResId = R.string.order_stop_price_label, hints = {"INIT_EMPTY=true"})
-    protected Money stopPrice;
+    private Money stopPrice;
 
     @ColumnEdit(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true"})
     @ColumnNew(order = 6, labelResId = R.string.order_stop_percent_label, hints = {"PERCENT=true","INIT_EMPTY=true"})
-    protected Double stopPercent;
+    private Double stopPercent;
 
     @ColumnEdit(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceLayout.class)
     @ColumnNew(order = 7, labelResId = R.string.order_quantity_label, customControl = QuantityPriceLayout.class)
-    protected Long quantity;
+    private Long quantity;
 
-    protected Money highestPrice;
+    private Money highestPrice;
 
     public Order() {
         this.symbol = "";

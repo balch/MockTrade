@@ -25,7 +25,7 @@ public class PortfolioLoader extends AsyncTaskLoader<PortfolioData> {
     private final Settings mSettings;
 
     private PortfolioData mPortfolioData;
-    protected UpdateReceiver mUpdateReceiver;
+    private UpdateReceiver mUpdateReceiver;
 
     public PortfolioLoader(Context context, PortfolioModel model, Settings settings) {
         super(context);

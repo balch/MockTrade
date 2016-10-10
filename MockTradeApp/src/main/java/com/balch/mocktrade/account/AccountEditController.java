@@ -56,7 +56,7 @@ public class AccountEditController implements ExternalController<Account>, Parce
     public void initialize(Context context, Account account, ControlMap controlMap) {
     }
 
-    protected AccountEditController(Parcel in) {
+    private AccountEditController(Parcel in) {
     }
 
     @Override

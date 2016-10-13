@@ -50,14 +50,14 @@ public class HighlightItem extends DomainObject implements Parcelable {
     private static final String DATA_TODAY_CHANGE_PERCENT = "todayChangePercent";
     private static final String DATA_ACCOUNT_ID = "accountId";
 
-    protected HighlightType mHighlightType;
-    protected String mDescription;
-    protected String mSymbol;
-    protected Money mCostBasis;
-    protected Money mValue;
-    protected Money mTodayChange;
-    protected float mTodayChangePercent;
-    protected long mAccountId;
+    private HighlightType mHighlightType;
+    private String mDescription;
+    private String mSymbol;
+    private Money mCostBasis;
+    private Money mValue;
+    private Money mTodayChange;
+    private float mTodayChangePercent;
+    private long mAccountId;
 
     public HighlightItem(HighlightType highlightType, String description,
                          String symbol, Money costBasis, Money value, Money todayChange,
@@ -80,7 +80,7 @@ public class HighlightItem extends DomainObject implements Parcelable {
                 map.getLong(DATA_ACCOUNT_ID, -1));
     }
 
-    protected HighlightItem(Parcel in) {
+    private HighlightItem(Parcel in) {
         super(in);
         mHighlightType = HighlightType.valueOf(in.readString());
         mDescription = in.readString();

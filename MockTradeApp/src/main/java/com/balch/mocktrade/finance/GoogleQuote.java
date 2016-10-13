@@ -49,9 +49,9 @@ public class GoogleQuote implements Quote {
 
     private Money mPrice;
     private Date mLastTradeTime;
+    private String mSymbol;
     private final Money mPreviousClose;
     private final Money mDividendPerShare;
-    private final String mSymbol;
     private final String mName;
     private final String mExchange;
 
@@ -80,6 +80,11 @@ public class GoogleQuote implements Quote {
     @Override
     public String getSymbol() {
         return mSymbol;
+    }
+
+    @Override
+    public void setSymbol(String symbol) {
+        mSymbol = symbol;
     }
 
     @Override

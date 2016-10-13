@@ -70,7 +70,7 @@ public class GoogleFinanceModel implements FinanceModel {
     public Map<String, Quote> getQuotes(final List<String> symbols) {
         String symbolString = this.getDelimitedSymbols(symbols);
 
-        Map<String, Quote> quoteMap;
+        Map<String, Quote> quoteMap = null;
         try {
             final String url = this.getGoogleQueryUrl(symbolString);
 
@@ -84,15 +84,22 @@ public class GoogleFinanceModel implements FinanceModel {
                 response = response.substring(2);
             }
 
-            quoteMap = new HashMap<>(symbols.size());
             JSONArray jsonQuotes = new JSONArray(response);
-            for (int x = 0; x < jsonQuotes.length(); x++) {
-                try {
-                    Quote quote = GoogleQuote.fromJSONObject(jsonQuotes.getJSONObject(x));
-                    quoteMap.put(quote.getSymbol(), quote);
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage(), e);
+            if (jsonQuotes.length() == symbols.size()) {
+                quoteMap = new HashMap<>(symbols.size());
+                for (int x = 0; x < jsonQuotes.length(); x++) {
+                    try {
+                        Quote quote = GoogleQuote.fromJSONObject(jsonQuotes.getJSONObject(x));
+
+                        // fix issue when returned symbol does not match, check LMT.WD
+                        quote.setSymbol(symbols.get(x));
+                        quoteMap.put(quote.getSymbol(), quote);
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
                 }
+            } else {
+                Log.e(TAG, "Wrong number of quotes returned");
             }
         } catch (JSONException | InterruptedException |
                 ExecutionException | UnsupportedEncodingException ex) {

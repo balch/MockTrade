@@ -40,11 +40,11 @@ public class PerformanceItem extends DomainObject implements Parcelable {
     private static final String DATA_VALUE = "value";
     private static final String DATA_TODAY_CHANGE = "todayChange";
 
-    protected long mAccountId;
-    protected Date mTimestamp;
-    protected Money mCostBasis;
-    protected Money mValue;
-    protected Money mTodayChange;
+    private long mAccountId;
+    private Date mTimestamp;
+    private Money mCostBasis;
+    private Money mValue;
+    private Money mTodayChange;
 
     public PerformanceItem() {
     }

@@ -68,6 +68,11 @@ public class QuoteGeneric implements Quote {
     }
 
     @Override
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    @Override
     public String getName() {
         return this.name;
     }

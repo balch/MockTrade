@@ -29,6 +29,8 @@ import java.util.Date;
 public interface Quote {
     String getSymbol();
 
+    void setSymbol(String symbol);
+
     String getName();
 
     Money getPrice();

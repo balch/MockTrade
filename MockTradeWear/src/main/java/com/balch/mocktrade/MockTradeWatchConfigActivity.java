@@ -26,6 +26,7 @@ package com.balch.mocktrade;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.CircledImageView;
@@ -103,7 +104,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
 
                             new ResultCallback<MessageApi.SendMessageResult>() {
                                 @Override
-                                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                                public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
 
                                     if (!sendMessageResult.getStatus().isSuccess()) {
                                         Log.e("TAG", "Failed to send message with status code: "
@@ -140,7 +141,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
 
     @Override // WearableListView.ClickListener
     public void onClick(WearableListView.ViewHolder viewHolder) {
-        ConfigItemViewHolder configItemViewHolder = (ConfigItemViewHolder) viewHolder;
+//        ConfigItemViewHolder configItemViewHolder = (ConfigItemViewHolder) viewHolder;
 //        updateConfigDataItem(configItemViewHolder.mConfigItem);
         finish();
     }
@@ -158,7 +159,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.e(TAG, "onConnectionFailed: " + result);
 }
 
@@ -169,7 +170,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
         mCompanionNode = null;
         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
-            public void onResult(NodeApi.GetConnectedNodesResult nodesResult) {
+            public void onResult(@NonNull NodeApi.GetConnectedNodesResult nodesResult) {
                 List<Node> nodes = nodesResult.getNodes();
                 if (!nodes.isEmpty()) {
                     for (Node node : nodes) {
@@ -191,7 +192,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
         PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(mGoogleApiClient);
         results.setResultCallback(new ResultCallback<DataItemBuffer>() {
             @Override
-            public void onResult(DataItemBuffer dataItems) {
+            public void onResult(@NonNull DataItemBuffer dataItems) {
                 for  (int x = 0; x < dataItems.getCount(); x++) {
                     DataItem dataItem = dataItems.get(x);
 
@@ -229,7 +230,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
     private static class ConfigItemAdapter extends WearableListView.Adapter {
         private final ConfigItemAdapterListener listener;
         private List<WatchConfigItem> mConfigItems = new ArrayList<>();
-        public ConfigItemAdapter(ConfigItemAdapterListener listener) {
+        ConfigItemAdapter(ConfigItemAdapterListener listener) {
             this.listener = listener;
         }
 
@@ -280,7 +281,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
             return mConfigItems.size();
         }
 
-        public interface ConfigItemAdapterListener {
+        interface ConfigItemAdapterListener {
             void onConfigItemChanged(WatchConfigItem item);
         }
     }
@@ -312,7 +313,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
     private static class ConfigItemViewHolder extends WearableListView.ViewHolder {
         private final ConfigItemView mConfigItem;
 
-        public ConfigItemViewHolder(ConfigItemView configItem) {
+        ConfigItemViewHolder(ConfigItemView configItem) {
             super(configItem);
             mConfigItem = configItem;
         }

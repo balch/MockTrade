@@ -70,19 +70,19 @@ import java.util.List;
 public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    protected static final int PORTFOLIO_LOADER_ID = 0;
-    protected static final int GRAPH_LOADER_ID = 1;
+    private static final int PORTFOLIO_LOADER_ID = 0;
+    private static final int GRAPH_LOADER_ID = 1;
 
-    protected static final int NEW_ACCOUNT_RESULT = 0;
-    protected static final int NEW_ORDER_RESULT = 1;
+    private static final int NEW_ACCOUNT_RESULT = 0;
+    private static final int NEW_ORDER_RESULT = 1;
 
-    protected static final int PERMS_REQUEST_BACKUP = 0;
-    protected static final int PERMS_REQUEST_RESTORE = 1;
+    private static final int PERMS_REQUEST_BACKUP = 0;
+    private static final int PERMS_REQUEST_RESTORE = 1;
 
-    protected PortfolioModel mPortfolioModel;
-    protected MainPortfolioView mMainPortfolioView;
+    private PortfolioModel mPortfolioModel;
+    private MainPortfolioView mMainPortfolioView;
 
-    protected PortfolioAdapter mPortfolioAdapter;
+    private PortfolioAdapter mPortfolioAdapter;
 
     private MenuItem mMenuProgressBar;
     private MenuItem mMenuRefreshButton;
@@ -327,7 +327,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
 
     @Override
-    protected void onHandleException(String logMsg, String displayMsg, Exception ex) {
+    protected boolean onHandleException(String logMsg, Exception ex) {
+        String displayMsg = ex.getLocalizedMessage();
         if (TextUtils.isEmpty(displayMsg)) {
             displayMsg = ex.toString();
         }
@@ -337,6 +338,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 R.color.failure,
                 android.support.design.R.id.snackbar_text)
                 .show();
+
+        return true;
 
     }
 

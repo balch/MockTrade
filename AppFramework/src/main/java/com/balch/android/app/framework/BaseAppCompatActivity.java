@@ -75,17 +75,17 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
     }
 
 
-    protected void onHandleException(String logMsg, String displayMsg, Exception ex) {
+    protected boolean onHandleException(String logMsg, Exception ex) {
+        return false;
     }
-
 
     public BaseAppCompatActivity() {
         this.mClassName = this.getClass().getSimpleName();
     }
 
-    private void handleException(String logMsg, String displayMsg, Exception ex) {
+    private boolean handleException(String logMsg, Exception ex) {
         Log.e(TAG, logMsg, ex);
-        onHandleException(logMsg, displayMsg, ex);
+        return onHandleException(logMsg, ex);
     }
 
     @Override
@@ -109,7 +109,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {
-            handleException("OnCreate ", ex.getLocalizedMessage(), ex);
+            if (!handleException("OnCreate ", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " OnCreate - End (ms):" + sw.stop());
     }
@@ -122,7 +124,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             super.onStart();
             onStartBase();
         } catch (Exception ex) {
-            handleException("onStart ", ex.getLocalizedMessage(), ex);
+            if (!handleException("onStart ", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onStart - End (ms):" + sw.stop());
     }
@@ -135,7 +139,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             super.onResume();
             onResumeBase();
         } catch (Exception ex) {
-            handleException("onResume ", ex.getLocalizedMessage(), ex);
+            if (!handleException("onResume ", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onResume - End (ms):" + sw.stop());
     }
@@ -150,7 +156,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             outState.putInt(STATE_VIEW_ID, viewId);
             onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
-            handleException("onSaveInstanceState ", ex.getLocalizedMessage(), ex);
+            if (!handleException("onSaveInstanceState ", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onSaveInstanceState - End (ms):" + sw.stop());
     }
@@ -163,7 +171,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             onPauseBase();
             super.onPause();
         } catch (Exception ex) {
-            handleException("onPause ", ex.getLocalizedMessage(), ex);
+            if (!handleException("onPause ", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onPause - End (ms):" + sw.stop());
     }
@@ -177,7 +187,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
             onStopBase();
             super.onStop();
         } catch (Exception ex) {
-            handleException("onStop", ex.getLocalizedMessage(), ex);
+            if (!handleException("onStop", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onStop - End (ms):" + sw.stop());
     }
@@ -189,7 +201,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         try {
             onDestroyBase();
         } catch (Exception ex) {
-            handleException("onDestroy", ex.getLocalizedMessage(), ex);
+            if (!handleException("onDestroy", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onDestroy - End (ms):" + sw.stop());
         super.onDestroy();
@@ -203,7 +217,9 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
         try {
             onActivityResultBase(requestCode, resultCode, data);
         } catch (Exception ex) {
-            handleException("onActivityResult", ex.getLocalizedMessage(), ex);
+            if (!handleException("onActivityResult", ex)) {
+                throw ex;
+            }
         }
         Log.i(TAG, this.mClassName + " onActivityResult - End (ms):" + sw.stop());
     }

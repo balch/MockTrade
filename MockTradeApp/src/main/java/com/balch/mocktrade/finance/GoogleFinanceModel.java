@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,17 +63,19 @@ public class GoogleFinanceModel implements FinanceModel {
 
     @Override
     public Quote getQuote(final String symbol) {
-        Map<String, Quote> quoteMap = this.getQuotes(Collections.singletonList(symbol));
+        Map<String, Quote> quoteMap = getQuotes(Collections.singletonList(symbol));
         return (quoteMap != null) ? quoteMap.get(symbol) : null;
     }
 
     @Override
     public Map<String, Quote> getQuotes(final List<String> symbols) {
-        String symbolString = this.getDelimitedSymbols(symbols);
+
+        Set<String> uniqueSymbols = getUniqueSymbols(symbols);
+        String symbolString = getDelimitedSymbols(uniqueSymbols);
 
         Map<String, Quote> quoteMap = null;
         try {
-            final String url = this.getGoogleQueryUrl(symbolString);
+            final String url = getGoogleQueryUrl(symbolString);
 
             RequestFuture<String> future = RequestFuture.newFuture();
             mModelProvider.addRequest(new StringRequest(Request.Method.GET, url, future, future));
@@ -85,14 +88,15 @@ public class GoogleFinanceModel implements FinanceModel {
             }
 
             JSONArray jsonQuotes = new JSONArray(response);
-            if (jsonQuotes.length() == symbols.size()) {
-                quoteMap = new HashMap<>(symbols.size());
+            if (jsonQuotes.length() == uniqueSymbols.size()) {
+                quoteMap = new HashMap<>(uniqueSymbols.size());
+                Iterator<String> symbolIterator = uniqueSymbols.iterator();
                 for (int x = 0; x < jsonQuotes.length(); x++) {
                     try {
                         Quote quote = GoogleQuote.fromJSONObject(jsonQuotes.getJSONObject(x));
 
                         // fix issue when returned symbol does not match, check LMT.WD
-                        quote.setSymbol(symbols.get(x));
+                        quote.setSymbol(symbolIterator.next());
                         quoteMap.put(quote.getSymbol(), quote);
                     } catch (Exception e) {
                         Log.e(TAG, e.getMessage(), e);
@@ -130,16 +134,17 @@ public class GoogleFinanceModel implements FinanceModel {
         mFinanceManager.setQuoteServiceAlarm();
     }
 
-    private String getDelimitedSymbols(List<String> symbols) {
+    private Set<String> getUniqueSymbols(List<String> symbols) {
+        Set<String> uniqueSymbols = new HashSet<>(symbols.size());
+        uniqueSymbols.addAll(symbols);
+        return uniqueSymbols;
+
+    }
+
+    private String getDelimitedSymbols(Set<String> symbols) {
         StringBuilder builder = new StringBuilder();
-        Set<String> symbolSet = new HashSet<>();
         boolean isFirst = true;
         for (String s : symbols) {
-            if (symbolSet.contains(s)) {
-                continue;
-            }
-
-            symbolSet.add(s);
             if (!isFirst) {
                 builder.append(",");
             }
@@ -149,4 +154,5 @@ public class GoogleFinanceModel implements FinanceModel {
         }
         return builder.toString();
     }
+
 }

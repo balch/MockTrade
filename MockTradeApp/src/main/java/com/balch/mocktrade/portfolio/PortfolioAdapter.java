@@ -94,7 +94,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        return isEmpty() ? VIEW_TYPE_NEW_ACCOUNT_ITEM :
+        return (mDataList.size() == 0) ? VIEW_TYPE_NEW_ACCOUNT_ITEM :
                 (mDataList.get(position) instanceof Investment) ?
                         VIEW_TYPE_PORTFOLIO_ITEM : VIEW_TYPE_ACCOUNT_HEADER;
     }
@@ -102,12 +102,9 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemCount() {
         // ensure that we always have one so we can show the empty view
-        return (!isEmpty()) ? mDataList.size() : 1;
+        return (mDataList == null) ? 0 : Math.max(mDataList.size(),  1);
     }
 
-    private boolean isEmpty() {
-        return ((mDataList == null) || (mDataList.size() == 0));
-    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -130,8 +127,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if (holder instanceof NewAccountViewHolder) {
-        } else if (holder instanceof AccountViewHolder) {
+        if (holder instanceof AccountViewHolder) {
             AccountViewHolder accountViewHolder = (AccountViewHolder) holder;
 
             final Account account = (Account) mDataList.get(position);
@@ -154,7 +150,7 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             });
 
-        } else {
+        } else if (holder instanceof InvestmentViewHolder) {
 
             InvestmentViewHolder investmentItemView = (InvestmentViewHolder) holder;
 

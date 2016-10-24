@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Author: Balch
+  ~ Created: 10/24/16 4:01 PM
+  ~
+  ~ This file is part of MockTrade.
+  ~
+  ~ MockTrade is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MockTrade is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2016
+  ~
+  -->
+
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/portfolio_view_status_container_height"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/portfolio_view_last_sync"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:textColor="@color/portfolio_view_status_text"
+        android:textSize="@dimen/portfolio_view_status_text_size"
+        android:background="@color/portfolio_view_status_background"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/portfolio_view_last_quote"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:textColor="@color/portfolio_view_status_text"
+        android:textSize="@dimen/portfolio_view_status_text_size"
+        android:background="@color/portfolio_view_status_background"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:gravity="end"
+        />
+</LinearLayout>
+

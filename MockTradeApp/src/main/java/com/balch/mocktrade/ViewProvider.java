@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 7/28/16 8:21 AM
+ * Created: 10/24/16 3:46 PM
  *
  * This file is part of MockTrade.
  *
@@ -21,32 +21,12 @@
  *
  */
 
-apply plugin: 'com.android.library'
+package com.balch.mocktrade;
 
-android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.2"
+import android.content.Context;
 
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 2
-        versionName "2.0"
-    }
+public interface ViewProvider {
+    boolean isTablet(Context context);
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(path: ':AppFramework')
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.google.android.gms:play-services-wearable:9.8.00'
-
-    testCompile 'junit:junit:4.12'
+    boolean isLandscape(Context context);
 }

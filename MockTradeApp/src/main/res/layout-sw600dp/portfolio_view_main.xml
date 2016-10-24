@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Author: Balch
+  ~ Created: 10/24/16 12:17 PM
+  ~
+  ~ This file is part of MockTrade.
+  ~
+  ~ MockTrade is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MockTrade is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2016
+  ~
+  -->
+
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlHardcoded"
+    tools:parentTag="LinearLayout">
+
+    <include layout="@layout/portfolio_view_main_toolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/portfolio_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <com.balch.mocktrade.portfolio.SummaryTotalsView
+        android:id="@+id/portfolio_view_summary_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include layout="@layout/portfolio_view_main_status"/>
+   
+</merge>
+
+
+

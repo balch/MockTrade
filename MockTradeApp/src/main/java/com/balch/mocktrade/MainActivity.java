@@ -7,9 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -123,7 +123,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
                     mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
 
-                    boolean showTotals = (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) &&
+                    ViewProvider viewProvider = (ViewProvider) getApplication();
+
+                    boolean showTotals = (!viewProvider.isLandscape(MainActivity.this) || viewProvider.isTablet(MainActivity.this)) &&
                             (accountsWithTotals > 1);
                     mMainPortfolioView.setTotals(showTotals, performanceItem);
 
@@ -167,7 +169,12 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     @Override
     protected void onCreateBase(Bundle bundle) {
 
-        ModelProvider modelProvider = ((ModelProvider) this.getApplication());
+        ModelProvider modelProvider = ((ModelProvider) getApplication());
+        ViewProvider viewProvider = (ViewProvider) getApplication();
+
+        if (viewProvider.isTablet(this)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
 
         mSettings = modelProvider.getSettings();
         mPortfolioModel = new PortfolioSqliteModel(modelProvider);
@@ -499,7 +506,9 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     protected void setupAdapter() {
-        mPortfolioAdapter = new PortfolioAdapter(mSettings);
+        ViewProvider viewProvider = ((ViewProvider) this.getApplication());
+
+        mPortfolioAdapter = new PortfolioAdapter(mSettings, viewProvider);
         mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {

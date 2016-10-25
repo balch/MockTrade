@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.ViewProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
@@ -54,12 +55,14 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
     private final LinearLayout mValueLayout;
     private final Button mTradeButton;
     private final Settings mSettings;
+    private final ViewProvider mViewProvider;
     private Account mAccount;
 
-    public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener, Settings settings) {
+    public AccountViewHolder(ViewGroup parent, AccountItemViewListener listener, Settings settings, ViewProvider viewProvider) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_account, parent, false));
         mAccountItemViewListener = listener;
         mSettings = settings;
+        mViewProvider = viewProvider;
 
         mName = (TextView) itemView.findViewById(R.id.account_item_name);
         mCurrentBalance = (TextView) itemView.findViewById(R.id.account_item_current_balance);
@@ -113,7 +116,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        boolean isTablet = itemView.getResources().getBoolean(R.bool.isTablet);
+        boolean isTablet = mViewProvider.isTablet(itemView.getContext());
         if (isTablet) {
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mValueLayout.getLayoutParams();
             layoutParams.weight = 2;

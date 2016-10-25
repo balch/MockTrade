@@ -139,8 +139,10 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
         this.mAllowEmpty = true;
         List<InputFilter> filters = getInputFilters();
         try {
-            Object obj = descriptor.getField().get(descriptor.getItem());
-            this.mValue.setText(this.getValueAsString(obj));
+            if (descriptor.getField() != null) {
+                Object obj = descriptor.getField().get(descriptor.getItem());
+                this.mValue.setText(this.getValueAsString(obj));
+            }
 
             // check the hints associated with this field
             for (ViewHint hint : descriptor.getHints()) {

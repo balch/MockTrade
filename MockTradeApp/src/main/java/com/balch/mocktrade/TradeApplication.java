@@ -24,6 +24,7 @@ package com.balch.mocktrade;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 
@@ -39,7 +40,7 @@ import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.WearSyncService;
 import com.balch.mocktrade.settings.Settings;
 
-public class TradeApplication extends Application implements ModelProvider {
+public class TradeApplication extends Application implements ModelProvider, ViewProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
     private static final int REQUEST_TIMEOUT_SECS = 30;
@@ -152,6 +153,16 @@ public class TradeApplication extends Application implements ModelProvider {
         }
 
         return mRequestQueue.add(request);
+    }
+
+    @Override
+    public boolean isTablet(Context context) {
+        return context.getResources().getBoolean(R.bool.isTablet);
+    }
+
+    @Override
+    public boolean isLandscape(Context context) {
+        return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
     }
 
 }

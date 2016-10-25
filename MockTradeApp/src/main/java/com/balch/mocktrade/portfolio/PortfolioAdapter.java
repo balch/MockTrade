@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.ViewProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.settings.Settings;
@@ -53,14 +54,16 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private AccountViewHolder.AccountItemViewListener mAccountItemViewListener;
 
     private final Settings mSettings;
+    private final ViewProvider mViewProvider;
 
     private PortfolioAdapterListener mPortfolioAdapterListener;
     private PortfolioData mPortfolioData = new PortfolioData();
 
     private List<Object> mDataList;
 
-    public PortfolioAdapter(Settings settings) {
+    public PortfolioAdapter(Settings settings, ViewProvider viewProvider) {
         mSettings = settings;
+        mViewProvider = viewProvider;
     }
 
     public void bind(PortfolioData portfolioData) {
@@ -111,10 +114,10 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ACCOUNT_HEADER:
-                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener, mSettings);
+                viewHolder = new AccountViewHolder(parent, mAccountItemViewListener, mSettings, mViewProvider);
                 break;
             case VIEW_TYPE_PORTFOLIO_ITEM:
-                viewHolder = new InvestmentViewHolder(parent);
+                viewHolder = new InvestmentViewHolder(parent, mViewProvider);
                 break;
             case VIEW_TYPE_NEW_ACCOUNT_ITEM:
                 viewHolder = new NewAccountViewHolder(parent, mPortfolioAdapterListener);

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Author: Balch
+  ~ Created: 10/24/16 12:17 PM
+  ~
+  ~ This file is part of MockTrade.
+  ~
+  ~ MockTrade is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MockTrade is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2016
+  ~
+  -->
+
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlHardcoded"
+    tools:parentTag="LinearLayout">
+
+    <include layout="@layout/portfolio_view_main_toolbar"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+        <LinearLayout
+            android:id="@+id/portfolio_nav_layout"
+            android:layout_width="360dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:orientation="vertical"
+            android:background="?attr/colorPrimary">
+
+            <include layout="@layout/portfolio_view_main_graph"/>
+
+            <com.balch.mocktrade.order.StockSymbolLayout
+                android:id="@+id/portfolio_nav_stock_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+
+            <com.balch.mocktrade.portfolio.SummaryTotalsView
+                android:id="@+id/portfolio_view_summary_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
+        </LinearLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/portfolio_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/portfolio_nav_layout"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </RelativeLayout>
+
+
+    <include layout="@layout/portfolio_view_main_status"/>
+   
+</merge>
+
+
+

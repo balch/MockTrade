@@ -31,17 +31,49 @@
 
     <include layout="@layout/portfolio_view_main_toolbar"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/portfolio_list"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        >
 
-    <com.balch.mocktrade.portfolio.SummaryTotalsView
-        android:id="@+id/portfolio_view_summary_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:id="@+id/portfolio_nav_layout"
+            android:layout_width="360dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:orientation="vertical"
+            android:background="?attr/colorPrimary">
+
+            <include layout="@layout/portfolio_view_main_graph"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+
+            <com.balch.mocktrade.portfolio.SummaryTotalsView
+                android:id="@+id/portfolio_view_summary_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
+        </LinearLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/portfolio_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/portfolio_nav_layout"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </RelativeLayout>
+
 
     <include layout="@layout/portfolio_view_main_status"/>
    

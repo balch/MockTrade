@@ -41,7 +41,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.BaseView;
+import com.balch.android.app.framework.domain.ColumnDescriptor;
+import com.balch.android.app.framework.domain.EditState;
+import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.mocktrade.account.Account;
+import com.balch.mocktrade.order.StockSymbolLayout;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.SummaryTotalsView;
 import com.balch.mocktrade.shared.PerformanceItem;
@@ -159,6 +163,13 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
                     mGraphTimeSelectedPosition = 0;
                 }
             });
+        }
+
+        StockSymbolLayout stockSymbolLayout = (StockSymbolLayout) findViewById(R.id.portfolio_nav_stock_picker);
+        if (stockSymbolLayout != null) {
+            ColumnDescriptor columnDescriptor = new ColumnDescriptor(null, null, R.string.order_symbol_label, EditState.CHANGEABLE,
+                    new ViewHint[]{new ViewHint(ViewHint.Hint.MAX_CHARS, "32"), new ViewHint(ViewHint.Hint.NOT_EMPTY, "0")}, 1, null);
+            stockSymbolLayout.bind(columnDescriptor);
         }
     }
 

@@ -48,6 +48,13 @@
 
             <include layout="@layout/portfolio_view_main_graph"/>
 
+            <com.balch.mocktrade.order.StockSymbolLayout
+                android:id="@+id/portfolio_nav_stock_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

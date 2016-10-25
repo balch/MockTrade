@@ -117,6 +117,10 @@ Changes to watchface reflect in application
 
 ![Wear Spec](assets/ss_watch_spec_12.png)
 
+Tablet View
+
+![Tablet View](assets/ss_app_tablet.png)
+
 
 ### Attributions
 * Awesome icon site: http://www.iconarchive.com/

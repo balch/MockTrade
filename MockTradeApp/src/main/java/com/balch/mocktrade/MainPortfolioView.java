@@ -168,7 +168,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         StockSymbolLayout stockSymbolLayout = (StockSymbolLayout) findViewById(R.id.portfolio_nav_stock_picker);
         if (stockSymbolLayout != null) {
             ColumnDescriptor columnDescriptor = new ColumnDescriptor(null, null, R.string.order_symbol_label, EditState.CHANGEABLE,
-                    new ViewHint[]{new ViewHint(ViewHint.Hint.MAX_CHARS, "32"), new ViewHint(ViewHint.Hint.NOT_EMPTY, "0")}, 1, null);
+                    new ViewHint[]{new ViewHint(ViewHint.Hint.MAX_CHARS, "32"), new ViewHint(ViewHint.Hint.NOT_EMPTY, "true")}, 1, null);
             stockSymbolLayout.bind(columnDescriptor);
         }
     }

@@ -73,5 +73,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':MockTradeShared')
     compile 'com.google.android.support:wearable:2.0.0-alpha3'
-    compile 'com.google.android.gms:play-services-wearable:9.8.00'
+    compile 'com.google.android.gms:play-services-wearable:9.8.0'
 }

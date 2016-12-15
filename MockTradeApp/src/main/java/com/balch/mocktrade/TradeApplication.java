@@ -26,7 +26,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.StrictMode;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -39,6 +41,15 @@ import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.WearSyncService;
 import com.balch.mocktrade.settings.Settings;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class TradeApplication extends Application implements ModelProvider, ViewProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
@@ -165,4 +176,99 @@ public class TradeApplication extends Application implements ModelProvider, View
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
     }
 
+    public static boolean backupDatabase(Context context) {
+        boolean success = false;
+
+        FileChannel src = null;
+        FileChannel dst = null;
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+
+            if (sd.canWrite()) {
+                File dbFile = context.getDatabasePath(TradeApplication.DATABASE_NAME);
+
+                String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
+                File backupDBFile = new File(sd, backupDBPath);
+
+                if (dbFile.exists()) {
+                    src = new FileInputStream(dbFile).getChannel();
+                    dst = new FileOutputStream(backupDBFile).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+
+                    success = true;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error backing up to Database", e);
+        } finally {
+            if (src != null) {
+                try {
+                    src.close();
+                } catch (IOException ignored) {
+                }
+            }
+
+            if (dst != null)
+                try {
+                    dst.close();
+                } catch (IOException ignored) {
+                }
+        }
+        return success;
+    }
+
+    public static boolean restoreDatabase(Context context) {
+        boolean success = false;
+
+        FileChannel src = null;
+        FileChannel dst = null;
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+
+            if (sd.canWrite()) {
+                File dbFile = context.getDatabasePath(TradeApplication.DATABASE_NAME);
+
+                File[] backups = sd.listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith("_" + TradeApplication.DATABASE_NAME);
+                    }
+                });
+
+                if (backups != null && backups.length > 1) {
+                    Arrays.sort(backups, new Comparator<File>() {
+                        @Override
+                        public int compare(File object1, File object2) {
+                            return object1.getName().compareTo(object2.getName());
+                        }
+                    });
+                }
+
+                if (backups != null) {
+                    src = new FileInputStream(backups[backups.length - 1]).getChannel();
+                    dst = new FileOutputStream(dbFile).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+
+                    success = true;
+
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error restoring Database", e);
+        } finally {
+            if (src != null) {
+                try {
+                    src.close();
+                } catch (IOException ignored) {
+                }
+            }
+
+            if (dst != null)
+                try {
+                    dst.close();
+                } catch (IOException ignored) {
+                }
+        }
+
+        return success;
+    }
 }

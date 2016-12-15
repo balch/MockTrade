@@ -13,7 +13,6 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -55,15 +54,7 @@ import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
 import com.balch.mocktrade.shared.PerformanceItem;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -353,43 +344,8 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private void backupDatabaseToSDCard() {
 
         if (isStoragePermissionsGranted(PERMS_REQUEST_BACKUP)) {
-            boolean success = false;
 
-            FileChannel src = null;
-            FileChannel dst = null;
-            try {
-                File sd = Environment.getExternalStorageDirectory();
-
-                if (sd.canWrite()) {
-                    File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
-
-                    String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
-                    File backupDBFile = new File(sd, backupDBPath);
-
-                    if (dbFile.exists()) {
-                        src = new FileInputStream(dbFile).getChannel();
-                        dst = new FileOutputStream(backupDBFile).getChannel();
-                        dst.transferFrom(src, 0, src.size());
-
-                        success = true;
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error backing up to Database", e);
-            } finally {
-                if (src != null) {
-                    try {
-                        src.close();
-                    } catch (IOException ignored) {
-                    }
-                }
-
-                if (dst != null)
-                    try {
-                        dst.close();
-                    } catch (IOException ignored) {
-                    }
-            }
+            boolean success = TradeApplication.backupDatabase(this);
 
             String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
 
@@ -405,57 +361,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     private void restoreLatestDatabase() {
 
         if (isStoragePermissionsGranted(PERMS_REQUEST_RESTORE)) {
-
-            boolean success = false;
-
-            FileChannel src = null;
-            FileChannel dst = null;
-            try {
-                File sd = Environment.getExternalStorageDirectory();
-
-                if (sd.canWrite()) {
-                    File dbFile = getDatabasePath(TradeApplication.DATABASE_NAME);
-
-                    File[] backups = sd.listFiles(new FilenameFilter() {
-                        public boolean accept(File dir, String name) {
-                            return name.endsWith("_" + TradeApplication.DATABASE_NAME);
-                        }
-                    });
-
-                    if (backups != null && backups.length > 1) {
-                        Arrays.sort(backups, new Comparator<File>() {
-                            @Override
-                            public int compare(File object1, File object2) {
-                                return object1.getName().compareTo(object2.getName());
-                            }
-                        });
-                    }
-
-                    if (backups != null) {
-                        src = new FileInputStream(backups[backups.length - 1]).getChannel();
-                        dst = new FileOutputStream(dbFile).getChannel();
-                        dst.transferFrom(src, 0, src.size());
-
-                        success = true;
-
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error restoring Database", e);
-            } finally {
-                if (src != null) {
-                    try {
-                        src.close();
-                    } catch (IOException ignored) {
-                    }
-                }
-
-                if (dst != null)
-                    try {
-                        dst.close();
-                    } catch (IOException ignored) {
-                    }
-            }
+            boolean success = TradeApplication.restoreDatabase(this);
 
             String msg = getResources().getString(success ? R.string.menu_restore_db_success : R.string.menu_restore_db_fail);
 

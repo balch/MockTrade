@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.balch.mocktrade"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 2
-        versionName "2.0"
+        applicationId rootProject.ext.applicationId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
     }
 
     signingConfigs {
@@ -50,20 +50,20 @@ dependencies {
     compile project(':AppFramework')
     compile project(':MockTradeShared')
 
-    compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile "com.android.support:support-v4:25.0.0"
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:recyclerview-v7:25.0.0'
-    compile 'com.android.support:cardview-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.google.android.gms:play-services-wearable:9.8.0'
+    compile "com.mcxiaoke.volley:library:$rootProject.ext.volley"
+    compile "com.android.support:support-v4:$rootProject.ext.support"
+    compile "com.android.support:appcompat-v7:$rootProject.ext.support"
+    compile "com.android.support:recyclerview-v7:$rootProject.ext.support"
+    compile "com.android.support:cardview-v7:$rootProject.ext.support"
+    compile "com.android.support:design:$rootProject.ext.support"
+    compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
 
     // Testing-only dependencies
 
     // Force usage of support annotations in the test app, since it is internally used by the runner module.
-    testCompile 'com.android.support:support-annotations:25.0.0'
-    testCompile 'com.android.support.test:runner:0.5'
-    testCompile 'com.android.support.test:rules:0.5'
-    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile "com.android.support:support-annotations:$rootProject.ext.support"
+    testCompile "com.android.support.test:runner:$rootProject.ext.support_test"
+    testCompile "com.android.support.test:rules:$rootProject.ext.support_test"
+    testCompile "org.mockito:mockito-all:$rootProject.ext.mockito"
 }
 

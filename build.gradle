@@ -1,5 +1,24 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+ext {
+    compileSdkVersion=25
+    buildToolsVersion="25.0.0"
+
+    applicationId="com.balch.mocktrade"
+    minSdkVersion=21
+    targetSdkVersion=25
+    versionCode=3
+    versionName="2.1"
+
+    support="25.1.0"
+    play_services="10.0.1"
+    support_wearable="2.0.0-beta1"
+    volley="1.0.19"
+    support_test="0.5"
+    junit="4.12"
+    mockito="1.9.5"
+}
+
 buildscript {
     repositories {
         mavenCentral()

@@ -25,15 +25,15 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.balch.mocktrade"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 2
-        versionName "2.0"
+        applicationId rootProject.ext.applicationId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
     }
 
     signingConfigs {
@@ -72,6 +72,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':MockTradeShared')
-    compile 'com.google.android.support:wearable:2.0.0-alpha3'
-    compile 'com.google.android.gms:play-services-wearable:9.8.0'
+    compile "com.google.android.support:wearable:$rootProject.ext.support_wearable"
+    compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
 }

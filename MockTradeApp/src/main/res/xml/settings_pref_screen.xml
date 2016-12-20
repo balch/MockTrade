@@ -34,4 +34,5 @@
         android:entryValues="@array/poll_interval_order_values"
         android:defaultValue="15"/>
 
+    <PreferenceCategory android:key="settings_version" />
 </PreferenceScreen>

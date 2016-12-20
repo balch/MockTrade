@@ -10,6 +10,7 @@
     <string name="settings_poll_interval_summary">Interval that the application checks for stock updates.</string>
     <string name="settings_poll_interval_order_title">Poll Interval - Open Orders</string>
     <string name="settings_poll_interval_order_summary">Interval that the application checks when processing open orders.</string>
+    <string name="settings_version_title">Version</string>
 
     <string-array name="settings_poll_interval_display_values">
         <item>30 Seconds</item>

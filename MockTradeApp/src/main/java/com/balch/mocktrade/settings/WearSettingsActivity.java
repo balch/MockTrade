@@ -26,13 +26,16 @@ package com.balch.mocktrade.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.balch.mocktrade.BuildConfig;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.services.WearSyncService;
+import com.balch.mocktrade.shared.utils.VersionUtils;
 
 public class WearSettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -77,6 +80,10 @@ public class WearSettingsActivity extends AppCompatActivity
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.wear_settings_pref_screen);
+
+            PreferenceGroup preferenceGroup = (PreferenceGroup) findPreference("settings_version");
+            preferenceGroup.setTitle("Version: " + VersionUtils.getVersion(this.getActivity(), BuildConfig.DEBUG));
+
         }
     }
 }

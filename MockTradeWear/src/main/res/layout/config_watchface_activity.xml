@@ -28,17 +28,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/config_watch_item_background_color">
-    <TextView
-        android:id="@+id/config_watch_title"
+
+    <LinearLayout
+        android:id="@+id/config_watch_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginTop="14dp"
-        android:fontFamily="sans-serif-condensed-light"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textColor="@color/config_watch_item_label_color"
-        android:textSize="24sp"
-        app:layout_box="all"/>
+        android:layout_marginBottom="14dp"
+        app:layout_box="all">
+
+        <TextView
+            android:id="@+id/config_watch_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/config_watch_item_label_color"
+            android:textSize="24sp"
+            app:layout_box="all"/>
+
+        <TextView
+            android:id="@+id/config_watch_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center"
+            android:textColor="@color/highlight_text_symbol_color"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_box="all"/>
+
+    </LinearLayout>
+
     <android.support.wearable.view.WearableListView
         android:id="@+id/config_watch_list"
         android:layout_width="match_parent"

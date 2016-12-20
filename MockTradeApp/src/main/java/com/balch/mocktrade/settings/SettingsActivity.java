@@ -27,15 +27,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.balch.mocktrade.BuildConfig;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
+import com.balch.mocktrade.shared.utils.VersionUtils;
 
 public class SettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -90,6 +93,10 @@ public class SettingsActivity extends AppCompatActivity
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_pref_screen);
+
+            PreferenceGroup preferenceGroup = (PreferenceGroup) findPreference("settings_version");
+            preferenceGroup.setTitle("Version: " + VersionUtils.getVersion(this.getActivity(), BuildConfig.DEBUG));
+
         }
     }
 }

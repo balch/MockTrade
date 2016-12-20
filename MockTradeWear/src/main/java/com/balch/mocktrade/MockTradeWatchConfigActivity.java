@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
+import com.balch.mocktrade.shared.utils.VersionUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -63,17 +64,28 @@ public class MockTradeWatchConfigActivity extends Activity implements
     private static final String TAG = "MockTradeWatchConfig";
 
     private GoogleApiClient mGoogleApiClient;
-    private TextView mHeader;
+    private LinearLayout mHeader;
     private ConfigItemAdapter mConfigItemAdapter;
     private Node mCompanionNode;
+
+    private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            float newTranslation = Math.min(-dx, 0);
+            mHeader.setTranslationY(newTranslation);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.config_watchface_activity);
 
-        mHeader = (TextView) findViewById(R.id.config_watch_title);
-        WearableListView listView = (WearableListView) findViewById(R.id.config_watch_list);
+        TextView version = (TextView) findViewById(R.id.config_watch_version);
+        version.setText("Version: " + VersionUtils.getVersion(this, BuildConfig.DEBUG));
+
+        mHeader = (LinearLayout) findViewById(R.id.config_watch_header);
         BoxInsetLayout content = (BoxInsetLayout) findViewById(R.id.content);
         // BoxInsetLayout adds padding by default on round devices. Add some on square devices.
         content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -90,6 +102,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
             }
         });
 
+        WearableListView listView = (WearableListView) findViewById(R.id.config_watch_list);
         listView.setHasFixedSize(true);
         listView.setClickListener(this);
         listView.addOnScrollListener(this);

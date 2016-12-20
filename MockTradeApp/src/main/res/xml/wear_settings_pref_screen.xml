@@ -41,4 +41,6 @@
         android:title="@string/watch_config_item_obfuscate_total"
         android:defaultValue="false"/>
 
+    <PreferenceCategory android:key="settings_version" />
+
 </PreferenceScreen>

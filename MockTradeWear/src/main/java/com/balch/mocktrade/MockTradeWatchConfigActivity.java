@@ -24,18 +24,16 @@
 package com.balch.mocktrade;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.CircledImageView;
-import android.support.wearable.view.WearableListView;
+import android.support.wearable.view.DefaultOffsettingHelper;
+import android.support.wearable.view.WearableRecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.mocktrade.shared.WatchConfigItem;
@@ -58,78 +56,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MockTradeWatchConfigActivity extends Activity implements
-        WearableListView.ClickListener, WearableListView.OnScrollListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MockTradeWatchConfig";
 
     private GoogleApiClient mGoogleApiClient;
-    private LinearLayout mHeader;
     private ConfigItemAdapter mConfigItemAdapter;
     private Node mCompanionNode;
-
-    private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            float newTranslation = Math.min(-dx, 0);
-            mHeader.setTranslationY(newTranslation);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.config_watchface_activity);
 
-        TextView version = (TextView) findViewById(R.id.config_watch_version);
-        version.setText("Version: " + VersionUtils.getVersion(this, BuildConfig.DEBUG));
+        WearableRecyclerView wearableRecyclerView = (WearableRecyclerView) findViewById(R.id.config_watch_list);
+        wearableRecyclerView.setHasFixedSize(true);
+        wearableRecyclerView.setCircularScrollingGestureEnabled(true);
+        wearableRecyclerView.setBezelWidth(0.5f);
+        wearableRecyclerView.setScrollDegreesPerScreen(90);
 
-        mHeader = (LinearLayout) findViewById(R.id.config_watch_header);
-        BoxInsetLayout content = (BoxInsetLayout) findViewById(R.id.content);
-        // BoxInsetLayout adds padding by default on round devices. Add some on square devices.
-        content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                if (!insets.isRound()) {
-                    v.setPaddingRelative(
-                            getResources().getDimensionPixelSize(R.dimen.content_padding_start),
-                            v.getPaddingTop(),
-                            v.getPaddingEnd(),
-                            v.getPaddingBottom());
-                }
-                return v.onApplyWindowInsets(insets);
-            }
-        });
+        wearableRecyclerView.setOffsettingHelper(new OffsettingHelper());
 
-        WearableListView listView = (WearableListView) findViewById(R.id.config_watch_list);
-        listView.setHasFixedSize(true);
-        listView.setClickListener(this);
-        listView.addOnScrollListener(this);
+        String version = "Version: " + VersionUtils.getVersion(this, BuildConfig.DEBUG);
 
-        mConfigItemAdapter = new ConfigItemAdapter(new ConfigItemAdapter.ConfigItemAdapterListener() {
-            @Override
-            public void onConfigItemChanged(WatchConfigItem item) {
-                if (mCompanionNode != null && mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
+        mConfigItemAdapter = new ConfigItemAdapter(version,
+                new ConfigItemAdapter.ConfigItemAdapterListener() {
+                    @Override
+                    public void onConfigItemChanged(WatchConfigItem item) {
+                        if (mCompanionNode != null && mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, mCompanionNode.getId(),
-                            WearDataSync.MSG_WATCH_CONFIG_SET, item.toDataMap().toByteArray()).setResultCallback(
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, mCompanionNode.getId(),
+                                    WearDataSync.MSG_WATCH_CONFIG_SET, item.toDataMap().toByteArray()).setResultCallback(
 
-                            new ResultCallback<MessageApi.SendMessageResult>() {
-                                @Override
-                                public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
+                                    new ResultCallback<MessageApi.SendMessageResult>() {
+                                        @Override
+                                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
 
-                                    if (!sendMessageResult.getStatus().isSuccess()) {
-                                        Log.e("TAG", "Failed to send message with status code: "
-                                                + sendMessageResult.getStatus().getStatusCode());
+                                            if (!sendMessageResult.getStatus().isSuccess()) {
+                                                Log.e("TAG", "Failed to send message with status code: "
+                                                        + sendMessageResult.getStatus().getStatusCode());
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                    );
-                }
-            }
-        });
-        listView.setAdapter(mConfigItemAdapter);
+                            );
+                        }
+                    }
+                });
+        wearableRecyclerView.setAdapter(mConfigItemAdapter);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -152,29 +125,10 @@ public class MockTradeWatchConfigActivity extends Activity implements
         super.onStop();
     }
 
-    @Override // WearableListView.ClickListener
-    public void onClick(WearableListView.ViewHolder viewHolder) {
-//        ConfigItemViewHolder configItemViewHolder = (ConfigItemViewHolder) viewHolder;
-//        updateConfigDataItem(configItemViewHolder.mConfigItem);
-        finish();
-    }
-
-    @Override // WearableListView.ClickListener
-    public void onTopEmptyRegionClick() {}
-
-    @Override // WearableListView.OnScrollListener
-    public void onScroll(int scroll) {}
-
-    @Override // WearableListView.OnScrollListener
-    public void onAbsoluteScrollChange(int scroll) {
-        float newTranslation = Math.min(-scroll, 0);
-        mHeader.setTranslationY(newTranslation);
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.e(TAG, "onConnectionFailed: " + result);
-}
+    }
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -206,7 +160,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
         results.setResultCallback(new ResultCallback<DataItemBuffer>() {
             @Override
             public void onResult(@NonNull DataItemBuffer dataItems) {
-                for  (int x = 0; x < dataItems.getCount(); x++) {
+                for (int x = 0; x < dataItems.getCount(); x++) {
                     DataItem dataItem = dataItems.get(x);
 
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
@@ -233,60 +187,74 @@ public class MockTradeWatchConfigActivity extends Activity implements
     public void onConnectionSuspended(int cause) {
     }
 
+    private static class ConfigItemAdapter extends WearableRecyclerView.Adapter {
 
-    @Override // WearableListView.OnScrollListener
-    public void onScrollStateChanged(int scrollState) {}
+        private static final int VIEW_TYPE_STATIC = 0;
+        private static final int VIEW_TYPE_CONFIG_ITEM = 1;
 
-    @Override // WearableListView.OnScrollListener
-    public void onCentralPositionChanged(int centralPosition) {}
-
-    private static class ConfigItemAdapter extends WearableListView.Adapter {
         private final ConfigItemAdapterListener listener;
-        private List<WatchConfigItem> mConfigItems = new ArrayList<>();
-        ConfigItemAdapter(ConfigItemAdapterListener listener) {
+        private List<Object> mConfigItems = new ArrayList<>();
+
+        ConfigItemAdapter(String version, ConfigItemAdapterListener listener) {
             this.listener = listener;
+            this.mConfigItems.add(version);
         }
 
         public void add(WatchConfigItem item) {
             this.mConfigItems.add(item);
         }
 
-        public void addAll(List<WatchConfigItem> items) {
-            this.mConfigItems.addAll(items);
-        }
-
         @Override
-        public ConfigItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ConfigItemViewHolder(new ConfigItemView(parent.getContext()));
-        }
+        public WearableRecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            WearableRecyclerView.ViewHolder viewHolder;
 
-        @Override
-        public void onBindViewHolder(WearableListView.ViewHolder holder, final int position) {
-            final ConfigItemViewHolder configItemViewHolder = (ConfigItemViewHolder) holder;
-            final WatchConfigItem configItem = mConfigItems.get(position);
-            configItemViewHolder.mConfigItem.bind(configItem, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    configItem.setEnabled(!configItem.isEnabled());
-                    configItemViewHolder.mConfigItem.setConfigItemEnabled(configItem.isEnabled());
-                    listener.onConfigItemChanged(configItem);
-                }
-            });
-
-            RecyclerView.LayoutParams layoutParams =
-                    new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-            int itemMargin = (int) ((ConfigItemViewHolder) holder).itemView.getResources()
-                    .getDimension(R.dimen.digital_config_color_picker_item_margin);
-            // Add margins to first and last item to make it possible for user to tap on them.
-            if (position == 0) {
-                layoutParams.setMargins(0, itemMargin, 0, 0);
-            } else if (position == mConfigItems.size() - 1) {
-                layoutParams.setMargins(0, 0, 0, itemMargin);
-            } else {
-                layoutParams.setMargins(0, 0, 0, 0);
+            switch (viewType) {
+                case VIEW_TYPE_STATIC:
+                    viewHolder = new StaticItemViewHolder(parent);
+                    break;
+                case VIEW_TYPE_CONFIG_ITEM:
+                    viewHolder = new ConfigItemViewHolder(parent);
+                    break;
+                default:
+                    throw new IllegalArgumentException("invalid viewtype=" + viewType);
             }
-            configItemViewHolder.itemView.setLayoutParams(layoutParams);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+            if (holder instanceof StaticItemViewHolder) {
+                final StaticItemViewHolder staticItemViewHolder = (StaticItemViewHolder) holder;
+                staticItemViewHolder.bind((String) mConfigItems.get(position));
+
+            } else if (holder instanceof ConfigItemViewHolder) {
+                final ConfigItemViewHolder configItemViewHolder = (ConfigItemViewHolder) holder;
+                final WatchConfigItem configItem = (WatchConfigItem) mConfigItems.get(position);
+                configItemViewHolder.bind(configItem, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        configItem.setEnabled(!configItem.isEnabled());
+                        configItemViewHolder.setConfigItemEnabled(configItem.isEnabled());
+                        listener.onConfigItemChanged(configItem);
+                    }
+                });
+
+                RecyclerView.LayoutParams layoutParams =
+                        new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                int itemMargin = (int) ((ConfigItemViewHolder) holder).itemView.getResources()
+                        .getDimension(R.dimen.digital_config_color_picker_item_margin);
+                // Add margins to first and last item to make it possible for user to tap on them.
+                if (position == 0) {
+                    layoutParams.setMargins(0, itemMargin, 0, 0);
+                } else if (position == mConfigItems.size() - 1) {
+                    layoutParams.setMargins(0, 0, 0, itemMargin);
+                } else {
+                    layoutParams.setMargins(0, 0, 0, 0);
+                }
+                configItemViewHolder.itemView.setLayoutParams(layoutParams);
+            }
         }
 
         @Override
@@ -294,42 +262,100 @@ public class MockTradeWatchConfigActivity extends Activity implements
             return mConfigItems.size();
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            int type;
+
+            Object obj = mConfigItems.get(position);
+            if (obj instanceof String) {
+                type = VIEW_TYPE_STATIC;
+            } else if (obj instanceof WatchConfigItem) {
+                type = VIEW_TYPE_CONFIG_ITEM;
+            } else {
+                throw new IllegalArgumentException(obj.getClass().getName() + " not supported");
+            }
+            return type;
+        }
+
+
         interface ConfigItemAdapterListener {
             void onConfigItemChanged(WatchConfigItem item);
         }
     }
 
-    private static class ConfigItemView extends LinearLayout {
+    private static class ConfigItemViewHolder extends WearableRecyclerView.ViewHolder {
         private final TextView mDescription;
         private final CircledImageView mEnabledImage;
 
-        public ConfigItemView(Context context) {
-            super(context);
-            View.inflate(context, R.layout.config_watchface_item, this);
+        ConfigItemViewHolder(ViewGroup parent) {
+            super(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.config_watchface_item, parent, false));
 
-            mDescription = (TextView) findViewById(R.id.config_watch_item_text);
-            mEnabledImage = (CircledImageView) findViewById(R.id.config_watch_item_image);
+            mDescription = (TextView) itemView.findViewById(R.id.config_watch_item_text);
+            mEnabledImage = (CircledImageView) itemView.findViewById(R.id.config_watch_item_image);
+
         }
 
-        public void bind(WatchConfigItem item, OnClickListener clickListener) {
+        void bind(WatchConfigItem item, View.OnClickListener clickListener) {
             mDescription.setText(item.getDescription());
             mEnabledImage.setOnClickListener(clickListener);
             setConfigItemEnabled(item.isEnabled());
         }
 
-        public void setConfigItemEnabled(boolean enabled) {
+        void setConfigItemEnabled(boolean enabled) {
             mEnabledImage.setImageResource(enabled ? R.drawable.sign_check : R.drawable.sign_error);
         }
-
     }
 
-    private static class ConfigItemViewHolder extends WearableListView.ViewHolder {
-        private final ConfigItemView mConfigItem;
+    private static class StaticItemViewHolder extends WearableRecyclerView.ViewHolder {
+        private final TextView mDescription;
 
-        ConfigItemViewHolder(ConfigItemView configItem) {
-            super(configItem);
-            mConfigItem = configItem;
+        StaticItemViewHolder(ViewGroup parent) {
+            super(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.static_watchface_item, parent, false));
+
+            mDescription = (TextView) itemView.findViewById(R.id.static_watch_item_text);
+        }
+
+        void bind(String text) {
+            mDescription.setText(text);
         }
     }
 
+    public static class OffsettingHelper extends DefaultOffsettingHelper {
+
+        /**
+         * How much should we scale the icon at most.
+         */
+        private static final float MAX_ICON_PROGRESS = 0.65f;
+
+        private float mProgressToCenter;
+
+        OffsettingHelper() {
+        }
+
+        @Override
+
+        public void updateChild(View child, WearableRecyclerView parent) {
+            super.updateChild(child, parent);
+
+            // Figure out % progress from top to bottom
+            float centerOffset = ((float) child.getHeight() / 2.0f) / (float) parent.getHeight();
+            float yRelativeToCenterOffset = (child.getY() / parent.getHeight()) + centerOffset;
+
+            // Normalize for center
+            mProgressToCenter = Math.abs(0.5f - yRelativeToCenterOffset);
+            // Adjust to the maximum scale
+            mProgressToCenter = Math.min(mProgressToCenter, MAX_ICON_PROGRESS);
+
+            child.setScaleX(1 - mProgressToCenter);
+            child.setScaleY(1 - mProgressToCenter);
+        }
+
+
+        @Override
+        public void adjustAnchorOffsetXY(View child, float[] anchorOffsetXY) {
+            anchorOffsetXY[0] = child.getHeight() / 2.0f;
+        }
+    }
 }

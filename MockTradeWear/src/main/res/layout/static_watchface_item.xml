@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Author: Balch
-  ~ Created: 8/15/16 6:46 AM
+  ~ Created: 12/20/16 5:18 PM
   ~
   ~ This file is part of MockTrade.
   ~
@@ -22,9 +22,12 @@
   ~
   -->
 
-<android.support.wearable.view.WearableRecyclerView
+<TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/config_watch_list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="vertical"/>
+    android:id="@+id/static_watch_item_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:fontFamily="sans-serif-condensed-light"
+    android:textColor="@color/green"
+    android:textSize="18sp"/>

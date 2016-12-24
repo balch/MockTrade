@@ -18,6 +18,15 @@ android {
     }
 }
 
+task generateSources (type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives generateSources
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.mcxiaoke.volley:library:$rootProject.ext.volley"

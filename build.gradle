@@ -17,6 +17,7 @@ ext {
     support_test="0.5"
     junit="4.12"
     mockito="1.9.5"
+    leak_canary="1.5"
 }
 
 buildscript {

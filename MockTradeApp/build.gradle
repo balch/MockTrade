@@ -58,6 +58,11 @@ dependencies {
     compile "com.android.support:design:$rootProject.ext.support"
     compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
 
+
+    debugCompile "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leak_canary"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leak_canary"
+    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leak_canary"
+
     // Testing-only dependencies
 
     // Force usage of support annotations in the test app, since it is internally used by the runner module.

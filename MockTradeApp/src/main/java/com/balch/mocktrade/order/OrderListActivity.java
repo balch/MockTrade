@@ -35,14 +35,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.balch.android.app.framework.BaseAppCompatActivity;
+import com.balch.android.app.framework.PresenterActivity;
 import com.balch.mocktrade.ModelProvider;
 import com.balch.mocktrade.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
+public class OrderListActivity extends PresenterActivity<OrderListView>
         implements LoaderManager.LoaderCallbacks<List<Order>>{
     private static final String TAG = OrderListActivity.class.getSimpleName();
 
@@ -60,7 +60,7 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
     }
 
     @Override
-    protected void onCreateBase(Bundle bundle) {
+    public void onCreateBase(Bundle bundle) {
 
         this.mAccountId = getIntent().getLongExtra(EXTRA_ACCOUNT_ID, 0);
 
@@ -102,9 +102,8 @@ public class OrderListActivity extends BaseAppCompatActivity<OrderListView>
 
     }
 
-
     @Override
-    protected OrderListView createView() {
+    public OrderListView createView() {
         this.mOrderListView = new OrderListView(this);
         return this.mOrderListView;
     }

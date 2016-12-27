@@ -7,8 +7,8 @@ ext {
     applicationId="com.balch.mocktrade"
     minSdkVersion=21
     targetSdkVersion=25
-    versionCode=3
-    versionName="2.1"
+    versionCode=4
+    versionName="3.0"
 
     support="25.1.0"
     play_services="10.0.1"

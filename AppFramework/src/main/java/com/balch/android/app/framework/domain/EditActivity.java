@@ -27,12 +27,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import com.balch.android.app.framework.BaseAppCompatActivity;
+import com.balch.android.app.framework.PresenterActivity;
 import com.balch.android.app.framework.R;
 
 import java.util.ArrayList;
 
-public class EditActivity extends BaseAppCompatActivity<EditView> {
+public class EditActivity extends PresenterActivity<EditView> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
     protected static final String EXTRA_VALIDATOR = "validator";
@@ -53,7 +53,7 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
     protected int cancelButtonResId;
 
     @Override
-    protected void onCreateBase(Bundle savedInstanceState) {
+    public void onCreateBase(Bundle savedInstanceState) {
         Intent intent = this.getIntent();
         int titleResId = intent.getIntExtra(EXTRA_TITLE_RESID, 0);
         if (titleResId != 0) {
@@ -94,12 +94,12 @@ public class EditActivity extends BaseAppCompatActivity<EditView> {
     }
 
     @Override
-    protected void onSaveInstanceStateBase(Bundle outState) {
+    public void onSaveInstanceStateBase(Bundle outState) {
         outState.putIntegerArrayList(STATE_COLUMN_VIEW_IDS, this.columnViewIDs);
     }
 
     @Override
-    protected EditView createView() {
+    public EditView createView() {
         this.view = new EditView(this);
         return this.view;
     }

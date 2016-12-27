@@ -38,8 +38,9 @@ import android.widget.TextView;
  *
  * @param <V> Type of BaseView to create
  */
-public abstract class BaseAppCompatActivity<V extends View & BaseView> extends AppCompatActivity {
-    private static final String TAG = BaseAppCompatActivity.class.getSimpleName();
+public abstract class PresenterActivity<V extends View & BaseView>
+        extends AppCompatActivity implements BasePresenter<V> {
+    private static final String TAG = PresenterActivity.class.getSimpleName();
 
     private static final String STATE_VIEW_ID = TAG + "_state_view_id";
 
@@ -47,39 +48,45 @@ public abstract class BaseAppCompatActivity<V extends View & BaseView> extends A
 
     private int viewId = -1;
 
-    abstract protected V createView();
-
     // override-able activity functions
-    protected void onCreateBase(Bundle savedInstanceState) {
+    @Override
+    public void onCreateBase(Bundle savedInstanceState) {
     }
 
-    protected void onResumeBase() {
+    @Override
+    public void onResumeBase() {
     }
 
-    protected void onPauseBase() {
+    @Override
+    public void onPauseBase() {
     }
 
-    protected void onStartBase() {
+    @Override
+    public void onStartBase() {
     }
 
-    protected void onStopBase() {
+    @Override
+    public void onStopBase() {
     }
 
-    protected void onDestroyBase() {
+    @Override
+    public void onDestroyBase() {
     }
 
-    protected void onSaveInstanceStateBase(Bundle outState) {
+    @Override
+    public void onSaveInstanceStateBase(Bundle outState) {
     }
 
-    protected void onActivityResultBase(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResultBase(int requestCode, int resultCode, Intent data) {
     }
 
-
-    protected boolean onHandleException(String logMsg, Exception ex) {
+    @Override
+    public boolean onHandleException(String logMsg, Exception ex) {
         return false;
     }
 
-    public BaseAppCompatActivity() {
+    public PresenterActivity() {
         this.mClassName = this.getClass().getSimpleName();
     }
 

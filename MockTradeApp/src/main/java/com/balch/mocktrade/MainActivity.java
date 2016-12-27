@@ -32,7 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.balch.android.app.framework.BaseAppCompatActivity;
+import com.balch.android.app.framework.PresenterActivity;
 import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
@@ -58,7 +58,7 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
+public class MainActivity extends PresenterActivity<MainPortfolioView> {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int PORTFOLIO_LOADER_ID = 0;
@@ -158,7 +158,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
             };
 
     @Override
-    protected void onCreateBase(Bundle bundle) {
+    public void onCreateBase(Bundle bundle) {
 
         ModelProvider modelProvider = ((ModelProvider) getApplication());
         ViewProvider viewProvider = (ViewProvider) getApplication();
@@ -202,7 +202,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     @Override
-    protected MainPortfolioView createView() {
+    public MainPortfolioView createView() {
         mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId, int daysToReturn) {
@@ -214,7 +214,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
 
     @Override
-    protected void onResumeBase() {
+    public void onResumeBase() {
         // onRestoreInstanceState is called after onStart but before OnResume
         // creating the loaders in onResume ensure the views are correctly restored
         if ((mPortfolioLoader == null) || (mGraphDataLoader == null)) {
@@ -225,7 +225,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     @Override
-    protected void onStartBase() {
+    public void onStartBase() {
 
         if (mAccountUpdateReceiver == null) {
             mAccountUpdateReceiver = new AccountUpdateReceiver();
@@ -236,7 +236,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     @Override
-    protected void onStopBase() {
+    public void onStopBase() {
         if (mAccountUpdateReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mAccountUpdateReceiver);
             mAccountUpdateReceiver = null;
@@ -317,7 +317,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 updateView();
                 handled = true;
                 break;
-
         }
 
         return handled;
@@ -325,7 +324,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
 
 
     @Override
-    protected boolean onHandleException(String logMsg, Exception ex) {
+    public boolean onHandleException(String logMsg, Exception ex) {
         String displayMsg = ex.getLocalizedMessage();
         if (TextUtils.isEmpty(displayMsg)) {
             displayMsg = ex.toString();
@@ -338,7 +337,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                 .show();
 
         return true;
-
     }
 
     private void backupDatabaseToSDCard() {
@@ -354,7 +352,6 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
                     success ? R.color.success : R.color.failure,
                     android.support.design.R.id.snackbar_text)
                     .show();
-
         }
     }
 
@@ -517,7 +514,7 @@ public class MainActivity extends BaseAppCompatActivity<MainPortfolioView> {
     }
 
     @Override
-    protected void onActivityResultBase(int requestCode, int resultCode, Intent data) {
+    public void onActivityResultBase(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == NEW_ACCOUNT_RESULT) {
                 Account account = EditActivity.getResult(data);

@@ -40,17 +40,3 @@ dependencies {
     testCompile "org.mockito:mockito-all:$rootProject.ext.mockito"
 
 }
-
-apply plugin: 'maven'
-
-uploadArchives {
-    repositories.mavenDeployer {
-        def deployPath = file("./deploy")
-        repository(url: "file://${deployPath.absolutePath}")
-        pom.project {
-            groupId 'com.balch'
-            artifactId 'app-framework'
-            version '2.0'
-        }
-    }
-}

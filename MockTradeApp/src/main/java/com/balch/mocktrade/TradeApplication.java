@@ -252,7 +252,8 @@ public class TradeApplication extends Application implements ModelProvider, View
 
                 File[] backups = sd.listFiles(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
-                        return name.endsWith("_" + TradeApplication.DATABASE_NAME);
+                        return name.startsWith("1") &&
+                                name.endsWith("_" + TradeApplication.DATABASE_NAME);
                     }
                 });
 

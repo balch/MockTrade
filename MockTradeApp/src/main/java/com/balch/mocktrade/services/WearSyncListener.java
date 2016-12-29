@@ -51,6 +51,8 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         Log.d(TAG, "WearSyncListener: onCreate");
         modelProvider = (ModelProvider) this.getApplication();
 

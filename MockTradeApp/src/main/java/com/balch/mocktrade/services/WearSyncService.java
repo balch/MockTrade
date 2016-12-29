@@ -92,6 +92,7 @@ public class WearSyncService extends IntentService implements
     @Override
     public void onCreate() {
         super.onCreate();
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)

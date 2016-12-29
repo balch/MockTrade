@@ -64,6 +64,8 @@ public class TradeApplication extends Application implements ModelProvider, View
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
     private static final String DATABASE_UPDATE_SCRIPT_FORMAT = "sql/upgrade_%d.sql";
 
+    private static final String DAILY_BACKUP_DATABASE_NAME = "daily_backup";
+
     private volatile SqlConnection mSqlConnection;
     private volatile RequestQueue mRequestQueue;
     private volatile Settings mSettings;
@@ -184,8 +186,21 @@ public class TradeApplication extends Application implements ModelProvider, View
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
     }
 
-    public static boolean backupDatabase(Context context) {
+    public static boolean backupDatabase(Context context, boolean isDaily) {
         boolean success = false;
+
+        String backupDBPathPrefix;
+
+        if (isDaily) {
+            backupDBPathPrefix = DAILY_BACKUP_DATABASE_NAME;
+            if (BuildConfig.DEBUG) {
+                backupDBPathPrefix += "_debug";
+            }
+        } else {
+            backupDBPathPrefix = String.valueOf(System.currentTimeMillis());
+        }
+
+        String backupDBPath = backupDBPathPrefix + "_" + DATABASE_NAME;
 
         FileChannel src = null;
         FileChannel dst = null;
@@ -195,7 +210,6 @@ public class TradeApplication extends Application implements ModelProvider, View
             if (sd.canWrite()) {
                 File dbFile = context.getDatabasePath(TradeApplication.DATABASE_NAME);
 
-                String backupDBPath = System.currentTimeMillis() + "_" + TradeApplication.DATABASE_NAME;
                 File backupDBFile = new File(sd, backupDBPath);
 
                 if (dbFile.exists()) {

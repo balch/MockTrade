@@ -343,7 +343,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView> {
 
         if (isStoragePermissionsGranted(PERMS_REQUEST_BACKUP)) {
 
-            boolean success = TradeApplication.backupDatabase(this);
+            boolean success = TradeApplication.backupDatabase(this, false);
 
             String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
 

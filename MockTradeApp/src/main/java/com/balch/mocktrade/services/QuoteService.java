@@ -30,6 +30,7 @@ import android.util.Log;
 import android.util.LongSparseArray;
 
 import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -124,6 +125,7 @@ public class QuoteService extends IntentService {
 
             // if the market is closed reset alarm to next market open time
             if (!financeModel.isInPollTime()) {
+                TradeApplication.backupDatabase(getApplicationContext(), true);
                 financeModel.setQuoteServiceAlarm();
             }
 

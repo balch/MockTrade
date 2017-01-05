@@ -6,9 +6,10 @@ MockTrade
 
 * Open Source Android Trading Simulator
 * AppFramework Library
-    * BaseAppCompatActivity with built in MVP
-        * Error Handling
-    * Annotation Driven List/Create/Edit Layouts
+    * PresenterActivity 
+        * Enforce MVP
+        * Activity Lifecycle Logging/Timing
+        * Error Handling                 
     * SqlConnection Encapsulation
         * Domain Objects
         * SqlMapper pattern

@@ -33,61 +33,51 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * This class enhances the AppCompatActivity functionality by providing View creation abstraction
+ * This class enhances the AppCompatActivity functionality by providing View creation abstraction,
  * and error handling.
  *
  * @param <V> Type of BaseView to create
  */
-public abstract class PresenterActivity<V extends View & BaseView>
-        extends AppCompatActivity implements BasePresenter<V> {
+public abstract class PresenterActivity<V extends View & BaseView> extends AppCompatActivity  {
     private static final String TAG = PresenterActivity.class.getSimpleName();
-
     private static final String STATE_VIEW_ID = TAG + "_state_view_id";
 
-    private String mClassName;
-
+    private String className;
     private int viewId = -1;
 
+    protected abstract V createView();
+
     // override-able activity functions
-    @Override
     public void onCreateBase(Bundle savedInstanceState) {
     }
 
-    @Override
     public void onResumeBase() {
     }
 
-    @Override
     public void onPauseBase() {
     }
 
-    @Override
     public void onStartBase() {
     }
 
-    @Override
     public void onStopBase() {
     }
 
-    @Override
     public void onDestroyBase() {
     }
 
-    @Override
     public void onSaveInstanceStateBase(Bundle outState) {
     }
 
-    @Override
     public void onActivityResultBase(int requestCode, int resultCode, Intent data) {
     }
 
-    @Override
     public boolean onHandleException(String logMsg, Exception ex) {
         return false;
     }
 
     public PresenterActivity() {
-        this.mClassName = this.getClass().getSimpleName();
+        this.className = this.getClass().getSimpleName();
     }
 
     private boolean handleException(String logMsg, Exception ex) {
@@ -98,7 +88,7 @@ public abstract class PresenterActivity<V extends View & BaseView>
     @Override
     final protected void onCreate(Bundle savedInstanceState) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " OnCreate - Begin");
+        Log.d(TAG, this.className + " OnCreate - Begin");
         try {
             super.onCreate(savedInstanceState);
             V view = this.createView();
@@ -120,13 +110,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " OnCreate - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " OnCreate - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onStart() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onStart - Begin");
+        Log.d(TAG, this.className + " onStart - Begin");
         try {
             super.onStart();
             onStartBase();
@@ -135,13 +125,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onStart - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onStart - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onResume() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onResume - Begin");
+        Log.d(TAG, this.className + " onResume - Begin");
         try {
             super.onResume();
             onResumeBase();
@@ -150,13 +140,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onResume - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onResume - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onSaveInstanceState(Bundle outState) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onSaveInstanceState - Begin");
+        Log.d(TAG, this.className + " onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
 
@@ -167,13 +157,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onSaveInstanceState - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onSaveInstanceState - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onPause() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onPause - Begin");
+        Log.d(TAG, this.className + " onPause - Begin");
         try {
             onPauseBase();
             super.onPause();
@@ -182,13 +172,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onPause - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onPause - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onStop() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onStop - Begin");
+        Log.d(TAG, this.className + " onStop - Begin");
 
         try {
             onStopBase();
@@ -198,13 +188,13 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onStop - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onStop - End (ms):" + sw.stop());
     }
 
     @Override
     final public void onDestroy() {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onDestroy - Begin");
+        Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             onDestroyBase();
         } catch (Exception ex) {
@@ -212,14 +202,14 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onDestroy - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onDestroy - End (ms):" + sw.stop());
         super.onDestroy();
     }
 
     @Override
     final public void onActivityResult(int requestCode, int resultCode, Intent data) {
         StopWatch sw = StopWatch.newInstance();
-        Log.d(TAG, this.mClassName + " onActivityResult - Begin");
+        Log.d(TAG, this.className + " onActivityResult - Begin");
         super.onActivityResult(requestCode, resultCode, data);
         try {
             onActivityResultBase(requestCode, resultCode, data);
@@ -228,7 +218,7 @@ public abstract class PresenterActivity<V extends View & BaseView>
                 throw ex;
             }
         }
-        Log.i(TAG, this.mClassName + " onActivityResult - End (ms):" + sw.stop());
+        Log.i(TAG, this.className + " onActivityResult - End (ms):" + sw.stop());
     }
 
     public Snackbar getSnackbar(View parent, String msg, int length) {

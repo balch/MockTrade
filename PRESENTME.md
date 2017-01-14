@@ -52,6 +52,17 @@ public interface TasksContract {
 }
 ```
 
+*[Presenter-View cross reference](https://github.com/googlesamples/android-architecture/blob/todo-mvp/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksPresenter.java)
+```java
+public class TasksPresenter implements TasksContract.Presenter {
+
+    private final TasksContract.View mTasksView;
+    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+        mTasksView.setPresenter(this);
+    }
+}
+```
+
 ### PresenterActivity
 * Activity Lifecycle is the heart of Android Application
    * Presenter state persistence

@@ -58,7 +58,7 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends PresenterActivity<MainPortfolioView> {
+public class MainActivity extends PresenterActivity<MainPortfolioView, TradeModelProvider> {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int PORTFOLIO_LOADER_ID = 0;
@@ -160,15 +160,11 @@ public class MainActivity extends PresenterActivity<MainPortfolioView> {
     @Override
     public void onCreateBase(Bundle bundle) {
 
-        ModelProvider modelProvider = ((ModelProvider) getApplication());
         ViewProvider viewProvider = (ViewProvider) getApplication();
 
         if (viewProvider.isTablet(this)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-
-        mSettings = modelProvider.getSettings();
-        mPortfolioModel = new PortfolioSqliteModel(modelProvider);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.portfolio_view_toolbar);
         if (toolbar != null) {
@@ -212,6 +208,11 @@ public class MainActivity extends PresenterActivity<MainPortfolioView> {
         return mMainPortfolioView;
     }
 
+    @Override
+    protected void createModel(TradeModelProvider modelProvider) {
+        mSettings = modelProvider.getSettings();
+        mPortfolioModel = new PortfolioSqliteModel(modelProvider);
+    }
 
     @Override
     public void onResumeBase() {

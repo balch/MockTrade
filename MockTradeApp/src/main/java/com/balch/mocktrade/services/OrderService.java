@@ -31,7 +31,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.balch.mocktrade.MainActivity;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
@@ -58,7 +58,7 @@ public class OrderService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
 
         try {
-            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
+            TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Order> orders = portfolioModel.getOpenOrders();

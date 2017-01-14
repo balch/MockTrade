@@ -27,7 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.LongSparseArray;
 
 import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -56,7 +56,7 @@ public class PortfolioSqliteModel implements PortfolioModel {
     private final SnapshotTotalsSqliteModel snapshotTotalsModel;
     private final SqlConnection sqlConnection;
 
-    public PortfolioSqliteModel(ModelProvider modelProvider) {
+    public PortfolioSqliteModel(TradeModelProvider modelProvider) {
         this.sqlConnection = modelProvider.getSqlConnection();
         this.accountModel = new AccountSqliteModel(modelProvider);
         this.investmentModel = new InvestmentSqliteModel(modelProvider);

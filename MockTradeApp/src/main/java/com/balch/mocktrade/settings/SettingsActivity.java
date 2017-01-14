@@ -34,7 +34,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.balch.mocktrade.BuildConfig;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
@@ -70,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Settings.Key settingKey = Settings.Key.fromKey(key);
         if (settingKey == Settings.Key.PREF_POLL_INTERVAL) {
-            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
+            TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             financeModel.setQuoteServiceAlarm();
         }

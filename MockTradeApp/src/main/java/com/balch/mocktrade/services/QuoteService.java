@@ -29,7 +29,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
@@ -63,11 +63,11 @@ public class QuoteService extends IntentService {
             Log.i(TAG, "QuoteService onHandleIntent");
 
             // get the investment list from the db
-            ModelProvider modelProvider = ((ModelProvider) this.getApplication());
+            TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
             final List<Investment> investments = portfolioModel.getAllInvestments();
-            Settings settings = ((ModelProvider) this.getApplication()).getSettings();
+            Settings settings = ((TradeModelProvider) this.getApplication()).getSettings();
 
             if (investments.size() > 0) {
                 final List<Account> accounts = portfolioModel.getAccounts(true);
@@ -148,7 +148,7 @@ public class QuoteService extends IntentService {
             Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
             if (strategyClazz != null) {
                 try {
-                    ModelProvider modelProvider = ((ModelProvider)this.getApplication());
+                    TradeModelProvider modelProvider = ((TradeModelProvider)this.getApplication());
                     BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, modelProvider);
                     if (doDailyUpdate) {
                         strategy.dailyUpdate(account, accountIdToInvestmentMap.get(account.getId()), quoteMap);

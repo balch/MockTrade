@@ -27,12 +27,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import com.balch.android.app.framework.ModelProvider;
 import com.balch.android.app.framework.PresenterActivity;
 import com.balch.android.app.framework.R;
 
 import java.util.ArrayList;
 
-public class EditActivity extends PresenterActivity<EditView> {
+public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
     protected static final String EXTRA_VALIDATOR = "validator";
@@ -102,6 +103,11 @@ public class EditActivity extends PresenterActivity<EditView> {
     public EditView createView() {
         this.view = new EditView(this);
         return this.view;
+    }
+
+    @Override
+    protected void createModel(ModelProvider modelProvider) {
+
     }
 
     public static Intent getIntent(Context context, int titleResId, DomainObject domainObject, ExternalController externalController,

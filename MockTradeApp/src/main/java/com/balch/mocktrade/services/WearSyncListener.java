@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.WatchConfigItem;
 import com.balch.mocktrade.shared.WearDataSync;
@@ -47,14 +47,14 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     private static final String TAG = WearSyncListener.class.getSimpleName();
 
     private GoogleApiClient mGoogleApiClient;
-    private ModelProvider modelProvider;
+    private TradeModelProvider modelProvider;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         Log.d(TAG, "WearSyncListener: onCreate");
-        modelProvider = (ModelProvider) this.getApplication();
+        modelProvider = (TradeModelProvider) this.getApplication();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)

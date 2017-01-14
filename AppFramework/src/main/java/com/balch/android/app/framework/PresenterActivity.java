@@ -38,7 +38,8 @@ import android.widget.TextView;
  *
  * @param <V> Type of BaseView to create
  */
-public abstract class PresenterActivity<V extends View & BaseView> extends AppCompatActivity  {
+public abstract class PresenterActivity<V extends View & BaseView, M extends ModelProvider>
+        extends AppCompatActivity  {
     private static final String TAG = PresenterActivity.class.getSimpleName();
     private static final String STATE_VIEW_ID = TAG + "_state_view_id";
 
@@ -46,6 +47,7 @@ public abstract class PresenterActivity<V extends View & BaseView> extends AppCo
     private int viewId = -1;
 
     protected abstract V createView();
+    protected abstract void createModel(M modelProvider);
 
     // override-able activity functions
     public void onCreateBase(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ public abstract class PresenterActivity<V extends View & BaseView> extends AppCo
         return onHandleException(logMsg, ex);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     final protected void onCreate(Bundle savedInstanceState) {
         StopWatch sw = StopWatch.newInstance();
@@ -103,6 +106,8 @@ public abstract class PresenterActivity<V extends View & BaseView> extends AppCo
             view.initializeLayout();
 
             this.setContentView(view);
+
+            this.createModel((M)getApplication());
             this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {

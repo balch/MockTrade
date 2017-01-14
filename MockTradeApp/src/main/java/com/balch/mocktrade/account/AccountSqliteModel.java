@@ -29,7 +29,7 @@ import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 
 import java.sql.SQLException;
@@ -48,9 +48,9 @@ public class AccountSqliteModel implements SqlMapper<Account> {
     public static final String COLUMN_AVAILABLE_FUNDS = "available_funds";
     public static final String COLUMN_EXCLUDE_FROM_TOTALS = "exclude_from_totals";
 
-    private final ModelProvider mModelProvider;
+    private final TradeModelProvider mModelProvider;
 
-    public AccountSqliteModel(ModelProvider modelProvider) {
+    public AccountSqliteModel(TradeModelProvider modelProvider) {
         mModelProvider = modelProvider;
     }
 

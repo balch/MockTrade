@@ -27,7 +27,7 @@ import android.database.Cursor;
 
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.Account;
 
 import java.util.Date;
@@ -57,9 +57,9 @@ public class InvestmentSqliteModel implements SqlMapper<Investment> {
     private static final String SQL_WHERE_BY_ACCOUNT_AND_SYMBOL =
              COLUMN_SYMBOL + " = ? AND " + COLUMN_ACCOUNT_ID + " = ?";
 
-    private final ModelProvider mModelProvider;
+    private final TradeModelProvider mModelProvider;
 
-    public InvestmentSqliteModel(ModelProvider modelProvider) {
+    public InvestmentSqliteModel(TradeModelProvider modelProvider) {
         this.mModelProvider = modelProvider;
     }
 

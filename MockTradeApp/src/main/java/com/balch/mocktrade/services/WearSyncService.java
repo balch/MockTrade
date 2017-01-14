@@ -31,7 +31,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.investment.Investment;
@@ -114,7 +114,7 @@ public class WearSyncService extends IntentService implements
                 boolean broadcastAccountID = intent.getBooleanExtra(EXTRA_BROADCAST_ACCOUNT_ID, false);
                 Log.i(TAG, "WearSyncService onHandleIntent");
 
-                ModelProvider modelProvider = (ModelProvider) this.getApplication();
+                TradeModelProvider modelProvider = (TradeModelProvider) this.getApplication();
                 PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
 
                 DataItemBuffer dataItems = Wearable.DataApi.getDataItems(mGoogleApiClient).await();

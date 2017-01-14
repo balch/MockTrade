@@ -24,7 +24,7 @@ package com.balch.mocktrade.account.strategies;
 
 import android.content.Context;
 
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
@@ -43,7 +43,7 @@ public abstract class BaseStrategy {
 
     public abstract void initialize(Account account);
 
-    private void init( ModelProvider modelProvider) {
+    private void init( TradeModelProvider modelProvider) {
         this.financeModel = new GoogleFinanceModel(modelProvider);
         this.portfolioModel = new PortfolioSqliteModel(modelProvider);
         this.context = modelProvider.getContext();
@@ -62,7 +62,7 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-              ModelProvider modelProvider) throws IllegalAccessException, InstantiationException {
+              TradeModelProvider modelProvider) throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
         baseStrategy.init(modelProvider);
 

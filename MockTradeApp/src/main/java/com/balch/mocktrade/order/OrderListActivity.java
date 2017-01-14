@@ -36,13 +36,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.PresenterActivity;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderListActivity extends PresenterActivity<OrderListView>
+public class OrderListActivity extends PresenterActivity<OrderListView, TradeModelProvider>
         implements LoaderManager.LoaderCallbacks<List<Order>>{
     private static final String TAG = OrderListActivity.class.getSimpleName();
 
@@ -72,9 +72,6 @@ public class OrderListActivity extends PresenterActivity<OrderListView>
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-
-        ModelProvider modelProvider = ((ModelProvider)this.getApplication());
-        mOrderModel = new OrderSqliteModel(modelProvider);
 
         this.mOrderListView.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
@@ -106,6 +103,11 @@ public class OrderListActivity extends PresenterActivity<OrderListView>
     public OrderListView createView() {
         this.mOrderListView = new OrderListView(this);
         return this.mOrderListView;
+    }
+
+    @Override
+    protected void createModel(TradeModelProvider modelProvider) {
+        mOrderModel = new OrderSqliteModel(modelProvider);
     }
 
     public void reload(boolean showProgress) {

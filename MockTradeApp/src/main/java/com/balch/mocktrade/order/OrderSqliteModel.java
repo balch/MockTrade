@@ -30,7 +30,7 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.account.Transaction;
@@ -68,7 +68,7 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
     private final OrderManager mOrderManager;
     private final SqlConnection mSqlConnection;
 
-    public OrderSqliteModel(ModelProvider modelProvider) {
+    public OrderSqliteModel(TradeModelProvider modelProvider) {
         mSqlConnection = modelProvider.getSqlConnection();
         this.mInvestmentModel = new InvestmentSqliteModel(modelProvider);
         this.mAccountModel = new AccountSqliteModel(modelProvider);

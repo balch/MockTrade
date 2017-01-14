@@ -52,7 +52,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class TradeApplication extends Application implements ModelProvider, ViewProvider {
+public class TradeApplication extends Application implements TradeModelProvider, ViewProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
     private static final int REQUEST_TIMEOUT_SECS = 30;
@@ -102,9 +102,9 @@ public class TradeApplication extends Application implements ModelProvider, View
     }
 
     private static class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
-        private final ModelProvider mModelProvider;
+        private final TradeModelProvider mModelProvider;
 
-        private StartAlarmsTask(ModelProvider modelProvider) {
+        private StartAlarmsTask(TradeModelProvider modelProvider) {
             this.mModelProvider = modelProvider;
         }
 

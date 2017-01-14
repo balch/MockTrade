@@ -29,7 +29,7 @@ import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
-import com.balch.mocktrade.ModelProvider;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
@@ -78,7 +78,7 @@ public class SnapshotTotalsSqliteModel {
     private final SqlConnection mSqlConnection;
     private final Settings mSettings;
 
-    public SnapshotTotalsSqliteModel(ModelProvider modelProvider) {
+    public SnapshotTotalsSqliteModel(TradeModelProvider modelProvider) {
         mSqlConnection = modelProvider.getSqlConnection();
         mSettings = modelProvider.getSettings();
     }

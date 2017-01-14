@@ -29,6 +29,8 @@ The `Activity.setContentView(View view)` is the primary example I use to make th
 that the view is conceptually separate from the Activity. The View is passed to the Activity and
 held as a reference (by adding it to the Window object). Calls to `Activity.findViewById()`
 are delegated to the stored View (since both View and Activity implement `.findViewById()`).
+This same concept also applies to Fragments and is reinforced by the `Fragment.onCreateView()`
+method which forces the Fragment derived class to create a separate view.
 
 Storing another reference to the View in a separate Presenter class adds another level
 of indirection: Activity (Lifecycle Events) --&gt; Presenter --&gt; View
@@ -37,8 +39,6 @@ complex Lifecycle Events tied to Loaders and `onActivityResult()`. I found the
 Presenter eventually morphed into a subset of Activity Lifecycle Events codified into an
 interface.
 
-This same concept also applies to Fragments and is reinforced by the `Fragment.onCreateView()`
-method which forces the Fragment derived class to create a separate view.
 
 
 #### [GoogleSamples todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/)

@@ -12,7 +12,13 @@ Mosby is an interesting Android MVP Framework that has a lot of cool functionali
 the complexities of developing Android applications.
 
 I found this quote which nicely describes their MVP philosophy:
-> But before we dive deeper in how to implement MVP on Android we have to clarify if an Activity or Fragment is a View or a Presenter. Activity and Fragment seems to be both, because they have lifecycle callbacks like onCreate() or onDestroy() as well as responsibilities of View things like switching from one UI widget to another UI widget (like showing a ProgressBar while loading and then displaying a ListView with data). You may say that these sounds like an Activity or Fragment is a Controller. However, we came to the conclusion that Activity and Fragment should be treated as part of a (dumb) View and not as a Presenter. You will see why afterwards.
+> But before we dive deeper in how to implement MVP on Android we have to clarify if an Activity or
+Fragment is a View or a Presenter. Activity and Fragment seems to be both, because they have
+lifecycle callbacks like onCreate() or onDestroy() as well as responsibilities of View things
+like switching from one UI widget to another UI widget (like showing a ProgressBar while loading
+and then displaying a ListView with data). You may say that these sounds like an Activity or
+Fragment is a Controller. However, we came to the conclusion that Activity and Fragment
+should be treated as part of a (dumb) View and not as a Presenter. You will see why afterwards.
 
 This quote asks the right question, but comes up with a different answer. They are correct
 that the Activity/Fragment provide both Presenter and View methods and behavior, but, I would
@@ -20,14 +26,19 @@ argue that the View methods (mainly `.findViewById()`) are convenience methods t
 useful for creating Android sample applications.
 
 The `Activity.setContentView(View view)` is the primary example I use to make the case
-that the view is conceptually separate from the Activity. Both View and Activity implement
-the `.findViewById()` function. Assuming the Activity version of `.findViewById()` delegates the
-call to the View, this implies the Activity holds a reference to the View, which is very similar
-to the Presenter holding a reference to the View.
+that the view is conceptually separate from the Activity. The View is passed to the Activity and
+held as a reference (by adding it to the Window object). Calls to `Activity.findViewById()`
+are delegated to the stored View (since both View and Activity implement `.findViewById()`).
+Storing another reference to the View in a separate Presenter class adds another level
+of indirection: Activity (Lifecycle Events) --&gt; Presenter --&gt; View
+(which is actually the Activity).
 
 This same concept also applies to Fragments and is reinforced by the `Fragment.onCreateView()`
 method which forces the Fragment derived class to create a separate view.
 
+I first tried this approach in an application using complex Lifecycle Events tied to Loaders
+and `onActivityResult()`. I found the Presenter eventually morphed into a subset of Activity
+Lifecycle Events codified into an interface.
 
 #### [GoogleSamples todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/)
 

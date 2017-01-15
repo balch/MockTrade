@@ -22,6 +22,7 @@
 
 package com.balch.android.app.framework;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -44,9 +45,24 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
     private static final String STATE_VIEW_ID = TAG + "_state_view_id";
 
     private String className;
+
+    private boolean isManagedViewId = false;
     private int viewId = -1;
 
+    /**
+     * Override abstract method to create a view of type V used by the Presenter.
+     * The view id will be managed by this class if not specified
+     * @return View containing view logic in the MVP pattern
+     */
     protected abstract V createView();
+
+    /**
+     * Override abstract method to create any models needed by the Presenter. A class of type
+     * M is injected into this method to take advantage the Dependency Injection pattern.
+     * This mechanism is implemented by requiring the Application instance be of type M.
+
+     * @param modelProvider injected ModelProvider
+     */
     protected abstract void createModel(M modelProvider);
 
     // override-able activity functions
@@ -96,18 +112,28 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
             super.onCreate(savedInstanceState);
             V view = this.createView();
 
-            if (savedInstanceState != null) {
-                viewId = savedInstanceState.getInt(STATE_VIEW_ID, -1);
+            // view's require an id for the internal state to be persisted/restored
+            // using onSaveInstanceState()/onRestoreInstanceState()
+            // this code assigns and manages the view id if necessary
+            isManagedViewId = (view.getId() <= 0);
+            if (isManagedViewId) {
+                if (savedInstanceState != null) {
+                    viewId = savedInstanceState.getInt(STATE_VIEW_ID, -1);
+                }
+                if (viewId == -1) {
+                    viewId = View.generateViewId();
+                }
+                view.setId(viewId);
             }
-            if (viewId == -1) {
-                viewId = View.generateViewId();
-            }
-            view.setId(viewId);
             view.initializeLayout();
 
             this.setContentView(view);
 
-            this.createModel((M)getApplication());
+            Application application = getApplication();
+            if (!(application instanceof ModelProvider)) {
+                throw new IllegalStateException("Android Application object must be derived from Model Provider");
+            }
+            this.createModel((M)application);
             this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {
@@ -155,7 +181,9 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
         try {
             super.onSaveInstanceState(outState);
 
-            outState.putInt(STATE_VIEW_ID, viewId);
+            if (isManagedViewId) {
+                outState.putInt(STATE_VIEW_ID, viewId);
+            }
             onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             if (!handleException("onSaveInstanceState ", ex)) {

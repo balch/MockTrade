@@ -85,7 +85,20 @@ public class TasksPresenter implements TasksContract.Presenter {
 public abstract class PresenterActivity<V extends View & BaseView, M extends ModelProvider>
                             extends AppCompatActivity  {
 
+    /**
+     * Override abstract method to create a view of type V used by the Presenter.
+     * The view id will be managed by this class  if not specified
+     * @return View containing view logic in the MVP pattern
+     */
     protected abstract V createView();
+
+    /**
+     * Override abstract method to create any models needed by the Presenter. A class of type
+     * M is injected into this method to take advantage the Dependency Injection pattern.
+     * This mechanism is implemented by requiring the Application instance be of type M.
+
+     * @param modelProvider injected ModelProvider
+     */
     protected abstract void createModel(M modelProvider);
 
     // override-able activity functions

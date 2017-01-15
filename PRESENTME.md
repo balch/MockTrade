@@ -204,9 +204,28 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 ```
 
 ### Unit Testing
-* Lifecycle *Base methods do not call super()
-    * can be used w/o robo
-* Dependency Injection with ModelProvider
+One of the stated benefits of MVP and Dependency Injection is improved testability. This
+is accomplished through proper encapsulation into MVP classes and the ability to inject
+mock versions of dependant classes to the code being tested. This is especially powerful
+when combined with a mock framework like [Mockito](http://site.mockito.org/).
+
+The `PresenterActivity` architecture facilitates unit testing with the minimal amount of
+bypassing functionality with `doNothing().when()` calls. This is accomplished through a
+combination of overriding the `createView()` method and injecting a `ModelProvider`
+instance with the proper mocked application scoped objects. This technique is
+demonstrated in the sample unit tests below.
+
+The `PresenterActivity` also solves testing issues associated with the Android framework
+itself. Many Android class implementations are not available in the testing framework
+which causes many Activity tests to fail with not implemented exceptions.
+This is typically solved through third-party testing frameworks that have TestRunners
+that include a version of the Android runtime libraries
+(I'm thinking of you [Robolectric](http://robolectric.org/)).
+
+The classes derived from `PresenterActivity` can be tested without these frameworks
+because the mirrored Activity Lifecycle events do not call their super counterparts.
+This makes writing reverse-engineered unit test a breeze (see
+`testOnCreateBase()` below).
 
 ```java
 public class MainActivityTest {

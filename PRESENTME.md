@@ -128,12 +128,13 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 }
 ```
 
-This pattern has the of benefits:
-* Supports all all Android LifeCycle events
-* Reduced learning curve by incorporating known LifeCycle method names
-* Android Lifecycle Logging and Timing
-* Forces MVP with `abstract V createView()` and `abstract void createModel(M modelProvider)`
-* Error Handling
+This pattern enforces MVP by requireing implementers to specify View and ModelProvider types, and implement
+`abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concreate classes
+to represent the **MV** part of **MV**P. These methods are extremley usefull when it comes to [Unit Testing](#unit_testing).
+
+The integration with the Android LifeCycle events provides a familiar set of methods to `@Override` and makes it easy to 
+port legacy applications. The interaction with the LifeCycle events allows the framework to provide integrated error handling
+and timing logs. 
 
 ### Model and ModelProvider
 * Domain Objects

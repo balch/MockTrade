@@ -83,7 +83,7 @@ events that need to be handled to create a robust Android Application. In additi
 activity events (onCreate/OnDestroy, onStart/onPause, onResume/onPause), there are advanced events
 (onActivityResult, onSaveInstanceState) which must be handled in most Android Applications.
 
-When implemented separately from the Activity, a typlical Presenter class usually contains methods that
+When implemented separately from the Activity, a typical Presenter class usually contains methods that
 correspond directly to LifeCycle events. In addition, the Presenter base interfaces usually define
 a subset of the Lifecycle methods which limits the Application in certain circumstances.
 
@@ -129,8 +129,8 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 ```
 
 This pattern enforces MVP by requireing implementers to specify View and ModelProvider types, and implement
-`abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concreate classes
-to represent the **MV** part of **MV**P. These methods are extremley usefull when it comes to [Unit Testing](#unit_testing).
+`abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concrete classes
+to represent the **MV** part of **MV**P. These methods are extremley usefull when it comes to [Unit Testing](#unit-testing).
 
 The integration with the Android LifeCycle events provides a familiar set of methods to `@Override` and makes it easy to 
 port legacy applications. The interaction with the LifeCycle events allows the framework to provide integrated error handling

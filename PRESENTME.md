@@ -77,12 +77,12 @@ events that need to be handled to create a robust Android Application. In additi
 activity events (onCreate/OnDestroy, onStart/onPause, onResume/onPause), there are advanced events
 (onActivityResult, onSaveInstanceState) which must be handled in most Android Applications.
 
-When implemented separately from the Activity, the Presenter class usually contains methods that
+When implemented separately from the Activity, a typlical Presenter class usually contains methods that
 correspond directly to LifeCycle events. In addition, the Presenter base interfaces usually define
 a subset of the Lifecycle methods which limits the Application in certain circumstances.
 
 The `PresenterActivity` solves the problem in a unique way. The supported Activity LifeCycle
-methods are wrapped and exposed to to the Child class by using a `Base` naming convention.
+methods are wrapped and exposed to the Child class by using a `Base` naming convention.
 
 **[Full PresenterActivity.java Source](https://github.com/balch/MockTrade/blob/develop/AppFramework/src/main/java/com/balch/android/app/framework/PresenterActivity.java)**
 

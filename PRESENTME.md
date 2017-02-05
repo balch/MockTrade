@@ -1,4 +1,4 @@
-# ![](https://cdn.pixabay.com/photo/2013/07/12/15/39/under-construction-150271_1280.png =100x)Under Constructon 
+# Under Constructon 
 
 PresenterActivity in Android MVP
 ===============================

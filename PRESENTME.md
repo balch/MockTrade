@@ -84,6 +84,8 @@ a subset of the Lifecycle methods which limits the Application in certain circum
 The `PresenterActivity` solves the problem in a unique way. The supported Activity LifeCycle
 methods are wrapped and exposed to to the Child class by using a `Base` naming convention.
 
+**[Full PresenterActivity.java Source](https://github.com/balch/MockTrade/blob/develop/AppFramework/src/main/java/com/balch/android/app/framework/PresenterActivity.java)**
+
 ```java
 public abstract class PresenterActivity<V extends View & BaseView, M extends ModelProvider>
                             extends AppCompatActivity  {
@@ -120,10 +122,12 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 }
 ```
 
-* Forces MVP with `abstract V createView()`
-* Error Handling
+This pattern has the of benefits:
+* Supports all all Android LifeCycle events
+* Reduced learning curve by incorporating known LifeCycle method names
 * Android Lifecycle Logging and Timing
-
+* Forces MVP with `abstract V createView()` and `abstract void createModel(M modelProvider)`
+* Error Handling
 
 ### Model and ModelProvider
 * Domain Objects

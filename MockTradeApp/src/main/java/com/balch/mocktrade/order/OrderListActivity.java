@@ -107,7 +107,9 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
 
     @Override
     protected void createModel(TradeModelProvider modelProvider) {
-        mOrderModel = new OrderSqliteModel(modelProvider);
+        mOrderModel = new OrderSqliteModel(modelProvider.getContext(),
+                modelProvider.getNetworkRequestProvider(), modelProvider.getSqlConnection(),
+                modelProvider.getSettings());
     }
 
     public void reload(boolean showProgress) {

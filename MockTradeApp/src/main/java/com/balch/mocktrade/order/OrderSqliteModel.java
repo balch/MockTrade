@@ -23,6 +23,7 @@
 package com.balch.mocktrade.order;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -30,7 +31,7 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.TradeModelProvider;
+import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.account.Transaction;
@@ -38,6 +39,7 @@ import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.investment.InvestmentSqliteModel;
+import com.balch.mocktrade.settings.Settings;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -66,15 +68,17 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
     private final InvestmentSqliteModel mInvestmentModel;
     private final AccountSqliteModel mAccountModel;
     private final OrderManager mOrderManager;
-    private final SqlConnection mSqlConnection;
+    private final SqlConnection sqlConnection;
 
-    public OrderSqliteModel(TradeModelProvider modelProvider) {
-        mSqlConnection = modelProvider.getSqlConnection();
-        this.mInvestmentModel = new InvestmentSqliteModel(modelProvider);
-        this.mAccountModel = new AccountSqliteModel(modelProvider);
-        this.mOrderManager = new OrderManager(modelProvider.getContext(),
-                new GoogleFinanceModel(modelProvider),
-                modelProvider.getSettings(), this);
+    public OrderSqliteModel(Context context, NetworkRequestProvider networkRequestProvider,
+                            SqlConnection sqlConnection, Settings settings) {
+        this.sqlConnection = sqlConnection;
+        this.mInvestmentModel = new InvestmentSqliteModel(sqlConnection);
+        this.mAccountModel = new AccountSqliteModel(context, networkRequestProvider,
+                sqlConnection, settings);
+        this.mOrderManager = new OrderManager(context,
+                new GoogleFinanceModel(context, networkRequestProvider, settings),
+                settings, this);
     }
 
     @Override
@@ -97,7 +101,7 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
                 whereArgs.add(String.valueOf(accountId));
             }
 
-            return mSqlConnection.query(this, Order.class, where.toString(),
+            return sqlConnection.query(this, Order.class, where.toString(),
                     whereArgs.toArray(new String[whereArgs.size()]), null);
         } catch (Exception e) {
             Log.e(TAG, "Error in getOpenOrders", e);
@@ -116,8 +120,8 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
             String where = " AND "+COLUMN_STATUS+"=?";
             String [] whereArgs = new String[]{Order.OrderStatus.OPEN.name()};
 
-            if (!mSqlConnection.update(this, order, where, whereArgs,
-                    mSqlConnection.getWritableDatabase())) {
+            if (!sqlConnection.update(this, order, where, whereArgs,
+                    sqlConnection.getWritableDatabase())) {
                 throw new OrderCancelException("Order cannot be canceled");
             }
         } catch (OrderCancelException ex) {
@@ -130,7 +134,7 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
 
     public void createOrder(Order order) {
         try {
-            mSqlConnection.insert(this, order);
+            sqlConnection.insert(this, order);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -143,20 +147,20 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
         } catch (Exception ex) {
             if (order != null) {
                 order.setStatus(Order.OrderStatus.ERROR);
-                mSqlConnection.update(this, order);
+                sqlConnection.update(this, order);
             }
             throw new OrderExecutionException(ex);
         }
     }
 
     public OrderResult executeOrder(Order order, Quote quote, Money price) throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        SQLiteDatabase db = mSqlConnection.getWritableDatabase();
+        SQLiteDatabase db = sqlConnection.getWritableDatabase();
         db.beginTransaction();
         try {
             Money cost = order.getCost(price);
             Money profit = new Money(0);
 
-            Account account = mSqlConnection.queryById(mAccountModel, Account.class, order.getAccount().getId());
+            Account account = sqlConnection.queryById(mAccountModel, Account.class, order.getAccount().getId());
 
             Money transactionCost;
             Transaction.TransactionType transactionType;
@@ -170,10 +174,10 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
             }
             transactionCost = Money.multiply(cost, -1);
             Transaction transaction = new Transaction(account, transactionCost, transactionType, "Order Id=" + order.getId());
-            long transactionId = mSqlConnection.insert(transaction, transaction, db);
+            long transactionId = sqlConnection.insert(transaction, transaction, db);
 
             account.getAvailableFunds().add(transactionCost);
-            if (!mSqlConnection.update(mAccountModel, account, db)) {
+            if (!sqlConnection.update(mAccountModel, account, db)) {
                 throw new IllegalAccessException("Error updating account");
             }
 
@@ -185,7 +189,7 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
                 investment = new Investment(account, quote.getSymbol(),
                         Investment.InvestmentStatus.OPEN, quote.getName(), quote.getExchange(),
                         cost, price, new Date(0), order.getQuantity());
-                mSqlConnection.insert(mInvestmentModel, investment, db);
+                sqlConnection.insert(mInvestmentModel, investment, db);
             } else {
                 if (order.getAction() == Order.OrderAction.SELL) {
                     if (order.getQuantity() > investment.getQuantity()) {
@@ -197,19 +201,19 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
 
                 investment.aggregateOrder(order, price);
                 if (investment.getQuantity() > 0) {
-                    if (!mSqlConnection.update(mInvestmentModel, investment, db)) {
+                    if (!sqlConnection.update(mInvestmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 } else {
                     // delete the investment if we sold everything
-                    if (!mSqlConnection.delete(mInvestmentModel, investment, db)) {
+                    if (!sqlConnection.delete(mInvestmentModel, investment, db)) {
                         throw new IllegalAccessException("Error updating investment");
                     }
                 }
             }
 
             order.setStatus(Order.OrderStatus.FULFILLED);
-            if (!mSqlConnection.update(this, order, db)) {
+            if (!sqlConnection.update(this, order, db)) {
                 throw new IllegalAccessException("Error updating order");
             }
 
@@ -228,7 +232,7 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
 
     @Override
     public boolean updateOrder(Order order) throws IllegalAccessException {
-        return mSqlConnection.update(this, order);
+        return sqlConnection.update(this, order);
     }
 
     public void scheduleOrderServiceAlarm(boolean isMarketOpen){

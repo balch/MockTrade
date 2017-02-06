@@ -84,7 +84,8 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
 
         TradeModelProvider modelProvider = ((TradeModelProvider)context.getApplicationContext());
-        FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
+        FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
 
         QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);

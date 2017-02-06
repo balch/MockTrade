@@ -71,7 +71,8 @@ public class SettingsActivity extends AppCompatActivity
         Settings.Key settingKey = Settings.Key.fromKey(key);
         if (settingKey == Settings.Key.PREF_POLL_INTERVAL) {
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
             financeModel.setQuoteServiceAlarm();
         }
     }

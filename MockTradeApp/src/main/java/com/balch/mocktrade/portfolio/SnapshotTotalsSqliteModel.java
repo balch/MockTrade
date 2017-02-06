@@ -29,7 +29,6 @@ import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
-import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
@@ -75,12 +74,12 @@ public class SnapshotTotalsSqliteModel {
                     SnapshotMapper.COLUMN_SNAPSHOT_TIME + " >= ? AND " +
                     SnapshotMapper.COLUMN_SNAPSHOT_TIME + " < ?";
 
-    private final SqlConnection mSqlConnection;
-    private final Settings mSettings;
+    private final SqlConnection sqlConnection;
+    private final Settings settings;
 
-    public SnapshotTotalsSqliteModel(TradeModelProvider modelProvider) {
-        mSqlConnection = modelProvider.getSqlConnection();
-        mSettings = modelProvider.getSettings();
+    public SnapshotTotalsSqliteModel(SqlConnection sqlConnection, Settings settings) {
+        this.sqlConnection = sqlConnection;
+        this.settings = settings;
     }
 
     public PerformanceItem getLastSnapshot(long accountId) {
@@ -90,7 +89,7 @@ public class SnapshotTotalsSqliteModel {
         PerformanceItem performanceItem = null;
         try {
             List<PerformanceItem> performanceItems =
-                    mSqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, where, whereArgs,
+                    sqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, where, whereArgs,
                             SnapshotMapper.COLUMN_SNAPSHOT_TIME + " DESC LIMIT 1");
             if ((performanceItems != null) && (performanceItems.size() > 0)) {
                 performanceItem = performanceItems.get(0);
@@ -118,7 +117,7 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems;
         try {
             performanceItems =
-                    mSqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                    sqlConnection.query(new SnapshotMapper(true), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
                             whereArgs, SnapshotMapper.COLUMN_SNAPSHOT_TIME + " ASC");
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots(accountId)", e);
@@ -143,7 +142,7 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems;
         try {
             performanceItems =
-                    mSqlConnection.query(new SnapshotMapper(false), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
+                    sqlConnection.query(new SnapshotMapper(false), PerformanceItem.class, SQL_WHERE_SNAPSHOTS_BY_ACCOUNT_ID,
                             whereArgs, SnapshotMapper.COLUMN_SNAPSHOT_TIME + " ASC");
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots(accountId)", e);
@@ -165,9 +164,9 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = mSqlConnection.rawQuery(
+            cursor = sqlConnection.rawQuery(
                     String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME), whereArgs);
-            mSqlConnection.processCursor(new SnapshotMapper(true), cursor, PerformanceItem.class, performanceItems);
+            sqlConnection.processCursor(new SnapshotMapper(true), cursor, PerformanceItem.class, performanceItems);
 
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshots()", e);
@@ -193,9 +192,9 @@ public class SnapshotTotalsSqliteModel {
         List<PerformanceItem> performanceItems = new ArrayList<>();
         try {
 
-            cursor = mSqlConnection.rawQuery(
+            cursor = sqlConnection.rawQuery(
                     String.format(SQL_ACCOUNTS_INCLUDED_TOTALS, SnapshotMapper.TABLE_NAME_SNAPSHOT_DAILY), whereArgs);
-            mSqlConnection.processCursor(new SnapshotMapper(false), cursor, PerformanceItem.class, performanceItems);
+            sqlConnection.processCursor(new SnapshotMapper(false), cursor, PerformanceItem.class, performanceItems);
 
         } catch (Exception e) {
             Log.e(TAG, "Error in getSnapshotsByDay()", e);
@@ -219,7 +218,7 @@ public class SnapshotTotalsSqliteModel {
         long latestTimestamp = 0;
         try {
 
-            cursor = mSqlConnection.rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
+            cursor = sqlConnection.rawQuery(SQL_LATEST_VALID_GRAPH_DATE, new String[]{});
             if (cursor.moveToNext()) {
                 latestTimestamp = cursor.getLong(0);
             }
@@ -237,7 +236,7 @@ public class SnapshotTotalsSqliteModel {
     }
 
     public int purgeSnapshotTable(int days) {
-        SQLiteDatabase db = mSqlConnection.getWritableDatabase();
+        SQLiteDatabase db = sqlConnection.getWritableDatabase();
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -days);
@@ -255,7 +254,7 @@ public class SnapshotTotalsSqliteModel {
 
         long latestTimestamp = getLatestGraphSnapshotTime();
         if (latestTimestamp > 0) {
-            Calendar cal = new GregorianCalendar(mSettings.getSavedSettingsTimeZone());
+            Calendar cal = new GregorianCalendar(settings.getSavedSettingsTimeZone());
             cal.setTimeInMillis(latestTimestamp);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
@@ -264,7 +263,7 @@ public class SnapshotTotalsSqliteModel {
 
             long startTime = cal.getTimeInMillis();
 
-            String [] parts = mSettings.geMarketCloseTime().split(":");
+            String [] parts = settings.geMarketCloseTime().split(":");
             cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(parts[0]));
             cal.set(Calendar.MINUTE, Integer.parseInt(parts[1]));
             cal.set(Calendar.SECOND, 0);
@@ -305,7 +304,7 @@ public class SnapshotTotalsSqliteModel {
     }
 
     private String getDemoModeWhereValue() {
-        return mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE) ? "1"  : "0";
+        return settings.getBoolean(Settings.Key.PREF_DEMO_MODE) ? "1"  : "0";
     }
 
 }

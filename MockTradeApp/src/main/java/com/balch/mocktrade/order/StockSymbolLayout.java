@@ -111,7 +111,8 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
         this.mPrice = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
 
         TradeModelProvider modelProvider = (TradeModelProvider)this.getContext().getApplicationContext();
-        this.mFinanceModel = new GoogleFinanceModel(modelProvider);
+        this.mFinanceModel = new GoogleFinanceModel(modelProvider.getContext(),
+                modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
 
         this.mValue.setHint(R.string.order_symbol_hint);
     }

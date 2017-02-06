@@ -59,8 +59,11 @@ public class OrderService extends IntentService {
 
         try {
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
-            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSettings());
             final List<Order> orders = portfolioModel.getOpenOrders();
 
             if (orders.size() > 0) {

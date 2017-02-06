@@ -211,7 +211,9 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     @Override
     protected void createModel(TradeModelProvider modelProvider) {
         mSettings = modelProvider.getSettings();
-        mPortfolioModel = new PortfolioSqliteModel(modelProvider);
+        mPortfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                modelProvider.getSettings());
     }
 
     @Override

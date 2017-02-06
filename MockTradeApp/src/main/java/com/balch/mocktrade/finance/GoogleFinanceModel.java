@@ -22,12 +22,14 @@
 
 package com.balch.mocktrade.finance;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
-import com.balch.mocktrade.TradeModelProvider;
+import com.balch.mocktrade.NetworkRequestProvider;
+import com.balch.mocktrade.settings.Settings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,12 +51,13 @@ public class GoogleFinanceModel implements FinanceModel {
 
     private final static String GOOGLE_BASE_URL = "http://www.google.com/finance/info?infotype=infoquoteall&q=";
 
-    private final TradeModelProvider mModelProvider;
+    private final NetworkRequestProvider networkRequestProvider;
     private final FinanceManager mFinanceManager;
 
-    public GoogleFinanceModel(TradeModelProvider mModelProvider) {
-        this.mModelProvider = mModelProvider;
-        this.mFinanceManager = new FinanceManager(mModelProvider.getContext(), mModelProvider.getSettings());
+    public GoogleFinanceModel(Context context, NetworkRequestProvider networkRequestProvider,
+                              Settings settings) {
+        this.networkRequestProvider = networkRequestProvider;
+        this.mFinanceManager = new FinanceManager(context.getApplicationContext(), settings);
     }
 
     private String getGoogleQueryUrl(String symbols) throws UnsupportedEncodingException  {
@@ -78,7 +81,7 @@ public class GoogleFinanceModel implements FinanceModel {
             final String url = getGoogleQueryUrl(symbolString);
 
             RequestFuture<String> future = RequestFuture.newFuture();
-            mModelProvider.addRequest(new StringRequest(Request.Method.GET, url, future, future));
+            networkRequestProvider.addRequest(new StringRequest(Request.Method.GET, url, future, future));
 
             String response = future.get();
 

@@ -27,7 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.LongSparseArray;
 
 import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.TradeModelProvider;
+import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
@@ -40,6 +40,7 @@ import com.balch.mocktrade.order.OrderExecutionException;
 import com.balch.mocktrade.order.OrderResult;
 import com.balch.mocktrade.order.OrderSqliteModel;
 import com.balch.mocktrade.services.OrderService;
+import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.shared.PerformanceItem;
 
 import java.sql.SQLException;
@@ -56,13 +57,15 @@ public class PortfolioSqliteModel implements PortfolioModel {
     private final SnapshotTotalsSqliteModel snapshotTotalsModel;
     private final SqlConnection sqlConnection;
 
-    public PortfolioSqliteModel(TradeModelProvider modelProvider) {
-        this.sqlConnection = modelProvider.getSqlConnection();
-        this.accountModel = new AccountSqliteModel(modelProvider);
-        this.investmentModel = new InvestmentSqliteModel(modelProvider);
-        this.orderModel = new OrderSqliteModel(modelProvider);
-        this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(modelProvider);
-        this.financeModel = new GoogleFinanceModel(modelProvider);
+    public PortfolioSqliteModel(Context context, SqlConnection sqlConnection,
+                                NetworkRequestProvider networkRequestProvider,
+                                Settings settings) {
+        this.sqlConnection = sqlConnection;
+        this.accountModel = new AccountSqliteModel(context, networkRequestProvider, sqlConnection, settings);
+        this.investmentModel = new InvestmentSqliteModel(sqlConnection);
+        this.orderModel = new OrderSqliteModel(context, networkRequestProvider, sqlConnection, settings);
+        this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(sqlConnection, settings);
+        this.financeModel = new GoogleFinanceModel(context, networkRequestProvider, settings);
     }
 
     @Override

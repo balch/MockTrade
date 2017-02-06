@@ -23,14 +23,17 @@
 package com.balch.mocktrade.account;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.TradeModelProvider;
+import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
+import com.balch.mocktrade.settings.Settings;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -48,10 +51,17 @@ public class AccountSqliteModel implements SqlMapper<Account> {
     public static final String COLUMN_AVAILABLE_FUNDS = "available_funds";
     public static final String COLUMN_EXCLUDE_FROM_TOTALS = "exclude_from_totals";
 
-    private final TradeModelProvider mModelProvider;
+    private final SqlConnection sqlConnection;
+    private final Context context;
+    private final NetworkRequestProvider networkRequestProvider;
+    private final Settings settings;
 
-    public AccountSqliteModel(TradeModelProvider modelProvider) {
-        mModelProvider = modelProvider;
+    public AccountSqliteModel(Context context, NetworkRequestProvider networkRequestProvider,
+                              SqlConnection sqlConnection, Settings settings) {
+        this.context = context.getApplicationContext();
+        this.sqlConnection = sqlConnection;
+        this.networkRequestProvider = networkRequestProvider;
+        this.settings = settings;
     }
 
     public List<Account> getAccounts(boolean allAccounts) {
@@ -62,7 +72,7 @@ public class AccountSqliteModel implements SqlMapper<Account> {
                 where = COLUMN_EXCLUDE_FROM_TOTALS + "=?";
                 args = new String[]{"0"};
             }
-            return mModelProvider.getSqlConnection().query(this, Account.class, where, args, COLUMN_NAME + " COLLATE NOCASE");
+            return sqlConnection.query(this, Account.class, where, args, COLUMN_NAME + " COLLATE NOCASE");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -70,7 +80,7 @@ public class AccountSqliteModel implements SqlMapper<Account> {
 
     public Account getAccount(long accountId) {
         try {
-            List<Account> accounts = mModelProvider.getSqlConnection().query(this, Account.class, SqlMapper.COLUMN_ID+"=?", new String[]{String.valueOf(accountId)}, null);
+            List<Account> accounts = sqlConnection.query(this, Account.class, SqlMapper.COLUMN_ID+"=?", new String[]{String.valueOf(accountId)}, null);
             return (accounts.size() == 1) ? accounts.get(0) : null;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -78,13 +88,13 @@ public class AccountSqliteModel implements SqlMapper<Account> {
     }
 
     public void createAccount(Account account) {
-        SQLiteDatabase db = mModelProvider.getSqlConnection().getWritableDatabase();
+        SQLiteDatabase db = sqlConnection.getWritableDatabase();
         db.beginTransaction();
         try {
-            mModelProvider.getSqlConnection().insert(this, account, db);
+            sqlConnection.insert(this, account, db);
 
             Transaction transaction = new Transaction(account, account.getInitialBalance(), Transaction.TransactionType.DEPOSIT, "Initial Deposit");
-            mModelProvider.getSqlConnection().insert(transaction, transaction, db);
+            sqlConnection.insert(transaction, transaction, db);
 
             db.setTransactionSuccessful();
 
@@ -98,7 +108,8 @@ public class AccountSqliteModel implements SqlMapper<Account> {
         Class<? extends BaseStrategy> strategyClazz = account.getStrategy().getStrategyClazz();
         if (strategyClazz != null) {
             try {
-                BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, mModelProvider);
+                BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz,
+                        context, networkRequestProvider, sqlConnection, settings);
                 strategy.initialize(account);
             } catch (Exception e) {
                 Log.e(TAG, "Error initializing the strategy", e);
@@ -108,7 +119,7 @@ public class AccountSqliteModel implements SqlMapper<Account> {
 
     public void deleteAccount(Account account) {
         try {
-            mModelProvider.getSqlConnection().delete(this, account);
+            sqlConnection.delete(this, account);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

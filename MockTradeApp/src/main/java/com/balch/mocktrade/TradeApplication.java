@@ -66,9 +66,10 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
     private static final String DAILY_BACKUP_DATABASE_NAME = "daily_backup";
 
-    private volatile SqlConnection mSqlConnection;
-    private volatile RequestQueue mRequestQueue;
-    private volatile Settings mSettings;
+    private volatile SqlConnection sqlConnection;
+    private volatile RequestQueue requestQueue;
+    private volatile Settings settings;
+    private volatile VolleyNetworkRequest networkRequest;
 
     @Override
     public void onCreate() {
@@ -102,17 +103,20 @@ public class TradeApplication extends Application implements TradeModelProvider,
     }
 
     private static class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
-        private final TradeModelProvider mModelProvider;
+        private final TradeModelProvider modelProvider;
 
         private StartAlarmsTask(TradeModelProvider modelProvider) {
-            this.mModelProvider = modelProvider;
+            this.modelProvider = modelProvider;
         }
 
         protected Void doInBackground(Void... urls) {
-            FinanceModel financeModel = new GoogleFinanceModel(mModelProvider);
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
             financeModel.setQuoteServiceAlarm();
 
-            PortfolioModel portfolioModel = new PortfolioSqliteModel(mModelProvider);
+            PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSettings());
             portfolioModel.scheduleOrderServiceAlarmIfNeeded();
             return null;
         }
@@ -127,53 +131,46 @@ public class TradeApplication extends Application implements TradeModelProvider,
     public SqlConnection getSqlConnection() {
 
         // double check lock pattern
-        if (mSqlConnection == null) {
+        if (sqlConnection == null) {
             synchronized (this) {
-                if (mSqlConnection == null) {
-                    mSqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
+                if (sqlConnection == null) {
+                    sqlConnection = new SqlConnection(this, DATABASE_NAME, DATABASE_VERSION,
                             DATABASE_CREATES_SCRIPT, DATABASE_UPDATE_SCRIPT_FORMAT);
                 }
             }
         }
 
-        return mSqlConnection;
+        return sqlConnection;
+    }
+
+    @Override
+    public NetworkRequestProvider getNetworkRequestProvider() {
+        // double check lock pattern
+        if (this.networkRequest == null) {
+            synchronized (this) {
+                if (this.networkRequest == null) {
+                    this.requestQueue = Volley.newRequestQueue(this);
+                    this.networkRequest = new VolleyNetworkRequest(this.requestQueue);
+                }
+            }
+        }
+
+        return this.networkRequest;
+
     }
 
     @Override
     public Settings getSettings() {
         // double check lock pattern
-        if (mSettings == null) {
+        if (settings == null) {
             synchronized (this) {
-                if (mSettings == null) {
-                    mSettings = new Settings(this);
+                if (settings == null) {
+                    settings = new Settings(this);
                 }
             }
         }
 
-        return mSettings;
-    }
-
-    @Override
-    public <T> Request<T> addRequest(Request<T> request) {
-        return addRequest(request, false);
-    }
-
-    @Override
-    public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
-        // double check lock pattern
-        if (mRequestQueue == null) {
-            synchronized (this) {
-                if (mRequestQueue == null) {
-                    mRequestQueue = Volley.newRequestQueue(this);
-                }
-            }
-        }
-
-        if (!customRetryPolicy) {
-            request.setRetryPolicy(DEFAULT_RETRY_POlICY);
-        }
-
-        return mRequestQueue.add(request);
+        return settings;
     }
 
     @Override
@@ -294,4 +291,28 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
         return success;
     }
+
+    static class VolleyNetworkRequest implements NetworkRequestProvider {
+
+        private final RequestQueue requestQueue;
+
+        VolleyNetworkRequest(RequestQueue requestQueue) {
+            this.requestQueue = requestQueue;
+        }
+
+        @Override
+        public <T> Request<T> addRequest(Request<T> request) {
+            return addRequest(request, false);
+        }
+
+        @Override
+        public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
+            if (!customRetryPolicy) {
+                request.setRetryPolicy(DEFAULT_RETRY_POlICY);
+            }
+
+            return this.requestQueue.add(request);
+        }
+    }
+
 }

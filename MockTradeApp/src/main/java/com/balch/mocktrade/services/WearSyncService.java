@@ -115,7 +115,9 @@ public class WearSyncService extends IntentService implements
                 Log.i(TAG, "WearSyncService onHandleIntent");
 
                 TradeModelProvider modelProvider = (TradeModelProvider) this.getApplication();
-                PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
+                PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                        modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                        modelProvider.getSettings());
 
                 DataItemBuffer dataItems = Wearable.DataApi.getDataItems(mGoogleApiClient).await();
                 long accountId = getAccountIdFromDataBuffer(dataItems);

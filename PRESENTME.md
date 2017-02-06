@@ -155,13 +155,9 @@ objects used to persist or retrieve data.
 
 ```java
 public interface AuctionModelProvider extends ModelProvider {
-    interface NetworkRequest {
-        <T> Request<T> addRequest(Request<T> request);
-        <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy);
-    }
     Settings getSettings();
     SqlConnection getSqlConnection();
-    NetworkRequest getNetworkRequest();
+    NetworkRequestProvider getNetworkRequest();
     ImageLoader getImageLoader();
 }
 ```

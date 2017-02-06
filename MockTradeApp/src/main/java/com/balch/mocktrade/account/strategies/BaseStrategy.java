@@ -24,7 +24,8 @@ package com.balch.mocktrade.account.strategies;
 
 import android.content.Context;
 
-import com.balch.mocktrade.TradeModelProvider;
+import com.balch.android.app.framework.sql.SqlConnection;
+import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
@@ -32,6 +33,7 @@ import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
+import com.balch.mocktrade.settings.Settings;
 
 import java.util.List;
 import java.util.Map;
@@ -43,10 +45,12 @@ public abstract class BaseStrategy {
 
     public abstract void initialize(Account account);
 
-    private void init( TradeModelProvider modelProvider) {
-        this.financeModel = new GoogleFinanceModel(modelProvider);
-        this.portfolioModel = new PortfolioSqliteModel(modelProvider);
-        this.context = modelProvider.getContext();
+    private void init(Context context, NetworkRequestProvider networkRequestProvider,
+                      SqlConnection sqlConnection, Settings settings) {
+        this.financeModel = new GoogleFinanceModel(context, networkRequestProvider, settings);
+        this.portfolioModel = new PortfolioSqliteModel(context, sqlConnection,
+                networkRequestProvider, settings);
+        this.context = context.getApplicationContext();
     }
 
     // NOTE: No Guarantees!!! This could be called more than once a day or not called at all
@@ -62,9 +66,11 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-              TradeModelProvider modelProvider) throws IllegalAccessException, InstantiationException {
+                      Context context, NetworkRequestProvider networkRequestProvider,
+                      SqlConnection sqlConnection, Settings settings)
+            throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
-        baseStrategy.init(modelProvider);
+        baseStrategy.init(context, networkRequestProvider, sqlConnection, settings);
 
         return baseStrategy;
     }

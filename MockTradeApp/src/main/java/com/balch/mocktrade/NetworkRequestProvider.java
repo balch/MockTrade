@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 8/12/16 8:00 PM
+ * Created: 2/6/17 6:21 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,25 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2016
+ * Copyright (C) 2017
  *
  */
 
 package com.balch.mocktrade;
 
-import android.content.Context;
+import com.android.volley.Request;
 
-import com.balch.android.app.framework.ModelProvider;
-import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.settings.Settings;
+public interface NetworkRequestProvider {
+    <T> Request<T> addRequest(Request<T> request);
 
-public interface TradeModelProvider extends ModelProvider {
-    Context getContext();
-
-    Settings getSettings();
-
-    SqlConnection getSqlConnection();
-
-    NetworkRequestProvider getNetworkRequestProvider();
-
+    <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy);
 }

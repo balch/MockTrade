@@ -64,8 +64,11 @@ public class QuoteService extends IntentService {
 
             // get the investment list from the db
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider);
-            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider);
+            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+            final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSettings());
             final List<Investment> investments = portfolioModel.getAllInvestments();
             Settings settings = ((TradeModelProvider) this.getApplication()).getSettings();
 
@@ -149,7 +152,9 @@ public class QuoteService extends IntentService {
             if (strategyClazz != null) {
                 try {
                     TradeModelProvider modelProvider = ((TradeModelProvider)this.getApplication());
-                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz, modelProvider);
+                    BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz,
+                            modelProvider.getContext(), modelProvider.getNetworkRequestProvider(),
+                            modelProvider.getSqlConnection(), modelProvider.getSettings());
                     if (doDailyUpdate) {
                         strategy.dailyUpdate(account, accountIdToInvestmentMap.get(account.getId()), quoteMap);
                     }

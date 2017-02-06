@@ -130,20 +130,75 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 
 This pattern enforces MVP by requireing implementers to specify View and ModelProvider types, and implement
 `abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concrete classes
-to represent the **MV** part of **MV**P. These methods are extremley usefull when it comes to [Unit Testing](#unit-testing).
+to represent the **MV** part of **MV**P. These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
 
 The integration with the Android LifeCycle events provides a familiar set of methods to `@Override` and makes it easy to 
 port legacy applications. The interaction with the LifeCycle events allows the framework to provide integrated error handling
 and timing logs. 
 
 ### Model and ModelProvider
-* Domain Objects
-* ModelProvider
-   * All Application Level Objects
-       * Sql Connection
-       * Http Connection
-   * Facilitate Dependency Injection
-* Model Interactors
+The Model is the least appreciated and documented part of the MVP triad. I see the Model layer has
+have a couple of distinct components: **Domain Model**, **Model API**, and **ModelProvider**.
+
+
+#### [Domain Model](https://en.wikipedia.org/wiki/Domain_model)
+
+I tend to use the old fashioned term **Domain Model** to describe:
+>a representation of meaningful real-world concepts pertinent to the domain
+that need to be modeled in software
+
+In short, these are the POJOs that represent the data models used throughout the applications. They
+are persisted and retrieved by the **Model API** layer and typically passed around to Views and
+Adapters to be visually presented to the user.
+
+#### Model API
+
+```java
+public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
+        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
+    ...
+    ...
+    ...
+    @VisibleForTesting EBayModel auctionModel;
+    @VisibleForTesting NotesModel notesModel;
+
+    @Override
+    protected void createModel(AuctionModelProvider modelProvider) {
+        auctionModel = new EBayModel(getString(R.string.ebay_app_id),
+                                        modelProvider.getNetworkRequest());
+        notesModel = new NotesModel(modelProvider.getSqlConnection());
+    }
+    ...
+    ...
+    ...
+}
+```
+
+#### ModelProvider
+
+The **ModelProvider** is a simple interface to define accessors for the application scoped
+objects used to persist or retrieve data.
+
+```java
+public interface AuctionModelProvider extends ModelProvider {
+    interface NetworkRequest {
+        <T> Request<T> addRequest(Request<T> request);
+        <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy);
+    }
+    Settings getSettings();
+    SqlConnection getSqlConnection();
+    NetworkRequest getNetworkRequest();
+    ImageLoader getImageLoader();
+}
+```
+
+The `PresenterActivity` requires the `ModelProver` interface to be implemented from the `Application`
+object. This allows the **Model Provider** to be passed into the
+`void createModel(AuctionModelProvider modelProvider)` where the individual components can
+be constructor injected into the **Model API**.
+
+This technique facilitates [Unit Testing](#unit-testing) by allowing the components of the
+**ModelProvider** to be mocked and injected into the test instance.
 
 ### View
 * Listener interface
@@ -196,9 +251,6 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 
     protected AuctionView auctionView;
 
-    @VisibleForTesting EBayModel auctionModel;
-    @VisibleForTesting NotesModel notesModel;
-
     @Override
     public void onCreateBase(Bundle bundle) {
         this.auctionView.setMainViewListener(this);
@@ -209,12 +261,6 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
     public AuctionView createView() {
         auctionView = new AuctionView(this);
         return auctionView;
-    }
-
-    @Override
-    protected void createModel(AuctionModelProvider modelProvider) {
-        auctionModel = new EBayModel(getString(R.string.ebay_app_id), modelProvider);
-        notesModel = new NotesModel(modelProvider);
     }
 
     ...

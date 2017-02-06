@@ -123,8 +123,6 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
     public void onActivityResultBase(int requestCode, int resultCode, Intent data) { }
     public boolean onHandleException(String logMsg, Exception ex) {return false;}
     ...
-    ...
-    ...
 }
 ```
 
@@ -182,8 +180,6 @@ This technique facilitates [Unit Testing](#unit-testing) by allowing the compone
 public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
         implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
     ...
-    ...
-    ...
     @VisibleForTesting EBayModel auctionModel;
     @VisibleForTesting NotesModel notesModel;
 
@@ -193,8 +189,6 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
                                         modelProvider.getNetworkRequest());
         notesModel = new NotesModel(modelProvider.getSqlConnection());
     }
-    ...
-    ...
     ...
 }
 ```
@@ -207,7 +201,6 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 * Con: damn &lt;merge&gt; tags
 ```java
 public class AuctionView extends LinearLayout implements BaseView {
-    ...
     ...
     public interface MainViewListener {
         boolean onLoadMore(int currentPage);
@@ -241,7 +234,6 @@ public class AuctionView extends LinearLayout implements BaseView {
         this.mainViewListener = mainViewListener;
     }
     ...
-    ...
 }
 ```
 
@@ -262,7 +254,6 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
         return auctionView;
     }
 
-    ...
     ...
 }
 ```

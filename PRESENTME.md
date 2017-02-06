@@ -150,29 +150,6 @@ In short, these are the POJOs that represent the data models used throughout the
 are persisted and retrieved by the **Model API** layer and typically passed around to Views and
 Adapters to be visually presented to the user.
 
-#### Model API
-
-```java
-public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
-        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
-    ...
-    ...
-    ...
-    @VisibleForTesting EBayModel auctionModel;
-    @VisibleForTesting NotesModel notesModel;
-
-    @Override
-    protected void createModel(AuctionModelProvider modelProvider) {
-        auctionModel = new EBayModel(getString(R.string.ebay_app_id),
-                                        modelProvider.getNetworkRequest());
-        notesModel = new NotesModel(modelProvider.getSqlConnection());
-    }
-    ...
-    ...
-    ...
-}
-```
-
 #### ModelProvider
 
 The **ModelProvider** is a simple interface to define accessors for the application scoped
@@ -198,6 +175,29 @@ be constructor injected into the **Model API**.
 
 This technique facilitates [Unit Testing](#unit-testing) by allowing the components of the
 **ModelProvider** to be mocked and injected into the test instance.
+
+#### Model API
+
+```java
+public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
+        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
+    ...
+    ...
+    ...
+    @VisibleForTesting EBayModel auctionModel;
+    @VisibleForTesting NotesModel notesModel;
+
+    @Override
+    protected void createModel(AuctionModelProvider modelProvider) {
+        auctionModel = new EBayModel(getString(R.string.ebay_app_id),
+                                        modelProvider.getNetworkRequest());
+        notesModel = new NotesModel(modelProvider.getSqlConnection());
+    }
+    ...
+    ...
+    ...
+}
+```
 
 ### View
 * Listener interface

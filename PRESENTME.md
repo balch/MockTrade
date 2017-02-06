@@ -144,10 +144,9 @@ have a couple of distinct components: **Domain Model**, **Model API**, and **Mod
 #### [Domain Model](https://en.wikipedia.org/wiki/Domain_model)
 
 I tend to use the old fashioned term **Domain Model** to describe:
->a representation of meaningful real-world concepts pertinent to the domain
-that need to be modeled in software
+>a representation of meaningful real-world concepts pertinent to the domain that need to be modeled in software
 
-In short, these are the POJOs that represent the data models used throughout the applications. They
+In short, these are the POJOs that represent the data models used throughout the application. They
 are persisted and retrieved by the **Model API** layer and typically passed around to Views and
 Adapters to be visually presented to the user.
 

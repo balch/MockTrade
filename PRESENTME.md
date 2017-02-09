@@ -136,12 +136,11 @@ and timing logs.
 
 ### Model and ModelProvider
 The Model is the least appreciated and documented part of the MVP triad. I see the Model layer has
-have a couple of distinct components: **Domain Model**, **Model API**, and **ModelProvider**.
+have a couple of distinct components: **Domain Objects**, **Model API**, and **ModelProvider**.
 
+#### Domain Objects
 
-#### [Domain Model](https://en.wikipedia.org/wiki/Domain_model)
-
-I tend to use the old fashioned term **Domain Model** to describe:
+I tend to use the old school term **Domain Objects** to describe:
 >a representation of meaningful real-world concepts pertinent to the domain that need to be modeled in software
 
 In short, these are the POJOs that represent the data models used throughout the application. They
@@ -162,15 +161,10 @@ public interface AuctionModelProvider extends ModelProvider {
 }
 ```
 
-The `PresenterActivity` requires the `ModelProver` interface to be implemented from the `Application`
-object. This allows the **Model Provider** to be passed into the
+The `PresenterActivity` requires the `ModelProvider` interface to be implemented from the `Application`
+object. This allows the `ModelProvider` to be passed into the
 `void createModel(AuctionModelProvider modelProvider)` where the individual components can
 be constructor injected into the **Model API**.
-
-This technique facilitates [Unit Testing](#unit-testing) by allowing the components of the
-**ModelProvider** to be mocked and injected into the test instance.
-
-#### Model API
 
 ```java
 public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
@@ -188,6 +182,17 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
     ...
 }
 ```
+
+This technique facilitates [Unit Testing](#unit-testing) by allowing the components of the
+**ModelProvider** to be mocked and injected into the test instance.
+
+#### Model API
+
+The **Model API** does the heavy lifting in the model layer. It&apos;s main purpose is to persist
+and retrieve **Domain Objects**. Data should be transformed in this layer to map
+the **Domain Objects** to the underlying storage format. With the correct abstractions and
+Factory pattern, the **Model API** can be implemented to allow for data sources to be swapped
+out at runtime (SQL and REST implementations for example).
 
 ### View
 * Listener interface

@@ -1,6 +1,6 @@
 # Under Construction
 
-# Table of Contents
+### Table of Contents
 - [Other Android MVP Approaches](#other-android-mvp-approaches)
     - [Mosby MVP](#mosby-mvp)
     - [GoogleSamples todo-mvp](#googlesamples-todo-mvp)

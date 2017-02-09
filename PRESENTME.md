@@ -310,9 +310,9 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 
 One of the stated benefits of MVP and Dependency Injection is improved
 testability. This is accomplished through proper encapsulation into MVP
-classes and the ability to inject mock versions of dependant classes to
-the code being tested. This is especially powerful when combined with a
-mock framework like [Mockito](http://site.mockito.org/).
+classes and the ability to inject alternate implementations of dependant
+classes to the code being tested. This is especially powerful when
+combined with a mock framework like [Mockito](http://site.mockito.org/).
 
 The **PresenterActivity** architecture facilitates unit testing with the
 minimal amount of bypassing functionality with `doNothing().when()`

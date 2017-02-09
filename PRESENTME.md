@@ -127,7 +127,7 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 ```
 
 This pattern requires implementers to specify **View** and **ModelProvider** types when
-extending the 'PresenterActivity'. The `abstract V createView()` and `abstract void createModel(M modelProvider)`
+extending the `PresenterActivity`. The `abstract V createView()` and `abstract void createModel(M modelProvider)`
 methods enforce the **MV** part of the **MV**P pattern.
 These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
 

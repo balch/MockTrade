@@ -1,5 +1,16 @@
 # Under Construction
 
+# PresenterActivity in Android MVP
+
+There are almost as many Android MVP patterns as there are Android
+applications. Most Android MVP Architectures implement the View logic in
+the Activity. This doc makes the case for putting the view logic in
+custom view classes and use the Activity as the Presenter.
+
+Sample Implementations:
+* [MockTrade](https://github.com/balch/MockTrade)
+* [EBay Auction Browser](https://github.com/balch/AuctionBrowser)
+
 ### Table of Contents
 - [Other Android MVP Approaches](#other-android-mvp-approaches)
     - [Mosby MVP](#mosby-mvp)
@@ -12,17 +23,6 @@
 - [View](#view)
 - [Unit Testing](#unit-testing)
 
-
-# PresenterActivity in Android MVP
-
-There are almost as many Android MVP patterns as there are Android
-applications. Most Android MVP Architectures implement the View logic in
-the Activity. This doc makes the case for putting the view logic in
-custom view classes and use the Activity as the Presenter.
-
-Sample Implementations:
-* [MockTrade](https://github.com/balch/MockTrade)
-* [EBay Auction Browser](https://github.com/balch/AuctionBrowser)
 
 ### Other Android MVP Approaches
 

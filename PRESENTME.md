@@ -126,9 +126,10 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 }
 ```
 
-This pattern enforces MVP by requiring implementers to specify View and ModelProvider types, and implement
-`abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concrete classes
-to represent the **MV** part of **MV**P. These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
+This pattern requires implementers to specify **View** and **ModelProvider** types when
+extending the 'PresenterActivity'. The `abstract V createView()` and `abstract void createModel(M modelProvider)`
+methods enforce the **MV** part of the **MV**P pattern.
+These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
 
 The integration with the Android LifeCycle events provides a familiar set of methods to `@Override` and makes it easy to 
 port legacy applications. The interaction with the LifeCycle events allows the framework to provide integrated error handling

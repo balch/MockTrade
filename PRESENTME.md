@@ -126,7 +126,7 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 }
 ```
 
-This pattern enforces MVP by requireing implementers to specify View and ModelProvider types, and implement
+This pattern enforces MVP by requiring implementers to specify View and ModelProvider types, and implement
 `abstract V createView()` and `abstract void createModel(M modelProvider)` methods to create concrete classes
 to represent the **MV** part of **MV**P. These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
 
@@ -135,12 +135,12 @@ port legacy applications. The interaction with the LifeCycle events allows the f
 and timing logs. 
 
 ### Model and ModelProvider
-The Model is the least appreciated and documented part of the MVP triad. I see the Model layer has
-have a couple of distinct components: **Domain Objects**, **Model API**, and **ModelProvider**.
+The Model is the least appreciated and documented part of the MVP triad. The Model layer has
+three distinct components: **Domain Objects**, **Model API**, and **ModelProvider**.
 
 #### Domain Objects
 
-I tend to use the old school term **Domain Objects** to describe:
+I use the old school term **Domain Objects** to describe:
 >a representation of meaningful real-world concepts pertinent to the domain that need to be modeled in software
 
 In short, these are the POJOs that represent the data models used throughout the application. They

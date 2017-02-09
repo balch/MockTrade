@@ -331,7 +331,7 @@ version of the Android runtime libraries (I'm thinking of you
 
 The classes derived from **PresenterActivity** can be tested without these
 frameworks because the mirrored Activity Lifecycle events do not call
-their super counterparts. This makes writing reverse-engineered unit
+their `super` counterparts. This makes writing reverse-engineered unit
 test a breeze (see `testOnCreateBase()` below).
 
 ```java

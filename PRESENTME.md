@@ -1,10 +1,24 @@
-# Under Constructon 
+# Under Construction
 
-PresenterActivity in Android MVP
-===============================
-There are almost as many Android MVP patterns as there are Android applications. Most Android MVP Architectures implement the View
-logic in the Activity. This doc makes the case for putting the view logic in custom view classes and use the Activity as
-the Presenter.
+# Table of Contents
+- [Other Android MVP Approaches](#other-android-mvp-approaches)
+    - [Mosby MVP](#mosby-mvp)
+    - [GoogleSamples todo-mvp](#googlesamples-todo-mvp)
+- [PresenterActivity](#presenteractivity)
+- [Model and ModelProvider](#model-and-modelprovider)
+    - [Domain Objects](#domain-objects)
+    - [ModelProvider](#modelprovider)
+    - [Model API](#model-api)
+- [View](#view)
+- [Unit Testing](#unit-testing)
+
+
+# PresenterActivity in Android MVP
+
+There are almost as many Android MVP patterns as there are Android
+applications. Most Android MVP Architectures implement the View logic in
+the Activity. This doc makes the case for putting the view logic in
+custom view classes and use the Activity as the Presenter.
 
 Sample Implementations:
 * [MockTrade](https://github.com/balch/MockTrade)
@@ -13,42 +27,52 @@ Sample Implementations:
 ### Other Android MVP Approaches
 
 #### [Mosby MVP](http://hannesdorfmann.com/mosby/mvp/)
-Mosby is an interesting Android MVP Framework that has a lot of cool functionality. I like that version
-2.0 is leaner and meaner, and the ViewState and Loading-Content-Error features show they understand
-the complexities of developing Android applications.
+
+Mosby is an interesting Android MVP Framework that has a lot of cool
+functionality. I like that version 2.0 is leaner and meaner, and the
+ViewState and Loading-Content-Error features show they understand the
+complexities of developing Android applications.
 
 I found this quote which nicely describes their MVP philosophy:
-> But before we dive deeper in how to implement MVP on Android we have to clarify if an Activity or
-Fragment is a View or a Presenter. Activity and Fragment seems to be both, because they have
-lifecycle callbacks like onCreate() or onDestroy() as well as responsibilities of View things
-like switching from one UI widget to another UI widget (like showing a ProgressBar while loading
-and then displaying a ListView with data). You may say that these sounds like an Activity or
-Fragment is a Controller. However, we came to the conclusion that Activity and Fragment
-should be treated as part of a (dumb) View and not as a Presenter. You will see why afterwards.
+> But before we dive deeper in how to implement MVP on Android we have
+> to clarify if an Activity or Fragment is a View or a Presenter.
+> Activity and Fragment seems to be both, because they have lifecycle
+> callbacks like onCreate() or onDestroy() as well as responsibilities
+> of View things like switching from one UI widget to another UI widget
+> (like showing a ProgressBar while loading and then displaying a
+> ListView with data). You may say that these sounds like an Activity or
+> Fragment is a Controller. However, we came to the conclusion that
+> Activity and Fragment should be treated as part of a (dumb) View and
+> not as a Presenter. You will see why afterwards.
 
-This quote asks the right question, but comes up with a different answer. They are correct
-that the Activity/Fragment provide both Presenter and View methods and behavior, but, I would
-argue that the View methods (mainly `.findViewById()`) are convenience methods that are most
-useful for creating Android sample applications.
+This quote asks the right question, but comes up with a different
+answer. They are correct that the Activity/Fragment provide both
+Presenter and View methods and behavior, but, I would argue that the
+View methods (mainly `.findViewById()`) are convenience methods that are
+most useful for creating Android sample applications.
 
-The `Activity.setContentView(View view)` is the primary example I use to make the case
-that the view is conceptually separate from the Activity. The View is passed to the Activity and
-held as a reference (by adding it to the Window object). Calls to `Activity.findViewById()`
-are delegated to the stored View (since both View and Activity implement `.findViewById()`).
-This same concept also applies to Fragments and is reinforced by the `Fragment.onCreateView()`
-method which forces the Fragment derived class to create a separate view.
+The `Activity.setContentView(View view)` is the primary example I use to
+make the case that the view is conceptually separate from the Activity.
+The View is passed to the Activity and held as a reference (by adding it
+to the Window object). Calls to `Activity.findViewById()` are delegated
+to the stored View (since both View and Activity implement
+`.findViewById()`). This same concept also applies to Fragments and is
+reinforced by the `Fragment.onCreateView()` method which forces the
+Fragment derived class to create a separate view.
 
-Storing another reference to the View in a separate Presenter class adds another level
-of indirection: Activity (Lifecycle Events) --&gt; Presenter --&gt; View
-(which is actually the Activity). I first tried this approach in an application using
-complex Lifecycle Events tied to Loaders and `onActivityResult()`. I found the
-Presenter eventually morphed into a subset of Activity Lifecycle Events codified into an
+Storing another reference to the View in a separate Presenter class adds
+another level of indirection: Activity (Lifecycle Events) --&gt;
+Presenter --&gt; View (which is actually the Activity). I first tried
+this approach in an application using complex Lifecycle Events tied to
+Loaders and `onActivityResult()`. I found the Presenter eventually
+morphed into a subset of Activity Lifecycle Events codified into an
 interface.
 
 #### [GoogleSamples todo-mvp](https://github.com/googlesamples/android-architecture/tree/todo-mvp/)
 
-The GoogleSamples repo demonstrates another flavor of the MVP architecture where view logic is
-implemented in the Fragment. The interesting part of this pattern is having the View and Presenter
+The GoogleSamples repo demonstrates another flavor of the MVP
+architecture where view logic is implemented in the Fragment. The
+interesting part of this pattern is having the View and Presenter
 interfaces defined in a Contract interface.
 
 ```java
@@ -70,25 +94,33 @@ public interface TasksContract {
 }
 ```
 
-I like the concept of a Presenter contract, but have implemented in a slightly diffent location
-in the PresenterActivity pattern. Each View class defines an interface which must be implemented
-by the caller. The interface allows the Presenter to handle events generated by the View and
-is used to drive the View.
+I like the concept of a Presenter contract, but have implemented in a
+slightly diffent location in the PresenterActivity pattern. Each View
+class defines an interface which must be implemented by the caller. The
+interface allows the Presenter to handle events generated by the View
+and is used to drive the View.
 
-This pattern is demonstrated in code samples in the [View](#view) section.
+This pattern is demonstrated in code samples in the [View](#view)
+section.
 
 ### PresenterActivity
-The Activity Lifecycle is the heart of any Android Application. It provides access to important
-events that need to be handled to create a robust Android Application. In addition to the common
-activity events (onCreate/OnDestroy, onStart/onPause, onResume/onPause), there are advanced events
-(onActivityResult, onSaveInstanceState) which must be handled in most Android Applications.
 
-When implemented separately from the Activity, a typical Presenter class usually contains methods that
-correspond directly to LifeCycle events. In addition, the Presenter base interfaces usually define
-a subset of the Lifecycle methods which limits the Application in certain circumstances.
+The Activity Lifecycle is the heart of any Android Application. It
+provides access to important events that need to be handled to create a
+robust Android Application. In addition to the common activity events
+(onCreate/OnDestroy, onStart/onPause, onResume/onPause), there are
+advanced events (onActivityResult, onSaveInstanceState) which must be
+handled in most Android Applications.
 
-The `PresenterActivity` solves the problem in a unique way. The supported Activity LifeCycle
-methods are wrapped and exposed to the Child class by using a `Base` naming convention.
+When implemented separately from the Activity, a typical Presenter class
+usually contains methods that correspond directly to LifeCycle events.
+In addition, the Presenter base interfaces usually define a subset of
+the Lifecycle methods which limits the Application in certain
+circumstances.
+
+The **PresenterActivity** solves the problem in a unique way. The
+supported Activity LifeCycle methods are wrapped and exposed to the
+Child class by using a `Base` naming convention.
 
 **[Full PresenterActivity.java Source](https://github.com/balch/MockTrade/blob/develop/AppFramework/src/main/java/com/balch/android/app/framework/PresenterActivity.java)**
 
@@ -126,32 +158,39 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
 }
 ```
 
-This pattern requires implementers to specify **View** and **ModelProvider** types when
-extending the `PresenterActivity`. The `abstract V createView()` and `abstract void createModel(M modelProvider)`
-methods enforce the **MV** part of the **MV**P pattern.
-These methods are extremely useful when it comes to [Unit Testing](#unit-testing).
+This pattern requires implementers to specify **View** and
+**ModelProvider** types when extending the **PresenterActivity**. The
+`abstract V createView()` and `abstract void createModel(M
+modelProvider)` methods enforce the **MV** part of the **MV**P pattern.
+These methods are extremely useful when it comes to
+[Unit Testing](#unit-testing).
 
-The integration with the Android LifeCycle events provides a familiar set of methods to `@Override` and makes it easy to 
-port legacy applications. The interaction with the LifeCycle events allows the framework to provide integrated error handling
-and timing logs. 
+The integration with the Android LifeCycle events provides a familiar
+set of methods to `@Override` and makes it easy to port legacy
+applications. The interaction with the LifeCycle events allows the
+framework to provide integrated error handling and timing logs.
 
 ### Model and ModelProvider
-The Model is the least appreciated and documented part of the MVP triad. The Model layer has
-three distinct components: **Domain Objects**, **Model API**, and **ModelProvider**.
+
+The Model is the least appreciated and documented part of the MVP triad.
+The Model layer has three distinct components: **Domain Objects**,
+**Model API**, and **ModelProvider**.
 
 #### Domain Objects
 
 I use the old school term **Domain Objects** to describe:
->a representation of meaningful real-world concepts pertinent to the domain that need to be modeled in software
+>a representation of meaningful real-world concepts pertinent to the
+>domain that need to be modeled in software
 
-In short, these are the POJOs that represent the data models used throughout the application. They
-are persisted and retrieved by the **Model API** layer and typically passed around to Views and
-Adapters to be visually presented to the user.
+In short, these are the POJOs that represent the data models used
+throughout the application. They are persisted and retrieved by the
+**Model API** layer and typically passed around to Views and Adapters to
+be visually presented to the user.
 
 #### ModelProvider
 
-The **ModelProvider** is a simple interface to define accessors for the application scoped
-objects used to persist or retrieve data.
+The **ModelProvider** is a simple interface to define accessors for the
+application scoped objects used to persist or retrieve data.
 
 ```java
 public interface AuctionModelProvider extends ModelProvider {
@@ -162,10 +201,11 @@ public interface AuctionModelProvider extends ModelProvider {
 }
 ```
 
-The `PresenterActivity` requires the `ModelProvider` interface to be implemented from the `Application`
-object. This allows the `ModelProvider` to be passed into the
-`void createModel(AuctionModelProvider modelProvider)` where the individual components can
-be constructor injected into the **Model API**.
+The **PresenterActivity** requires the **ModelProvider** interface to be
+implemented from the `Application` object. This allows the
+**ModelProvider** to be passed into the `void
+createModel(AuctionModelProvider modelProvider)` where the individual
+components can be constructor injected into the **Model API**.
 
 ```java
 public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
@@ -184,25 +224,29 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 }
 ```
 
-This technique facilitates [Unit Testing](#unit-testing) by allowing the components of the
-**ModelProvider** to be mocked and injected into the test instance.
+This technique facilitates [Unit Testing](#unit-testing) by allowing the
+components of the **ModelProvider** to be mocked and injected into the
+test instance.
 
 #### Model API
 
-The **Model API** does the heavy lifting in the model layer. It&apos;s main purpose is to persist
-and retrieve **Domain Objects**. Data should be transformed in this layer to map
-the **Domain Objects** to the underlying storage format. With the correct abstractions and
-Factory pattern, the **Model API** can be implemented to allow for data sources to be swapped
-out at runtime (SQL and REST implementations for example).
+The **Model API** does the heavy lifting in the model layer. It&apos;s
+main purpose is to persist and retrieve **Domain Objects**. Data should
+be transformed in this layer to map the **Domain Objects** to the
+underlying storage format. With the correct abstractions and Factory
+pattern, the **Model API** can be implemented to allow for data sources
+to be swapped out at runtime (SQL and REST implementations for example).
 
 ### View
+
 * Listener interface
-   * acts as a mini-presenter
-   * allows activity to call through models and set data in view
+  * acts as a mini-presenter
+  * allows activity to call through models and set data in view
 * Reusable to display data from other sources
 * Con: damn &lt;merge&gt; tags
-```java
-public class AuctionView extends LinearLayout implements BaseView {
+
+  ```java
+  public class AuctionView extends LinearLayout implements BaseView {
     ...
     public interface MainViewListener {
         boolean onLoadMore(int currentPage);
@@ -236,7 +280,10 @@ public class AuctionView extends LinearLayout implements BaseView {
         this.mainViewListener = mainViewListener;
     }
     ...
-}
+  ```
+
+
+
 ```
 
 ```java
@@ -261,28 +308,32 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
 ```
 
 ### Unit Testing
-One of the stated benefits of MVP and Dependency Injection is improved testability. This
-is accomplished through proper encapsulation into MVP classes and the ability to inject
-mock versions of dependant classes to the code being tested. This is especially powerful
-when combined with a mock framework like [Mockito](http://site.mockito.org/).
 
-The `PresenterActivity` architecture facilitates unit testing with the minimal amount of
-bypassing functionality with `doNothing().when()` calls. This is accomplished through a
-combination of overriding the `createView()` method and injecting a `ModelProvider`
-instance with the proper mocked application scoped objects. This technique is
-demonstrated in the sample unit tests below.
+One of the stated benefits of MVP and Dependency Injection is improved
+testability. This is accomplished through proper encapsulation into MVP
+classes and the ability to inject mock versions of dependant classes to
+the code being tested. This is especially powerful when combined with a
+mock framework like [Mockito](http://site.mockito.org/).
 
-The `PresenterActivity` also solves testing issues associated with the Android framework
-itself. Many Android class implementations are not available in the testing framework
-which causes many Activity tests to fail with not implemented exceptions.
-This is typically solved through third-party testing frameworks that have TestRunners
-that include a version of the Android runtime libraries
-(I'm thinking of you [Robolectric](http://robolectric.org/)).
+The **PresenterActivity** architecture facilitates unit testing with the
+minimal amount of bypassing functionality with `doNothing().when()`
+calls. This is accomplished through a combination of overriding the
+`createView()` method and injecting a **ModelProvider** instance with the
+proper mocked application scoped objects. This technique is demonstrated
+in the sample unit tests below.
 
-The classes derived from `PresenterActivity` can be tested without these frameworks
-because the mirrored Activity Lifecycle events do not call their super counterparts.
-This makes writing reverse-engineered unit test a breeze (see
-`testOnCreateBase()` below).
+The **PresenterActivity** also solves testing issues associated with the
+Android framework itself. Many Android class implementations are not
+available in the testing framework which causes many Activity tests to
+fail with not implemented exceptions. This is typically solved through
+third-party testing frameworks that have TestRunners that include a
+version of the Android runtime libraries (I'm thinking of you
+[Robolectric](http://robolectric.org/)).
+
+The classes derived from **PresenterActivity** can be tested without these
+frameworks because the mirrored Activity Lifecycle events do not call
+their super counterparts. This makes writing reverse-engineered unit
+test a breeze (see `testOnCreateBase()` below).
 
 ```java
 public class MainActivityTest {
@@ -368,3 +419,4 @@ public class MainActivityTest {
 
 }
 ```
+

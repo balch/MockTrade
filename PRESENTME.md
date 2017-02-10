@@ -241,7 +241,7 @@ to be swapped out at runtime (SQL and REST implementations for example).
 
 The **View** is my favorite part of MVP, sometimes I call it the _Fluff Layer_.
 
-As discussed previously, the view logic in this pattern is implemented in Custom Views usually derived
+The view logic in this pattern is implemented in Custom Views usually derived
 from Android Layout classes.  This provides a number of reuse possibilities and is easy to include
 in either a Fragment or Activity.
 

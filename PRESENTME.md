@@ -13,7 +13,7 @@ custom view classes and use the Activity as the Presenter.
     - [GoogleSamples todo-mvp](#googlesamples-todo-mvp)
 - [PresenterActivity](#presenteractivity)
 - [Model and ModelProvider](#model-and-modelprovider)
-    - [Domain Objects](#domain-objects)
+    - [Model Objects](#model-objects)
     - [ModelProvider](#modelprovider)
     - [Model API](#model-api)
 - [View](#view)
@@ -173,12 +173,12 @@ framework to provide integrated error handling and timing logs.
 ### Model and ModelProvider
 
 The Model is the least appreciated and documented part of the MVP triad.
-The Model layer has three distinct components: **Domain Objects**,
+The Model layer has three distinct components: **Model Objects**,
 **Model API**, and **ModelProvider**.
 
-#### Domain Objects
+#### Model Objects
 
-I use the old school term **Domain Objects** to describe:
+I use the old school term **Model Objects** to describe:
 >a representation of meaningful real-world concepts pertinent to the
 >domain that need to be modeled in software
 
@@ -231,8 +231,8 @@ test instance.
 #### Model API
 
 The **Model API** does the heavy lifting in the model layer. It&apos;s
-main purpose is to persist and retrieve **Domain Objects**. Data should
-be transformed in this layer to map the **Domain Objects** to the
+main purpose is to persist and retrieve **Model Objects**. Data should
+be transformed in this layer to map the **Model Objects** to the
 underlying storage format. With the correct abstractions and Factory
 pattern, the **Model API** can be implemented to allow for data sources
 to be swapped out at runtime (SQL and REST implementations for example).

@@ -246,13 +246,14 @@ from Android Layout classes.  This provides a number of reuse possibilities and 
 in either a Fragment or Activity.
 
 ```java
-public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider> {
+public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
+       implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
 
     protected AuctionView auctionView;
 
     @Override
     public void onCreateBase(Bundle bundle) {
-        this.auctionView.setMainViewListener(this);
+        this.auctionView.setAuctionViewListener(this);
         this.auctionView.showBusy();
     }
 
@@ -272,7 +273,7 @@ is supplied by the Presenter through a setter method.
 ```java
   public class AuctionView extends LinearLayout implements BaseView {
     ...
-    public interface MainViewListener {
+    public interface AuctionViewListener {
         boolean onLoadMore(int currentPage);
         void onChangeSort(int position);
         void onClickNoteButton(Auction auction);
@@ -280,7 +281,7 @@ is supplied by the Presenter through a setter method.
         void onClickSearch(String keyword);
     }
 
-    protected MainViewListener mainViewListener;
+    protected AuctionViewListener auctionViewListener;
 
     public AuctionView(Context context) {
         super(context);
@@ -300,8 +301,8 @@ is supplied by the Presenter through a setter method.
          ...
     }
 
-    public void setMainViewListener(MainViewListener mainViewListener) {
-        this.mainViewListener = mainViewListener;
+    public void setAuctionViewListener(AuctionViewListener auctionViewListener) {
+        this.auctionViewListener = auctionViewListener;
     }
     ...
 ```
@@ -374,7 +375,7 @@ public class MainActivityTest {
     public void testOnCreateBase() throws Exception {
         activity.onCreateBase(null);
 
-        verify(view).setMainViewListener(eq(activity));
+        verify(view).setAuctionViewListener(eq(activity));
         verify(view).setSortStrings(eq(R.array.auction_sort_col));
         verify(view).showBusy();
         verify(loaderManager).initLoader(anyInt(), isNull(Bundle.class), eq(activity));

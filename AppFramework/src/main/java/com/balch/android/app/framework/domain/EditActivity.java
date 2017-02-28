@@ -44,7 +44,6 @@ public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
 
     protected static final String STATE_COLUMN_VIEW_IDS = "col_view_ids";
 
-    protected EditView view;
     protected ArrayList<Integer> columnViewIDs = new ArrayList<>();
 
     protected ExternalController validator;
@@ -101,8 +100,7 @@ public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
 
     @Override
     public EditView createView() {
-        this.view = new EditView(this);
-        return this.view;
+        return new EditView(this);
     }
 
     @Override

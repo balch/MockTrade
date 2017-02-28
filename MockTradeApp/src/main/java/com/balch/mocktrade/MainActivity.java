@@ -71,7 +71,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     private static final int PERMS_REQUEST_RESTORE = 1;
 
     private PortfolioModel mPortfolioModel;
-    private MainPortfolioView mMainPortfolioView;
 
     private PortfolioAdapter mPortfolioAdapter;
 
@@ -112,17 +111,17 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                         }
                     }
 
-                    mMainPortfolioView.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
+                    view.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
 
                     ViewProvider viewProvider = (ViewProvider) getApplication();
 
                     boolean showTotals = (!viewProvider.isLandscape(MainActivity.this) || viewProvider.isTablet(MainActivity.this)) &&
                             (accountsWithTotals > 1);
-                    mMainPortfolioView.setTotals(showTotals, performanceItem);
+                    view.setTotals(showTotals, performanceItem);
 
                     mPortfolioAdapter.bind(data);
 
-                    mMainPortfolioView.setDailyGraphDataAccounts(data.getAccounts());
+                    view.setDailyGraphDataAccounts(data.getAccounts());
 
                     hideProgress();
 
@@ -144,7 +143,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
                 @Override
                 public void onLoadFinished(Loader<List<PerformanceItem>> loader, List<PerformanceItem> data) {
-                    mMainPortfolioView.setDailyGraphData(data);
+                    view.setDailyGraphData(data);
 //                      mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
                     hideProgress();
@@ -199,13 +198,12 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
     @Override
     public MainPortfolioView createView() {
-        mMainPortfolioView = new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
+        return new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId, int daysToReturn) {
                 mGraphDataLoader.setSelectionCriteria(accountId, daysToReturn);
             }
         });
-        return mMainPortfolioView;
     }
 
     @Override
@@ -309,7 +307,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
                 mSettings.setBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
                 mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
-                mMainPortfolioView.resetSelectedAccountID();
+                view.resetSelectedAccountID();
                 updateView();
                 handled = true;
                 break;
@@ -333,7 +331,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
             displayMsg = ex.toString();
         }
 
-        getSnackbar(mMainPortfolioView, displayMsg, Snackbar.LENGTH_LONG,
+        getSnackbar(view, displayMsg, Snackbar.LENGTH_LONG,
                 R.color.snackbar_background,
                 R.color.failure,
                 android.support.design.R.id.snackbar_text)
@@ -350,7 +348,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
             String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
 
-            getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
+            getSnackbar(view, msg, Snackbar.LENGTH_LONG,
                     R.color.snackbar_background,
                     success ? R.color.success : R.color.failure,
                     android.support.design.R.id.snackbar_text)
@@ -365,7 +363,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
             String msg = getResources().getString(success ? R.string.menu_restore_db_success : R.string.menu_restore_db_fail);
 
-            getSnackbar(mMainPortfolioView, msg, Snackbar.LENGTH_LONG,
+            getSnackbar(view, msg, Snackbar.LENGTH_LONG,
                     R.color.snackbar_background,
                     success ? R.color.success : R.color.failure,
                     android.support.design.R.id.snackbar_text)
@@ -470,7 +468,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 startActivity(OrderListActivity.newIntent(MainActivity.this, account.getId()));
             }
         });
-        this.mMainPortfolioView.setPortfolioAdapter(mPortfolioAdapter);
+        this.view.setPortfolioAdapter(mPortfolioAdapter);
     }
 
     /**
@@ -483,7 +481,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     }
 
     protected void showNewAccountActivity() {
-        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(), R.string.account_create_title,
+        Intent intent = EditActivity.getIntent(view.getContext(), R.string.account_create_title,
                 new Account("", "", new Money(100000.0), Account.Strategy.NONE, false),
                 new AccountEditController(), 0, 0);
 
@@ -495,7 +493,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         order.setAccount(account);
         order.setAction(Order.OrderAction.BUY);
         order.setStrategy(Order.OrderStrategy.MARKET);
-        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(), R.string.order_create_buy_title,
+        Intent intent = EditActivity.getIntent(view.getContext(), R.string.order_create_buy_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
         startActivityForResult(intent, NEW_ORDER_RESULT);
@@ -509,7 +507,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         order.setAction(Order.OrderAction.SELL);
         order.setStrategy(Order.OrderStrategy.MARKET);
 
-        Intent intent = EditActivity.getIntent(mMainPortfolioView.getContext(),
+        Intent intent = EditActivity.getIntent(view.getContext(),
                 R.string.order_create_sell_title,
                 order, new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
@@ -636,7 +634,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
             PerformanceItemUpdateBroadcaster.PerformanceItemUpdateData data = PerformanceItemUpdateBroadcaster.getData(intent);
             mGraphDataLoader.setSelectionCriteria(data.accountId, data.days);
             mGraphDataLoader.forceLoad();
-            mMainPortfolioView.setAccountSpinner(data.accountId);
+            view.setAccountSpinner(data.accountId);
         }
     }
 

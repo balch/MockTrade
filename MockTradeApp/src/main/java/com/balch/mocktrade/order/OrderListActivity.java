@@ -50,7 +50,6 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
     private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
 
     private OrderModel mOrderModel;
-    private OrderListView mOrderListView;
     private Long mAccountId;
 
     public static Intent newIntent(Context context, long accountId) {
@@ -73,7 +72,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        this.mOrderListView.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
+        this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
             public boolean onCancelOrder(final Order order) {
                 new AlertDialog.Builder(OrderListActivity.this)
@@ -101,8 +100,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
 
     @Override
     public OrderListView createView() {
-        this.mOrderListView = new OrderListView(this);
-        return this.mOrderListView;
+        return new OrderListView(this);
     }
 
     @Override
@@ -132,7 +130,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
             return;
         }
 
-        this.mOrderListView.bind(data);
+        this.view.bind(data);
         hideProgress();
 
         // hack to prevent onLoadFinished being called twice
@@ -143,7 +141,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
 
     @Override
     public void onLoaderReset(Loader<List<Order>> loader) {
-        this.mOrderListView.bind(new ArrayList<Order>());
+        this.view.bind(new ArrayList<Order>());
     }
 
     private static class OrderLoader extends AsyncTaskLoader<List<Order>> {

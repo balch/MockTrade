@@ -49,6 +49,8 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
     private boolean isManagedViewId = false;
     private int viewId = -1;
 
+    protected V view;
+
     /**
      * Override abstract method to create a view of type V used by the Presenter.
      * The view id will be managed by this class if not specified
@@ -110,7 +112,7 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
         Log.d(TAG, this.className + " OnCreate - Begin");
         try {
             super.onCreate(savedInstanceState);
-            V view = this.createView();
+            this.view = this.createView();
 
             // view's require an id for the internal state to be persisted/restored
             // using onSaveInstanceState()/onRestoreInstanceState()

@@ -209,7 +209,7 @@ components can be constructor injected into the **Model API**.
 
 ```java
 public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
-        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
+        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.AuctionViewListener {
     ...
     @VisibleForTesting EBayModel auctionModel;
     @VisibleForTesting NotesModel notesModel;
@@ -247,20 +247,17 @@ in either a Fragment or Activity.
 
 ```java
 public class MainActivity extends PresenterActivity<AuctionView, AuctionModelProvider>
-       implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.MainViewListener {
-
-    protected AuctionView auctionView;
+       implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.AuctionViewListener {
 
     @Override
     public void onCreateBase(Bundle bundle) {
-        this.auctionView.setAuctionViewListener(this);
-        this.auctionView.showBusy();
+        this.view.setAuctionViewListener(this);
+        this.view.showBusy();
     }
 
     @Override
     public AuctionView createView() {
-        auctionView = new AuctionView(this);
-        return auctionView;
+        return new AuctionView(this);
     }
 
     ...

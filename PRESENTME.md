@@ -250,14 +250,14 @@ public class MainActivity extends PresenterActivity<AuctionView, AuctionModelPro
        implements LoaderManager.LoaderCallbacks<AuctionData>, AuctionView.AuctionViewListener {
 
     @Override
-    public void onCreateBase(Bundle bundle) {
-        this.view.setAuctionViewListener(this);
-        this.view.showBusy();
+    public AuctionView createView() {
+        return new AuctionView(this);
     }
 
     @Override
-    public AuctionView createView() {
-        return new AuctionView(this);
+    public void onCreateBase(Bundle bundle) {
+        this.view.setAuctionViewListener(this);
+        this.view.showBusy();
     }
 
     ...

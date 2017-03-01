@@ -66,70 +66,70 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     private final static int GRAPH_TIME_HOURLY_INDEX = 0;
     private final static DateFormat DATE_FORMAT_SHORT = DateFormat.getDateInstance(DateFormat.SHORT);
 
-    private RecyclerView mPortfolioList;
+    private RecyclerView portfolioRecycler;
 
-    private SummaryTotalsView mPortfolioSummary;
+    private SummaryTotalsView portfolioSummary;
 
-    private TextView mLastQuoteTime;
-    private TextView mLastSyncTime;
+    private TextView lastQuoteTime;
+    private TextView lastSyncTime;
 
-    private DailyGraphView mDailyGraphView;
-    private TextView mEmptyGraphView;
-    private Spinner mAccountGraphSpinner;
+    private DailyGraphView dailyGraphView;
+    private TextView emptyGraphView;
+    private Spinner accountGraphSpinner;
 
-    private ArrayAdapter<String> mGraphAccountAdapter;
-    private GraphTimeAdapter mGraphTimeAdapter;
+    private ArrayAdapter<String> graphAccountAdapter;
+    private GraphTimeAdapter graphTimeAdapter;
 
     // variables that need to be persisted
-    private List<Long> mAccountIds = new ArrayList<>();
-    private int mAccountSelectedPosition = 0;
-    private int mGraphTimeSelectedPosition = 0;
+    private List<Long> accountIds = new ArrayList<>();
+    private int accountSelectedPosition = 0;
+    private int graphTimeSelectedPosition = 0;
 
-    private final MainPortfolioViewListener mMainPortfolioViewListener;
+    private final MainPortfolioViewListener listener;
 
-    public MainPortfolioView(Context context, MainPortfolioViewListener mainPortfolioViewListener) {
+    public MainPortfolioView(Context context, MainPortfolioViewListener listener) {
         super(context);
-        this.mMainPortfolioViewListener = mainPortfolioViewListener;
+        this.listener = listener;
+        initializeLayout();
     }
 
-    @Override
-    public void initializeLayout() {
+    private void initializeLayout() {
         setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setOrientation(VERTICAL);
         inflate(getContext(), R.layout.portfolio_view_main, this);
 
-        mPortfolioList = (RecyclerView) findViewById(R.id.portfolio_list);
-        mPortfolioList.setLayoutManager(new LinearLayoutManager(getContext()));
+        portfolioRecycler = (RecyclerView) findViewById(R.id.portfolio_list);
+        portfolioRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mPortfolioSummary = (SummaryTotalsView) findViewById(R.id.portfolio_view_summary_view);
+        portfolioSummary = (SummaryTotalsView) findViewById(R.id.portfolio_view_summary_view);
 
-        mLastQuoteTime = (TextView) findViewById(R.id.portfolio_view_last_quote);
-        mLastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
+        lastQuoteTime = (TextView) findViewById(R.id.portfolio_view_last_quote);
+        lastSyncTime = (TextView) findViewById(R.id.portfolio_view_last_sync);
 
-        mDailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
-        mEmptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
+        dailyGraphView = (DailyGraphView) findViewById(R.id.portfolio_view_daily_graph);
+        emptyGraphView = (TextView) findViewById(R.id.portfolio_view_daily_graph_empty);
 
-        mGraphAccountAdapter = new ArrayAdapter<>(getContext(), R.layout.portfolio_view_graph_spinner_text);
-        mGraphAccountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        graphAccountAdapter = new ArrayAdapter<>(getContext(), R.layout.portfolio_view_graph_spinner_text);
+        graphAccountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        mAccountGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_account_graph_spinner);
-        if (mAccountGraphSpinner != null) {
-            mAccountGraphSpinner.setAdapter(mGraphAccountAdapter);
+        accountGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_account_graph_spinner);
+        if (accountGraphSpinner != null) {
+            accountGraphSpinner.setAdapter(graphAccountAdapter);
 
-            mAccountGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            accountGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (mAccountSelectedPosition != position) {
-                        mAccountSelectedPosition = position;
-                        if (mMainPortfolioViewListener != null) {
-                            mMainPortfolioViewListener.onGraphSelectionChanged(getSelectedAccountId(), getGraphDays());
+                    if (accountSelectedPosition != position) {
+                        accountSelectedPosition = position;
+                        if (listener != null) {
+                            listener.onGraphSelectionChanged(getSelectedAccountId(), getGraphDays());
                         }
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    mAccountSelectedPosition = 0;
+                    accountSelectedPosition = 0;
                 }
             });
         }
@@ -138,29 +138,29 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
         Spinner timeGraphSpinner = (Spinner) findViewById(R.id.portfolio_view_time_graph_spinner);
         if (timeGraphSpinner != null) {
-            mGraphTimeAdapter = new GraphTimeAdapter(getContext(), R.layout.portfolio_view_graph_spinner_text, android.R.layout.simple_spinner_dropdown_item);
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_today));
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_week));
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_month));
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_90_days));
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_180_days));
-            mGraphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_year));
-            timeGraphSpinner.setAdapter(mGraphTimeAdapter);
+            graphTimeAdapter = new GraphTimeAdapter(getContext(), R.layout.portfolio_view_graph_spinner_text, android.R.layout.simple_spinner_dropdown_item);
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_today));
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_week));
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_month));
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_90_days));
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_180_days));
+            graphTimeAdapter.add(resources.getString(R.string.portfolio_view_time_title_last_year));
+            timeGraphSpinner.setAdapter(graphTimeAdapter);
 
             timeGraphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (mGraphTimeSelectedPosition != position) {
-                        mGraphTimeSelectedPosition = position;
-                        if (mMainPortfolioViewListener != null) {
-                            mMainPortfolioViewListener.onGraphSelectionChanged(getSelectedAccountId(), getGraphDays());
+                    if (graphTimeSelectedPosition != position) {
+                        graphTimeSelectedPosition = position;
+                        if (listener != null) {
+                            listener.onGraphSelectionChanged(getSelectedAccountId(), getGraphDays());
                         }
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    mGraphTimeSelectedPosition = 0;
+                    graphTimeSelectedPosition = 0;
                 }
             });
         }
@@ -175,8 +175,8 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public long getSelectedAccountId() {
         long accountId = -1;
-        if (mAccountSelectedPosition < mAccountIds.size()) {
-            accountId = mAccountIds.get(mAccountSelectedPosition);
+        if (accountSelectedPosition < accountIds.size()) {
+            accountId = accountIds.get(accountSelectedPosition);
         }
 
         return accountId;
@@ -184,32 +184,32 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
 
     public int getGraphDays() {
         int days = -1;
-        if (mGraphTimeSelectedPosition < GRAPH_TIME_VALUES.length) {
-            days = GRAPH_TIME_VALUES[mGraphTimeSelectedPosition];
+        if (graphTimeSelectedPosition < GRAPH_TIME_VALUES.length) {
+            days = GRAPH_TIME_VALUES[graphTimeSelectedPosition];
         }
         return days;
     }
 
     public void resetSelectedAccountID() {
-        mAccountSelectedPosition = 0;
+        accountSelectedPosition = 0;
     }
 
     public void setPortfolioAdapter(PortfolioAdapter portfolioAdapter) {
-        mPortfolioList.setAdapter(portfolioAdapter);
+        portfolioRecycler.setAdapter(portfolioAdapter);
     }
 
     public void setTotals(boolean showTotals, PerformanceItem performanceItem) {
-        mPortfolioSummary.setVisibility(showTotals ? VISIBLE : GONE);
+        portfolioSummary.setVisibility(showTotals ? VISIBLE : GONE);
 
         if (showTotals) {
-            mPortfolioSummary.bind(performanceItem);
+            portfolioSummary.bind(performanceItem);
         }
     }
 
     public void setSyncTimes(Date lastSync, Date lastQuote) {
         Resources resources = getResources();
-        mLastSyncTime.setText(resources.getString(R.string.portfolio_view_last_sync, getDateTimeString(lastSync)));
-        mLastQuoteTime.setText(resources.getString(R.string.portfolio_view_last_quote, getDateTimeString(lastQuote)));
+        lastSyncTime.setText(resources.getString(R.string.portfolio_view_last_sync, getDateTimeString(lastSync)));
+        lastQuoteTime.setText(resources.getString(R.string.portfolio_view_last_quote, getDateTimeString(lastQuote)));
     }
 
     private String getDateTimeString(Date date) {
@@ -223,62 +223,62 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     }
 
     public void animateGraph() {
-        mDailyGraphView.animateGraph();
+        dailyGraphView.animateGraph();
     }
 
     public void setDailyGraphDataAccounts(List<Account> accounts) {
-        if ((mAccountGraphSpinner != null) && (accounts != null)) {
+        if ((accountGraphSpinner != null) && (accounts != null)) {
 
-            mGraphAccountAdapter.setNotifyOnChange(false);
-            mGraphAccountAdapter.clear();
-            mGraphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
+            graphAccountAdapter.setNotifyOnChange(false);
+            graphAccountAdapter.clear();
+            graphAccountAdapter.add(getContext().getString(R.string.portfolio_view_graph_spinner_totals));
 
-            mAccountIds.clear();
-            mAccountIds.add(-1L);
+            accountIds.clear();
+            accountIds.add(-1L);
 
             for (Account account : accounts) {
-                mGraphAccountAdapter.add(account.getName());
-                mAccountIds.add(account.getId());
+                graphAccountAdapter.add(account.getName());
+                accountIds.add(account.getId());
             }
-            mGraphAccountAdapter.setNotifyOnChange(true);
-            mGraphAccountAdapter.notifyDataSetChanged();
+            graphAccountAdapter.setNotifyOnChange(true);
+            graphAccountAdapter.notifyDataSetChanged();
 
-            if (mAccountSelectedPosition != AdapterView.INVALID_POSITION) {
-                mAccountGraphSpinner.setSelection(mAccountSelectedPosition);
+            if (accountSelectedPosition != AdapterView.INVALID_POSITION) {
+                accountGraphSpinner.setSelection(accountSelectedPosition);
             }
         }
 
     }
 
     public void setAccountSpinner(long accountID) {
-        mAccountSelectedPosition = mAccountIds.contains(accountID) ? mAccountIds.indexOf(accountID) : 0;
-        mAccountGraphSpinner.setSelection(mAccountSelectedPosition);
+        accountSelectedPosition = accountIds.contains(accountID) ? accountIds.indexOf(accountID) : 0;
+        accountGraphSpinner.setSelection(accountSelectedPosition);
     }
 
     public void setDailyGraphData(List<PerformanceItem> performanceItems) {
 
-        if ((mDailyGraphView != null) && (mEmptyGraphView != null)) {
+        if ((dailyGraphView != null) && (emptyGraphView != null)) {
             if ((performanceItems != null) && (performanceItems.size() >= 2)) {
 
-                if (mGraphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX) {
+                if (graphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX) {
                     Date timestamp = performanceItems.get(performanceItems.size() - 1).getTimestamp();
                     String label = (DateUtils.isToday(timestamp.getTime()) ?
                             getResources().getString(R.string.portfolio_view_time_title_today) :
                             DATE_FORMAT_SHORT.format(timestamp));
 
-                    if (!mGraphTimeAdapter.getItem(GRAPH_TIME_HOURLY_INDEX).equals(label)) {
-                        mGraphTimeAdapter.set(GRAPH_TIME_HOURLY_INDEX, label);
+                    if (!graphTimeAdapter.getItem(GRAPH_TIME_HOURLY_INDEX).equals(label)) {
+                        graphTimeAdapter.set(GRAPH_TIME_HOURLY_INDEX, label);
                     }
                 }
 
-                mDailyGraphView.bind(performanceItems, (mGraphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX));
-                mEmptyGraphView.setVisibility(GONE);
-                mDailyGraphView.setVisibility(VISIBLE);
+                dailyGraphView.bind(performanceItems, (graphTimeSelectedPosition == GRAPH_TIME_HOURLY_INDEX));
+                emptyGraphView.setVisibility(GONE);
+                dailyGraphView.setVisibility(VISIBLE);
 
 
             } else {
-                mDailyGraphView.setVisibility(GONE);
-                mEmptyGraphView.setVisibility(VISIBLE);
+                dailyGraphView.setVisibility(GONE);
+                emptyGraphView.setVisibility(VISIBLE);
             }
         }
     }
@@ -288,9 +288,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         Parcelable superState = super.onSaveInstanceState();
 
         SavedState ss = new SavedState(superState);
-        ss.mAccountSelectedPosition = this.mAccountSelectedPosition;
-        ss.mAccountIds = this.mAccountIds;
-        ss.mGraphTimeSelectedPosition = this.mGraphTimeSelectedPosition;
+        ss.mAccountSelectedPosition = this.accountSelectedPosition;
+        ss.mAccountIds = this.accountIds;
+        ss.mGraphTimeSelectedPosition = this.graphTimeSelectedPosition;
 
         return ss;
     }
@@ -305,9 +305,9 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
         SavedState ss = (SavedState)state;
         super.onRestoreInstanceState(ss.getSuperState());
 
-        this.mAccountSelectedPosition = ss.mAccountSelectedPosition;
-        this.mAccountIds = ss.mAccountIds;
-        this.mGraphTimeSelectedPosition = ss.mGraphTimeSelectedPosition;
+        this.accountSelectedPosition = ss.mAccountSelectedPosition;
+        this.accountIds = ss.mAccountIds;
+        this.graphTimeSelectedPosition = ss.mGraphTimeSelectedPosition;
     }
 
     static class SavedState extends BaseSavedState {

@@ -39,41 +39,47 @@ import java.util.List;
 
 public class OrderListView extends LinearLayout implements BaseView {
 
-    private OrderItemView.OrderItemViewListener mOrderItemViewListener;
-    private ListView mOrderList;
+    private OrderItemView.OrderItemViewListener listener;
+    private ListView orderListView;
 
     public OrderListView(Context context) {
         super(context);
+        initializeLayout();
     }
 
     public OrderListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initializeLayout();
     }
 
     public OrderListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initializeLayout();
     }
 
-    @Override
-    public void initializeLayout() {
+    private void initializeLayout() {
         setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setOrientation(VERTICAL);
         inflate(getContext(), R.layout.order_list_view, this);
-        this.mOrderList = (ListView)findViewById(R.id.order_list);
+        this.orderListView = (ListView)findViewById(R.id.order_list);
     }
 
     public void setOrderItemViewListener(OrderItemView.OrderItemViewListener listener) {
-        this.mOrderItemViewListener = listener;
+        this.listener = listener;
     }
 
     public void bind(List<Order> orders) {
-        this.mOrderList.setAdapter(new OrderListAdapter(this.getContext(), orders));
+        this.orderListView.setAdapter(new OrderListAdapter(this.getContext(), orders, this.listener));
     }
 
-    private class OrderListAdapter extends  ArrayAdapter<Order> {
+    private static class OrderListAdapter extends ArrayAdapter<Order> {
 
-        OrderListAdapter(Context context, List<Order> orders) {
+        final private OrderItemView.OrderItemViewListener listener;
+
+        OrderListAdapter(Context context, List<Order> orders,
+                         OrderItemView.OrderItemViewListener listener) {
             super(context, 0, orders);
+            this.listener = listener;
         }
 
         @Override
@@ -83,7 +89,7 @@ public class OrderListView extends LinearLayout implements BaseView {
                 view = new OrderItemView(this.getContext());
             }
 
-            view.setOrderItemViewListener(mOrderItemViewListener);
+            view.setOrderItemViewListener(listener);
             view.bind(getItem(position));
             return view;
         }

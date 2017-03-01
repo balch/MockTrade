@@ -127,7 +127,6 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
                 }
                 view.setId(viewId);
             }
-            view.initializeLayout();
 
             this.setContentView(view);
 

@@ -49,46 +49,48 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
         void onCancel();
     }
 
-    protected EditViewListener mEditViewListener;
-    protected List<ColumnDescriptor> mColumnDescriptorList;
-    protected DomainObject mDomainObject;
+    protected EditViewListener listener;
+    protected List<ColumnDescriptor> columnDescriptorList;
+    protected DomainObject domainObject;
 
-    protected LinearLayout mEditControlLayout;
-    protected Button mOkButton;
-    protected Button mCancelButton;
-    protected ExternalController mExternalController;
-    protected ControlMap mControlMap = new ControlMap();
+    protected LinearLayout editControlLayout;
+    protected Button okButton;
+    protected Button cancelButton;
+    protected ExternalController externalController;
+    protected ControlMap controlMap = new ControlMap();
 
     public EditView(Context context) {
         super(context);
+        initializeLayout();
     }
 
     public EditView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initializeLayout();
     }
 
     public EditView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initializeLayout();
     }
 
-    @Override
-    public void initializeLayout() {
+    private void initializeLayout() {
         setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setOrientation(VERTICAL);
 
         inflate(getContext(), R.layout.edit_view, this);
-        this.mEditControlLayout = (LinearLayout)findViewById(R.id.edit_layout);
-        this.mOkButton = (Button)findViewById(R.id.edit_ok_button);
-        this.mCancelButton = (Button)findViewById(R.id.edit_cancel_button);
+        this.editControlLayout = (LinearLayout)findViewById(R.id.edit_layout);
+        this.okButton = (Button)findViewById(R.id.edit_ok_button);
+        this.cancelButton = (Button)findViewById(R.id.edit_cancel_button);
 
-        this.mOkButton.setOnClickListener(new OnClickListener() {
+        this.okButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditView.this.save();
             }
         });
 
-        this.mCancelButton.setOnClickListener(new OnClickListener() {
+        this.cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditView.this.cancel();
@@ -99,21 +101,21 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
 
     @Override
     public ControlMap getControlMap() {
-        return this.mControlMap;
+        return this.controlMap;
     }
 
     public void bind(DomainObject domainObject, boolean isNew, ExternalController controller,
                      int okButtonResId, int cancelButtonResId, List<Integer> columnViewIDs) {
-        this.mDomainObject = domainObject;
-        this.mExternalController = controller;
-        this.mColumnDescriptorList = MetadataUtils.getColumnDescriptors(mDomainObject, isNew);
+        this.domainObject = domainObject;
+        this.externalController = controller;
+        this.columnDescriptorList = MetadataUtils.getColumnDescriptors(this.domainObject, isNew);
 
-        this.mCancelButton.setText((cancelButtonResId != 0) ? cancelButtonResId : R.string.edit_view_button_cancel);
-        this.mOkButton.setText((okButtonResId != 0) ? okButtonResId : isNew ? R.string.edit_view_ok_button_new : R.string.edit_view_ok_button_edit);
+        this.cancelButton.setText((cancelButtonResId != 0) ? cancelButtonResId : R.string.edit_view_button_cancel);
+        this.okButton.setText((okButtonResId != 0) ? okButtonResId : isNew ? R.string.edit_view_ok_button_new : R.string.edit_view_ok_button_edit);
 
-        this.mControlMap.clear();
+        this.controlMap.clear();
         int cnt = 0;
-        for (ColumnDescriptor descriptor : this.mColumnDescriptorList) {
+        for (ColumnDescriptor descriptor : this.columnDescriptorList) {
             MetadataUtils.FrameworkType frameworkType = MetadataUtils.getFrameworkTypeByField(descriptor.getField());
 
             View view = MetadataUtils.getEditView(descriptor, frameworkType, this.getContext());
@@ -130,7 +132,7 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             if (view instanceof EditLayout) {
 
                 EditLayout control = (EditLayout)view;
-                this.mControlMap.put(descriptor.getField().getName(), control);
+                this.controlMap.put(descriptor.getField().getName(), control);
 
                 control.setControlMapper(this);
                 control.bind(descriptor);
@@ -153,32 +155,32 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
                 });
             }
 
-            this.mEditControlLayout.addView(view);
+            this.editControlLayout.addView(view);
         }
 
-        if (this.mExternalController != null) {
-            this.mExternalController.initialize(this.getContext(), mDomainObject, this.mControlMap);
+        if (this.externalController != null) {
+            this.externalController.initialize(this.getContext(), this.domainObject, this.controlMap);
         }
 
         validate();
     }
 
     protected void save() {
-        populateFromView(this.mEditControlLayout, this.mDomainObject);
+        populateFromView(this.editControlLayout, this.domainObject);
 
-        if (this.mEditViewListener != null) {
-            this.mEditViewListener.onSave(this.mDomainObject);
+        if (this.listener != null) {
+            this.listener.onSave(this.domainObject);
         }
     }
 
     protected DomainObject getPopulatedCopy() {
         DomainObject domObj = createEmptyObject();
-        Field[] fields = ((Object)this.mDomainObject).getClass().getDeclaredFields();
+        Field[] fields = ((Object)this.domainObject).getClass().getDeclaredFields();
         for (Field field : fields) {
             if (DomainObject.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 try {
-                    field.set(domObj, field.get(this.mDomainObject));
+                    field.set(domObj, field.get(this.domainObject));
                 } catch (IllegalAccessException e) {
                     Log.e(TAG, "Error Setting DomainObject", e);
                 }
@@ -186,14 +188,14 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
         }
 
 
-        populateFromView(this.mEditControlLayout, domObj);
+        populateFromView(this.editControlLayout, domObj);
         return  domObj;
     }
 
     protected DomainObject createEmptyObject() {
         DomainObject domObj = null;
         try {
-            domObj = (DomainObject)((Object) mDomainObject).getClass().newInstance();
+            domObj = (DomainObject)((Object) domainObject).getClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             Log.e(TAG, "Create DomainObject object", e);
             setErrorState(true);
@@ -221,17 +223,17 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
 
 
     protected void cancel() {
-        if (this.mEditViewListener != null) {
-            this.mEditViewListener.onCancel();
+        if (this.listener != null) {
+            this.listener.onCancel();
         }
     }
 
     protected void validate()  {
         boolean hasError = false;
 
-        int cnt = this.mEditControlLayout.getChildCount();
+        int cnt = this.editControlLayout.getChildCount();
         for (int x = 0; x < cnt; x++) {
-            View view = this.mEditControlLayout.getChildAt(x);
+            View view = this.editControlLayout.getChildAt(x);
             if (view.getVisibility() == VISIBLE) {
                 if (view instanceof EditLayout) {
                     EditLayout control = (EditLayout) view;
@@ -245,9 +247,9 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             }
         }
 
-        if (this.mExternalController != null) {
+        if (this.externalController != null) {
             try {
-                mExternalController.validate(this.getContext(), getPopulatedCopy(), this.mControlMap);
+                externalController.validate(this.getContext(), getPopulatedCopy(), this.controlMap);
             } catch (ValidatorException e) {
                 hasError = true;
             }
@@ -257,9 +259,9 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     }
 
     protected void valueChanged(ColumnDescriptor descriptor, Object value) throws ValidatorException {
-        if ( this.mExternalController != null) {
+        if ( this.externalController != null) {
             try {
-                mExternalController.onChanged(this.getContext(), descriptor, value, this.mControlMap);
+                externalController.onChanged(this.getContext(), descriptor, value, this.controlMap);
             } catch (ValidatorException e) {
                 setErrorState(true);
                 throw e;
@@ -268,11 +270,11 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     }
 
     protected void setErrorState(boolean hasError) {
-        this.mOkButton.setEnabled(!hasError);
+        this.okButton.setEnabled(!hasError);
     }
 
-    public void setEditViewListener(EditViewListener editViewListener) {
-        this.mEditViewListener = editViewListener;
+    public void setEditViewListener(EditViewListener listener) {
+        this.listener = listener;
     }
 
 }

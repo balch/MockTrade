@@ -282,18 +282,20 @@ is supplied by the Presenter through a setter method.
 
     public AuctionView(Context context) {
         super(context);
+        initializeLayout();
     }
 
     public AuctionView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initializeLayout();
     }
 
     public AuctionView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initializeLayout();
     }
 
-    @Override
-    public void initializeLayout() {
+    private void initializeLayout() {
          inflate(getContext(), R.layout.auction_view, this);
          ...
     }

@@ -24,5 +24,4 @@
 package com.balch.android.app.framework;
 
 public interface BaseView {
-   void initializeLayout();
 }

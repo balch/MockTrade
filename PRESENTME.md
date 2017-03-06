@@ -1,11 +1,22 @@
-# Under Construction
-
 # PresenterActivity in Android MVP
 
 There are almost as many Android MVP patterns as there are Android
 applications. Most Android MVP Architectures implement the View logic in
 the Activity. This doc makes the case for putting the view logic in
 custom view classes and use the Activity as the Presenter.
+
+### TL;DR
+- **PresenterActivity** - Activity base class encapsulating presenter functionality
+    - Responds to Android Lifecycle events, gets data from Model, sends data to View
+    - Handles View events, fetches or retrieves data from Model, handle app naviation
+- **View** - View logic encapsulated into custom view classes
+    - Reusable across Activities and Fragments
+    - Exposes listener interface to be implemented by the presenter
+- **Model** - Data API and access classes
+    - **Model Objects** - POJOs for application specific entities
+    - **ModelProvider** - application scoped data access classes used for DI
+    - **Model API** - fetches and persists **Model Objects** to a specific data store using
+       objects from the **ModelProvider**
 
 ### Table of Contents
 - [Other Android MVP Approaches](#other-android-mvp-approaches)

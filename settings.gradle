@@ -1,2 +1,1 @@
-include ':AppFramework', ':MockTradeWear', ':MockTradeShared'
-include ':MockTradeApp'
+include ':AppFramework', ':MockTradeApp', ':MockTradeWear', ':MockTradeShared'

@@ -10,14 +10,13 @@ ext {
     versionCode=4
     versionName="3.0"
 
-    support="25.1.0"
-    play_services="10.0.1"
-    support_wearable="2.0.0-beta1"
-    volley="1.0.19"
+    support="25.3.1"
+    play_services="10.2.1"
+    support_wearable="2.0.0"
+    volley="1.0.0"
     support_test="0.5"
     junit="4.12"
-    mockito="1.9.5"
-    leak_canary="1.5"
+    mockito="1.10.19"
 }
 
 buildscript {
@@ -25,7 +24,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:2.3.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -35,6 +34,7 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
 }

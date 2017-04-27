@@ -42,14 +42,14 @@ import java.util.Map;
 public class AccountSqliteModel implements SqlMapper<Account> {
     private static final String TAG = AccountSqliteModel.class.getSimpleName();
 
-    public static final String TABLE_NAME = "account";
+    private static final String TABLE_NAME = "account";
 
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_INITIAL_BALANCE = "initial_balance";
-    public static final String COLUMN_STRATEGY = "strategy";
-    public static final String COLUMN_AVAILABLE_FUNDS = "available_funds";
-    public static final String COLUMN_EXCLUDE_FROM_TOTALS = "exclude_from_totals";
+    private static final String COLUMN_NAME = "name";
+    private static final String COLUMN_DESCRIPTION = "description";
+    private static final String COLUMN_INITIAL_BALANCE = "initial_balance";
+    private static final String COLUMN_STRATEGY = "strategy";
+    private static final String COLUMN_AVAILABLE_FUNDS = "available_funds";
+    private static final String COLUMN_EXCLUDE_FROM_TOTALS = "exclude_from_totals";
 
     private final SqlConnection sqlConnection;
     private final Context context;
@@ -155,6 +155,5 @@ public class AccountSqliteModel implements SqlMapper<Account> {
         account.setAvailableFunds(new Money(cursor.getLong(columnMap.get(COLUMN_AVAILABLE_FUNDS))));
         account.setExcludeFromTotals(cursor.getInt(columnMap.get(COLUMN_EXCLUDE_FROM_TOTALS))==1);
     }
-
 
 }

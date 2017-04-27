@@ -50,7 +50,7 @@ dependencies {
     compile project(':AppFramework')
     compile project(':MockTradeShared')
 
-    compile "com.mcxiaoke.volley:library:$rootProject.ext.volley"
+    compile "com.android.volley:volley:$rootProject.ext.volley"
     compile "com.android.support:support-v4:$rootProject.ext.support"
     compile "com.android.support:appcompat-v7:$rootProject.ext.support"
     compile "com.android.support:recyclerview-v7:$rootProject.ext.support"
@@ -58,10 +58,6 @@ dependencies {
     compile "com.android.support:design:$rootProject.ext.support"
     compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
 
-
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leak_canary"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leak_canary"
-    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leak_canary"
 
     // Testing-only dependencies
 

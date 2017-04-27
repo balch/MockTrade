@@ -55,6 +55,8 @@ public class TradeApplication extends Application implements TradeModelProvider,
     private static final String TAG = TradeApplication.class.getSimpleName();
 
     private static final int REQUEST_TIMEOUT_SECS = 30;
+    private static final DefaultRetryPolicy DEFAULT_RETRY_POlICY = new DefaultRetryPolicy(
+            REQUEST_TIMEOUT_SECS * 1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     public static final String DATABASE_NAME = "mocktrade.db";
     private static final int DATABASE_VERSION = 5;
@@ -291,6 +293,15 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
         @Override
         public <T> Request<T> addRequest(Request<T> request) {
+            return addRequest(request, false);
+        }
+
+        @Override
+        public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
+            if (!customRetryPolicy) {
+                request.setRetryPolicy(DEFAULT_RETRY_POlICY);
+            }
+
             return this.requestQueue.add(request);
         }
     }

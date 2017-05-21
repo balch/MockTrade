@@ -29,6 +29,11 @@ import retrofit2.http.Query;
 
 public interface GoogleFinanceApi {
 
+    /**
+     * Note: This API returns the body as a string b/c
+     * the returned payload starts with `//` which
+     * must be trimmed before the json can be parsed
+     */
     @GET("info?infotype=infoquoteall")
     Observable<String> getQuotes(@Query("q") String symbols);
 

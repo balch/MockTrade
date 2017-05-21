@@ -92,6 +92,9 @@ public class GoogleFinanceModel implements FinanceModel {
                 .map(new Function<String, List<Quote>>() {
                     @Override
                     public List<Quote> apply(@NonNull String s) throws Exception {
+                        // Note: googleFinanceApi.getQuotes returns the body as a string b/c
+                        // the returned payload starts with `//` which
+                        // must be trimmed before the json can be parsed
                         return parseQuotes(s);
                     }
                 })

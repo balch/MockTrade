@@ -109,7 +109,6 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
         int padding = getResources().getDimensionPixelSize(R.dimen.edit_control_padding);
         setPadding(0, padding, 0, padding);
 
-
         setOrientation(VERTICAL);
         inflate(getContext(), com.balch.mocktrade.R.layout.symbol_edit_control, this);
         symbolLabel = (TextView) findViewById(R.id.symbol_edit_label);

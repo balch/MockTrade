@@ -112,7 +112,6 @@ public class PortfolioViewModel extends ViewModel {
         disposePortfolioData();
         disposablePortfolioData = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Function<Boolean, PortfolioData>() {
                     @Override
                     public PortfolioData apply(@NonNull Boolean aBoolean) throws Exception {
@@ -123,6 +122,7 @@ public class PortfolioViewModel extends ViewModel {
                         return portfolioData;
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<PortfolioData>() {
                                @Override
                                public void accept(@NonNull PortfolioData data) throws Exception {
@@ -141,7 +141,6 @@ public class PortfolioViewModel extends ViewModel {
         disposeGraphData();
         disposableGraphData = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Function<Boolean, List<PerformanceItem>>() {
                     @Override
                     public List<PerformanceItem> apply(@NonNull Boolean aBoolean) throws Exception {
@@ -156,6 +155,7 @@ public class PortfolioViewModel extends ViewModel {
                         return performanceItems;
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<PerformanceItem>>() {
                         @Override
                         public void accept(@NonNull List<PerformanceItem> data) throws Exception {
@@ -178,6 +178,7 @@ public class PortfolioViewModel extends ViewModel {
     }
 
     private PortfolioData loadPortfolioDataInBackground() {
+
         PortfolioData portfolioData = new PortfolioData();
 
         List<Account> accounts = portfolioModel.getAccounts(!appSettings.getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));

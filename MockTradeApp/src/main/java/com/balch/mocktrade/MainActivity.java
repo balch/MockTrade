@@ -580,7 +580,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         disposeNewAccount();
         disposableNewAccount = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Function<Boolean, Boolean>() {
                     @Override
                     public Boolean apply(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {
@@ -588,6 +587,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                         return true;
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Boolean>() {
                                @Override
                                public void accept(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {

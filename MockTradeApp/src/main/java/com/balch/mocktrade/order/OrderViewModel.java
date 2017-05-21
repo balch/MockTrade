@@ -62,13 +62,13 @@ class OrderViewModel extends ViewModel {
         disposeOrders();
         disposableLoadOrders = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Function<Boolean, List<Order>>() {
                     @Override
                     public List<Order> apply(@NonNull Boolean aBoolean) throws Exception {
                         return orderModel.getOpenOrders(accountId);
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<Order>>() {
                     @Override
                     public void accept(@NonNull List<Order> orders) throws Exception {

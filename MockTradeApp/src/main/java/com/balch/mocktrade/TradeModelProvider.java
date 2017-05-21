@@ -36,6 +36,6 @@ public interface TradeModelProvider extends ModelProvider {
 
     SqlConnection getSqlConnection();
 
-    NetworkRequestProvider getNetworkRequestProvider();
+    ModelApiFactory getModelApiFactory();
 
 }

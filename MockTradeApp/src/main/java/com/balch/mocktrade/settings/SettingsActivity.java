@@ -37,6 +37,7 @@ import com.balch.mocktrade.BuildConfig;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.shared.utils.VersionUtils;
 
@@ -72,7 +73,8 @@ public class SettingsActivity extends AppCompatActivity
         if (settingKey == Settings.Key.PREF_POLL_INTERVAL) {
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSettings());
             financeModel.setQuoteServiceAlarm();
         }
     }

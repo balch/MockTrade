@@ -38,6 +38,7 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 
 import java.util.ArrayList;
@@ -85,7 +86,8 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
 
         TradeModelProvider modelProvider = ((TradeModelProvider)context.getApplicationContext());
         FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+                modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                modelProvider.getSettings());
 
         QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);

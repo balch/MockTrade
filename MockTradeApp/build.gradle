@@ -42,6 +42,10 @@ android {
             zipAlignEnabled true
         }
     }
+
+    packagingOptions{
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 dependencies {
@@ -50,7 +54,19 @@ dependencies {
     compile project(':AppFramework')
     compile project(':MockTradeShared')
 
-    compile "com.android.volley:volley:$rootProject.ext.volley"
+    compile "com.google.code.gson:gson:$gson"
+    compile "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_xcepter"
+
+    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
+    compile "com.squareup.retrofit2:converter-gson:$retrofit"
+    compile "com.squareup.retrofit2:converter-scalars:$retrofit"
+    compile "io.reactivex.rxjava2:rxjava:$rxjava2"
+    compile "io.reactivex.rxjava2:rxandroid:$rxandroid"
+
+    compile "android.arch.lifecycle:runtime:$android_arch"
+    compile "android.arch.lifecycle:extensions:$android_arch"
+    annotationProcessor "android.arch.lifecycle:compiler:$android_arch"
+
     compile "com.android.support:support-v4:$rootProject.ext.support"
     compile "com.android.support:appcompat-v7:$rootProject.ext.support"
     compile "com.android.support:recyclerview-v7:$rootProject.ext.support"

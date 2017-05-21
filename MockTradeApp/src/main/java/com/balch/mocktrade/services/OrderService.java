@@ -34,6 +34,7 @@ import com.balch.mocktrade.MainActivity;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.order.Order;
@@ -60,9 +61,11 @@ public class OrderService extends IntentService {
         try {
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSettings());
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
-                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSqlConnection(),
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
                     modelProvider.getSettings());
             final List<Order> orders = portfolioModel.getOpenOrders();
 
@@ -72,7 +75,7 @@ public class OrderService extends IntentService {
                     symbols.add(o.getSymbol());
                 }
 
-                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols);
+                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
                 boolean updateView = false;
                 boolean reschedule = (quoteMap == null);
                 if (quoteMap != null) {

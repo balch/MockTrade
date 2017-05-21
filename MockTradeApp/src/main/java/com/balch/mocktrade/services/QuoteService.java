@@ -34,6 +34,7 @@ import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
@@ -65,9 +66,11 @@ public class QuoteService extends IntentService {
             // get the investment list from the db
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSettings());
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
-                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSqlConnection(),
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
                     modelProvider.getSettings());
             final List<Investment> investments = portfolioModel.getAllInvestments();
             Settings settings = ((TradeModelProvider) this.getApplication()).getSettings();
@@ -90,7 +93,7 @@ public class QuoteService extends IntentService {
                 }
 
                 // get quotes over the wire
-                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols);
+                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
                 if (quoteMap != null) {
                     boolean newHasQuotes = false;
                     for (Investment i : investments) {
@@ -153,8 +156,10 @@ public class QuoteService extends IntentService {
                 try {
                     TradeModelProvider modelProvider = ((TradeModelProvider)this.getApplication());
                     BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz,
-                            modelProvider.getContext(), modelProvider.getNetworkRequestProvider(),
-                            modelProvider.getSqlConnection(), modelProvider.getSettings());
+                            modelProvider.getContext(),
+                            modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                            modelProvider.getSqlConnection(),
+                            modelProvider.getSettings());
                     if (doDailyUpdate) {
                         strategy.dailyUpdate(account, accountIdToInvestmentMap.get(account.getId()), quoteMap);
                     }

@@ -31,8 +31,8 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.settings.Settings;
 
 import java.sql.SQLException;
@@ -53,14 +53,14 @@ public class AccountSqliteModel implements SqlMapper<Account> {
 
     private final SqlConnection sqlConnection;
     private final Context context;
-    private final NetworkRequestProvider networkRequestProvider;
+    private final GoogleFinanceApi googleFinanceApi;
     private final Settings settings;
 
-    public AccountSqliteModel(Context context, NetworkRequestProvider networkRequestProvider,
+    public AccountSqliteModel(Context context, GoogleFinanceApi googleFinanceApi,
                               SqlConnection sqlConnection, Settings settings) {
         this.context = context.getApplicationContext();
         this.sqlConnection = sqlConnection;
-        this.networkRequestProvider = networkRequestProvider;
+        this.googleFinanceApi = googleFinanceApi;
         this.settings = settings;
     }
 
@@ -109,7 +109,7 @@ public class AccountSqliteModel implements SqlMapper<Account> {
         if (strategyClazz != null) {
             try {
                 BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz,
-                        context, networkRequestProvider, sqlConnection, settings);
+                        context, googleFinanceApi, sqlConnection, settings);
                 strategy.initialize(account);
             } catch (Exception e) {
                 Log.e(TAG, "Error initializing the strategy", e);

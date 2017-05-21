@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 2/6/17 6:21 AM
+ * Created: 5/21/17 6:35 AM
  *
  * This file is part of MockTrade.
  *
@@ -21,12 +21,20 @@
  *
  */
 
-package com.balch.mocktrade;
+package com.balch.mocktrade.finance;
 
-import com.android.volley.Request;
+import io.reactivex.Observable;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
-public interface NetworkRequestProvider {
-    <T> Request<T> addRequest(Request<T> request);
+public interface GoogleFinanceApi {
 
-    <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy);
+    /**
+     * Note: This API returns the body as a string b/c
+     * the returned payload starts with `//` which
+     * must be trimmed before the json can be parsed
+     */
+    @GET("info?infotype=infoquoteall")
+    Observable<String> getQuotes(@Query("q") String symbols);
+
 }

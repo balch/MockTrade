@@ -23,34 +23,38 @@
 package com.balch.mocktrade.order;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.PresenterActivity;
-import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.TradeModelProvider;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OrderListActivity extends PresenterActivity<OrderListView, TradeModelProvider>
-        implements LoaderManager.LoaderCallbacks<List<Order>>{
-    private static final String TAG = OrderListActivity.class.getSimpleName();
+        implements LifecycleRegistryOwner {
 
-    private static final int ORDER_LOADER_ID = 0;
+    private static final String TAG = OrderListActivity.class.getSimpleName();
     private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
 
-    private OrderModel mOrderModel;
-    private Long mAccountId;
+    private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+
+    private OrderViewModel orderViewModel;
+    private OrderModel orderModel;
+    private Long accountId;
 
     public static Intent newIntent(Context context, long accountId) {
         Intent intent = new Intent(context, OrderListActivity.class);
@@ -61,7 +65,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
     @Override
     public void onCreateBase(Bundle bundle) {
 
-        this.mAccountId = getIntent().getLongExtra(EXTRA_ACCOUNT_ID, 0);
+        accountId = getIntent().getLongExtra(EXTRA_ACCOUNT_ID, 0);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.order_list_view_toolbar);
         setSupportActionBar(toolbar);
@@ -72,7 +76,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        this.view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
+        view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
             @Override
             public boolean onCancelOrder(final Order order) {
                 new AlertDialog.Builder(OrderListActivity.this)
@@ -82,7 +86,7 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
-                                    mOrderModel.cancelOrder(order);
+                                    orderModel.cancelOrder(order);
                                     reload(true);
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Canceling Order", ex);
@@ -94,8 +98,15 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
                 return true;
             }
         });
-        reload(true);
 
+        orderViewModel.getOrders().observe(this, orderDataObserver);
+
+        reload(true);
+    }
+
+    @Override
+    public void onDestroyBase() {
+        orderViewModel.getOrders().removeObserver(orderDataObserver);
     }
 
     @Override
@@ -105,61 +116,37 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
 
     @Override
     protected void createModel(TradeModelProvider modelProvider) {
-        mOrderModel = new OrderSqliteModel(modelProvider.getContext(),
-                modelProvider.getNetworkRequestProvider(), modelProvider.getSqlConnection(),
-                modelProvider.getSettings());
+        orderViewModel = getOrderViewModel();
+        if (!orderViewModel.isInitialized()) {
+            orderModel = new OrderSqliteModel(modelProvider.getContext(),
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSqlConnection(),
+                    modelProvider.getSettings());
+            orderViewModel.setOrderModel(orderModel);
+        } else {
+            orderModel = orderViewModel.getOrderModel();
+        }
     }
 
     public void reload(boolean showProgress) {
         if (showProgress) {
             showProgress();
         }
-        getSupportLoaderManager().initLoader(ORDER_LOADER_ID, null, this).forceLoad();
+        orderViewModel.loadOrders(accountId);
     }
 
-    @Override
-    public Loader<List<Order>> onCreateLoader(int id, Bundle args) {
-        return new OrderLoader(this, this.mAccountId, this.mOrderModel);
-    }
-
-    @Override
-    public void onLoadFinished(android.support.v4.content.Loader<List<Order>> loader, List<Order> data) {
-
-        if (data.size() == 0) {
-            finish();
-            return;
-        }
-
-        this.view.bind(data);
-        hideProgress();
-
-        // hack to prevent onLoadFinished being called twice
-        // http://stackoverflow.com/questions/11293441/android-loadercallbacks-onloadfinished-called-twice/22183247
-        getSupportLoaderManager().destroyLoader(ORDER_LOADER_ID);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Order>> loader) {
-        this.view.bind(new ArrayList<Order>());
-    }
-
-    private static class OrderLoader extends AsyncTaskLoader<List<Order>> {
-        private OrderModel model;
-        private Long accountId;
-
-
-        OrderLoader(Context context, Long accountId, OrderModel model) {
-            super(context);
-            this.accountId = accountId;
-            this.model = model;
-        }
-
+    private Observer<List<Order>> orderDataObserver = new Observer<List<Order>>() {
         @Override
-        public List<Order> loadInBackground() {
-            return model.getOpenOrders(this.accountId);
+        public void onChanged(@Nullable List<Order> data) {
+            if (data.size() == 0) {
+                finish();
+                return;
+            }
+
+            view.bind(data);
+            hideProgress();
         }
-    }
+    };
 
 
     public void showProgress() {
@@ -172,4 +159,12 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
 //        this.refreshImageButton.setVisibility(View.VISIBLE);
     }
 
+    private OrderViewModel getOrderViewModel() {
+        return ViewModelProviders.of(this).get(OrderViewModel.class);
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
+    }
 }

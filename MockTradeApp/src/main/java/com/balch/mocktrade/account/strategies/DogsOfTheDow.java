@@ -39,6 +39,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class DogsOfTheDow extends BaseStrategy {
     private static final String TAG = DogsOfTheDow.class.getSimpleName();
 
@@ -48,43 +52,23 @@ public class DogsOfTheDow extends BaseStrategy {
             "PFE","PG","T","TRV","UNH","UTX","VZ","V","WMT","DIS"};
 
     public void initialize(final Account account) {
-        Map<String, Quote> response = this.financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS));
-        if (response != null) {
-            List<Quote> sortedQuotes = new ArrayList<>(response.values());
-            Collections.sort(sortedQuotes, new Comparator<Quote>() {
-                @Override
-                public int compare(Quote lhs, Quote rhs) {
-                    // reverse sort
-                    return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
-                }
-            });
+        financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<Map<String, Quote>>() {
+                               @Override
+                               public void accept(@NonNull Map<String, Quote> quoteMap) throws Exception {
+                                    handleQuotes(account, quoteMap);
+                               }
+                           },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(@NonNull Throwable throwable) throws Exception {
+                                    Log.e(TAG, "Dogs of the Dow getQuotes error", throwable);
+                                }
+                            });
 
-            if (sortedQuotes.size() > 0) {
-                int size = sortedQuotes.size();
-                int numberOfStocks = Math.min(size, 10);
-                double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) numberOfStocks;
 
-                for (int x = 0; x < numberOfStocks; x++) {
-                    Quote quote = sortedQuotes.get(x);
-                    Order order = new Order();
-                    order.setAccount(account);
-                    order.setSymbol(quote.getSymbol());
-                    order.setAction(Order.OrderAction.BUY);
-                    order.setStrategy(Order.OrderStrategy.MANUAL);
-                    order.setLimitPrice(quote.getPrice());
-                    order.setQuantity((long) (fundsPerOrder / quote.getPrice().getDollars()));
-
-                    portfolioModel.createOrder(order);
-                    try {
-                        portfolioModel.attemptExecuteOrder(order, quote);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error executing order", e);
-                    }
-                }
-
-                PortfolioUpdateBroadcaster.broadcast(context);
-            }
-        }
     }
 
     @Override
@@ -126,4 +110,43 @@ public class DogsOfTheDow extends BaseStrategy {
         return portfolioModel.getAccount(account.getId());
     }
 
+
+    private void handleQuotes(Account account, Map<String, Quote> quoteMap) {
+        List<Quote> sortedQuotes = new ArrayList<>(quoteMap.values());
+        Collections.sort(sortedQuotes, new Comparator<Quote>() {
+            @Override
+            public int compare(Quote lhs, Quote rhs) {
+                // reverse sort
+                return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
+            }
+        });
+
+        if (sortedQuotes.size() > 0) {
+            int size = sortedQuotes.size();
+            int numberOfStocks = Math.min(size, 10);
+            double fundsPerOrder = account.getAvailableFunds().getDollars()
+                    / (double) numberOfStocks;
+
+            for (int x = 0; x < numberOfStocks; x++) {
+                Quote quote = sortedQuotes.get(x);
+                Order order = new Order();
+                order.setAccount(account);
+                order.setSymbol(quote.getSymbol());
+                order.setAction(Order.OrderAction.BUY);
+                order.setStrategy(Order.OrderStrategy.MANUAL);
+                order.setLimitPrice(quote.getPrice());
+                order.setQuantity((long) (fundsPerOrder / quote.getPrice().getDollars()));
+
+                portfolioModel.createOrder(order);
+                try {
+                    portfolioModel.attemptExecuteOrder(order, quote);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error executing order", e);
+                }
+            }
+
+            PortfolioUpdateBroadcaster.broadcast(context);
+        }
+    }
 }
+

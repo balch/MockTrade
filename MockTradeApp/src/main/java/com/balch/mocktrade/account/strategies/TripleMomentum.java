@@ -49,7 +49,7 @@ public class TripleMomentum extends BaseStrategy {
     }
 
     private void executeStrategy(final List<String> symbols, final Account account) {
-        Map<String, Quote> response = this.financeModel.getQuotes(symbols);
+        Map<String, Quote> response = this.financeModel.getQuotes(symbols).blockingFirst();
         if (response != null) {
             for (Quote quote : response.values()) {
                 double fundsPerOrder = account.getAvailableFunds().getDollars() / (double) symbols.size();

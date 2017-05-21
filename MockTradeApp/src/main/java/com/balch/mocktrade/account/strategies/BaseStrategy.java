@@ -25,9 +25,9 @@ package com.balch.mocktrade.account.strategies;
 import android.content.Context;
 
 import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.NetworkRequestProvider;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
@@ -45,11 +45,11 @@ public abstract class BaseStrategy {
 
     public abstract void initialize(Account account);
 
-    private void init(Context context, NetworkRequestProvider networkRequestProvider,
+    private void init(Context context, GoogleFinanceApi googleFinanceApi,
                       SqlConnection sqlConnection, Settings settings) {
-        this.financeModel = new GoogleFinanceModel(context, networkRequestProvider, settings);
+        this.financeModel = new GoogleFinanceModel(context, googleFinanceApi, settings);
         this.portfolioModel = new PortfolioSqliteModel(context, sqlConnection,
-                networkRequestProvider, settings);
+                googleFinanceApi, settings);
         this.context = context.getApplicationContext();
     }
 
@@ -66,11 +66,11 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-                      Context context, NetworkRequestProvider networkRequestProvider,
+                      Context context, GoogleFinanceApi googleFinanceApi,
                       SqlConnection sqlConnection, Settings settings)
             throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
-        baseStrategy.init(context, networkRequestProvider, sqlConnection, settings);
+        baseStrategy.init(context, googleFinanceApi, sqlConnection, settings);
 
         return baseStrategy;
     }

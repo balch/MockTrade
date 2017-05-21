@@ -30,12 +30,9 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
@@ -54,10 +51,6 @@ import java.util.Comparator;
 public class TradeApplication extends Application implements TradeModelProvider, ViewProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
 
-    private static final int REQUEST_TIMEOUT_SECS = 30;
-    private static final DefaultRetryPolicy DEFAULT_RETRY_POlICY = new DefaultRetryPolicy(
-            REQUEST_TIMEOUT_SECS * 1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-
     public static final String DATABASE_NAME = "mocktrade.db";
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_CREATES_SCRIPT = "sql/create.sql";
@@ -66,9 +59,8 @@ public class TradeApplication extends Application implements TradeModelProvider,
     private static final String DAILY_BACKUP_DATABASE_NAME = "daily_backup";
 
     private volatile SqlConnection sqlConnection;
-    private volatile RequestQueue requestQueue;
     private volatile Settings settings;
-    private volatile VolleyNetworkRequest networkRequest;
+    private final ModelApiFactory modelApiFactory = new ModelApiFactory();
 
     @Override
     public void onCreate() {
@@ -102,11 +94,13 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
         protected Void doInBackground(Void... urls) {
             FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSettings());
             financeModel.setQuoteServiceAlarm();
 
             PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
-                    modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
+                    modelProvider.getSqlConnection(),
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
                     modelProvider.getSettings());
             portfolioModel.scheduleOrderServiceAlarmIfNeeded();
             return null;
@@ -132,22 +126,6 @@ public class TradeApplication extends Application implements TradeModelProvider,
         }
 
         return sqlConnection;
-    }
-
-    @Override
-    public NetworkRequestProvider getNetworkRequestProvider() {
-        // double check lock pattern
-        if (this.networkRequest == null) {
-            synchronized (this) {
-                if (this.networkRequest == null) {
-                    this.requestQueue = Volley.newRequestQueue(this);
-                    this.networkRequest = new VolleyNetworkRequest(this.requestQueue);
-                }
-            }
-        }
-
-        return this.networkRequest;
-
     }
 
     @Override
@@ -283,27 +261,9 @@ public class TradeApplication extends Application implements TradeModelProvider,
         return success;
     }
 
-    static class VolleyNetworkRequest implements NetworkRequestProvider {
-
-        private final RequestQueue requestQueue;
-
-        VolleyNetworkRequest(RequestQueue requestQueue) {
-            this.requestQueue = requestQueue;
-        }
-
-        @Override
-        public <T> Request<T> addRequest(Request<T> request) {
-            return addRequest(request, false);
-        }
-
-        @Override
-        public <T> Request<T> addRequest(Request<T> request, boolean customRetryPolicy) {
-            if (!customRetryPolicy) {
-                request.setRetryPolicy(DEFAULT_RETRY_POlICY);
-            }
-
-            return this.requestQueue.add(request);
-        }
+    @Override
+    public ModelApiFactory getModelApiFactory() {
+        return modelApiFactory;
     }
 
 }

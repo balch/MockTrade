@@ -23,7 +23,6 @@
 package com.balch.mocktrade.order;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -47,31 +46,39 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class StockSymbolLayout extends LinearLayout implements EditLayout, TextWatcher {
     private static final String TAG = StockSymbolLayout.class.getSimpleName();
     private static final int TEXT_CHANGE_DELAY_MS = 500;
 
-    private TextView mLabel;
-    private EditText mValue;
-    private TextView mDescription;
-    private TextView mPrice;
+    private TextView symbolLabel;
+    private EditText symbolValue;
+    private TextView symbolDescription;
+    private TextView symbolPrice;
 
-    private ColumnDescriptor mDescriptor;
-    private EditLayoutListener mEditLayoutListener;
+    private ColumnDescriptor columnDescriptor;
+    private EditLayoutListener editLayoutListener;
 
-    private FinanceModel mFinanceModel;
+    private FinanceModel financeModel;
 
-    private boolean mAllowEmpty;
+    private boolean allowEmpty;
 
-    private Handler mTextChangeHandler = new Handler(Looper.getMainLooper());
-    private Runnable mTxtChangeRunnable = new Runnable() {
+    private Disposable disposableGetQuote = null;
+
+    private Handler textChangeHandler = new Handler(Looper.getMainLooper());
+    private Runnable textChangeRunnable = new Runnable() {
         @Override
         public void run() {
             try {
@@ -105,44 +112,45 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
         setOrientation(VERTICAL);
         inflate(getContext(), com.balch.mocktrade.R.layout.symbol_edit_control, this);
-        this.mLabel = (TextView) findViewById(R.id.symbol_edit_label);
-        this.mValue = (EditText) findViewById(R.id.symbol_edit_value);
-        this.mDescription = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
-        this.mPrice = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
+        symbolLabel = (TextView) findViewById(R.id.symbol_edit_label);
+        symbolValue = (EditText) findViewById(R.id.symbol_edit_value);
+        symbolDescription = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_description);
+        symbolPrice = (TextView)findViewById(com.balch.mocktrade.R.id.symbol_edit_price);
 
         TradeModelProvider modelProvider = (TradeModelProvider)this.getContext().getApplicationContext();
-        this.mFinanceModel = new GoogleFinanceModel(modelProvider.getContext(),
-                modelProvider.getNetworkRequestProvider(), modelProvider.getSettings());
+        financeModel = new GoogleFinanceModel(modelProvider.getContext(),
+                modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                modelProvider.getSettings());
 
-        this.mValue.setHint(R.string.order_symbol_hint);
+        symbolValue.setHint(R.string.order_symbol_hint);
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        this.mValue.setEnabled(enabled);
+        symbolValue.setEnabled(enabled);
     }
 
     protected void setInvestmentData(String description, Money price) {
-        this.mDescription.setText(description);
-        this.mPrice.setText((price != null) ? price.getFormatted(2) : "");
+        symbolDescription.setText(description);
+        symbolPrice.setText((price != null) ? price.getFormatted(2) : "");
     }
 
     @Override
     public void bind(ColumnDescriptor descriptor) {
-        this.mDescriptor = descriptor;
-        this.mLabel.setText(descriptor.getLabelResId());
+        columnDescriptor = descriptor;
+        symbolLabel.setText(descriptor.getLabelResId());
 
-        this.mValue.removeTextChangedListener(this);
-        this.mValue.setLines(1);
+        symbolValue.removeTextChangedListener(this);
+        symbolValue.setLines(1);
 
         boolean enabled = (descriptor.getState() == EditState.CHANGEABLE);
-        this.mAllowEmpty = true;
+        allowEmpty = true;
         List<InputFilter> filters = getInputFilters();
         try {
             if (descriptor.getField() != null) {
                 Object obj = descriptor.getField().get(descriptor.getItem());
-                this.mValue.setText(this.getValueAsString(obj));
+                symbolValue.setText(this.getValueAsString(obj));
             }
 
             // check the hints associated with this field
@@ -150,24 +158,24 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                 if (hint.getHint() == ViewHint.Hint.MAX_CHARS) {
                     filters.add(new InputFilter.LengthFilter(hint.getIntValue()));
                 } else if (hint.getHint() == ViewHint.Hint.DISPLAY_LINES) {
-                    this.mValue.setLines(hint.getIntValue());
+                    symbolValue.setLines(hint.getIntValue());
                 } else if (hint.getHint() == ViewHint.Hint.NOT_EMPTY) {
-                    this.mAllowEmpty = !hint.getBoolValue();
+                    allowEmpty = !hint.getBoolValue();
                 }
             }
         } catch (IllegalAccessException e) {
             Log.e(TAG, "bind error", e);
-            this.mValue.setText(R.string.get_value_error);
+            symbolValue.setText(R.string.get_value_error);
             enabled = false;
         }
-        this.mValue.setEnabled(enabled);
-        this.mValue.setFilters(filters.toArray(new InputFilter[filters.size()]));
+        symbolValue.setEnabled(enabled);
+        symbolValue.setFilters(filters.toArray(new InputFilter[filters.size()]));
 
-        if (!TextUtils.isEmpty(this.mValue.getText())) {
+        if (!TextUtils.isEmpty(this.symbolValue.getText())) {
             doTextChanged();
         }
 
-        this.mValue.addTextChangedListener(this);
+        this.symbolValue.addTextChangedListener(this);
     }
 
 
@@ -185,14 +193,14 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
     @Override
     public ColumnDescriptor getDescriptor() {
-        return this.mDescriptor;
+        return this.columnDescriptor;
     }
 
     @Override
     public void validate() throws ValidatorException {
-        String val = this.mValue.getText().toString();
+        String val = symbolValue.getText().toString();
         // empty string validation
-        if (!this.mAllowEmpty) {
+        if (!this.allowEmpty) {
             if (TextUtils.isEmpty(val)) {
                 throw new ValidatorException(getResources().getString(R.string.error_empty_string));
             }
@@ -201,17 +209,17 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
     @Override
     public Object getValue() {
-        return this.mValue.getText().toString();
+        return symbolValue.getText().toString();
     }
 
     @Override
     public void setValue(Object value) {
-        this.mValue.setText(this.getValueAsString(value));
+        this.symbolValue.setText(this.getValueAsString(value));
     }
 
     @Override
     public void setEditControlListener(EditLayoutListener listener) {
-        this.mEditLayoutListener = listener;
+        this.editLayoutListener = listener;
     }
 
     @Override
@@ -220,12 +228,12 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        this.mTextChangeHandler.removeCallbacks(this.mTxtChangeRunnable);
+        textChangeHandler.removeCallbacks(this.textChangeRunnable);
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        this.mTextChangeHandler.postDelayed(this.mTxtChangeRunnable, TEXT_CHANGE_DELAY_MS);
+        textChangeHandler.postDelayed(this.textChangeRunnable, TEXT_CHANGE_DELAY_MS);
     }
 
     @Override
@@ -239,68 +247,67 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
     }
 
     protected void doTextChanged() {
-        final String symbol = mValue.getText().toString();
+        final String symbol = symbolValue.getText().toString();
 
         boolean hasError = false;
         try {
-            this.validate();
-            mValue.setError(null);
+            validate();
+            symbolValue.setError(null);
         } catch (ValidatorException e) {
-            this.mValue.setError(e.getMessage());
+            symbolValue.setError(e.getMessage());
             hasError = true;
         }
 
 
         if (!hasError) {
-            new GetQuoteTask(this, mFinanceModel).execute(symbol);
+            getQuoteAsync(symbol);
         }
     }
 
     protected void callListenerOnChanged(boolean hasError) {
-        if (this.mEditLayoutListener != null) {
+        if (editLayoutListener != null) {
             try {
-                this.mEditLayoutListener.onChanged(this.mDescriptor, this.getValue(), hasError);
+                editLayoutListener.onChanged(this.columnDescriptor, this.getValue(), hasError);
             } catch (ValidatorException e) {
-                this.mValue.setError(e.getMessage());
+                symbolValue.setError(e.getMessage());
             }
         }
     }
 
     public Money getPrice() {
-        return new Money(mPrice.getText().toString());
+        return new Money(symbolPrice.getText().toString());
     }
 
-    private static class GetQuoteTask extends AsyncTask<String, Void, Quote> {
-        private final FinanceModel mFinanceModel;
-        private final WeakReference<StockSymbolLayout> mStockSymbolLayout;
-
-        GetQuoteTask(StockSymbolLayout layout, FinanceModel financeModel) {
-            mStockSymbolLayout = new WeakReference<>(layout);
-            mFinanceModel = financeModel;
+    private void disposeGetQuote() {
+        if (disposableGetQuote != null) {
+            disposableGetQuote.dispose();
+            disposableGetQuote = null;
         }
+    }
 
-        @Override
-        protected Quote doInBackground(String... symbols) {
-            return mFinanceModel.getQuote(symbols[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Quote quote) {
-            final StockSymbolLayout layout = mStockSymbolLayout.get();
-            if (layout != null) {
-                if (quote != null) {
-                    layout.setInvestmentData(quote.getName(), quote.getPrice());
-                    layout.mValue.setError(null);
-                    layout.callListenerOnChanged(false);
-                } else {
-                    layout.setInvestmentData("", null);
-                    String message = layout.getResources().getString(R.string.error_invalid_symbol);
-                    layout.mValue.setError(message);
-                    layout.callListenerOnChanged(true);
-                }
-            }
-        }
-
+    private void getQuoteAsync(String symbol) {
+        disposeGetQuote();
+        disposableGetQuote = financeModel.getQuote(symbol)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Quote>() {
+                               @Override
+                               public void accept(@NonNull Quote quote) throws Exception {
+                                   setInvestmentData(quote.getName(), quote.getPrice());
+                                   symbolValue.setError(null);
+                                   callListenerOnChanged(false);
+                               }
+                           },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(@NonNull Throwable throwable) throws Exception {
+                                    Log.e(TAG, "getQuoteAsync exception", throwable );
+                                    setInvestmentData("", null);
+                                    String message = getResources().getString(R.string.error_invalid_symbol);
+                                    symbolValue.setError(message);
+                                    callListenerOnChanged(true);
+                                }
+                            });
     }
 
 }

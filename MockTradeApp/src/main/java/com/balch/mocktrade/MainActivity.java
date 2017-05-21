@@ -2,6 +2,10 @@ package com.balch.mocktrade;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,17 +15,15 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
@@ -37,15 +39,14 @@ import com.balch.android.app.framework.domain.EditActivity;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountEditController;
+import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.order.OrderEditController;
 import com.balch.mocktrade.order.OrderListActivity;
 import com.balch.mocktrade.portfolio.AccountViewHolder;
-import com.balch.mocktrade.portfolio.GraphDataLoader;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
 import com.balch.mocktrade.portfolio.PortfolioData;
-import com.balch.mocktrade.portfolio.PortfolioLoader;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.PerformanceItemUpdateBroadcaster;
@@ -54,15 +55,19 @@ import com.balch.mocktrade.settings.Settings;
 import com.balch.mocktrade.settings.SettingsActivity;
 import com.balch.mocktrade.shared.PerformanceItem;
 
-import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends PresenterActivity<MainPortfolioView, TradeModelProvider> {
-    private static final String TAG = MainActivity.class.getSimpleName();
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
-    private static final int PORTFOLIO_LOADER_ID = 0;
-    private static final int GRAPH_LOADER_ID = 1;
+public class MainActivity extends PresenterActivity<MainPortfolioView, TradeModelProvider>
+        implements LifecycleRegistryOwner {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int NEW_ACCOUNT_RESULT = 0;
     private static final int NEW_ORDER_RESULT = 1;
@@ -70,91 +75,24 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     private static final int PERMS_REQUEST_BACKUP = 0;
     private static final int PERMS_REQUEST_RESTORE = 1;
 
-    private PortfolioModel mPortfolioModel;
+    private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
-    private PortfolioAdapter mPortfolioAdapter;
+    private PortfolioModel portfolioModel;
 
-    private MenuItem mMenuProgressBar;
-    private MenuItem mMenuRefreshButton;
-    private MenuItem mMenuHideExcludeAccounts;
-    private MenuItem mMenuDemoMode;
+    private PortfolioAdapter portfolioAdapter;
 
-    private Handler mUIHandler = new Handler(Looper.getMainLooper());
-    private Settings mSettings;
+    private MenuItem menuProgressBar;
+    private MenuItem menuRefreshButton;
+    private MenuItem menuHideExcludeAccounts;
+    private MenuItem menuDemoMode;
 
-    private GraphDataLoader mGraphDataLoader;
-    private PortfolioLoader mPortfolioLoader;
+    private Handler uiHandler = new Handler(Looper.getMainLooper());
+    private Settings appSetting;
 
-    private AccountUpdateReceiver mAccountUpdateReceiver;
+    private PortfolioViewModel portfolioViewModel;
+    private Disposable disposableNewAccount = null;
 
-    private LoaderManager.LoaderCallbacks<PortfolioData> mPortfolioDataLoaderCallback =
-            new LoaderManager.LoaderCallbacks<PortfolioData>() {
-                @Override
-                public Loader<PortfolioData> onCreateLoader(int id, Bundle args) {
-                    return new PortfolioLoader(MainActivity.this, mPortfolioModel, mSettings);
-                }
-
-                @Override
-                public void onLoadFinished(Loader<PortfolioData> loader, PortfolioData data) {
-                    PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
-
-                    int accountsWithTotals = 0;
-
-                    Date timestamp = new Date();
-                    boolean demoMode = mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE);
-                    for (Account account : data.getAccounts()) {
-                        if (demoMode || !account.getExcludeFromTotals()) {
-                            List<Investment> investments = data.getInvestments(account.getId());
-                            performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
-
-                            accountsWithTotals++;
-                        }
-                    }
-
-                    view.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
-
-                    ViewProvider viewProvider = (ViewProvider) getApplication();
-
-                    boolean showTotals = (!viewProvider.isLandscape(MainActivity.this) || viewProvider.isTablet(MainActivity.this)) &&
-                            (accountsWithTotals > 1);
-                    view.setTotals(showTotals, performanceItem);
-
-                    mPortfolioAdapter.bind(data);
-
-                    view.setDailyGraphDataAccounts(data.getAccounts());
-
-                    hideProgress();
-
-                }
-
-                @Override
-                public void onLoaderReset(Loader<PortfolioData> loader) {
-                    mPortfolioAdapter.clear(true);
-                }
-
-            };
-
-    private LoaderManager.LoaderCallbacks<List<PerformanceItem>> mGraphDataLoaderCallback =
-            new LoaderManager.LoaderCallbacks<List<PerformanceItem>>() {
-                @Override
-                public Loader<List<PerformanceItem>> onCreateLoader(int id, Bundle args) {
-                    return new GraphDataLoader(MainActivity.this, mPortfolioModel);
-                }
-
-                @Override
-                public void onLoadFinished(Loader<List<PerformanceItem>> loader, List<PerformanceItem> data) {
-                    view.setDailyGraphData(data);
-//                      mMainPortfolioView.setDailyGraphData(generateRandomTestData());
-
-                    hideProgress();
-
-                }
-
-                @Override
-                public void onLoaderReset(Loader<List<PerformanceItem>> loader) {
-                }
-
-            };
+    private AccountUpdateReceiver accountUpdateReceiver;
 
     @Override
     public void onCreateBase(Bundle bundle) {
@@ -184,7 +122,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.portfolio_view_app_bar);
         if (appBarLayout != null) {
             if (bundle == null) {
-                mUIHandler.postDelayed(new Runnable() {
+                uiHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         appBarLayout.setExpanded(false);
@@ -194,6 +132,16 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 appBarLayout.setExpanded(false, false);
             }
         }
+
+        portfolioViewModel.getGraphData(this).observe(this, graphDataObserver);
+        portfolioViewModel.getPortfolioData(this).observe(this, portfolioDataObserver);
+    }
+
+    @Override
+    public void onDestroyBase() {
+        portfolioViewModel.getGraphData(this).removeObserver(graphDataObserver);
+        portfolioViewModel.getPortfolioData(this).removeObserver(portfolioDataObserver);
+        disposeNewAccount();
     }
 
     @Override
@@ -201,46 +149,44 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         return new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
             @Override
             public void onGraphSelectionChanged(long accountId, int daysToReturn) {
-                mGraphDataLoader.setSelectionCriteria(accountId, daysToReturn);
+                portfolioViewModel.setGraphSelectionCriteria(accountId, daysToReturn);
             }
         });
     }
 
     @Override
     protected void createModel(TradeModelProvider modelProvider) {
-        mSettings = modelProvider.getSettings();
-        mPortfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
-                modelProvider.getSqlConnection(), modelProvider.getNetworkRequestProvider(),
-                modelProvider.getSettings());
-    }
-
-    @Override
-    public void onResumeBase() {
-        // onRestoreInstanceState is called after onStart but before OnResume
-        // creating the loaders in onResume ensure the views are correctly restored
-        if ((mPortfolioLoader == null) || (mGraphDataLoader == null)) {
-            LoaderManager loaderManager = getSupportLoaderManager();
-            mPortfolioLoader = (PortfolioLoader) loaderManager.initLoader(PORTFOLIO_LOADER_ID, null, mPortfolioDataLoaderCallback);
-            mGraphDataLoader = (GraphDataLoader) loaderManager.initLoader(GRAPH_LOADER_ID, null, mGraphDataLoaderCallback);
+        portfolioViewModel = getPortfolioViewModel();
+        appSetting = modelProvider.getSettings();
+        if (!portfolioViewModel.isInitialized()) {
+            portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
+                    modelProvider.getSqlConnection(),
+                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getSettings());
+            portfolioViewModel.setPortfolioModel(portfolioModel);
+            portfolioViewModel.setAppSettings(appSetting);
+        } else {
+            portfolioModel = portfolioViewModel.getPortfolioModel();
         }
     }
 
     @Override
     public void onStartBase() {
+        updateView();
 
-        if (mAccountUpdateReceiver == null) {
-            mAccountUpdateReceiver = new AccountUpdateReceiver();
+        if (accountUpdateReceiver == null) {
+            accountUpdateReceiver = new AccountUpdateReceiver();
 
             LocalBroadcastManager.getInstance(this)
-                    .registerReceiver(mAccountUpdateReceiver, new IntentFilter(PerformanceItemUpdateBroadcaster.ACTION));
+                    .registerReceiver(accountUpdateReceiver, new IntentFilter(PerformanceItemUpdateBroadcaster.ACTION));
         }
     }
 
     @Override
     public void onStopBase() {
-        if (mAccountUpdateReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mAccountUpdateReceiver);
-            mAccountUpdateReceiver = null;
+        if (accountUpdateReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(accountUpdateReceiver);
+            accountUpdateReceiver = null;
         }
     }
 
@@ -249,10 +195,10 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         super.onCreateOptionsMenu(menu);
 
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        mMenuProgressBar = menu.findItem(R.id.menu_progress_bar);
-        mMenuRefreshButton = menu.findItem(R.id.menu_refresh);
-        mMenuHideExcludeAccounts = menu.findItem(R.id.menu_hide_exclude_accounts);
-        mMenuDemoMode = menu.findItem(R.id.menu_demo_mode);
+        menuProgressBar = menu.findItem(R.id.menu_progress_bar);
+        menuRefreshButton = menu.findItem(R.id.menu_refresh);
+        menuHideExcludeAccounts = menu.findItem(R.id.menu_hide_exclude_accounts);
+        menuDemoMode = menu.findItem(R.id.menu_demo_mode);
 
         // tint all the menu item icons
         ColorStateList colorSelector = ContextCompat.getColorStateList(this, R.color.nav_on_color);
@@ -272,8 +218,8 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        mMenuHideExcludeAccounts.setChecked(mSettings.getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
-        mMenuDemoMode.setChecked(mSettings.getBoolean(Settings.Key.PREF_DEMO_MODE));
+        menuHideExcludeAccounts.setChecked(appSetting.getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS));
+        menuDemoMode.setChecked(appSetting.getBoolean(Settings.Key.PREF_DEMO_MODE));
         return true;
     }
 
@@ -304,17 +250,17 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 handled = true;
                 break;
             case R.id.menu_hide_exclude_accounts:
-                boolean hideExcludeAccounts = !mMenuHideExcludeAccounts.isChecked();
-                mSettings.setBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
-                mMenuHideExcludeAccounts.setChecked(hideExcludeAccounts);
+                boolean hideExcludeAccounts = !menuHideExcludeAccounts.isChecked();
+                appSetting.setBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS, hideExcludeAccounts);
+                menuHideExcludeAccounts.setChecked(hideExcludeAccounts);
                 view.resetSelectedAccountID();
                 updateView();
                 handled = true;
                 break;
             case R.id.menu_demo_mode:
-                boolean demoMode = !mMenuDemoMode.isChecked();
-                mSettings.setBoolean(Settings.Key.PREF_DEMO_MODE, demoMode);
-                mMenuDemoMode.setChecked(demoMode);
+                boolean demoMode = !menuDemoMode.isChecked();
+                appSetting.setBoolean(Settings.Key.PREF_DEMO_MODE, demoMode);
+                menuDemoMode.setChecked(demoMode);
                 updateView();
                 handled = true;
                 break;
@@ -322,7 +268,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
         return handled;
     }
-
 
     @Override
     public boolean onHandleException(String logMsg, Exception ex) {
@@ -340,12 +285,58 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         return true;
     }
 
-    private void backupDatabaseToSDCard() {
+    private Observer<List<PerformanceItem>> graphDataObserver = new Observer<List<PerformanceItem>>() {
+        @Override
+        public void onChanged(@Nullable List<PerformanceItem> data) {
+            view.setDailyGraphData(data);
+//          mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
+            hideProgress();
+        }
+    };
+
+    private Observer<PortfolioData> portfolioDataObserver = new Observer<PortfolioData>() {
+        @Override
+        public void onChanged(@Nullable PortfolioData data) {
+            displayPortfolioData(data);
+        }
+    };
+
+    private void displayPortfolioData(PortfolioData data) {
+        PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
+
+        int accountsWithTotals = 0;
+
+        Date timestamp = new Date();
+        boolean demoMode = appSetting.getBoolean(Settings.Key.PREF_DEMO_MODE);
+        for (Account account : data.getAccounts()) {
+            if (demoMode || !account.getExcludeFromTotals()) {
+                List<Investment> investments = data.getInvestments(account.getId());
+                performanceItem.aggregate(account.getPerformanceItem(investments, timestamp));
+
+                accountsWithTotals++;
+            }
+        }
+
+        view.setSyncTimes(data.getLastSyncTime(), data.getLastQuoteTime());
+
+        ViewProvider viewProvider = (ViewProvider) getApplication();
+
+        boolean showTotals = (!viewProvider.isLandscape(MainActivity.this) || viewProvider.isTablet(MainActivity.this)) &&
+                (accountsWithTotals > 1);
+        view.setTotals(showTotals, performanceItem);
+
+        portfolioAdapter.bind(data);
+
+        view.setDailyGraphDataAccounts(data.getAccounts());
+
+        hideProgress();
+    }
+
+    private void backupDatabaseToSDCard() {
         if (isStoragePermissionsGranted(PERMS_REQUEST_BACKUP)) {
 
             boolean success = TradeApplication.backupDatabase(this, false);
-
             String msg = getResources().getString(success ? R.string.menu_backup_db_success : R.string.menu_backup_db_fail);
 
             getSnackbar(view, msg, Snackbar.LENGTH_LONG,
@@ -357,7 +348,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     }
 
     private void restoreLatestDatabase() {
-
         if (isStoragePermissionsGranted(PERMS_REQUEST_RESTORE)) {
             boolean success = TradeApplication.restoreDatabase(this);
 
@@ -412,8 +402,8 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     protected void setupAdapter() {
         ViewProvider viewProvider = ((ViewProvider) this.getApplication());
 
-        mPortfolioAdapter = new PortfolioAdapter(mSettings, viewProvider);
-        mPortfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
+        portfolioAdapter = new PortfolioAdapter(appSetting, viewProvider);
+        portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -423,7 +413,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
-                                    mPortfolioModel.deleteAccount(account);
+                                    portfolioModel.deleteAccount(account);
                                     updateView();
                                 } catch (Exception ex) {
                                     Log.e(TAG, "Error Deleting account", ex);
@@ -453,11 +443,11 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
                 Account newAccount = new Account(name, desc,
                         new Money(100000.0), Account.Strategy.DOGS_OF_THE_DOW, false);
-                new CreateAccountTask(MainActivity.this).execute(newAccount);
+                createNewAccountAsync(newAccount);
             }
         });
 
-        mPortfolioAdapter.setAccountItemViewListener(new AccountViewHolder.AccountItemViewListener() {
+        portfolioAdapter.setAccountItemViewListener(new AccountViewHolder.AccountItemViewListener() {
             @Override
             public void onTradeButtonClicked(Account account) {
                 showNewBuyOrderActivity(account);
@@ -468,7 +458,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 startActivity(OrderListActivity.newIntent(MainActivity.this, account.getId()));
             }
         });
-        this.view.setPortfolioAdapter(mPortfolioAdapter);
+        this.view.setPortfolioAdapter(portfolioAdapter);
     }
 
     /**
@@ -522,15 +512,15 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
                 if (account != null) {
                     Account newAccount = new Account(account.getName(), account.getDescription(),
                             account.getInitialBalance(), account.getStrategy(), account.getExcludeFromTotals());
-                    new CreateAccountTask(this).execute(newAccount);
+                    createNewAccountAsync(newAccount);
                 }
             } else if (requestCode == NEW_ORDER_RESULT) {
                 Order order = EditActivity.getResult(data);
                 if (order != null) {
-                    mPortfolioModel.createOrder(order);
-                    mPortfolioLoader.onContentChanged();
+                    portfolioModel.createOrder(order);
+                    updateView();
 
-                    mPortfolioModel.processOrders(this,
+                    portfolioModel.processOrders(this,
                             (order.getStrategy() == Order.OrderStrategy.MANUAL));
                 }
             }
@@ -538,16 +528,16 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
     }
 
     public void showProgress() {
-        if (mMenuProgressBar != null) {
-            mMenuProgressBar.setVisible(true);
-            mMenuRefreshButton.setVisible(false);
+        if (menuProgressBar != null) {
+            menuProgressBar.setVisible(true);
+            menuRefreshButton.setVisible(false);
         }
     }
 
     public void hideProgress() {
-        if (mMenuProgressBar != null) {
-            mMenuProgressBar.setVisible(false);
-            mMenuRefreshButton.setVisible(true);
+        if (menuProgressBar != null) {
+            menuProgressBar.setVisible(false);
+            menuRefreshButton.setVisible(true);
         }
     }
 
@@ -581,47 +571,43 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 */
 
     private void updateView() {
-        mGraphDataLoader.forceLoad();
-        mPortfolioLoader.forceLoad();
+        portfolioViewModel.loadGraphData();
+        portfolioViewModel.loadPortfolioData();
     }
 
-    private static class CreateAccountTask extends AsyncTask<Account, Void, Void> {
-        private final WeakReference<MainActivity> mWeakActivity;
-        private final PortfolioModel mPortfolioModel;
+    private void createNewAccountAsync(final Account account) {
+        showProgress();
+        disposeNewAccount();
+        disposableNewAccount = Observable.just(true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Function<Boolean, Boolean>() {
+                    @Override
+                    public Boolean apply(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {
+                        portfolioModel.createAccount(account);
+                        return true;
+                    }
+                })
+                .subscribe(new Consumer<Boolean>() {
+                               @Override
+                               public void accept(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {
+                                   hideProgress();
+                                   updateView();
+                               }
+                           },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
+                                    hideProgress();
+                                    Log.e(TAG, "createNewAccountAsync error", throwable);
+                                }
+                            });
+    }
 
-        private CreateAccountTask(MainActivity activity) {
-            this.mWeakActivity = new WeakReference<>(activity);
-
-            // the models are application scope so it is OK to hold a ref to it
-            mPortfolioModel = activity.mPortfolioModel;
-        }
-
-        @Override
-        protected Void doInBackground(Account... accounts) {
-            for (Account account : accounts) {
-                mPortfolioModel.createAccount(account);
-                if (isCancelled()) {
-                    break;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            MainActivity activity = mWeakActivity.get();
-            if ((activity != null) && !activity.isFinishing()) {
-                activity.showProgress();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            MainActivity activity = mWeakActivity.get();
-            if ((activity != null) && !activity.isFinishing()) {
-                activity.hideProgress();
-                activity.mPortfolioLoader.onContentChanged();
-            }
+    private void disposeNewAccount() {
+        if (disposableNewAccount != null) {
+            disposableNewAccount.dispose();
+            disposableNewAccount = null;
         }
     }
 
@@ -632,10 +618,18 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         @Override
         public void onReceive(Context context, Intent intent) {
             PerformanceItemUpdateBroadcaster.PerformanceItemUpdateData data = PerformanceItemUpdateBroadcaster.getData(intent);
-            mGraphDataLoader.setSelectionCriteria(data.accountId, data.days);
-            mGraphDataLoader.forceLoad();
+            portfolioViewModel.setGraphSelectionCriteria(data.accountId, data.days);
             view.setAccountSpinner(data.accountId);
         }
+    }
+
+    private PortfolioViewModel getPortfolioViewModel() {
+        return ViewModelProviders.of(this).get(PortfolioViewModel.class);
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
     }
 
 }

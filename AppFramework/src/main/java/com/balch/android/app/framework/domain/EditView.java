@@ -79,18 +79,18 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
         setOrientation(VERTICAL);
 
         inflate(getContext(), R.layout.edit_view, this);
-        this.editControlLayout = (LinearLayout)findViewById(R.id.edit_layout);
-        this.okButton = (Button)findViewById(R.id.edit_ok_button);
-        this.cancelButton = (Button)findViewById(R.id.edit_cancel_button);
+        editControlLayout = (LinearLayout)findViewById(R.id.edit_layout);
+        okButton = (Button)findViewById(R.id.edit_ok_button);
+        cancelButton = (Button)findViewById(R.id.edit_cancel_button);
 
-        this.okButton.setOnClickListener(new OnClickListener() {
+        okButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditView.this.save();
             }
         });
 
-        this.cancelButton.setOnClickListener(new OnClickListener() {
+        cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditView.this.cancel();
@@ -101,26 +101,27 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
 
     @Override
     public ControlMap getControlMap() {
-        return this.controlMap;
+        return controlMap;
     }
 
+    @SuppressWarnings("unchecked")
     public void bind(DomainObject domainObject, boolean isNew, ExternalController controller,
                      int okButtonResId, int cancelButtonResId, List<Integer> columnViewIDs) {
         this.domainObject = domainObject;
-        this.externalController = controller;
-        this.columnDescriptorList = MetadataUtils.getColumnDescriptors(this.domainObject, isNew);
+        externalController = controller;
+        columnDescriptorList = MetadataUtils.getColumnDescriptors(this.domainObject, isNew);
 
-        this.cancelButton.setText((cancelButtonResId != 0) ? cancelButtonResId : R.string.edit_view_button_cancel);
-        this.okButton.setText((okButtonResId != 0) ? okButtonResId : isNew ? R.string.edit_view_ok_button_new : R.string.edit_view_ok_button_edit);
+        cancelButton.setText((cancelButtonResId != 0) ? cancelButtonResId : R.string.edit_view_button_cancel);
+        okButton.setText((okButtonResId != 0) ? okButtonResId : isNew ? R.string.edit_view_ok_button_new : R.string.edit_view_ok_button_edit);
 
-        this.controlMap.clear();
+        controlMap.clear();
         int cnt = 0;
-        for (ColumnDescriptor descriptor : this.columnDescriptorList) {
+        for (ColumnDescriptor descriptor : columnDescriptorList) {
             MetadataUtils.FrameworkType frameworkType = MetadataUtils.getFrameworkTypeByField(descriptor.getField());
 
             View view = MetadataUtils.getEditView(descriptor, frameworkType, this.getContext());
             if (view == null) {
-                view = new UnsupportedEditLayout(this.getContext());
+                view = new UnsupportedEditLayout(getContext());
             }
 
             if (cnt >= columnViewIDs.size()) {
@@ -132,7 +133,7 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             if (view instanceof EditLayout) {
 
                 EditLayout control = (EditLayout)view;
-                this.controlMap.put(descriptor.getField().getName(), control);
+                controlMap.put(descriptor.getField().getName(), control);
 
                 control.setControlMapper(this);
                 control.bind(descriptor);
@@ -155,11 +156,11 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
                 });
             }
 
-            this.editControlLayout.addView(view);
+            editControlLayout.addView(view);
         }
 
-        if (this.externalController != null) {
-            this.externalController.initialize(this.getContext(), this.domainObject, this.controlMap);
+        if (externalController != null) {
+            externalController.initialize(getContext(), this.domainObject, this.controlMap);
         }
 
         validate();
@@ -223,17 +224,18 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
 
 
     protected void cancel() {
-        if (this.listener != null) {
-            this.listener.onCancel();
+        if (listener != null) {
+            listener.onCancel();
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void validate()  {
         boolean hasError = false;
 
-        int cnt = this.editControlLayout.getChildCount();
+        int cnt = editControlLayout.getChildCount();
         for (int x = 0; x < cnt; x++) {
-            View view = this.editControlLayout.getChildAt(x);
+            View view = editControlLayout.getChildAt(x);
             if (view.getVisibility() == VISIBLE) {
                 if (view instanceof EditLayout) {
                     EditLayout control = (EditLayout) view;
@@ -247,9 +249,9 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             }
         }
 
-        if (this.externalController != null) {
+        if (externalController != null) {
             try {
-                externalController.validate(this.getContext(), getPopulatedCopy(), this.controlMap);
+                externalController.validate(this.getContext(), getPopulatedCopy(), controlMap);
             } catch (ValidatorException e) {
                 hasError = true;
             }
@@ -259,9 +261,9 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     }
 
     protected void valueChanged(ColumnDescriptor descriptor, Object value) throws ValidatorException {
-        if ( this.externalController != null) {
+        if ( externalController != null) {
             try {
-                externalController.onChanged(this.getContext(), descriptor, value, this.controlMap);
+                externalController.onChanged(this.getContext(), descriptor, value, controlMap);
             } catch (ValidatorException e) {
                 setErrorState(true);
                 throw e;
@@ -270,7 +272,7 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
     }
 
     protected void setErrorState(boolean hasError) {
-        this.okButton.setEnabled(!hasError);
+        okButton.setEnabled(!hasError);
     }
 
     public void setEditViewListener(EditViewListener listener) {

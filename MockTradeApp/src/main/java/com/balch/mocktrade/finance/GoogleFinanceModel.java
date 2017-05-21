@@ -25,96 +25,91 @@ package com.balch.mocktrade.finance;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
-import com.balch.mocktrade.NetworkRequestProvider;
+import com.balch.android.app.framework.types.ISO8601DateTime;
+import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.settings.Settings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.TimeZone;
+
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 
 public class GoogleFinanceModel implements FinanceModel {
     private static final String TAG = GoogleFinanceModel.class.getSimpleName();
 
-    private final static String GOOGLE_BASE_URL = "http://www.google.com/finance/info?infotype=infoquoteall&q=";
+    private final static String LAST_CLOSE_PRICE ="pcls_fix";
+    private final static String LAST_TRADE_PRICE_ONLY ="l_fix";
+    private final static String SYMBOL ="t";
+    private final static String LAST_TRADE_TIME ="lt_dts"; // 2014-09-04T10:32:44Z  in EST
+    private final static String NAME ="name";
+    private final static String EXCHANGE ="e";
+    private final static String DIVIDEND_PER_SHARE ="div";
 
-    private final NetworkRequestProvider networkRequestProvider;
+    private final GoogleFinanceApi googleFinanceApi;
     private final FinanceManager mFinanceManager;
 
-    public GoogleFinanceModel(Context context, NetworkRequestProvider networkRequestProvider,
+    public GoogleFinanceModel(Context context, GoogleFinanceApi googleFinanceApi,
                               Settings settings) {
-        this.networkRequestProvider = networkRequestProvider;
+        this.googleFinanceApi = googleFinanceApi;
         this.mFinanceManager = new FinanceManager(context.getApplicationContext(), settings);
     }
 
-    private String getGoogleQueryUrl(String symbols) throws UnsupportedEncodingException  {
-        return GOOGLE_BASE_URL +  URLEncoder.encode(symbols, "UTF-8");
+    @Override
+    public Observable<Quote> getQuote(final String symbol) {
+        return getQuotes(Collections.singletonList(symbol))
+                .map(new Function<Map<String, Quote>, Quote>() {
+                    @Override
+                    public Quote apply(@NonNull Map<String, Quote> quoteMap) throws Exception {
+                        return quoteMap.get(symbol);
+                    }
+                });
     }
 
     @Override
-    public Quote getQuote(final String symbol) {
-        Map<String, Quote> quoteMap = getQuotes(Collections.singletonList(symbol));
-        return (quoteMap != null) ? quoteMap.get(symbol) : null;
-    }
+    public Observable<Map<String, Quote>> getQuotes(final List<String> symbols) {
 
-    @Override
-    public Map<String, Quote> getQuotes(final List<String> symbols) {
-
-        Set<String> uniqueSymbols = getUniqueSymbols(symbols);
+        final Set<String> uniqueSymbols = getUniqueSymbols(symbols);
         String symbolString = getDelimitedSymbols(uniqueSymbols);
 
-        Map<String, Quote> quoteMap = null;
-        try {
-            final String url = getGoogleQueryUrl(symbolString);
-
-            RequestFuture<String> future = RequestFuture.newFuture();
-            networkRequestProvider.addRequest(new StringRequest(Request.Method.GET, url, future, future));
-
-            String response = future.get();
-
-            response = response.trim();
-            if (response.startsWith("//")) {
-                response = response.substring(2);
-            }
-
-            JSONArray jsonQuotes = new JSONArray(response);
-            if (jsonQuotes.length() == uniqueSymbols.size()) {
-                quoteMap = new HashMap<>(uniqueSymbols.size());
-                Iterator<String> symbolIterator = uniqueSymbols.iterator();
-                for (int x = 0; x < jsonQuotes.length(); x++) {
-                    try {
-                        Quote quote = GoogleQuote.fromJSONObject(jsonQuotes.getJSONObject(x));
-
-                        // fix issue when returned symbol does not match, check LMT.WD
-                        quote.setSymbol(symbolIterator.next());
-                        quoteMap.put(quote.getSymbol(), quote);
-                    } catch (Exception e) {
-                        Log.e(TAG, e.getMessage(), e);
+        return googleFinanceApi.getQuotes(symbolString)
+                .map(new Function<String, List<Quote>>() {
+                    @Override
+                    public List<Quote> apply(@NonNull String s) throws Exception {
+                        return parseQuotes(s);
                     }
-                }
-            } else {
-                Log.e(TAG, "Wrong number of quotes returned");
-            }
-        } catch (JSONException | InterruptedException |
-                ExecutionException | UnsupportedEncodingException ex) {
-            Log.e(TAG, "GoogleFinanceModel.getQuotes exception", ex);
-            quoteMap = null;
-        }
-
-        return quoteMap;
+                })
+                .map(new Function<List<Quote>, Map<String, Quote>>() {
+                    @Override
+                    public Map<String, Quote> apply(@NonNull List<Quote> quotes) throws Exception {
+                        Map quoteMap = new HashMap<>(uniqueSymbols.size());
+                        if (quotes.size() == uniqueSymbols.size()) {
+                            Iterator<String> symbolIterator = uniqueSymbols.iterator();
+                            for (Quote quote : quotes) {
+                                // fix issue when returned symbol does not match, check LMT.WD
+                                quote.setSymbol(symbolIterator.next());
+                                quoteMap.put(quote.getSymbol(), quote);
+                            }
+                        }
+                       return quoteMap;
+                    }
+                });
     }
 
     @Override
@@ -141,7 +136,6 @@ public class GoogleFinanceModel implements FinanceModel {
         Set<String> uniqueSymbols = new HashSet<>(symbols.size());
         uniqueSymbols.addAll(symbols);
         return uniqueSymbols;
-
     }
 
     private String getDelimitedSymbols(Set<String> symbols) {
@@ -156,6 +150,58 @@ public class GoogleFinanceModel implements FinanceModel {
             isFirst = false;
         }
         return builder.toString();
+    }
+
+
+    private List<Quote> parseQuotes(String jsonString) {
+
+        String json = jsonString.trim();
+        if (json.startsWith("//")) {
+            json = json.substring(2);
+        }
+
+        JsonElement root = new JsonParser().parse(json);
+        List<Quote> quotes = new ArrayList<>();
+
+        if (root.isJsonArray()) {
+            JsonArray jsonQuotes = root.getAsJsonArray();
+            for (JsonElement element : jsonQuotes) {
+                quotes.add(parseQuote(element.getAsJsonObject()));
+            }
+        }
+        return quotes;
+    }
+
+    private GoogleQuote parseQuote(JsonObject jsonObject) {
+
+        Money price = new Money(getJsonString(jsonObject, LAST_TRADE_PRICE_ONLY));
+        Money previousClose = new Money(getJsonString(jsonObject, LAST_CLOSE_PRICE));
+        Money dividendPerShare = new Money(getJsonString(jsonObject, DIVIDEND_PER_SHARE));
+        String name = getJsonString(jsonObject, NAME);
+        String symbol = getJsonString(jsonObject, SYMBOL);
+        String exchange = getJsonString(jsonObject, EXCHANGE);
+        Date lastTradeTime =  getDateFromISO8601(getJsonString(jsonObject, LAST_TRADE_TIME));
+
+        return new GoogleQuote(price, previousClose, dividendPerShare, symbol, name, exchange, lastTradeTime);
+    }
+
+    private String getJsonString(JsonObject jsonObject, String key) {
+        return jsonObject.has(key) ? jsonObject.get(key).getAsString() :  null;
+    }
+
+    private Date getDateFromISO8601(String dateStr) {
+        TimeZone ny_tz = TimeZone.getTimeZone("America/New_York");
+        Calendar ny_cal = Calendar.getInstance(ny_tz);
+        int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET)) / 60000;
+
+        dateStr = dateStr.replace("Z", String.format(Locale.getDefault(), "%s%02d:%02d",
+                (offset_mins >= 0) ? "+" : "-", Math.abs(offset_mins / 60), Math.abs(offset_mins % 60)));
+        try {
+            return ISO8601DateTime.toDate(dateStr);
+        } catch (ParseException e) {
+            Log.e(TAG, "Error parsing date:" + dateStr, e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -310,4 +310,10 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
                             });
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        disposeGetQuote();
+        super.onDetachedFromWindow();
+    }
+
 }

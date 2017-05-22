@@ -70,7 +70,7 @@ public class WearSyncService extends IntentService implements
     private static final String EXTRA_BROADCAST_ACCOUNT_ID = "extra_broadcast_account_id";
 
     private static final long CONNECTION_TIME_OUT_MS = 1000;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient googleApiClient;
 
     public static Intent getIntent(Context context, boolean sendPerformanceItems, boolean sendHighlights,
                                    boolean sendConfigItems, boolean broadcastAccountId) {
@@ -94,7 +94,7 @@ public class WearSyncService extends IntentService implements
     public void onCreate() {
         super.onCreate();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -104,8 +104,8 @@ public class WearSyncService extends IntentService implements
     @Override
     protected void onHandleIntent(final Intent intent) {
 
-        mGoogleApiClient.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-        if (mGoogleApiClient.isConnected()) {
+        googleApiClient.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+        if (googleApiClient.isConnected()) {
 
             try {
 
@@ -121,7 +121,7 @@ public class WearSyncService extends IntentService implements
                         modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
                         modelProvider.getSettings());
 
-                DataItemBuffer dataItems = Wearable.DataApi.getDataItems(mGoogleApiClient).await();
+                DataItemBuffer dataItems = Wearable.DataApi.getDataItems(googleApiClient).await();
                 long accountId = getAccountIdFromDataBuffer(dataItems);
 
                 dataItems.release();
@@ -146,7 +146,7 @@ public class WearSyncService extends IntentService implements
             } catch (Exception ex) {
                 Log.e(TAG, "onHandleIntent exception", ex);
             } finally {
-                mGoogleApiClient.disconnect();
+                googleApiClient.disconnect();
             }
         } else {
             Log.e(TAG, "Failed to connect to GoogleApiClient");
@@ -158,7 +158,7 @@ public class WearSyncService extends IntentService implements
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_WATCH_CONFIG_SYNC);
         putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS, getConfigDataMap(settings));
         putDataMapRequest.setUrgent();
-        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest());
         pendingResult.await();
     }
 
@@ -171,7 +171,7 @@ public class WearSyncService extends IntentService implements
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WearDataSync.PATH_SNAPSHOT_SYNC);
         putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_SNAPSHOT_DAILY, dataMapList);
         putDataMapRequest.setUrgent();
-        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest());
         pendingResult.await();
     }
 
@@ -310,7 +310,7 @@ public class WearSyncService extends IntentService implements
         putDataMapRequest.setUrgent();
         putDataMapRequest.getDataMap().putDataMapArrayList(WearDataSync.DATA_HIGHLIGHTS, dataMapList);
         PendingResult<DataApi.DataItemResult> pendingResult =
-                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataMapRequest.asPutDataRequest());
+                Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest());
         pendingResult.await();
     }
 

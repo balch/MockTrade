@@ -18,7 +18,7 @@ ext {
     rxandroid="2.0.1"
     support="25.3.1"
     play_services="10.2.6"
-    support_wearable="2.0.0"
+    wearable="2.0.2"
     support_test="0.5"
     junit="4.12"
     mockito="1.10.19"

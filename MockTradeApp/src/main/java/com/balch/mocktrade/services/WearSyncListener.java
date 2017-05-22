@@ -46,7 +46,7 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
 
     private static final String TAG = WearSyncListener.class.getSimpleName();
 
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient googleApiClient;
     private TradeModelProvider modelProvider;
 
     @Override
@@ -56,13 +56,23 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
         Log.d(TAG, "WearSyncListener: onCreate");
         modelProvider = (TradeModelProvider) this.getApplication();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (googleApiClient.isConnected()) {
+            Wearable.DataApi.removeListener(googleApiClient, this);
+            Wearable.MessageApi.removeListener(googleApiClient, this);
+            googleApiClient.disconnect();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -95,15 +105,13 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "WearSyncListener: onConnected");
-        Wearable.DataApi.addListener(mGoogleApiClient, this);
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Wearable.DataApi.addListener(googleApiClient, this);
+        Wearable.MessageApi.addListener(googleApiClient, this);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.d(TAG, "WearSyncListener: onConnectionSuspended");
-        Wearable.DataApi.removeListener(mGoogleApiClient, this);
-        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
     }
 
     @Override

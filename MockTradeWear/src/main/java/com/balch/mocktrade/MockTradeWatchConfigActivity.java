@@ -63,19 +63,11 @@ public class MockTradeWatchConfigActivity extends Activity implements
 
     private static final String TAG = "MockTradeWatchConfig";
 
-    private GoogleApiClient mGoogleApiClient;
-    private LinearLayout mHeader;
-    private ConfigItemAdapter mConfigItemAdapter;
-    private Node mCompanionNode;
+    private GoogleApiClient googleApiClient;
+    private LinearLayout headerLayout;
+    private ConfigItemAdapter configItemAdapter;
+    private Node companionNode;
 
-    private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            float newTranslation = Math.min(-dx, 0);
-            mHeader.setTranslationY(newTranslation);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +77,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
         TextView version = (TextView) findViewById(R.id.config_watch_version);
         version.setText("Version: " + VersionUtils.getVersion(this, BuildConfig.DEBUG));
 
-        mHeader = (LinearLayout) findViewById(R.id.config_watch_header);
+        headerLayout = (LinearLayout) findViewById(R.id.config_watch_header);
         BoxInsetLayout content = (BoxInsetLayout) findViewById(R.id.content);
         // BoxInsetLayout adds padding by default on round devices. Add some on square devices.
         content.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -107,12 +99,12 @@ public class MockTradeWatchConfigActivity extends Activity implements
         listView.setClickListener(this);
         listView.addOnScrollListener(this);
 
-        mConfigItemAdapter = new ConfigItemAdapter(new ConfigItemAdapter.ConfigItemAdapterListener() {
+        configItemAdapter = new ConfigItemAdapter(new ConfigItemAdapter.ConfigItemAdapterListener() {
             @Override
             public void onConfigItemChanged(WatchConfigItem item) {
-                if (mCompanionNode != null && mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
+                if (companionNode != null && googleApiClient !=null && googleApiClient.isConnected()) {
 
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, mCompanionNode.getId(),
+                    Wearable.MessageApi.sendMessage(googleApiClient, companionNode.getId(),
                             WearDataSync.MSG_WATCH_CONFIG_SET, item.toDataMap().toByteArray()).setResultCallback(
 
                             new ResultCallback<MessageApi.SendMessageResult>() {
@@ -129,9 +121,9 @@ public class MockTradeWatchConfigActivity extends Activity implements
                 }
             }
         });
-        listView.setAdapter(mConfigItemAdapter);
+        listView.setAdapter(configItemAdapter);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
@@ -141,13 +133,13 @@ public class MockTradeWatchConfigActivity extends Activity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
         }
         super.onStop();
     }
@@ -168,7 +160,7 @@ public class MockTradeWatchConfigActivity extends Activity implements
     @Override // WearableListView.OnScrollListener
     public void onAbsoluteScrollChange(int scroll) {
         float newTranslation = Math.min(-scroll, 0);
-        mHeader.setTranslationY(newTranslation);
+        headerLayout.setTranslationY(newTranslation);
     }
 
     @Override
@@ -180,29 +172,29 @@ public class MockTradeWatchConfigActivity extends Activity implements
     public void onConnected(Bundle connectionHint) {
         Log.d(TAG, "onConnected: " + connectionHint);
 
-        mCompanionNode = null;
-        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+        companionNode = null;
+        Wearable.NodeApi.getConnectedNodes(googleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(@NonNull NodeApi.GetConnectedNodesResult nodesResult) {
                 List<Node> nodes = nodesResult.getNodes();
                 if (!nodes.isEmpty()) {
                     for (Node node : nodes) {
                         if (node.isNearby()) {
-                            mCompanionNode = node;
+                            companionNode = node;
                             break;
                         }
 
-                        if (mCompanionNode == null) {
-                            mCompanionNode = nodes.get(0);
+                        if (companionNode == null) {
+                            companionNode = nodes.get(0);
                         }
                     }
                 }
 
-                mCompanionNode = !nodes.isEmpty() ? nodes.get(0) : null;
+                companionNode = !nodes.isEmpty() ? nodes.get(0) : null;
             }
         });
 
-        PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(mGoogleApiClient);
+        PendingResult<DataItemBuffer> results = Wearable.DataApi.getDataItems(googleApiClient);
         results.setResultCallback(new ResultCallback<DataItemBuffer>() {
             @Override
             public void onResult(@NonNull DataItemBuffer dataItems) {
@@ -217,9 +209,9 @@ public class MockTradeWatchConfigActivity extends Activity implements
                         ArrayList<DataMap> dataMapList = dataMap.getDataMapArrayList(WearDataSync.DATA_WATCH_CONFIG_DATA_ITEMS);
                         if (dataMapList != null) {
                             for (DataMap dm : dataMapList) {
-                                mConfigItemAdapter.add(new WatchConfigItem(dm));
+                                configItemAdapter.add(new WatchConfigItem(dm));
                             }
-                            mConfigItemAdapter.notifyDataSetChanged();
+                            configItemAdapter.notifyDataSetChanged();
                         }
                     }
                 }

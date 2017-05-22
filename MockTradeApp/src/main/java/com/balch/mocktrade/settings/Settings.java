@@ -71,15 +71,15 @@ public class Settings {
         }
     }
 
-    private Application mContext;
+    private Application application;
 
-    public Settings(Application context) {
-        this.mContext = context;
-        PreferenceManager.setDefaultValues(this.mContext, R.xml.settings_pref_screen, false);
+    public Settings(Application application) {
+        this.application = application;
+        PreferenceManager.setDefaultValues(application, R.xml.settings_pref_screen, false);
     }
 
     private SharedPreferences getSharedPrefs() {
-        return PreferenceManager.getDefaultSharedPreferences(this.mContext);
+        return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
     // Polls start time is in HH:mm format in PST
@@ -117,7 +117,7 @@ public class Settings {
                 .apply();
 
         if (key.isRefreshWatch()) {
-            mContext.startService(WearSyncService.getIntent(mContext, true, true, true, false));
+            application.startService(WearSyncService.getIntent(application, true, true, true, false));
         }
 
     }

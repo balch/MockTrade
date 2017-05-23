@@ -142,15 +142,12 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             View view = accountViewHolder.itemView;
             view.setLongClickable(true);
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    boolean consumed = false;
-                    if (mPortfolioAdapterListener != null) {
-                        consumed = mPortfolioAdapterListener.onLongClickAccount(account);
-                    }
-                    return consumed;
+            view.setOnLongClickListener(v -> {
+                boolean consumed = false;
+                if (mPortfolioAdapterListener != null) {
+                    consumed = mPortfolioAdapterListener.onLongClickAccount(account);
                 }
+                return consumed;
             });
 
         } else if (holder instanceof InvestmentViewHolder) {
@@ -162,15 +159,12 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             View view = investmentItemView.itemView;
             view.setLongClickable(true);
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    boolean consumed = false;
-                    if (mPortfolioAdapterListener != null) {
-                        consumed = mPortfolioAdapterListener.onLongClickInvestment(investment);
-                    }
-                    return consumed;
+            view.setOnLongClickListener(v -> {
+                boolean consumed = false;
+                if (mPortfolioAdapterListener != null) {
+                    consumed = mPortfolioAdapterListener.onLongClickInvestment(investment);
                 }
+                return consumed;
             });
 
         }
@@ -182,24 +176,16 @@ public class PortfolioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             super(LayoutInflater.from(parent.getContext()).inflate(R.layout.portfolio_view_holder_empty, parent, false));
 
             itemView.findViewById(R.id.portfolio_view_holder_empty_create)
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (listener != null) {
-                                listener.createNewAccount();
-                            }
-
+                    .setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.createNewAccount();
                         }
                     });
 
             itemView.findViewById(R.id.portfolio_view_holder_empty_dogs)
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (listener != null) {
-                                listener.createNewDogsAccount();
-                            }
-
+                    .setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.createNewDogsAccount();
                         }
                     });
         }

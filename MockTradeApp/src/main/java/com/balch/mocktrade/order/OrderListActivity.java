@@ -28,10 +28,8 @@ import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -76,27 +74,22 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        view.setOrderItemViewListener(new OrderItemView.OrderItemViewListener() {
-            @Override
-            public boolean onCancelOrder(final Order order) {
-                new AlertDialog.Builder(OrderListActivity.this)
-                        .setTitle(R.string.order_cancel_dlg_title)
-                        .setMessage(getString(R.string.order_cancel_dlg_message_format, order.getId(), order.getSymbol()))
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                try {
-                                    orderModel.cancelOrder(order);
-                                    reload(true);
-                                } catch (Exception ex) {
-                                    Log.e(TAG, "Error Canceling Order", ex);
-                                    Toast.makeText(OrderListActivity.this, "Error Canceling Order", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null).show();
-                return true;
-            }
+        view.setOrderItemViewListener(order -> {
+            new AlertDialog.Builder(OrderListActivity.this)
+                    .setTitle(R.string.order_cancel_dlg_title)
+                    .setMessage(getString(R.string.order_cancel_dlg_message_format, order.getId(), order.getSymbol()))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                        try {
+                            orderModel.cancelOrder(order);
+                            reload(true);
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Error Canceling Order", ex);
+                            Toast.makeText(OrderListActivity.this, "Error Canceling Order", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
+            return true;
         });
 
         orderViewModel.getOrders().observe(this, orderDataObserver);
@@ -135,17 +128,14 @@ public class OrderListActivity extends PresenterActivity<OrderListView, TradeMod
         orderViewModel.loadOrders(accountId);
     }
 
-    private Observer<List<Order>> orderDataObserver = new Observer<List<Order>>() {
-        @Override
-        public void onChanged(@Nullable List<Order> data) {
-            if (data.size() == 0) {
-                finish();
-                return;
-            }
-
-            view.bind(data);
-            hideProgress();
+    private Observer<List<Order>> orderDataObserver = data -> {
+        if (data.size() == 0) {
+            finish();
+            return;
         }
+
+        view.bind(data);
+        hideProgress();
     };
 
 

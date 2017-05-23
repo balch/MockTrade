@@ -48,10 +48,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class PortfolioViewModel extends ViewModel {
@@ -112,62 +109,36 @@ public class PortfolioViewModel extends ViewModel {
         disposePortfolioData();
         disposablePortfolioData = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .map(new Function<Boolean, PortfolioData>() {
-                    @Override
-                    public PortfolioData apply(@NonNull Boolean aBoolean) throws Exception {
-                        PortfolioData portfolioData = loadPortfolioDataInBackground();
-                        if (portfolioData == null) {
-                            portfolioData = new PortfolioData();
-                        }
-                        return portfolioData;
+                .map(aBoolean -> {
+                    PortfolioData portfolioData = loadPortfolioDataInBackground();
+                    if (portfolioData == null) {
+                        portfolioData = new PortfolioData();
                     }
+                    return portfolioData;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<PortfolioData>() {
-                               @Override
-                               public void accept(@NonNull PortfolioData data) throws Exception {
-                                   livePortfolioData.setValue(data);
-                               }
-                           },
-                        new Consumer<Throwable>() {
-                            @Override
-                            public void accept(@NonNull Throwable throwable) throws Exception {
-                                Log.e(TAG, "loadPortfolioData exception", throwable );
-                            }
-                        });
+                .subscribe(livePortfolioData::setValue,
+                        throwable -> Log.e(TAG, "loadPortfolioData exception", throwable ));
     }
 
     void loadGraphData() {
         disposeGraphData();
         disposableGraphData = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .map(new Function<Boolean, List<PerformanceItem>>() {
-                    @Override
-                    public List<PerformanceItem> apply(@NonNull Boolean aBoolean) throws Exception {
-                        List<PerformanceItem> performanceItems =
-                                (graphDaysToReturn < 2) ?
-                                    portfolioModel.getCurrentSnapshot(graphSelectedAccountId) :
-                                    portfolioModel.getCurrentDailySnapshot(graphSelectedAccountId, graphDaysToReturn);
+                .map(aBoolean -> {
+                    List<PerformanceItem> performanceItems =
+                            (graphDaysToReturn < 2) ?
+                                portfolioModel.getCurrentSnapshot(graphSelectedAccountId) :
+                                portfolioModel.getCurrentDailySnapshot(graphSelectedAccountId, graphDaysToReturn);
 
-                        if (performanceItems == null) {
-                            performanceItems = new ArrayList<>();
-                        }
-                        return performanceItems;
+                    if (performanceItems == null) {
+                        performanceItems = new ArrayList<>();
                     }
+                    return performanceItems;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<PerformanceItem>>() {
-                        @Override
-                        public void accept(@NonNull List<PerformanceItem> data) throws Exception {
-                            liveGraphData.setValue(data);
-                        }
-                    },
-                    new Consumer<Throwable>() {
-                        @Override
-                        public void accept(@NonNull Throwable throwable) throws Exception {
-                            Log.e(TAG, "loadGraphData exception", throwable );
-                        }
-                });
+                .subscribe(liveGraphData::setValue,
+                        throwable -> Log.e(TAG, "loadGraphData exception", throwable ));
 
     }
 

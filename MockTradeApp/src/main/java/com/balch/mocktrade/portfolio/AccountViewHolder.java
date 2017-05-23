@@ -98,21 +98,15 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
             mOpenOrders.setText(String.format(itemView.getResources().getString(R.string.account_item_open_orders_format), openOrderCount));
         }
 
-        this.mTradeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mAccountItemViewListener != null) {
-                    mAccountItemViewListener.onTradeButtonClicked(mAccount);
-                }
+        this.mTradeButton.setOnClickListener(v -> {
+            if (mAccountItemViewListener != null) {
+                mAccountItemViewListener.onTradeButtonClicked(mAccount);
             }
         });
 
-        this.mOpenOrders.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mAccountItemViewListener != null) {
-                    mAccountItemViewListener.onShowOpenOrdersClicked(mAccount);
-                }
+        this.mOpenOrders.setOnClickListener(v -> {
+            if (mAccountItemViewListener != null) {
+                mAccountItemViewListener.onShowOpenOrdersClicked(mAccount);
             }
         });
 

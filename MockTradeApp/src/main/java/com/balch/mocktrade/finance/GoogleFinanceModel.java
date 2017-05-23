@@ -48,8 +48,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
 
 public class GoogleFinanceModel implements FinanceModel {
     private static final String TAG = GoogleFinanceModel.class.getSimpleName();
@@ -74,12 +72,7 @@ public class GoogleFinanceModel implements FinanceModel {
     @Override
     public Observable<Quote> getQuote(final String symbol) {
         return getQuotes(Collections.singletonList(symbol))
-                .map(new Function<Map<String, Quote>, Quote>() {
-                    @Override
-                    public Quote apply(@NonNull Map<String, Quote> quoteMap) throws Exception {
-                        return quoteMap.get(symbol);
-                    }
-                });
+                .map(quoteMap -> quoteMap.get(symbol));
     }
 
     @Override
@@ -88,31 +81,12 @@ public class GoogleFinanceModel implements FinanceModel {
         final Set<String> uniqueSymbols = getUniqueSymbols(symbols);
         String symbolString = getDelimitedSymbols(uniqueSymbols);
 
+        // Note: googleFinanceApi.getQuotes returns the body as a string b/c
+        // the returned payload starts with `//` which
+        // must be trimmed before the json can be parsed
         return googleFinanceApi.getQuotes(symbolString)
-                .map(new Function<String, List<Quote>>() {
-                    @Override
-                    public List<Quote> apply(@NonNull String s) throws Exception {
-                        // Note: googleFinanceApi.getQuotes returns the body as a string b/c
-                        // the returned payload starts with `//` which
-                        // must be trimmed before the json can be parsed
-                        return parseQuotes(s);
-                    }
-                })
-                .map(new Function<List<Quote>, Map<String, Quote>>() {
-                    @Override
-                    public Map<String, Quote> apply(@NonNull List<Quote> quotes) throws Exception {
-                        Map quoteMap = new HashMap<>(uniqueSymbols.size());
-                        if (quotes.size() == uniqueSymbols.size()) {
-                            Iterator<String> symbolIterator = uniqueSymbols.iterator();
-                            for (Quote quote : quotes) {
-                                // fix issue when returned symbol does not match, check LMT.WD
-                                quote.setSymbol(symbolIterator.next());
-                                quoteMap.put(quote.getSymbol(), quote);
-                            }
-                        }
-                       return quoteMap;
-                    }
-                });
+                .map(this::parseQuotes)
+                .map(quotes -> mapSymbolsToQuotes(quotes, uniqueSymbols));
     }
 
     @Override
@@ -176,7 +150,6 @@ public class GoogleFinanceModel implements FinanceModel {
     }
 
     private GoogleQuote parseQuote(JsonObject jsonObject) {
-
         Money price = new Money(getJsonString(jsonObject, LAST_TRADE_PRICE_ONLY));
         Money previousClose = new Money(getJsonString(jsonObject, LAST_CLOSE_PRICE));
         Money dividendPerShare = new Money(getJsonString(jsonObject, DIVIDEND_PER_SHARE));
@@ -207,4 +180,16 @@ public class GoogleFinanceModel implements FinanceModel {
         }
     }
 
+    private Map<String, Quote>  mapSymbolsToQuotes(List<Quote> quotes, Set<String> uniqueSymbols) {
+        Map<String, Quote> quoteMap = new HashMap<>(uniqueSymbols.size());
+        if (quotes.size() == uniqueSymbols.size()) {
+            Iterator<String> symbolIterator = uniqueSymbols.iterator();
+            for (Quote quote : quotes) {
+                // fix issue when returned symbol does not match, check LMT.WD
+                quote.setSymbol(symbolIterator.next());
+                quoteMap.put(quote.getSymbol(), quote);
+            }
+        }
+        return quoteMap;
+    }
 }

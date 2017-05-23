@@ -43,20 +43,17 @@ import com.balch.android.app.framework.domain.ViewHint;
 import com.balch.android.app.framework.domain.widget.ControlMapper;
 import com.balch.android.app.framework.domain.widget.EditLayout;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.finance.GoogleFinanceModel;
-import com.balch.mocktrade.finance.Quote;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class StockSymbolLayout extends LinearLayout implements EditLayout, TextWatcher {
@@ -289,24 +286,18 @@ public class StockSymbolLayout extends LinearLayout implements EditLayout, TextW
         disposableGetQuote = financeModel.getQuote(symbol)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Quote>() {
-                               @Override
-                               public void accept(@NonNull Quote quote) throws Exception {
-                                   setInvestmentData(quote.getName(), quote.getPrice());
-                                   symbolValue.setError(null);
-                                   callListenerOnChanged(false);
-                               }
-                           },
-                            new Consumer<Throwable>() {
-                                @Override
-                                public void accept(@NonNull Throwable throwable) throws Exception {
-                                    Log.e(TAG, "getQuoteAsync exception", throwable );
-                                    setInvestmentData("", null);
-                                    String message = getResources().getString(R.string.error_invalid_symbol);
-                                    symbolValue.setError(message);
-                                    callListenerOnChanged(true);
-                                }
-                            });
+                .subscribe(quote -> {
+                    setInvestmentData(quote.getName(), quote.getPrice());
+                    symbolValue.setError(null);
+                    callListenerOnChanged(false);
+                },
+                throwable -> {
+                    Log.e(TAG, "getQuoteAsync exception", throwable );
+                    setInvestmentData("", null);
+                    String message = getResources().getString(R.string.error_invalid_symbol);
+                    symbolValue.setError(message);
+                    callListenerOnChanged(true);
+                });
     }
 
     @Override

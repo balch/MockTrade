@@ -34,13 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class DogsOfTheDow extends BaseStrategy {
@@ -55,20 +52,8 @@ public class DogsOfTheDow extends BaseStrategy {
         financeModel.getQuotes(Arrays.asList(DOW_SYMBOLS))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(new Consumer<Map<String, Quote>>() {
-                               @Override
-                               public void accept(@NonNull Map<String, Quote> quoteMap) throws Exception {
-                                    handleQuotes(account, quoteMap);
-                               }
-                           },
-                            new Consumer<Throwable>() {
-                                @Override
-                                public void accept(@NonNull Throwable throwable) throws Exception {
-                                    Log.e(TAG, "Dogs of the Dow getQuotes error", throwable);
-                                }
-                            });
-
-
+                .subscribe(quoteMap -> handleQuotes(account, quoteMap),
+                        throwable -> Log.e(TAG, "Dogs of the Dow getQuotes error", throwable));
     }
 
     @Override
@@ -113,12 +98,9 @@ public class DogsOfTheDow extends BaseStrategy {
 
     private void handleQuotes(Account account, Map<String, Quote> quoteMap) {
         List<Quote> sortedQuotes = new ArrayList<>(quoteMap.values());
-        Collections.sort(sortedQuotes, new Comparator<Quote>() {
-            @Override
-            public int compare(Quote lhs, Quote rhs) {
-                // reverse sort
-                return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
-            }
+        Collections.sort(sortedQuotes, (lhs, rhs) -> {
+            // reverse sort
+            return rhs.getDividendPerShare().compareTo(lhs.getDividendPerShare());
         });
 
         if (sortedQuotes.size() > 0) {

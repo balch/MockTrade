@@ -24,7 +24,6 @@ package com.balch.mocktrade.order;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -81,15 +80,12 @@ public class OrderItemView extends LinearLayout {
         this.mQuantity = (TextView)findViewById(R.id.order_item_quantity);
 
         this.setLongClickable(true);
-        this.setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                boolean handled = false;
-                if (mOrderItemViewListener != null) {
-                    handled = mOrderItemViewListener.onCancelOrder(mOrder);
-                }
-                return handled;
+        this.setOnLongClickListener(v -> {
+            boolean handled = false;
+            if (mOrderItemViewListener != null) {
+                handled = mOrderItemViewListener.onCancelOrder(mOrder);
             }
+            return handled;
         });
 
     }

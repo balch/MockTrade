@@ -31,10 +31,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 class OrderViewModel extends ViewModel {
@@ -62,19 +59,9 @@ class OrderViewModel extends ViewModel {
         disposeOrders();
         disposableLoadOrders = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .map(new Function<Boolean, List<Order>>() {
-                    @Override
-                    public List<Order> apply(@NonNull Boolean aBoolean) throws Exception {
-                        return orderModel.getOpenOrders(accountId);
-                    }
-                })
+                .map(aBoolean -> orderModel.getOpenOrders(accountId))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<Order>>() {
-                    @Override
-                    public void accept(@NonNull List<Order> orders) throws Exception {
-                        liveOrders.setValue(orders);
-                    }
-                });
+                .subscribe(liveOrders::setValue);
     }
     void setOrderModel(OrderModel orderModel) {
         this.orderModel = orderModel;

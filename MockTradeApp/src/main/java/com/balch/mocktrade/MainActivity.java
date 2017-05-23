@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -61,8 +60,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends PresenterActivity<MainPortfolioView, TradeModelProvider>
@@ -122,12 +119,7 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.portfolio_view_app_bar);
         if (appBarLayout != null) {
             if (bundle == null) {
-                uiHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        appBarLayout.setExpanded(false);
-                    }
-                }, 500);
+                uiHandler.postDelayed(() -> appBarLayout.setExpanded(false), 500);
             } else {
                 appBarLayout.setExpanded(false, false);
             }
@@ -146,12 +138,9 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
 
     @Override
     public MainPortfolioView createView() {
-        return new MainPortfolioView(this, new MainPortfolioView.MainPortfolioViewListener() {
-            @Override
-            public void onGraphSelectionChanged(long accountId, int daysToReturn) {
-                portfolioViewModel.setGraphSelectionCriteria(accountId, daysToReturn);
-            }
-        });
+        return new MainPortfolioView(this,
+                (accountId, daysToReturn) ->
+                        portfolioViewModel.setGraphSelectionCriteria(accountId, daysToReturn));
     }
 
     @Override
@@ -285,22 +274,14 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         return true;
     }
 
-    private Observer<List<PerformanceItem>> graphDataObserver = new Observer<List<PerformanceItem>>() {
-        @Override
-        public void onChanged(@Nullable List<PerformanceItem> data) {
-            view.setDailyGraphData(data);
+    private Observer<List<PerformanceItem>> graphDataObserver = data -> {
+        view.setDailyGraphData(data);
 //          mMainPortfolioView.setDailyGraphData(generateRandomTestData());
 
-            hideProgress();
-        }
+        hideProgress();
     };
 
-    private Observer<PortfolioData> portfolioDataObserver = new Observer<PortfolioData>() {
-        @Override
-        public void onChanged(@Nullable PortfolioData data) {
-            displayPortfolioData(data);
-        }
-    };
+    private Observer<PortfolioData> portfolioDataObserver = data -> displayPortfolioData(data);
 
     private void displayPortfolioData(PortfolioData data) {
         PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());
@@ -580,28 +561,19 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, TradeMode
         disposeNewAccount();
         disposableNewAccount = Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .map(new Function<Boolean, Boolean>() {
-                    @Override
-                    public Boolean apply(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {
-                        portfolioModel.createAccount(account);
-                        return true;
-                    }
+                .map(aBoolean -> {
+                    portfolioModel.createAccount(account);
+                    return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Boolean>() {
-                               @Override
-                               public void accept(@io.reactivex.annotations.NonNull Boolean aBoolean) throws Exception {
-                                   hideProgress();
-                                   updateView();
-                               }
-                           },
-                            new Consumer<Throwable>() {
-                                @Override
-                                public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
-                                    hideProgress();
-                                    Log.e(TAG, "createNewAccountAsync error", throwable);
-                                }
-                            });
+                .subscribe(aBoolean -> {
+                            hideProgress();
+                            updateView();
+                        },
+                        throwable -> {
+                            hideProgress();
+                            Log.e(TAG, "createNewAccountAsync error", throwable);
+                        });
     }
 
     private void disposeNewAccount() {

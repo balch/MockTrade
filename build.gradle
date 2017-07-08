@@ -10,18 +10,20 @@ ext {
     versionCode=4
     versionName="3.0"
 
-    android_arch="1.0.0-alpha1"
+    android_arch="1.0.0-alpha3"
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
     rxjava2="2.1.0"
     rxandroid="2.0.1"
-    support="25.3.1"
-    play_services="10.2.6"
-    wearable="2.0.2"
+    support="25.4.0"
+    play_services="11.0.2"
+    wearable="2.0.3"
+    joda="2.9.9"
     support_test="0.5"
     junit="4.12"
     mockito="1.10.19"
+
 }
 
 buildscript {
@@ -29,8 +31,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
-        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha5'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

@@ -25,7 +25,6 @@ package com.balch.mocktrade.finance;
 import android.content.Context;
 import android.util.Log;
 
-import com.balch.android.app.framework.types.ISO8601DateTime;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.settings.Settings;
 import com.google.gson.JsonArray;
@@ -33,7 +32,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.text.ParseException;
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -166,17 +166,19 @@ public class GoogleFinanceModel implements FinanceModel {
     }
 
     private Date getDateFromISO8601(String dateStr) {
-        TimeZone ny_tz = TimeZone.getTimeZone("America/New_York");
-        Calendar ny_cal = Calendar.getInstance(ny_tz);
-        int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET)) / 60000;
 
-        dateStr = dateStr.replace("Z", String.format(Locale.getDefault(), "%s%02d:%02d",
-                (offset_mins >= 0) ? "+" : "-", Math.abs(offset_mins / 60), Math.abs(offset_mins % 60)));
         try {
-            return ISO8601DateTime.toDate(dateStr);
-        } catch (ParseException e) {
+            TimeZone ny_tz = TimeZone.getTimeZone("America/New_York");
+            Calendar ny_cal = Calendar.getInstance(ny_tz);
+            int offset_mins = (ny_cal.get(Calendar.ZONE_OFFSET) + ny_cal.get(Calendar.DST_OFFSET)) / 60000;
+
+            dateStr = dateStr.replace("Z", String.format(Locale.getDefault(), "%s%02d:%02d",
+                    (offset_mins >= 0) ? "+" : "-", Math.abs(offset_mins / 60), Math.abs(offset_mins % 60)));
+
+            return DateTime.parse(dateStr).toDate();
+        } catch (Exception e) {
             Log.e(TAG, "Error parsing date:" + dateStr, e);
-            throw new RuntimeException(e);
+            return new Date();
         }
     }
 

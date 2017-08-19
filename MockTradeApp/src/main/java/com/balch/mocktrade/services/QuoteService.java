@@ -93,39 +93,44 @@ public class QuoteService extends IntentService {
                 }
 
                 // get quotes over the wire
-                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
-                if (quoteMap != null) {
-                    boolean newHasQuotes = false;
-                    for (Investment i : investments) {
-                        try {
-                            Quote quote = quoteMap.get(i.getSymbol());
-                            if (quote != null) {
-                                if (quote.getLastTradeTime().after(i.getLastTradeTime())) {
-                                    newHasQuotes = true;
-                                    i.setPrevDayClose(quote.getPreviousClose());
-                                    i.setPrice(quote.getPrice(), quote.getLastTradeTime());
-                                    portfolioModel.updateInvestment(i);
+                try {
+                    Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
+                    if (quoteMap != null) {
+                        boolean newHasQuotes = false;
+                        for (Investment i : investments) {
+                            try {
+                                Quote quote = quoteMap.get(i.getSymbol());
+                                if (quote != null) {
+                                    if (quote.getLastTradeTime().after(i.getLastTradeTime())) {
+                                        newHasQuotes = true;
+                                        i.setPrevDayClose(quote.getPreviousClose());
+                                        i.setPrice(quote.getPrice(), quote.getLastTradeTime());
+                                        portfolioModel.updateInvestment(i);
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                Log.e(TAG, "updateInvestment exception", ex);
                             }
-                        } catch (Exception ex) {
-                            Log.e(TAG, "updateInvestment exception", ex);
                         }
+
+                        boolean isFirstSyncOfDay = !DateUtils.isToday(settings.getLastSyncTime());
+                        if (isFirstSyncOfDay) {
+                            portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
+                        }
+
+                        if (newHasQuotes) {
+                            portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
+                        }
+
+                        processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
+
+                        settings.setLastSyncTime(System.currentTimeMillis());
+
+                        startService(WearSyncService.getIntent(getApplicationContext()));
                     }
+                } catch (Exception ex1) {
+                    Log.e(TAG, "updateInvestment exception", ex1);
 
-                    boolean isFirstSyncOfDay = !DateUtils.isToday(settings.getLastSyncTime());
-                    if (isFirstSyncOfDay) {
-                        portfolioModel.purgeSnapshots(SNAPSHOT_DAYS_TO_KEEP);
-                    }
-
-                    if (newHasQuotes) {
-                        portfolioModel.createSnapshotTotals(accounts, accountIdToInvestmentMap);
-                    }
-
-                    processAccountStrategies(accounts, accountIdToInvestmentMap, quoteMap, isFirstSyncOfDay);
-
-                    settings.setLastSyncTime(System.currentTimeMillis());
-
-                    startService(WearSyncService.getIntent(getApplicationContext()));
                 }
             }
 
@@ -136,7 +141,7 @@ public class QuoteService extends IntentService {
             }
 
         } catch (Exception ex) {
-            Log.e(TAG, "onHandleIntent exception", ex);
+            Log.e(TAG, "financeModel.getQuotes(symbols exception", ex);
         } finally {
             PortfolioUpdateBroadcaster.broadcast(QuoteService.this);
             QuoteReceiver.completeWakefulIntent(intent);

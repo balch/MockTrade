@@ -4,7 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="RtlHardcoded">
+    tools:ignore="RtlHardcoded"
+    android:id="@+id/edit_view"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

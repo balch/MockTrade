@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.widget;
+package com.balch.android.app.framework.core.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -29,8 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.ValidatorException;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.ValidatorException;
 
 public class UnsupportedEditLayout extends LinearLayout implements EditLayout {
 

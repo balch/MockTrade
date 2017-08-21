@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 8/23/16 5:07 PM
+ * Created: 9/4/14 12:26 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,12 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2016
- *
+ * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework;
+package com.balch.android.app.framework.core.widget;
 
-public interface BaseView {
-    void cleanup();
+public interface ControlMapper {
+    ControlMap getControlMap();
 }

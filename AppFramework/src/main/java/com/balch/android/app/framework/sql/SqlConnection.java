@@ -31,7 +31,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.balch.android.app.framework.StopWatch;
-import com.balch.android.app.framework.domain.DomainObject;
+import com.balch.android.app.framework.core.DomainObject;
 
 import java.io.IOException;
 import java.io.InputStream;

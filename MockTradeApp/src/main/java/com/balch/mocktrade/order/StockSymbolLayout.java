@@ -36,12 +36,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.ViewHint;
-import com.balch.android.app.framework.domain.widget.ControlMapper;
-import com.balch.android.app.framework.domain.widget.EditLayout;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.EditState;
+import com.balch.android.app.framework.core.ValidatorException;
+import com.balch.android.app.framework.core.ViewHint;
+import com.balch.android.app.framework.core.widget.ControlMapper;
+import com.balch.android.app.framework.core.widget.EditLayout;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeModelProvider;

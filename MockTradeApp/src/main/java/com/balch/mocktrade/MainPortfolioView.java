@@ -41,9 +41,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.balch.android.app.framework.BaseView;
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.EditState;
+import com.balch.android.app.framework.core.ViewHint;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.order.StockSymbolLayout;
 import com.balch.mocktrade.portfolio.PortfolioAdapter;
@@ -85,7 +85,7 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
     private int accountSelectedPosition = 0;
     private int graphTimeSelectedPosition = 0;
 
-    private final MainPortfolioViewListener listener;
+    private MainPortfolioViewListener listener;
 
     public MainPortfolioView(Context context, MainPortfolioViewListener listener) {
         super(context);
@@ -171,6 +171,11 @@ public class MainPortfolioView extends LinearLayout implements BaseView {
                     new ViewHint[]{new ViewHint(ViewHint.Hint.MAX_CHARS, "32"), new ViewHint(ViewHint.Hint.NOT_EMPTY, "true")}, 1, null);
             stockSymbolLayout.bind(columnDescriptor);
         }
+    }
+
+    @Override
+    public void cleanup() {
+        listener = null;
     }
 
     public long getSelectedAccountId() {

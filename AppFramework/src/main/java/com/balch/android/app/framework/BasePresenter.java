@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 8/23/16 5:07 PM
+ * Created: 8/19/17 7:23 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,12 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2016
+ * Copyright (C) 2017
  *
  */
 
 package com.balch.android.app.framework;
 
-public interface BaseView {
-    void cleanup();
+public abstract class BasePresenter<V extends BaseView> {
+    protected V view;
+
+    public BasePresenter(V view) {
+        this.view = view;
+    }
+
+    protected void cleanup() {
+        view.cleanup();
+        view = null;
+    }
+
 }

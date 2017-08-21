@@ -25,7 +25,7 @@
         </activity>
 
         <activity
-            android:name="com.balch.android.app.framework.domain.EditActivity" >
+            android:name="com.balch.android.app.framework.core.EditActivity" >
         </activity>
 
         <activity

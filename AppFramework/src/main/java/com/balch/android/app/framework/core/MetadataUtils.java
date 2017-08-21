@@ -21,22 +21,22 @@
  *
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.domain.annotations.ColumnEdit;
-import com.balch.android.app.framework.domain.annotations.ColumnNew;
-import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.domain.widget.BoolEditLayout;
-import com.balch.android.app.framework.domain.widget.EnumEditLayout;
-import com.balch.android.app.framework.domain.widget.MoneyEditLayout;
-import com.balch.android.app.framework.domain.widget.NumberEditLayout;
-import com.balch.android.app.framework.domain.widget.StringEditLayout;
-import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
+import com.balch.android.app.framework.core.annotations.ColumnEdit;
+import com.balch.android.app.framework.core.annotations.ColumnNew;
+import com.balch.android.app.framework.core.widget.EditLayout;
+import com.balch.android.app.framework.core.widget.BoolEditLayout;
+import com.balch.android.app.framework.core.widget.EnumEditLayout;
+import com.balch.android.app.framework.core.widget.MoneyEditLayout;
+import com.balch.android.app.framework.core.widget.NumberEditLayout;
+import com.balch.android.app.framework.core.widget.StringEditLayout;
+import com.balch.android.app.framework.core.widget.UnsupportedEditLayout;
 import com.balch.android.app.framework.types.Money;
 
 import java.lang.reflect.Field;

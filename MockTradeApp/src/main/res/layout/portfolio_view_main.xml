@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="RtlHardcoded"
-    tools:parentTag="LinearLayout">
+    tools:parentTag="android.widget.LinearLayout"
+    android:id="@+id/portfolio_view_main">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/portfolio_view_coordinator"

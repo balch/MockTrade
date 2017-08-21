@@ -25,7 +25,7 @@ package com.balch.android.app.framework.sql;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.balch.android.app.framework.domain.DomainObject;
+import com.balch.android.app.framework.core.DomainObject;
 
 import java.util.Map;
 

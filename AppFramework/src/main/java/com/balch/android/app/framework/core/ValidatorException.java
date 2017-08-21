@@ -20,10 +20,21 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
-public enum EditState {
-    HIDDEN,
-    READONLY,
-    CHANGEABLE
+public class ValidatorException extends Exception {
+    public ValidatorException() {
+    }
+
+    public ValidatorException(String detailMessage) {
+        super(detailMessage);
+    }
+
+    public ValidatorException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
+    }
+
+    public ValidatorException(Throwable throwable) {
+        super(throwable);
+    }
 }

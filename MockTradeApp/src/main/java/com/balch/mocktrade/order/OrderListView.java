@@ -72,6 +72,11 @@ public class OrderListView extends LinearLayout implements BaseView {
         this.orderListView.setAdapter(new OrderListAdapter(this.getContext(), orders, this.listener));
     }
 
+    @Override
+    public void cleanup() {
+        listener = null;
+    }
+
     private static class OrderListAdapter extends ArrayAdapter<Order> {
 
         final private OrderItemView.OrderItemViewListener listener;

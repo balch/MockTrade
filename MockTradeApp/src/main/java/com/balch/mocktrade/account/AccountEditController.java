@@ -26,11 +26,11 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.ExternalController;
-import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.widget.ControlMap;
-import com.balch.android.app.framework.domain.widget.EditLayout;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.ExternalController;
+import com.balch.android.app.framework.core.ValidatorException;
+import com.balch.android.app.framework.core.widget.ControlMap;
+import com.balch.android.app.framework.core.widget.EditLayout;
 
 public class AccountEditController implements ExternalController<Account>, Parcelable {
     public AccountEditController() {

@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 8/19/17 7:47 AM
  *
  * This file is part of MockTrade.
  *
@@ -17,25 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2017
+ *
  */
 
-package com.balch.android.app.framework.domain.annotations;
+package com.balch.android.app.framework.core;
 
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.widget.EditLayout;
+import com.balch.android.app.framework.BasePresenter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ColumnNew {
-    int labelResId();
-    EditState state() default EditState.CHANGEABLE;
-    String [] hints() default {};
-    int order();
-    Class<? extends EditLayout> customControl() default EditLayout.class;
+public class EditPresenter extends BasePresenter<EditView> {
+    public EditPresenter(EditView view) {
+        super(view);
+    }
+
+    public void initialize(DomainObject item, boolean isNew, ExternalController validator,
+                           int okButtonResId, int cancelButtonResId, List<Integer> columnViewIDs,
+                           EditView.EditViewListener listener) {
+        view.bind(item, isNew, validator, okButtonResId, cancelButtonResId, columnViewIDs);
+        view.setEditViewListener(listener);
+    }
+
 }

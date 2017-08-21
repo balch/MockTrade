@@ -28,7 +28,7 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.balch.android.app.framework.domain.DomainObject;
+import com.balch.android.app.framework.core.DomainObject;
 import com.balch.android.app.framework.sql.SqlMapper;
 import com.balch.android.app.framework.types.Money;
 

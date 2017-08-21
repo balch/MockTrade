@@ -20,20 +20,19 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import com.balch.android.app.framework.ModelProvider;
 import com.balch.android.app.framework.PresenterActivity;
 import com.balch.android.app.framework.R;
 
 import java.util.ArrayList;
 
-public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
+public class EditActivity extends PresenterActivity<EditView, EditPresenter> {
     protected static final String EXTRA_ISNEW = "isNew";
     protected static final String EXTRA_ITEM = "item";
     protected static final String EXTRA_VALIDATOR = "validator";
@@ -57,45 +56,44 @@ public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
         Intent intent = this.getIntent();
         int titleResId = intent.getIntExtra(EXTRA_TITLE_RESID, 0);
         if (titleResId != 0) {
-            this.setTitle(titleResId);
+            setTitle(titleResId);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.edit_view_toolbar);
+        Toolbar toolbar = findViewById(R.id.edit_view_toolbar);
         setSupportActionBar(toolbar);
 
-        this.validator = intent.getParcelableExtra(EXTRA_VALIDATOR);
-        this.item = intent.getParcelableExtra(EXTRA_ITEM);
-        this.isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
-        this.okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
-        this.cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
-
-        this.view.setEditViewListener(new EditView.EditViewListener() {
-            @Override
-            public void onSave(DomainObject item) {
-                Intent intent = getIntent();
-                intent.putExtra(EXTRA_RESULT, item);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-
-            @Override
-            public void onCancel() {
-                Intent intent = getIntent();
-                setResult(RESULT_CANCELED, intent);
-                finish();
-            }
-        });
+        validator = intent.getParcelableExtra(EXTRA_VALIDATOR);
+        item = intent.getParcelableExtra(EXTRA_ITEM);
+        isNew = intent.getBooleanExtra(EXTRA_ISNEW, false);
+        okButtonResId = intent.getIntExtra(EXTRA_OK_BUTTON_RESID, 0);
+        cancelButtonResId = intent.getIntExtra(EXTRA_CANCEL_BUTTON_RESID, 0);
 
         if (savedInstanceState != null) {
             this.columnViewIDs = savedInstanceState.getIntegerArrayList(STATE_COLUMN_VIEW_IDS);
         }
 
-        this.view.bind(this.item, this.isNew, this.validator, this.okButtonResId, this.cancelButtonResId, this.columnViewIDs);
+        presenter.initialize(item, isNew, validator, okButtonResId, cancelButtonResId, columnViewIDs,
+                new EditView.EditViewListener() {
+                    @Override
+                    public void onSave(DomainObject item) {
+                        Intent intent = getIntent();
+                        intent.putExtra(EXTRA_RESULT, item);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Intent intent = getIntent();
+                        setResult(RESULT_CANCELED, intent);
+                        finish();
+                    }
+                });
     }
 
     @Override
     public void onSaveInstanceStateBase(Bundle outState) {
-        outState.putIntegerArrayList(STATE_COLUMN_VIEW_IDS, this.columnViewIDs);
+        outState.putIntegerArrayList(STATE_COLUMN_VIEW_IDS, columnViewIDs);
     }
 
     @Override
@@ -104,8 +102,8 @@ public class EditActivity extends PresenterActivity<EditView, ModelProvider> {
     }
 
     @Override
-    protected void createModel(ModelProvider modelProvider) {
-
+    protected EditPresenter createPresenter(EditView view) {
+        return new EditPresenter(view);
     }
 
     public static Intent getIntent(Context context, int titleResId, DomainObject domainObject, ExternalController externalController,

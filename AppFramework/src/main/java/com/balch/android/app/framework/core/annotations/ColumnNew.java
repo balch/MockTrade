@@ -20,21 +20,22 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core.annotations;
 
-public class ValidatorException extends Exception {
-    public ValidatorException() {
-    }
+import com.balch.android.app.framework.core.EditState;
+import com.balch.android.app.framework.core.widget.EditLayout;
 
-    public ValidatorException(String detailMessage) {
-        super(detailMessage);
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public ValidatorException(String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
-    }
-
-    public ValidatorException(Throwable throwable) {
-        super(throwable);
-    }
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ColumnNew {
+    int labelResId();
+    EditState state() default EditState.CHANGEABLE;
+    String [] hints() default {};
+    int order();
+    Class<? extends EditLayout> customControl() default EditLayout.class;
 }

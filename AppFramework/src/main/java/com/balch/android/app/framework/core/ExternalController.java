@@ -20,12 +20,12 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 import android.content.Context;
 import android.os.Parcelable;
 
-import com.balch.android.app.framework.domain.widget.ControlMap;
+import com.balch.android.app.framework.core.widget.ControlMap;
 
 public interface ExternalController<T extends DomainObject> extends Parcelable {
 

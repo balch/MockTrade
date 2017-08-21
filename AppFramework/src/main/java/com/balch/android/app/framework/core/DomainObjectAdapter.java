@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 import android.content.Context;
 import android.widget.BaseAdapter;

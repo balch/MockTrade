@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 public class ViewHint {
 

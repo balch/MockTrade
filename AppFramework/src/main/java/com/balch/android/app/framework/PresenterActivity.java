@@ -39,17 +39,13 @@ import android.widget.TextView;
  *
  * @param <V> Type of BaseView to create
  */
-public abstract class PresenterActivity<V extends View & BaseView, M extends ModelProvider>
+public abstract class PresenterActivity<V extends View & BaseView, P extends BasePresenter>
         extends AppCompatActivity  {
     private static final String TAG = PresenterActivity.class.getSimpleName();
-    private static final String STATE_VIEW_ID = TAG + "_state_view_id";
 
     private String className;
 
-    private boolean isManagedViewId = false;
-    private int viewId = -1;
-
-    protected V view;
+    protected P presenter;
 
     /**
      * Override abstract method to create a view of type V used by the Presenter.
@@ -58,14 +54,7 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
      */
     protected abstract V createView();
 
-    /**
-     * Override abstract method to create any models needed by the Presenter. A class of type
-     * M is injected into this method to take advantage the Dependency Injection pattern.
-     * This mechanism is implemented by requiring the Application instance be of type M.
-
-     * @param modelProvider injected ModelProvider
-     */
-    protected abstract void createModel(M modelProvider);
+    protected abstract P createPresenter(V view);
 
     // override-able activity functions
     public void onCreateBase(Bundle savedInstanceState) {
@@ -112,21 +101,7 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
         Log.d(TAG, this.className + " OnCreate - Begin");
         try {
             super.onCreate(savedInstanceState);
-            this.view = this.createView();
-
-            // view's require an id for the internal state to be persisted/restored
-            // using onSaveInstanceState()/onRestoreInstanceState()
-            // this code assigns and manages the view id if necessary
-            isManagedViewId = (view.getId() <= 0);
-            if (isManagedViewId) {
-                if (savedInstanceState != null) {
-                    viewId = savedInstanceState.getInt(STATE_VIEW_ID, -1);
-                }
-                if (viewId == -1) {
-                    viewId = View.generateViewId();
-                }
-                view.setId(viewId);
-            }
+            V view = this.createView();
 
             this.setContentView(view);
 
@@ -134,7 +109,9 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
             if (!(application instanceof ModelProvider)) {
                 throw new IllegalStateException("Android Application object must be derived from Model Provider");
             }
-            this.createModel((M)application);
+
+            presenter = this.createPresenter(view);
+
             this.onCreateBase(savedInstanceState);
 
         } catch (Exception ex) {
@@ -181,10 +158,6 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
         Log.d(TAG, this.className + " onSaveInstanceState - Begin");
         try {
             super.onSaveInstanceState(outState);
-
-            if (isManagedViewId) {
-                outState.putInt(STATE_VIEW_ID, viewId);
-            }
             onSaveInstanceStateBase(outState);
         } catch (Exception ex) {
             if (!handleException("onSaveInstanceState ", ex)) {
@@ -231,6 +204,8 @@ public abstract class PresenterActivity<V extends View & BaseView, M extends Mod
         Log.d(TAG, this.className + " onDestroy - Begin");
         try {
             onDestroyBase();
+            presenter.cleanup();
+            presenter = null;
         } catch (Exception ex) {
             if (!handleException("onDestroy", ex)) {
                 throw ex;

@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.widget;
+package com.balch.android.app.framework.core.widget;
 
 import android.content.Context;
 import android.text.InputType;
@@ -28,8 +28,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.ViewHint;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.ViewHint;
 
 public class NumberEditLayout extends StringEditLayout {
 

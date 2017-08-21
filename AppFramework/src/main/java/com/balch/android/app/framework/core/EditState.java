@@ -20,22 +20,10 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain.annotations;
+package com.balch.android.app.framework.core;
 
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.widget.EditLayout;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ColumnEdit {
-    int labelResId();
-    EditState state() default EditState.CHANGEABLE;
-    String [] hints() default {};
-    int order();
-    Class<? extends EditLayout> customControl() default EditLayout.class;
+public enum EditState {
+    HIDDEN,
+    READONLY,
+    CHANGEABLE
 }

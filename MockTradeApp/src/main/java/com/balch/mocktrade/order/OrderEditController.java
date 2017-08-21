@@ -28,12 +28,12 @@ import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.balch.android.app.framework.domain.ColumnDescriptor;
-import com.balch.android.app.framework.domain.ExternalController;
-import com.balch.android.app.framework.domain.ValidatorException;
-import com.balch.android.app.framework.domain.widget.ControlMap;
-import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.domain.widget.EnumEditLayout;
+import com.balch.android.app.framework.core.ColumnDescriptor;
+import com.balch.android.app.framework.core.ExternalController;
+import com.balch.android.app.framework.core.ValidatorException;
+import com.balch.android.app.framework.core.widget.ControlMap;
+import com.balch.android.app.framework.core.widget.EditLayout;
+import com.balch.android.app.framework.core.widget.EnumEditLayout;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;

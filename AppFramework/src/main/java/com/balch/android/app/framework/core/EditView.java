@@ -20,7 +20,7 @@
  * Copyright (C) 2014
  */
 
-package com.balch.android.app.framework.domain;
+package com.balch.android.app.framework.core;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -32,10 +32,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.balch.android.app.framework.R;
-import com.balch.android.app.framework.domain.widget.ControlMap;
-import com.balch.android.app.framework.domain.widget.ControlMapper;
-import com.balch.android.app.framework.domain.widget.EditLayout;
-import com.balch.android.app.framework.domain.widget.UnsupportedEditLayout;
+import com.balch.android.app.framework.core.widget.ControlMap;
+import com.balch.android.app.framework.core.widget.ControlMapper;
+import com.balch.android.app.framework.core.widget.EditLayout;
+import com.balch.android.app.framework.core.widget.UnsupportedEditLayout;
 import com.balch.android.app.framework.BaseView;
 
 import java.lang.reflect.Field;
@@ -97,6 +97,11 @@ public class EditView extends LinearLayout implements BaseView, ControlMapper {
             }
         });
 
+    }
+
+    @Override
+    public void cleanup() {
+        listener = null;
     }
 
     @Override

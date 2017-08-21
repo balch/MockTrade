@@ -26,11 +26,11 @@ package com.balch.mocktrade.account;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.balch.android.app.framework.domain.MetadataUtils;
-import com.balch.android.app.framework.domain.DomainObject;
-import com.balch.android.app.framework.domain.EditState;
-import com.balch.android.app.framework.domain.annotations.ColumnEdit;
-import com.balch.android.app.framework.domain.annotations.ColumnNew;
+import com.balch.android.app.framework.core.MetadataUtils;
+import com.balch.android.app.framework.core.DomainObject;
+import com.balch.android.app.framework.core.EditState;
+import com.balch.android.app.framework.core.annotations.ColumnEdit;
+import com.balch.android.app.framework.core.annotations.ColumnNew;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.account.strategies.BaseStrategy;

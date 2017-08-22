@@ -119,6 +119,8 @@ public class OrderService extends IntentService {
                     portfolioModel.scheduleOrderServiceAlarm();
                 }
             }
+        } catch (Exception ex) {
+            Log.e(TAG, "OrderService Exception", ex);
         } finally {
             OrderReceiver.completeWakefulIntent(intent);
         }

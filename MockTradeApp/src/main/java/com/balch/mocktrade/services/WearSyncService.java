@@ -34,7 +34,6 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
@@ -118,7 +117,7 @@ public class WearSyncService extends IntentService implements
                 TradeModelProvider modelProvider = (TradeModelProvider) this.getApplication();
                 PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
                         modelProvider.getSqlConnection(),
-                        modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                        modelProvider.getFinanceModel(),
                         modelProvider.getSettings());
 
                 DataItemBuffer dataItems = Wearable.DataApi.getDataItems(googleApiClient).await();

@@ -43,6 +43,16 @@ android {
         }
     }
 
+    flavorDimensions "basic"
+
+    productFlavors {
+        demo {
+            resValue "string", "barchart_app_id", "8ff18220f7a48af2f0d1f1abe9c3c0d8"
+        }
+        secret {
+        }
+    }
+
     packagingOptions{
         exclude 'META-INF/rxjava.properties'
     }

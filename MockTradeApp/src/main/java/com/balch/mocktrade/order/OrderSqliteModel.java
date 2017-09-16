@@ -34,8 +34,7 @@ import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.account.Transaction;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
+import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.investment.InvestmentSqliteModel;
@@ -70,14 +69,14 @@ public class OrderSqliteModel implements SqlMapper<Order>, OrderModel, OrderMana
     private final OrderManager mOrderManager;
     private final SqlConnection sqlConnection;
 
-    public OrderSqliteModel(Context context, GoogleFinanceApi googleFinanceApi,
+    public OrderSqliteModel(Context context, FinanceModel financeModel,
                             SqlConnection sqlConnection, Settings settings) {
         this.sqlConnection = sqlConnection;
         this.mInvestmentModel = new InvestmentSqliteModel(sqlConnection);
-        this.mAccountModel = new AccountSqliteModel(context, googleFinanceApi,
+        this.mAccountModel = new AccountSqliteModel(context, financeModel,
                 sqlConnection, settings);
         this.mOrderManager = new OrderManager(context,
-                new GoogleFinanceModel(context, googleFinanceApi, settings),
+                financeModel,
                 settings, this);
     }
 

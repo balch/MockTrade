@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 5/21/17 6:35 AM
+ * Created: 9/11/17 8:54 PM
  *
  * This file is part of MockTrade.
  *
@@ -23,18 +23,13 @@
 
 package com.balch.mocktrade.finance;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface GoogleFinanceApi {
+public interface BarChartFinanceApi {
 
-    /**
-     * Note: This API returns the body as a string b/c
-     * the returned payload starts with `//` which
-     * must be trimmed before the json can be parsed
-     */
-    @GET("info?infotype=infoquoteall")
-    Observable<String> getQuotes(@Query("q") String symbols);
-
+    @GET("getQuote.json?mode=R&fields=symbol,name,exchange,lastPrice,tradeTimestamp,close,dividendYieldAnnual,mode")
+    Single<QuoteResult> getQuotes(@Query("symbols") String symbols,
+                                  @Query("apikey") String appKey);
 }

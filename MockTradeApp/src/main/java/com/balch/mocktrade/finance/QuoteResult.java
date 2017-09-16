@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 8/12/16 8:00 PM
+ * Created: 9/11/17 9:54 PM
  *
  * This file is part of MockTrade.
  *
@@ -17,27 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2016
+ * Copyright (C) 2017
  *
  */
 
-package com.balch.mocktrade;
+package com.balch.mocktrade.finance;
 
-import android.content.Context;
+import java.util.List;
 
-import com.balch.android.app.framework.ModelProvider;
-import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.settings.Settings;
+public class QuoteResult {
+    private List<Quote> quotes;
+    private String errorMessage;
+    private boolean success;
 
-public interface TradeModelProvider extends ModelProvider {
-    Context getContext();
+    QuoteResult(boolean success, List<Quote> quotes, String errorMessage) {
+        this.quotes = quotes;
+        this.errorMessage = errorMessage;
+        this.success = success;
+    }
 
-    Settings getSettings();
+    public List<Quote> getQuotes() {
+        return quotes;
+    }
 
-    SqlConnection getSqlConnection();
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 
-    ModelApiFactory getModelApiFactory();
-
-    FinanceModel getFinanceModel();
+    public boolean isSuccess() {
+        return success;
+    }
 }

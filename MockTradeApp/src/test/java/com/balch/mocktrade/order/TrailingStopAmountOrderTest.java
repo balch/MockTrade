@@ -27,7 +27,6 @@ import android.content.Context;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.Quote;
-import com.balch.mocktrade.finance.QuoteGeneric;
 import com.balch.mocktrade.settings.Settings;
 
 import org.junit.Test;
@@ -77,7 +76,7 @@ public class TrailingStopAmountOrderTest {
     }
 
     private static Quote createQuote(double price) {
-        Quote quote = new QuoteGeneric();
+        Quote quote = new Quote();
         quote.setPrice(new Money(price));
         return quote;
     }

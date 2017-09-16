@@ -32,16 +32,13 @@ import android.content.pm.PackageManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.balch.android.app.framework.BasePresenter;
 import com.balch.android.app.framework.types.Money;
 import com.balch.mocktrade.account.Account;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.order.Order;
 import com.balch.mocktrade.portfolio.AccountViewHolder;
@@ -71,6 +68,8 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         void startNewAccountActivity();
         void startOrderListActivity(Account account);
         void startNewOrderActivity(Order order, @StringRes int stringId);
+
+        void requestAccountDelete(Account account);
     }
 
     private Settings appSetting;
@@ -100,7 +99,7 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         if (!portfolioViewModel.isInitialized()) {
             portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
                     modelProvider.getSqlConnection(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getFinanceModel(),
                     modelProvider.getSettings());
             portfolioViewModel.setPortfolioModel(portfolioModel);
             portfolioViewModel.setAppSettings(appSetting);
@@ -115,7 +114,7 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         portfolioLiveData = portfolioViewModel.getPortfolioData(context);
         portfolioLiveData.observe(lifecycleOwner, portfolioDataObserver);
 
-        setupAdapter(context);
+        setupAdapter();
 
     }
 
@@ -157,6 +156,10 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         listener.showProgress(false);
     }
 
+    public void deleteAccount(Account account) {
+        portfolioModel.deleteAccount(account);
+        updateView();
+    }
 
     public boolean getHideExcludeAccounts() {
         return appSetting.getBoolean(Settings.Key.PREF_HIDE_EXCLUDE_ACCOUNTS);
@@ -215,26 +218,13 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         }
     }
 
-    protected void setupAdapter(final Context context) {
+    protected void setupAdapter() {
 
         portfolioAdapter = new PortfolioAdapter(appSetting, viewProvider);
         portfolioAdapter.setListener(new PortfolioAdapter.PortfolioAdapterListener() {
             @Override
             public boolean onLongClickAccount(final Account account) {
-                new AlertDialog.Builder(context)
-                        .setTitle(R.string.account_delete_dlg_title)
-                        .setMessage(String.format(context.getString(R.string.account_delete_dlg_message_format), account.getName()))
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
-                            try {
-                                portfolioModel.deleteAccount(account);
-                                updateView();
-                            } catch (Exception ex) {
-                                Log.e(TAG, "Error Deleting account", ex);
-                                Toast.makeText(context, "Error deleting account", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null).show();
+                listener.requestAccountDelete(account);
                 return true;
             }
 

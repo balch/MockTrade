@@ -34,8 +34,6 @@ import com.balch.mocktrade.TradeApplication;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.strategies.BaseStrategy;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
@@ -65,12 +63,10 @@ public class QuoteService extends IntentService {
 
             // get the investment list from the db
             TradeModelProvider modelProvider = ((TradeModelProvider) this.getApplication());
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
-                    modelProvider.getSettings());
+            FinanceModel financeModel = modelProvider.getFinanceModel();
             final PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
                     modelProvider.getSqlConnection(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    financeModel,
                     modelProvider.getSettings());
             final List<Investment> investments = portfolioModel.getAllInvestments();
             Settings settings = ((TradeModelProvider) this.getApplication()).getSettings();
@@ -94,7 +90,7 @@ public class QuoteService extends IntentService {
 
                 // get quotes over the wire
                 try {
-                    Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
+                    Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingGet();
                     if (quoteMap != null) {
                         boolean newHasQuotes = false;
                         for (Investment i : investments) {
@@ -162,7 +158,7 @@ public class QuoteService extends IntentService {
                     TradeModelProvider modelProvider = ((TradeModelProvider)this.getApplication());
                     BaseStrategy strategy = BaseStrategy.createStrategy(strategyClazz,
                             modelProvider.getContext(),
-                            modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                            modelProvider.getFinanceModel(),
                             modelProvider.getSqlConnection(),
                             modelProvider.getSettings());
                     if (doDailyUpdate) {

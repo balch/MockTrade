@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/4/14 12:26 AM
+ * Created: 9/11/17 10:11 PM
  *
  * This file is part of MockTrade.
  *
@@ -17,7 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with MockTrade.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2014
+ * Copyright (C) 2017
+ *
  */
 
 package com.balch.mocktrade.finance;
@@ -26,29 +27,53 @@ import com.balch.android.app.framework.types.Money;
 
 import java.util.Date;
 
-public interface Quote {
-    String getSymbol();
+public class Quote {
+    private String symbol;
+    private String name;
+    private String exchange;
+    private Money price;
+    private Date lastTradeTime;
+    private Money previousClose;
+    private Money dividendPerShare;
 
-    void setSymbol(String symbol);
+    public Quote(String symbol, String name,
+                  String exchange, Money price, Date lastTradeTime,
+                  Money previousClose, Money dividendPerShare) {
+        this.symbol = symbol;
+        this.name = name;
+        this.exchange = exchange;
+        this.price = price;
+        this.lastTradeTime = lastTradeTime;
+        this.previousClose = previousClose;
+        this.dividendPerShare = dividendPerShare;
+    }
 
-    String getName();
+    public Money getPrice() {
+        return this.price;
+    }
 
-    Money getPrice();
+    public String getSymbol() {
+        return this.symbol;
+    }
 
-    String getExchange();
+    public String getName() {
+        return this.name;
+    }
 
-    void setPrice(Money price);
+    public String getExchange() {
+        return this.exchange;
+    }
 
-    Date getLastTradeTime();
+    public Date getLastTradeTime() {
+        return this.lastTradeTime;
+    }
 
-    void setLastTradeTime(Date time);
+    public Money getPreviousClose() {
+        return this.previousClose;
+    }
 
-    Money getPreviousClose();
-
-    Money getDividendPerShare();
-
-    boolean isDelayed();
-
-    int getDelaySeconds();
+    public Money getDividendPerShare() {
+        return this.dividendPerShare;
+    }
 
 }

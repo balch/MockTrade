@@ -23,9 +23,7 @@
 
 package com.balch.mocktrade;
 
-import com.balch.mocktrade.finance.BarChartFinanceApi;
-import com.balch.mocktrade.finance.BarchartTypeAdapter;
-import com.balch.mocktrade.finance.QuoteResult;
+import com.balch.mocktrade.finance.YahooFinanceApi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -38,22 +36,21 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ModelApiFactory {
 
-    private final static String BARCHART_FINANCE_BASE_URL = "http://marketdata.websol.barchart.com/";
+    private final static String YAHOO_FINANCE_BASE_URL = "http://finance.yahoo.com/";
 
-    private BarChartFinanceApi barChartFinanceApi = null;
+    private YahooFinanceApi yahooFinanceApi = null;
 
     private final static Gson gson = new GsonBuilder()
-            .registerTypeAdapter(QuoteResult.class, new BarchartTypeAdapter())
             .create();
 
     @SuppressWarnings("unchecked")
     public <T> T getModelApi(Class<T> api) {
-        if (api == BarChartFinanceApi.class) {
-            if (barChartFinanceApi == null) {
-                barChartFinanceApi = getRetrofitService(BARCHART_FINANCE_BASE_URL)
-                        .create(BarChartFinanceApi.class);
+        if (api == YahooFinanceApi.class) {
+            if (yahooFinanceApi == null) {
+                yahooFinanceApi = getRetrofitService(YAHOO_FINANCE_BASE_URL)
+                        .create(YahooFinanceApi.class);
             }
-            return (T)barChartFinanceApi;
+            return (T) yahooFinanceApi;
         }
 
         return null;

@@ -90,7 +90,7 @@ public class QuoteService extends IntentService {
 
                 // get quotes over the wire
                 try {
-                    Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingGet();
+                    Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
                     if (quoteMap != null) {
                         boolean newHasQuotes = false;
                         for (Investment i : investments) {

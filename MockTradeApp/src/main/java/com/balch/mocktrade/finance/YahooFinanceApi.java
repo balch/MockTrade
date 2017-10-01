@@ -23,13 +23,28 @@
 
 package com.balch.mocktrade.finance;
 
-import io.reactivex.Single;
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface BarChartFinanceApi {
+public interface YahooFinanceApi {
 
-    @GET("getQuote.json?mode=R&fields=symbol,name,exchange,lastPrice,tradeTimestamp,close,dividendYieldAnnual,mode")
-    Single<QuoteResult> getQuotes(@Query("symbols") String symbols,
-                                  @Query("apikey") String appKey);
+    /**
+     * Get quotes from Yahoo download service
+     * See http://www.jarloo.com/yahoo_finance/
+     *
+     * s = Symbol
+     * x = Exchange
+     * l1 = Last Trade
+     * p = Previous Close
+     * d1 = Last Trade Date
+     * t1 = Last Trade Time (EST)
+     * d = Dividend Per Share
+     * n = Name
+     *
+     * @param symbols
+     * @return
+     */
+    @GET("d/quotes.csv?f=sxl1pd1t1dn")
+    Observable<String> getQuotes(@Query("s") String symbols);
 }

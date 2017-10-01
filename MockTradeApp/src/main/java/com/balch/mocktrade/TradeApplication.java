@@ -31,13 +31,15 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
-import com.balch.mocktrade.finance.BarChartFinanceApi;
-import com.balch.mocktrade.finance.BarChartFinanceModel;
 import com.balch.mocktrade.finance.FinanceModel;
+import com.balch.mocktrade.finance.FinanceModelImpl;
+import com.balch.mocktrade.finance.YahooFinanceApi;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.WearSyncService;
 import com.balch.mocktrade.settings.Settings;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,6 +67,8 @@ public class TradeApplication extends Application implements TradeModelProvider,
     @Override
     public void onCreate() {
         super.onCreate();
+
+        JodaTimeAndroid.init(this);
 
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -266,8 +270,8 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
     @Override
     public FinanceModel getFinanceModel() {
-        return new BarChartFinanceModel(this,
-                modelApiFactory.getModelApi(BarChartFinanceApi.class), getSettings());
+        return new FinanceModelImpl(this,
+                modelApiFactory.getModelApi(YahooFinanceApi.class), getSettings());
     }
 
 }

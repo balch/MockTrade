@@ -71,7 +71,7 @@ public class OrderService extends IntentService {
                     symbols.add(o.getSymbol());
                 }
 
-                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingGet();
+                Map<String, Quote> quoteMap = financeModel.getQuotes(symbols).blockingFirst();
                 boolean updateView = false;
                 boolean reschedule = (quoteMap == null);
                 if (quoteMap != null) {

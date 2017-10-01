@@ -26,13 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Single;
+import io.reactivex.Observable;
 
 public interface FinanceModel  {
 
-    Single<Map<String, Quote>> getQuotes(List<String> symbols);
+    Observable<Map<String, Quote>> getQuotes(List<String> symbols);
 
-    Single<Quote> getQuote(String symbol);
+    Observable<Quote> getQuote(String symbol);
 
     boolean isMarketOpen();
 

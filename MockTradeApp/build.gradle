@@ -43,15 +43,6 @@ android {
         }
     }
 
-    flavorDimensions "basic"
-
-    productFlavors {
-        demo {
-        }
-        secret {
-        }
-    }
-
     packagingOptions{
         exclude 'META-INF/rxjava.properties'
     }

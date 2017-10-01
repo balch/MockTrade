@@ -27,8 +27,6 @@ import android.content.Context;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.portfolio.PortfolioModel;
@@ -45,11 +43,11 @@ public abstract class BaseStrategy {
 
     public abstract void initialize(Account account);
 
-    private void init(Context context, GoogleFinanceApi googleFinanceApi,
+    private void init(Context context, FinanceModel financeModel,
                       SqlConnection sqlConnection, Settings settings) {
-        this.financeModel = new GoogleFinanceModel(context, googleFinanceApi, settings);
+        this.financeModel = financeModel;
         this.portfolioModel = new PortfolioSqliteModel(context, sqlConnection,
-                googleFinanceApi, settings);
+                financeModel, settings);
         this.context = context.getApplicationContext();
     }
 
@@ -66,11 +64,11 @@ public abstract class BaseStrategy {
     }
 
     static public BaseStrategy createStrategy(Class<? extends BaseStrategy> clazz,
-                      Context context, GoogleFinanceApi googleFinanceApi,
+                      Context context, FinanceModel financeModel,
                       SqlConnection sqlConnection, Settings settings)
             throws IllegalAccessException, InstantiationException {
         BaseStrategy baseStrategy = clazz.newInstance();
-        baseStrategy.init(context, googleFinanceApi, sqlConnection, settings);
+        baseStrategy.init(context, financeModel, sqlConnection, settings);
 
         return baseStrategy;
     }

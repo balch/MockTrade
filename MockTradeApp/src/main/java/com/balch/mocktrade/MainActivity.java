@@ -26,11 +26,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.balch.android.app.framework.PresenterActivity;
 import com.balch.android.app.framework.core.EditActivity;
@@ -129,7 +131,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, MainPrese
                                 colorId,
                                 android.support.design.R.id.snackbar_text)
                                 .show();
-
                     }
 
                     @Override
@@ -137,7 +138,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, MainPrese
                         ActivityCompat.requestPermissions(MainActivity.this,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                                 requestCode);
-
                     }
 
                     @Override
@@ -152,7 +152,24 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, MainPrese
                                 new OrderEditController(), R.string.order_edit_ok_button_new, 0);
 
                         startActivityForResult(intent, NEW_ORDER_RESULT);
+                    }
 
+                    @Override
+                    public void requestAccountDelete(Account account) {
+                        Context context = MainActivity.this;
+                        new AlertDialog.Builder(context)
+                                .setTitle(R.string.account_delete_dlg_title)
+                                .setMessage(String.format(context.getString(R.string.account_delete_dlg_message_format), account.getName()))
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                                    try {
+                                        presenter.deleteAccount(account);
+                                    } catch (Exception ex) {
+                                        Log.e(TAG, "Error Deleting account", ex);
+                                        Toast.makeText(context, "Error deleting account", Toast.LENGTH_LONG).show();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, null).show();
                     }
                 });
     }

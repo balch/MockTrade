@@ -32,12 +32,14 @@ import android.util.Log;
 
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
+import com.balch.mocktrade.finance.FinanceModelImpl;
+import com.balch.mocktrade.finance.YahooFinanceApi;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.WearSyncService;
 import com.balch.mocktrade.settings.Settings;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,6 +68,8 @@ public class TradeApplication extends Application implements TradeModelProvider,
     public void onCreate() {
         super.onCreate();
 
+        JodaTimeAndroid.init(this);
+
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
@@ -93,14 +97,12 @@ public class TradeApplication extends Application implements TradeModelProvider,
         }
 
         protected Void doInBackground(Void... urls) {
-            FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
-                    modelProvider.getSettings());
+            FinanceModel financeModel = modelProvider.getFinanceModel();
             financeModel.setQuoteServiceAlarm();
 
             PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
                     modelProvider.getSqlConnection(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    financeModel,
                     modelProvider.getSettings());
             portfolioModel.scheduleOrderServiceAlarmIfNeeded();
             return null;
@@ -264,6 +266,12 @@ public class TradeApplication extends Application implements TradeModelProvider,
     @Override
     public ModelApiFactory getModelApiFactory() {
         return modelApiFactory;
+    }
+
+    @Override
+    public FinanceModel getFinanceModel() {
+        return new FinanceModelImpl(this,
+                modelApiFactory.getModelApi(YahooFinanceApi.class), getSettings());
     }
 
 }

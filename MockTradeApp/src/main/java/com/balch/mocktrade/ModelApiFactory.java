@@ -23,7 +23,7 @@
 
 package com.balch.mocktrade;
 
-import com.balch.mocktrade.finance.GoogleFinanceApi;
+import com.balch.mocktrade.finance.YahooFinanceApi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -36,20 +36,21 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ModelApiFactory {
 
-    private final static String GOOGLE_FINANCE_BASE_URL = "http://www.google.com/finance/";
+    private final static String YAHOO_FINANCE_BASE_URL = "http://finance.yahoo.com/";
 
-    private GoogleFinanceApi googleFinanceApi = null;
+    private YahooFinanceApi yahooFinanceApi = null;
 
     private final static Gson gson = new GsonBuilder()
             .create();
 
     @SuppressWarnings("unchecked")
     public <T> T getModelApi(Class<T> api) {
-        if (api == GoogleFinanceApi.class) {
-            if (googleFinanceApi == null) {
-                googleFinanceApi = getRetrofitService(GOOGLE_FINANCE_BASE_URL).create(GoogleFinanceApi.class);
+        if (api == YahooFinanceApi.class) {
+            if (yahooFinanceApi == null) {
+                yahooFinanceApi = getRetrofitService(YAHOO_FINANCE_BASE_URL)
+                        .create(YahooFinanceApi.class);
             }
-            return (T)googleFinanceApi;
+            return (T) yahooFinanceApi;
         }
 
         return null;

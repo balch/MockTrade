@@ -35,11 +35,9 @@ import com.balch.android.app.framework.core.widget.ControlMap;
 import com.balch.android.app.framework.core.widget.EditLayout;
 import com.balch.android.app.framework.core.widget.EnumEditLayout;
 import com.balch.android.app.framework.types.Money;
-import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.R;
+import com.balch.mocktrade.TradeModelProvider;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,9 +83,7 @@ public class OrderEditController implements ExternalController<Order>, Parcelabl
         boolean controlEnabled = (order.getAction() == Order.OrderAction.BUY);
 
         TradeModelProvider modelProvider = ((TradeModelProvider)context.getApplicationContext());
-        FinanceModel financeModel = new GoogleFinanceModel(modelProvider.getContext(),
-                modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
-                modelProvider.getSettings());
+        FinanceModel financeModel = modelProvider.getFinanceModel();
 
         QuantityPriceLayout quantityControl = controlMap.get(Order.FLD_QUANTITY);
         quantityControl.setOrderInfo(order);

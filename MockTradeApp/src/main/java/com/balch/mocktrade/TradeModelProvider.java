@@ -27,6 +27,7 @@ import android.content.Context;
 
 import com.balch.android.app.framework.ModelProvider;
 import com.balch.android.app.framework.sql.SqlConnection;
+import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.settings.Settings;
 
 public interface TradeModelProvider extends ModelProvider {
@@ -38,4 +39,5 @@ public interface TradeModelProvider extends ModelProvider {
 
     ModelApiFactory getModelApiFactory();
 
+    FinanceModel getFinanceModel();
 }

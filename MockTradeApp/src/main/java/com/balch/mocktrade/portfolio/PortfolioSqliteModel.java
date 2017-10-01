@@ -30,8 +30,6 @@ import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.account.Account;
 import com.balch.mocktrade.account.AccountSqliteModel;
 import com.balch.mocktrade.finance.FinanceModel;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
-import com.balch.mocktrade.finance.GoogleFinanceModel;
 import com.balch.mocktrade.finance.Quote;
 import com.balch.mocktrade.investment.Investment;
 import com.balch.mocktrade.investment.InvestmentSqliteModel;
@@ -58,14 +56,14 @@ public class PortfolioSqliteModel implements PortfolioModel {
     private final SqlConnection sqlConnection;
 
     public PortfolioSqliteModel(Context context, SqlConnection sqlConnection,
-                                GoogleFinanceApi googleFinanceApi,
+                                FinanceModel financeModel,
                                 Settings settings) {
         this.sqlConnection = sqlConnection;
-        this.accountModel = new AccountSqliteModel(context, googleFinanceApi, sqlConnection, settings);
+        this.accountModel = new AccountSqliteModel(context, financeModel, sqlConnection, settings);
         this.investmentModel = new InvestmentSqliteModel(sqlConnection);
-        this.orderModel = new OrderSqliteModel(context, googleFinanceApi, sqlConnection, settings);
+        this.orderModel = new OrderSqliteModel(context, financeModel, sqlConnection, settings);
         this.snapshotTotalsModel = new SnapshotTotalsSqliteModel(sqlConnection, settings);
-        this.financeModel = new GoogleFinanceModel(context, googleFinanceApi, settings);
+        this.financeModel = financeModel;
     }
 
     @Override

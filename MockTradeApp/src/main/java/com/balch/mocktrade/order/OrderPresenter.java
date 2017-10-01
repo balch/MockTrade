@@ -33,7 +33,6 @@ import android.widget.Toast;
 import com.balch.android.app.framework.BasePresenter;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeModelProvider;
-import com.balch.mocktrade.finance.GoogleFinanceApi;
 
 import java.util.List;
 
@@ -62,7 +61,7 @@ public class OrderPresenter extends BasePresenter<OrderListView> {
 
         if (!orderViewModel.isInitialized()) {
             orderModel = new OrderSqliteModel(modelProvider.getContext(),
-                    modelProvider.getModelApiFactory().getModelApi(GoogleFinanceApi.class),
+                    modelProvider.getFinanceModel(),
                     modelProvider.getSqlConnection(),
                     modelProvider.getSettings());
             orderViewModel.setOrderModel(orderModel);

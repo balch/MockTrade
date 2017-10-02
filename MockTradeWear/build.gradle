@@ -73,6 +73,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':MockTradeShared')
     compile "com.google.android.support:wearable:$rootProject.ext.wearable"
+    compile "com.android.support:percent:$rootProject.ext.support"
+    compileOnly 'com.google.android.wearable:wearable:2.0.5'
+
+
     provided "com.google.android.wearable:wearable:$rootProject.ext.wearable"
     compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
 }

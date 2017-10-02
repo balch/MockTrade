@@ -5,20 +5,20 @@ ext {
     buildToolsVersion="26.0.1"
 
     applicationId="com.balch.mocktrade"
-    minSdkVersion=21
+    minSdkVersion=23
     targetSdkVersion=26
-    versionCode=4
-    versionName="3.0"
+    versionCode=5
+    versionName="3.1"
 
-    android_arch="1.0.0-alpha9"
+    android_arch="1.0.0-alpha9-1"
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
     rxjava2="2.1.0"
     rxandroid="2.0.1"
-    support="26.0.1"
-    play_services="11.0.2"
-    wearable="2.0.3"
+    support="26.1.0"
+    play_services="11.4.0"
+    wearable="2.0.5"
     joda="2.9.9"
     support_test="0.5"
     junit="4.12"

@@ -52,7 +52,7 @@ public class FinanceModelImpl implements FinanceModel {
     private final FinanceManager mFinanceManager;
 
     private static final DateTimeFormatter YAHOO_DATE_FORMAT = DateTimeFormat
-            .forPattern("MM/dd/yyyy HH:mma")
+            .forPattern("MM/dd/yyyy hh:mma")
             .withZone(DateTimeZone.forID("America/New_York"));
 
     public FinanceModelImpl(Context context, YahooFinanceApi financeApi,

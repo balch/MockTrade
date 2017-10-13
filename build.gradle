@@ -2,7 +2,7 @@
 
 ext {
     compileSdkVersion=26
-    buildToolsVersion="26.0.1"
+    buildToolsVersion="26.0.2"
 
     applicationId="com.balch.mocktrade"
     minSdkVersion=23
@@ -10,7 +10,7 @@ ext {
     versionCode=5
     versionName="3.1"
 
-    android_arch="1.0.0-alpha9-1"
+    android_arch="1.0.0-beta2"
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
@@ -35,7 +35,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta7'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -47,7 +47,6 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url 'https://maven.google.com' }
-
     }
 
 }

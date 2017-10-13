@@ -69,7 +69,6 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:$rxjava2"
     compile "io.reactivex.rxjava2:rxandroid:$rxandroid"
 
-    compile "android.arch.lifecycle:runtime:$android_arch"
     compile "android.arch.lifecycle:extensions:$android_arch"
     annotationProcessor "android.arch.lifecycle:compiler:$android_arch"
 

@@ -3,8 +3,6 @@ package com.balch.mocktrade;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,8 +44,7 @@ import com.balch.mocktrade.services.PerformanceItemUpdateBroadcaster;
 import com.balch.mocktrade.services.QuoteService;
 import com.balch.mocktrade.settings.SettingsActivity;
 
-public class MainActivity extends PresenterActivity<MainPortfolioView, MainPresenter>
-        implements LifecycleRegistryOwner {
+public class MainActivity extends PresenterActivity<MainPortfolioView, MainPresenter> {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int NEW_ACCOUNT_RESULT = 0;
@@ -55,8 +52,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, MainPrese
 
     private static final int PERMS_REQUEST_BACKUP = 0;
     private static final int PERMS_REQUEST_RESTORE = 1;
-
-    private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
     private MenuItem menuProgressBar;
     private MenuItem menuRefreshButton;
@@ -380,11 +375,6 @@ public class MainActivity extends PresenterActivity<MainPortfolioView, MainPrese
 
     private PortfolioViewModel getPortfolioViewModel() {
         return ViewModelProviders.of(this).get(PortfolioViewModel.class);
-    }
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
     }
 
 }

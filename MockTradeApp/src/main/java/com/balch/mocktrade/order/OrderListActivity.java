@@ -22,8 +22,6 @@
 
 package com.balch.mocktrade.order;
 
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -35,12 +33,9 @@ import com.balch.android.app.framework.PresenterActivity;
 import com.balch.mocktrade.R;
 import com.balch.mocktrade.TradeModelProvider;
 
-public class OrderListActivity extends PresenterActivity<OrderListView, OrderPresenter>
-        implements LifecycleRegistryOwner {
+public class OrderListActivity extends PresenterActivity<OrderListView, OrderPresenter> {
 
     private static final String EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID";
-
-    private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
     public static Intent newIntent(Context context, long accountId) {
         Intent intent = new Intent(context, OrderListActivity.class);
@@ -93,10 +88,5 @@ public class OrderListActivity extends PresenterActivity<OrderListView, OrderPre
 
     private OrderViewModel getOrderViewModel() {
         return ViewModelProviders.of(this).get(OrderViewModel.class);
-    }
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
     }
 }

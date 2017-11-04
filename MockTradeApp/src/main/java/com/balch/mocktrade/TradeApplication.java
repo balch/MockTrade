@@ -33,7 +33,7 @@ import android.util.Log;
 import com.balch.android.app.framework.sql.SqlConnection;
 import com.balch.mocktrade.finance.FinanceModel;
 import com.balch.mocktrade.finance.FinanceModelImpl;
-import com.balch.mocktrade.finance.YahooFinanceApi;
+import com.balch.mocktrade.finance.IEXFinanceApi;
 import com.balch.mocktrade.portfolio.PortfolioModel;
 import com.balch.mocktrade.portfolio.PortfolioSqliteModel;
 import com.balch.mocktrade.services.WearSyncService;
@@ -271,7 +271,7 @@ public class TradeApplication extends Application implements TradeModelProvider,
     @Override
     public FinanceModel getFinanceModel() {
         return new FinanceModelImpl(this,
-                modelApiFactory.getModelApi(YahooFinanceApi.class), getSettings());
+                modelApiFactory.getModelApi(IEXFinanceApi.class), getSettings());
     }
 
 }

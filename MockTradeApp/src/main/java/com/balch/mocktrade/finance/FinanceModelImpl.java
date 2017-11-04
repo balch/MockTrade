@@ -48,14 +48,14 @@ import io.reactivex.Observable;
 public class FinanceModelImpl implements FinanceModel {
     private static final String TAG = FinanceModelImpl.class.getSimpleName();
 
-    private final YahooFinanceApi financeApi;
+    private final IEXFinanceApi financeApi;
     private final FinanceManager mFinanceManager;
 
     private static final DateTimeFormatter YAHOO_DATE_FORMAT = DateTimeFormat
             .forPattern("MM/dd/yyyy hh:mma")
             .withZone(DateTimeZone.forID("America/New_York"));
 
-    public FinanceModelImpl(Context context, YahooFinanceApi financeApi,
+    public FinanceModelImpl(Context context, IEXFinanceApi financeApi,
                             Settings settings) {
         this.financeApi = financeApi;
         this.mFinanceManager = new FinanceManager(context.getApplicationContext(), settings);
@@ -74,7 +74,7 @@ public class FinanceModelImpl implements FinanceModel {
         String symbolString = getDelimitedSymbols(uniqueSymbols);
 
         return financeApi.getQuotes(symbolString)
-                .map(this::parseYahooQuotes)
+                .map(QuoteResult::getQuotes)
                 .map(quotes -> mapSymbolsToQuotes(quotes, uniqueSymbols));
     }
 

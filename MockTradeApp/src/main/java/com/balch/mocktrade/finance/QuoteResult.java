@@ -1,6 +1,6 @@
 /*
  * Author: Balch
- * Created: 9/11/17 8:54 PM
+ * Created: 11/4/17 10:54 AM
  *
  * This file is part of MockTrade.
  *
@@ -23,28 +23,22 @@
 
 package com.balch.mocktrade.finance;
 
-import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import java.util.List;
 
-public interface YahooFinanceApi {
+public class QuoteResult {
+    private final boolean success;
+    private final List<Quote> quotes;
 
-    /**
-     * Get quotes from Yahoo download service
-     * See http://www.jarloo.com/yahoo_finance/
-     *
-     * s = Symbol
-     * x = Exchange
-     * l1 = Last Trade
-     * p = Previous Close
-     * d1 = Last Trade Date
-     * t1 = Last Trade Time (EST)
-     * d = Dividend Per Share
-     * n = Name
-     *
-     * @param symbols
-     * @return
-     */
-    @GET("d/quotes.csv?f=sxl1pd1t1dn")
-    Observable<String> getQuotes(@Query("s") String symbols);
+    public QuoteResult(boolean success, List<Quote> quotes) {
+        this.success = success;
+        this.quotes = quotes;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public List<Quote> getQuotes() {
+        return quotes;
+    }
 }

@@ -23,7 +23,9 @@
 
 package com.balch.mocktrade;
 
-import com.balch.mocktrade.finance.YahooFinanceApi;
+import com.balch.mocktrade.finance.IEXFinanceApi;
+import com.balch.mocktrade.finance.IEXQuoteTypeAdapter;
+import com.balch.mocktrade.finance.QuoteResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -36,21 +38,22 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ModelApiFactory {
 
-    private final static String YAHOO_FINANCE_BASE_URL = "http://finance.yahoo.com/";
+    private final static String IEX_FINANCE_BASE_URL = "https://api.iextrading.com/1.0/";
 
-    private YahooFinanceApi yahooFinanceApi = null;
+    private IEXFinanceApi IEXFinanceApi = null;
 
     private final static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(QuoteResult.class, new IEXQuoteTypeAdapter())
             .create();
 
     @SuppressWarnings("unchecked")
     public <T> T getModelApi(Class<T> api) {
-        if (api == YahooFinanceApi.class) {
-            if (yahooFinanceApi == null) {
-                yahooFinanceApi = getRetrofitService(YAHOO_FINANCE_BASE_URL)
-                        .create(YahooFinanceApi.class);
+        if (api == IEXFinanceApi.class) {
+            if (IEXFinanceApi == null) {
+                IEXFinanceApi = getRetrofitService(IEX_FINANCE_BASE_URL)
+                        .create(IEXFinanceApi.class);
             }
-            return (T) yahooFinanceApi;
+            return (T) IEXFinanceApi;
         }
 
         return null;

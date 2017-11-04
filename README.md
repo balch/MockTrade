@@ -124,6 +124,11 @@ Tablet View
 
 
 ### Attributions
+
+* [IEX API 1.0](https://iextrading.com/developer/docs/#iex-api-1-0)
+    * Data provided for free by IEX!!!
+    * https://iextrading.com/api-exhibit-a
+
 * Awesome icon site: http://www.iconarchive.com/
     * [Ecommerce Business Icons by DesignContest](http://www.designcontest.com) 
         * http://creativecommons.org/licenses/by/4.0/

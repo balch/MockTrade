@@ -69,9 +69,7 @@ public class LimitOrderTest {
     }
 
     private static Quote createQuote(double price) {
-        Quote quote = new Quote();
-        quote.setPrice(new Money(price));
-        return quote;
+        return new Quote(new Money(price));
     }
 
     @Parameterized.Parameters

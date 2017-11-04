@@ -23,6 +23,8 @@
 
 package com.balch.mocktrade.finance;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.balch.android.app.framework.types.Money;
 
 import java.util.Date;
@@ -46,6 +48,11 @@ public class Quote {
         this.lastTradeTime = lastTradeTime;
         this.previousClose = previousClose;
         this.dividendPerShare = dividendPerShare;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    public Quote(Money price) {
+        this.price = price;
     }
 
     public Money getPrice() {

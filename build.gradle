@@ -10,7 +10,7 @@ ext {
     versionCode=5
     versionName="3.1"
 
-    android_arch="1.0.0-rc1"
+    android_arch="1.0.0"
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
@@ -22,7 +22,7 @@ ext {
     joda="2.9.9"
     support_test="0.5"
     junit="4.12"
-    mockito="1.10.19"
+    mockito="2.7.22"
 
 }
 

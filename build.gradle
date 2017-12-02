@@ -16,8 +16,8 @@ ext {
     retrofit="2.3.0"
     rxjava2="2.1.0"
     rxandroid="2.0.1"
-    support="27.0.0"
-    play_services="11.4.2"
+    support="27.0.2"
+    play_services="11.6.0"
     wearable="2.1.0"
     joda="2.9.9"
     support_test="0.5"
@@ -35,7 +35,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

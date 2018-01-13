@@ -72,12 +72,12 @@ dependencies {
     compile "android.arch.lifecycle:extensions:$android_arch"
     annotationProcessor "android.arch.lifecycle:compiler:$android_arch"
 
-    compile "com.android.support:support-v4:$rootProject.ext.support"
-    compile "com.android.support:appcompat-v7:$rootProject.ext.support"
-    compile "com.android.support:recyclerview-v7:$rootProject.ext.support"
-    compile "com.android.support:cardview-v7:$rootProject.ext.support"
-    compile "com.android.support:design:$rootProject.ext.support"
-    compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
+    compile "com.android.support:support-v4:$support"
+    compile "com.android.support:appcompat-v7:$support"
+    compile "com.android.support:recyclerview-v7:$support"
+    compile "com.android.support:cardview-v7:$support"
+    compile "com.android.support:design:$support"
+    compile "com.google.android.gms:play-services-wearable:$play_services"
 
     compile "net.danlew:android.joda:$joda"
 
@@ -85,9 +85,9 @@ dependencies {
     // Testing-only dependencies
 
     // Force usage of support annotations in the test app, since it is internally used by the runner module.
-    testCompile "com.android.support:support-annotations:$rootProject.ext.support"
-    testCompile "com.android.support.test:runner:$rootProject.ext.support_test"
-    testCompile "com.android.support.test:rules:$rootProject.ext.support_test"
-    testCompile "org.mockito:mockito-core:$rootProject.ext.mockito"
+    testCompile "com.android.support:support-annotations:$support"
+    testCompile "com.android.support.test:runner:$support_test"
+    testCompile "com.android.support.test:rules:$support_test"
+    testCompile "org.mockito:mockito-core:$mockito"
 }
 

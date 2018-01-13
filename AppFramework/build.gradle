@@ -29,13 +29,12 @@ artifacts {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:support-v4:$rootProject.ext.support"
-    compile "com.android.support:appcompat-v7:$rootProject.ext.support"
-    compile "com.android.support:design:$rootProject.ext.support"
+    compile "com.android.support:support-v4:$support"
+    compile "com.android.support:appcompat-v7:$support"
+    compile "com.android.support:design:$support"
 
-    testCompile "com.android.support.test:runner:$rootProject.ext.support_test"
-    testCompile "com.android.support.test:rules:$rootProject.ext.support_test"
-
-    testCompile "org.mockito:mockito-core:$rootProject.ext.mockito"
+    testCompile "com.android.support.test:runner:$support_test"
+    testCompile "com.android.support.test:rules:$support_test"
+    testCompile "org.mockito:mockito-core:$mockito"
 
 }

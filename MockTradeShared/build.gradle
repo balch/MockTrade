@@ -45,8 +45,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':AppFramework')
-    compile "com.android.support:appcompat-v7:$rootProject.ext.support"
-    compile "com.google.android.gms:play-services-wearable:$rootProject.ext.play_services"
+    compile "com.android.support:appcompat-v7:$support"
+    compile "com.google.android.gms:play-services-wearable:$play_services"
 
-    testCompile "junit:junit:$rootProject.ext.junit"
+    testCompile "junit:junit:$junit"
 }

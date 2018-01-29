@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 task generateSources (type: Jar) {
@@ -28,13 +32,11 @@ artifacts {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile "com.android.support:support-v4:$support"
     compile "com.android.support:appcompat-v7:$support"
     compile "com.android.support:design:$support"
-
     testCompile "com.android.support.test:runner:$support_test"
     testCompile "com.android.support.test:rules:$support_test"
     testCompile "org.mockito:mockito-core:$mockito"
-
 }

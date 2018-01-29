@@ -67,15 +67,17 @@ android {
             zipAlignEnabled true
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(path: ':MockTradeShared')
     compile "com.google.android.support:wearable:$wearable"
     compileOnly "com.google.android.wearable:wearable:$wearable"
-
     provided "com.google.android.wearable:wearable:$wearable"
     compile "com.google.android.gms:play-services-wearable:$play_services"
-
 }

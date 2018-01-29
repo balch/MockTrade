@@ -77,8 +77,8 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
     private PortfolioModel portfolioModel;
 
     private PortfolioViewModel portfolioViewModel;
-    LiveData<List<PerformanceItem>> performanceItemLiveData;
-    LiveData<PortfolioData> portfolioLiveData;
+    private LiveData<List<PerformanceItem>> performanceItemLiveData;
+    private LiveData<PortfolioData> portfolioLiveData;
 
     private PortfolioAdapter portfolioAdapter;
 
@@ -125,7 +125,7 @@ public class MainPresenter extends BasePresenter<MainPortfolioView> {
         listener.showProgress(false);
     };
 
-    private Observer<PortfolioData> portfolioDataObserver = data -> displayPortfolioData(data);
+    private Observer<PortfolioData> portfolioDataObserver = this::displayPortfolioData;
 
     private void displayPortfolioData(PortfolioData data) {
         PerformanceItem performanceItem = new PerformanceItem(-1, new Date(), new Money(), new Money(), new Money());

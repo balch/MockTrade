@@ -47,9 +47,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(path: ':AppFramework')
-    compile "com.android.support:appcompat-v7:$support"
-    compile "com.google.android.gms:play-services-wearable:$play_services"
-    testCompile "junit:junit:$junit"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    api project(path: ':AppFramework')
+    implementation "com.google.android.gms:play-services-wearable:$play_services"
+
+    testImplementation "junit:junit:$junit"
 }

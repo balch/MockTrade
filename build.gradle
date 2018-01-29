@@ -3,14 +3,14 @@
 ext {
     applicationId="com.balch.mocktrade"
     versionCode=6
-    versionName="3.2"
+    versionName="3.2.1"
 
     compileSdkVersion=26
     targetSdkVersion=25
     minSdkVersion=23
     buildToolsVersion="26.0.2"
 
-    android_arch="1.0.0"
+    android_arch="1.1.0"
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
@@ -18,7 +18,7 @@ ext {
     rxandroid="2.0.1"
     support="27.0.2"
     play_services="11.8.0"
-    wearable="2.1.0"
+    wearable="2.2.0"
     joda="2.9.9"
     support_test="0.5"
     junit="4.12"

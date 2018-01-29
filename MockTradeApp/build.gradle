@@ -55,39 +55,39 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     wearApp project(':MockTradeWear')
-    compile project(':AppFramework')
-    compile project(':MockTradeShared')
+    implementation project(':AppFramework')
+    implementation project(':MockTradeShared')
 
-    compile "com.google.code.gson:gson:$gson"
-    compile "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_xcepter"
+    implementation "com.google.code.gson:gson:$gson"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_xcepter"
 
-    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
-    compile "com.squareup.retrofit2:converter-gson:$retrofit"
-    compile "com.squareup.retrofit2:converter-scalars:$retrofit"
-    compile "io.reactivex.rxjava2:rxjava:$rxjava2"
-    compile "io.reactivex.rxjava2:rxandroid:$rxandroid"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava2"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid"
 
-    compile "android.arch.lifecycle:extensions:$android_arch"
+    implementation "android.arch.lifecycle:extensions:$android_arch"
     annotationProcessor "android.arch.lifecycle:compiler:$android_arch"
 
-    compile "com.android.support:support-v4:$support"
-    compile "com.android.support:appcompat-v7:$support"
-    compile "com.android.support:recyclerview-v7:$support"
-    compile "com.android.support:cardview-v7:$support"
-    compile "com.android.support:design:$support"
-    compile "com.google.android.gms:play-services-wearable:$play_services"
+    implementation "com.android.support:support-v4:$support"
+    implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:recyclerview-v7:$support"
+    implementation "com.android.support:cardview-v7:$support"
+    implementation "com.android.support:design:$support"
+    implementation "com.google.android.gms:play-services-wearable:$play_services"
 
-    compile "net.danlew:android.joda:$joda"
+    implementation "net.danlew:android.joda:$joda"
 
 
     // Testing-only dependencies
 
     // Force usage of support annotations in the test app, since it is internally used by the runner module.
-    testCompile "com.android.support:support-annotations:$support"
-    testCompile "com.android.support.test:runner:$support_test"
-    testCompile "com.android.support.test:rules:$support_test"
-    testCompile "org.mockito:mockito-core:$mockito"
+    testImplementation "com.android.support:support-annotations:$support"
+    testImplementation "com.android.support.test:runner:$support_test"
+    testImplementation "com.android.support.test:rules:$support_test"
+    testImplementation "org.mockito:mockito-core:$mockito"
 }
 

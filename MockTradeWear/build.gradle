@@ -74,10 +74,17 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(path: ':MockTradeShared')
-    compile "com.google.android.support:wearable:$wearable"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    api (project(path: ':MockTradeShared')) {
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-compat'
+        exclude group: 'com.android.support', module: 'support-fragment'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+        exclude group: 'com.android.support', module: 'support-core-ui'
+        exclude group: 'com.android.support', module: 'support-core-utils'
+    }
+    implementation "com.google.android.support:wearable:$wearable"
+    implementation "com.google.android.gms:play-services-wearable:$play_services"
+
     compileOnly "com.google.android.wearable:wearable:$wearable"
-    provided "com.google.android.wearable:wearable:$wearable"
-    compile "com.google.android.gms:play-services-wearable:$play_services"
 }

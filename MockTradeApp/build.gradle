@@ -68,14 +68,14 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$rxjava2"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid"
 
-    implementation "android.arch.lifecycle:extensions:$android_arch"
-    annotationProcessor "android.arch.lifecycle:compiler:$android_arch"
+    implementation "androidx.lifecycle:lifecycle-extensions:$android_arch"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$android_arch"
 
-    implementation "com.android.support:support-v4:$support"
-    implementation "com.android.support:appcompat-v7:$support"
-    implementation "com.android.support:recyclerview-v7:$support"
-    implementation "com.android.support:cardview-v7:$support"
-    implementation "com.android.support:design:$support"
+    implementation "androidx.legacy:legacy-support-v4:$support"
+    implementation "androidx.appcompat:appcompat:$support"
+    implementation "androidx.recyclerview:recyclerview:$support"
+    implementation "androidx.cardview:cardview:$cardview"
+    implementation "com.google.android.material:material:$support"
     implementation "com.google.android.gms:play-services-wearable:$play_services"
 
     implementation "net.danlew:android.joda:$joda"
@@ -84,9 +84,9 @@ dependencies {
     // Testing-only dependencies
 
     // Force usage of support annotations in the test app, since it is internally used by the runner module.
-    testImplementation "com.android.support:support-annotations:$support"
-    testImplementation "com.android.support.test:runner:$support_test"
-    testImplementation "com.android.support.test:rules:$support_test"
+    testImplementation "androidx.annotation:annotation:$support"
+    testImplementation "androidx.test:runner:$support_test"
+    testImplementation "androidx.test:rules:$support_test"
     testImplementation "org.mockito:mockito-core:$mockito"
 }
 

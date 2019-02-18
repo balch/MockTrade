@@ -32,11 +32,11 @@ artifacts {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.android.support:support-v4:$support"
-    implementation "com.android.support:appcompat-v7:$support"
-    implementation "com.android.support:design:$support"
+    implementation "androidx.legacy:legacy-support-v4:$support"
+    implementation "androidx.appcompat:appcompat:$support"
+    implementation "com.google.android.material:material:$support"
 
-    testImplementation "com.android.support.test:runner:$support_test"
-    testImplementation "com.android.support.test:rules:$support_test"
+    testImplementation "androidx.test:runner:$support_test"
+    testImplementation "androidx.test:rules:$support_test"
     testImplementation "org.mockito:mockito-core:$mockito"
 }

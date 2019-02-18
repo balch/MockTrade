@@ -9,17 +9,18 @@ ext {
     targetSdkVersion=28
     minSdkVersion=23
 
-    android_arch="1.1.0"
+    android_arch= '2.0.0-beta01'
     gson="2.8.0"
     okhttp_logging_xcepter="3.8.0"
     retrofit="2.3.0"
     rxjava2="2.1.0"
-    rxandroid="2.0.1"
-    support="27.0.2"
-    play_services="11.8.0"
-    wearable="2.2.0"
+    rxandroid="2.1.0"
+    support= '1.0.0-beta01'
+    cardview= '1.0.0'
+    play_services="16.0.1"
+    wearable="2.4.0"
     joda="2.9.9"
-    support_test="0.5"
+    support_test= '1.1.0-alpha4'
     junit="4.12"
     mockito="2.7.22"
 
@@ -47,6 +48,7 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url 'https://maven.google.com' }
+        google()
     }
 
 }

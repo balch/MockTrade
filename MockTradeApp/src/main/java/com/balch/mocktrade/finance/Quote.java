@@ -23,7 +23,7 @@
 
 package com.balch.mocktrade.finance;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import com.balch.android.app.framework.types.Money;
 

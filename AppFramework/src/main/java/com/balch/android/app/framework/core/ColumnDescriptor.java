@@ -22,7 +22,7 @@
 
 package com.balch.android.app.framework.core;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.balch.android.app.framework.core.widget.EditLayout;
 

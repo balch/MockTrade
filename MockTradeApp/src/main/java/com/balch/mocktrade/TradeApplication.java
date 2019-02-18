@@ -25,7 +25,6 @@ package com.balch.mocktrade;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
@@ -44,11 +43,12 @@ import net.danlew.android.joda.JodaTimeAndroid;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
-import java.util.Comparator;
+
+import io.reactivex.Completable;
+import io.reactivex.schedulers.Schedulers;
 
 public class TradeApplication extends Application implements TradeModelProvider, ViewProvider {
     private static final String TAG = TradeApplication.class.getSimpleName();
@@ -86,27 +86,18 @@ public class TradeApplication extends Application implements TradeModelProvider,
 
         startService(WearSyncService.getIntent(this, true, true, true, false));
 
-        new StartAlarmsTask(this).execute();
+        Completable.fromAction(this::startAlarms)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
-    private static class StartAlarmsTask extends AsyncTask<Void, Void, Void> {
-        private final TradeModelProvider modelProvider;
+    protected void startAlarms() {
+        FinanceModel financeModel = getFinanceModel();
+        financeModel.setQuoteServiceAlarm();
 
-        private StartAlarmsTask(TradeModelProvider modelProvider) {
-            this.modelProvider = modelProvider;
-        }
-
-        protected Void doInBackground(Void... urls) {
-            FinanceModel financeModel = modelProvider.getFinanceModel();
-            financeModel.setQuoteServiceAlarm();
-
-            PortfolioModel portfolioModel = new PortfolioSqliteModel(modelProvider.getContext(),
-                    modelProvider.getSqlConnection(),
-                    financeModel,
-                    modelProvider.getSettings());
-            portfolioModel.scheduleOrderServiceAlarmIfNeeded();
-            return null;
-        }
+        PortfolioModel portfolioModel = new PortfolioSqliteModel(this,
+                getSqlConnection(), financeModel, getSettings());
+        portfolioModel.scheduleOrderServiceAlarmIfNeeded();
     }
 
     @Override
@@ -218,20 +209,12 @@ public class TradeApplication extends Application implements TradeModelProvider,
             if (sd.canWrite()) {
                 File dbFile = context.getDatabasePath(TradeApplication.DATABASE_NAME);
 
-                File[] backups = sd.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return name.startsWith("1") &&
-                                name.endsWith("_" + TradeApplication.DATABASE_NAME);
-                    }
-                });
+                File[] backups = sd.listFiles((dir, name) -> name.startsWith("1") &&
+                        name.endsWith("_" + TradeApplication.DATABASE_NAME));
 
                 if (backups != null && backups.length > 1) {
-                    Arrays.sort(backups, new Comparator<File>() {
-                        @Override
-                        public int compare(File object1, File object2) {
-                            return object1.getName().compareTo(object2.getName());
-                        }
-                    });
+                    Arrays.sort(backups, (object1, object2) ->
+                            object1.getName().compareTo(object2.getName()));
                 }
 
                 if (backups != null) {

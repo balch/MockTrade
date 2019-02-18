@@ -25,9 +25,12 @@ package com.balch.android.app.framework;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.IdRes;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -234,7 +237,8 @@ public abstract class PresenterActivity<V extends View & BaseView, P extends Bas
         return Snackbar.make(parent, msg, length);
     }
 
-    public Snackbar getSnackbar(View parent, String msg, int length, int backgroundColorId) {
+    public Snackbar getSnackbar(View parent, String msg, int length,
+                                @ColorRes int backgroundColorId) {
         Snackbar snackbar = getSnackbar(parent, msg, length);
         ViewGroup group = (ViewGroup) snackbar.getView();
         group.setBackgroundColor(ContextCompat.getColor(this, backgroundColorId));
@@ -246,7 +250,9 @@ public abstract class PresenterActivity<V extends View & BaseView, P extends Bas
      * does not resolve in aar
      */
     public Snackbar getSnackbar(View parent, String msg, int length,
-                                int backgroundColorId, int textColorId, int snackBarTextId) {
+                                @ColorRes int backgroundColorId,
+                                @ColorRes int textColorId,
+                                @IdRes int snackBarTextId) {
         Snackbar snackbar = getSnackbar(parent, msg, length, backgroundColorId);
         ViewGroup group = (ViewGroup) snackbar.getView();
 

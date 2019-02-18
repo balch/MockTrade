@@ -24,8 +24,8 @@
 package com.balch.mocktrade.order;
 
 import android.app.AlertDialog;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;

@@ -37,7 +37,7 @@ public class TimePickerPreference extends DialogPreference {
     private int minute = 0;
     private TimePicker picker = null;
 
-    public TimePickerPreference(Context context, AttributeSet attrs) {
+    TimePickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setPositiveButtonText(R.string.picker_preference_positive);
@@ -55,8 +55,8 @@ public class TimePickerPreference extends DialogPreference {
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
 
-        this.picker.setCurrentHour(this.hour);
-        this.picker.setCurrentMinute(this.minute);
+        this.picker.setHour(this.hour);
+        this.picker.setMinute(this.minute);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class TimePickerPreference extends DialogPreference {
         super.onDialogClosed(positiveResult);
 
         if (positiveResult) {
-            this.hour = this.picker.getCurrentHour();
-            this.minute = this.picker.getCurrentMinute();
+            this.hour = this.picker.getHour();
+            this.minute = this.picker.getMinute();
 
             String time = String.valueOf(this.hour) + ":" + String.valueOf(this.minute);
 
@@ -82,13 +82,9 @@ public class TimePickerPreference extends DialogPreference {
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        String time = null;
-
-        if (restoreValue) {
-            time = this.getPersistedString((defaultValue != null)?defaultValue.toString():"00:00");
-        }  else {
-            time = this.getDefaultValue(defaultValue);
-        }
+        String time =  (restoreValue)
+            ? getPersistedString((defaultValue != null)?defaultValue.toString():"00:00")
+            : getDefaultValue(defaultValue);
 
         String[] parts = time.split(":");
 

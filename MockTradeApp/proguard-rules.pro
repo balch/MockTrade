@@ -16,8 +16,13 @@
 #   public *;
 #}
 
--keep class android.support.v4.app.** { *; }
--keep interface android.support.v4.app.** { *; }
+-keep class com.google.android.material.** { *; }
+-dontwarn com.google.android.material.**
+-dontnote com.google.android.material.**
+-dontwarn androidx.**
+-keep class androidx.** { *; }
+-keep interface androidx.** { *; }
+
 -keep class com.android.volley.** { *; }
 -keep interface com.android.volley.** { *; }
 

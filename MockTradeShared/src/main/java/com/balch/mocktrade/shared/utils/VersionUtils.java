@@ -33,7 +33,7 @@ public class VersionUtils {
         String version = "???";
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            version = pInfo.versionName + " (" + pInfo.versionCode + ")";
+            version = pInfo.versionName + " (" + pInfo.getLongVersionCode() + ")";
             if (isDebug) {
                 version += " - DEBUG";
             }
